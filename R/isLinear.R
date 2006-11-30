@@ -4,7 +4,7 @@ isLinear <- function(object, ...)
 isLinear.default <- function(object, ...)
   stop("no linearity tests available for this model")
 
-isLinear <- function(object, s_t) {
+isLinear.lstar <- function(object, s_t) {
 
     sampleSize <- length(object$yy);
     T <- object$n.used - object$m;  # The number of lagged samples

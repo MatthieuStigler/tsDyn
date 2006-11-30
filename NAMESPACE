@@ -9,8 +9,9 @@ autopairs, autotriples, autotriples.rgl,
 delta, delta.test, delta.lin, delta.lin.test,
 llar, llar.predict, llar.fitted,
 setar, lstar, availableModels, nlarDialog, 
-linear, nnetTs, aar, tarch)
+linear, isLinear, nnetTs, aar, tarch)
 S3method(extend, list)
+S3method(isLinear, lstar)
 S3method(toLatex, setar)
 S3method(plot, nlar)
 S3method(plot, setar)
