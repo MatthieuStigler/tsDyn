@@ -1,0 +1,116 @@
+-version 0.5-4 released
+-fixed some warnings issued in R-2.4.0 check script
+
+-version 0.5-3 released
+-fixed some warnings issued in R-devel check script
+-added URL field to DESCRIPTION
+
+-version 0.5-2 released
+-fixed gui design error in autopairs and autotriples
+
+-version 0.5-1 released
+-added draft of internal design vignette
+-minor fixes in vignette, added AAR model fitting example
+-fixed bug in setar and lstar (introduced in version 0.5)
+
+-version 0.5 released
+-added minor fixes for passing checks under R-2.3.0
+-added tsDyn package overview man page, with getting started indications
+-upgraded vignette to the new models usage
+-fixed bug in plot.llar
+-changed llar interface to nlar models schema
+-*eliminated* nlar function: now each model has its own function. Using more explicitely classes inheritance and polymorphism. Adding more nlar models now should be much simpler.
+
+-version 0.4-1 released
+-updated all package dialogs to the new GUI system
+-written a whole (basic) object oriented GUI system, with pass-by-reference semantics
+-added input checking to first dialog of nlarDialog()
+	
+-version 0.4 released
+-added hidden 'series' name argument to 'nlar'
+-added early version of nlarDialog, a GUI for 'nlar' model fitting
+-fixed latex apparence of some manual pages
+-fixed notational errors in vignette: Z_t=Z_{t-d}, z_t changed in Z_t in LSTAR model formulation
+-added nlar.fit class documentation
+-changed text entry with slide bar in autopairs and autotriples	
+-added availableModels function, upgraded docs	
+-added and documented aar model	
+-added and documented tarch model	
+-added and documented arch model
+	
+-version 0.3-5 released
+-largely improved apparence of regime-switching plot, changed palette for lstar diagnostic plots
+-added latex printing of fitted setar models
+	
+-version 0.3-4 released
+-changed lag-plots for setar and lstar models when more than 300 points are to be plotted
+-fixed notation error in vignette (equation (4) on neural networks)
+-deleted 0-lag in acf, pacf and ami summary plots for nlar.fit objects
+-extended threshold variable printing informations for setar and lstar models
+-added alternative selection criteria for selectSETAR
+-added regime proportions info in print.setar and summary.setar
+-added regime switching plot to plot.setar and plot.lstar
+-fixed graphical pars. resetting in plot.nlar.fit
+-added convenience wrappers 'setar' and 'lstar', improved relative documentation
+	
+-version 0.3-3 released
+-fixed minor bug in selectSETAR output presentation
+	
+-version 0.3-2 released
+-changed general AIC formula
+-added dummy (non-working), undocumented version of FAR (Functional AutoRegressive) model
+-added early, undocumented version of AAR (Additive AutoRegressive) model
+-modified selectSETAR, selectLSTAR, selectNNET functions: now more coherent results
+	
+-version 0.3-1 released
+-added autotriples.rgl (now also the rgl package is suggested)
+-added the possibility to stop the llar procedure
+-fixed y-scale in llar diagnostic plot
+-improved autotriples, upgraded vignette 
+	
+-version 0.3 released
+-added llar.predict and llar.fitted functions, improved llar output object
+
+-version 0.2-4 released
+-fixed vignette
+-fixed external variable management in predict.setar and predict.lstar
+
+-version 0.2-3 released
+-added vignette
+-improved SETAR and LSTAR models: now 'predict' interface is sensible to the type of threshold variable
+-fixed and exported delta, delta.test, delta.lin and delta.lin.test
+
+-version 0.2-2 released
+-added optional legend to plot.setar and plot.lstar
+
+-version 0.2-1 released
+-added autopairs and autotriples functions, with a minimal (optional) TclTk GUI
+
+-version 0.2 released
+-changed builtin nonlinear models documentation structure: now one page per model
+-added possibility of external threshold variables in setar models
+-added unexported delta tests of indipendence and linearity
+-added hidden tests in nlar-methods and llar man pages examples
+-improved summary method for linear and setar models
+-added llar routine, i.e., Casdagli test of nonlinearity
+
+-version 0.1-2 released
+-removed unuseful sum-of-squares functions
+-added selectSETAR, selectLSTAR and selectNNET functions, for automatic selection of model hyper-parameters
+-minor bug fixes
+-added 'predict' method to nlar.fit objects, subclasses linear, setar, lstar and nnet
+-fixed nlar.fit objects time series storage redundancy
+
+-version 0.1-1 released
+-added neural network model documentation
+-added dummy predict method to nlar.fit
+-minor bug fix in lstar model
+-added lstar and setar plot method
+-fixed lstar model documentation
+-bug fix in summary.lstar when embedding dimension is 1
+-bug fix in nlar and plot.setar when embedding dimension is 1
+-added dummy 'summary', 'print' and 'plot' function to nnet subclass
+-added utility 'sum-of-squares' functions for implemented models
+-added plot method to nlar.fit class
+
+- version 0.1: initial release
