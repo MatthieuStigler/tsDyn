@@ -1,32 +1,35 @@
 nlarDialog <- function(series){
-  require(tcltk)||stop("tcltk package required for displaying the GUI")
+    require(tcltk)||stop("tcltk package required for displaying the GUI")
 
-  models <- availableModels()
+    models <- availableModels()
 	vModel <- tclVar(models[1])
 
 	frMain <- Frame(opts=list(anchor="w"))
 	frTop <- Frame()
 	add(frTop, frMain)
 	add(frMain, Widget(opts=list(type="label", text="Model")))
-  for(i in 1:length(models))
-    add(frMain,Widget(opts=list(type="radiobutton", text=models[i], value=models[i], variable=vModel)))
 
-  onNext <- function() {
-    model <- as.character(tclObj(vModel))
-    tkdestroy(frRoot$tkvar)
-		fun <- get(paste("showDialog",model,sep="."))
-		fun(series)
-		return(invisible(NULL))
+    for(i in 1:length(models))
+        add(frMain, Widget(opts = list(type = "radiobutton", text=models[i], value=models[i], variable=vModel)))
+
+    onNext <- function() {
+        model <- as.character(tclObj(vModel))
+        tkdestroy(frRoot$tkvar)
+	    fun <- get(paste("showDialog",model,sep="."))
+	    fun(series)
+	    return(invisible(NULL))
 	}
-  onCancel <- function()
-    tkdestroy(frRoot$tkvar)
+
+    onCancel <- function()
+        tkdestroy(frRoot$tkvar)
 
 	frBottom <- makeButtonsFrame(list(Next=onNext, Cancel=onCancel))
 	frRoot <- Frame()
 	add(frRoot, frTop, frBottom)
 	buildDialog("nlar model fitting", frRoot)
 	cat("\n")
-  invisible(NULL)
+    invisible(NULL)
+
 }
 
 nlar.struct.Frame <- function(vM, vD, vSteps) {
@@ -62,14 +65,14 @@ namedSpinbox <- function(name, var, from, to, increment=1, width=4, ...) {
 }
 
 outputDialog <- function(oC) {
-  series <- oC$series
-  m <- oC$m
-  d <- oC$d
-  steps <- oC$steps
-  model <- oC$model
-  cl <- oC$cl #nlar function call
-  res <- eval(cl)
-  res$call <- NULL
-  assign("nlarModel", res, env=.GlobalEnv)
-  return( invisible( NULL ) )
+    series <- oC$series
+    m <- oC$m
+    d <- oC$d
+    steps <- oC$steps
+    model <- oC$model
+    cl <- oC$cl #nlar function call
+    res <- eval(cl)
+    res$call <- NULL
+    assign("nlarModel", res, env=.GlobalEnv)
+    return( invisible( NULL ) )
 }
