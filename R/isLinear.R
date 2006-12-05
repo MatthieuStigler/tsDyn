@@ -10,7 +10,8 @@ isLinear <- function(object, ...)
 isLinear.default <- function(object, ...)
   stop("no linearity tests available for this model")
 
-isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE) {
+isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE, ...)
+{
 
 # Reading function arguments  
   
@@ -61,7 +62,7 @@ isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE) {
 # Parameters read
   
   sampleSize <- length(object$yy);
-  T <- object$n.used - object$m;  # The number of lagged samples
+  T <- NROW(object$xx);  # The number of lagged samples
   
   # Build the regressand vector
   y_t <- object$yy;
