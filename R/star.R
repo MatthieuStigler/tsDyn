@@ -23,9 +23,9 @@
 #       transFunct[i]: vector with the parameters of tr. function i.
 #	trace: should infos be printed?
 #	control: 'control' options to be passed to optim
-star <- function(x, m, d=1, steps=d, series,
-                  maxRegressors, noRegimes, phi, transFunct,
-                  mTh, thDelay, thVar, trace=TRUE, control=list())
+star <- function(x, m, noRegimes, d=1, steps=d, series,
+                  maxRegressors, phi, transFunct,
+                  mTh, thDelay=1, thVar, trace=TRUE, control=list())
 {
 
   if(missing(m))
@@ -80,6 +80,7 @@ star <- function(x, m, d=1, steps=d, series,
   }
 
   if(missing(transFunct)) {
+    transFunct <- array(0, c(noRegimes, 2))
     range <- range(z)
     transFunct[1:noRegimes,1] <-
       range[1] + ((range[2] - range[1]) / (noRegimes)) * (0:(noRegimes-1))
@@ -95,21 +96,29 @@ star <- function(x, m, d=1, steps=d, series,
   #y: variable
   #g: smoothing parameter
   #c: threshold value
-  G <- function(y, g, c) {
-    plogis(y, c, 1/g)
+  G <- function(z, g, c) {
+    if((length(c) > 1) && (length(g) > 1))
+      t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
+    else
+      plogis(z, c, 1/g)
   }
-  
+
   #Sum of squares function
   #p: vector of parameters
-  SS <- function(p) {
-    # Extract parameters from p into phi and transFunct again
-    int_phi <- p[1:(noRegimes*(m+1))]
-    dim(int_phi) <- c(noRegimes, m+1)
+  SS <- function(transFunct) {
+    dim(transFunct) <- c(noRegimes, 2)
     
-    int_transFunct <- p[(noRegimes*(m+1) + 1):length(p)]
-    dim(int_transFunct) <- c(noRegimes,2)
-    
-    y.hat <- F(int_phi,int_transFunct)
+    # We first fix the linear parameters before optimizing the nonlinear.
+    tmp <- rep(cbind(1,xx), noRegimes)
+    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+    for (i in 1:noRegimes) 
+      tmp[,,i] <- tmp[,,i] * G(z, transFunct[i,2], transFunct[i,1])
+
+    new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(new_phi) <- c(noRegimes, m + 1)
+
+    # Now we return the sum of squares
+    y.hat <- F(new_phi, transFunct)
     crossprod(yy - y.hat)
   }
  
@@ -119,21 +128,23 @@ star <- function(x, m, d=1, steps=d, series,
   F <- function(phi, transFunct) {
     local <- array(0, c(noRegimes, T))
     int_xx <- cbind(1, xx)
-    for (i in 1:noRegimes) {
-      local[i,] <- (int_xx %*% phi[i,]) * G(z, transFunct[i,2], transFunct[i,1])
-    }
+    for (i in 1:noRegimes) 
+      local[i,] <-
+        (int_xx %*% phi[i,]) * G(z, transFunct[i,2], transFunct[i,1])
 
-#    res <- 1:T
-#    for (i in 1:T) 
-#      res[i] <- sum(local[1:noRegimes,i])
     result <- apply(local, 2, sum)
     result
-
   }
   
 #Numerical optimization##########
-  p <- c(phi, transFunct)		#pack parameters in one vector
+  if(trace) 
+    cat('Optimizing...')
+
+  p <- as.vector(transFunct)
   res <- optim(p, SS, hessian = TRUE, control = control)
+  
+  if(trace) 
+    cat(' Done.\n')
 
   if(trace)
     if(res$convergence!=0)
@@ -143,10 +154,16 @@ star <- function(x, m, d=1, steps=d, series,
 ################################
   
   #Results storing################
-  res$coefficients <- res$par
-  res$phi <- p[1:(noRegimes*(m+1))]
+  tmp <- rep(cbind(1,xx), noRegimes)
+  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+  for (i in 1:noRegimes) 
+    tmp[,,i] <- tmp[,,i] * G(z, transFunct[i,2], transFunct[i,1])
+  
+  res$phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
   dim(res$phi) <- c(noRegimes, m+1)
-  res$transFunct <- p[(noRegimes*(m+1) + 1):length(p)]
+  res$coefficients <- c(res$phi, res$par)
+  
+  res$transFunct <- res$par
   dim(res$transFunct) <- c(noRegimes,2)
     
   res$m <- m
@@ -162,10 +179,11 @@ star <- function(x, m, d=1, steps=d, series,
   }
 
   res$thVar <- z
-  res$fitted <- F(res$coef[1:(mL+1)], res$coef[(mL+2):(mL+mH+2)], 
-                  res$coef[mL+mH+3], res$coef[mL+mH+4])
+  
+  res$fitted <- F(res$phi, res$transFunct)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
+
   res$k <- length(res$coefficients)
   
 ################################
@@ -177,4 +195,3 @@ star <- function(x, m, d=1, steps=d, series,
                      k   =res$k,
                      model.specific=res), "star"))
 }
-

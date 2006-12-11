@@ -48,13 +48,15 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if(thDelay>=m) 
       stop(paste("thDelay too high: should be < m (=",m,")"))
     z <- xx[,thDelay+1]
-  } else if(!missing(mTh)) {
+  }
+  else if(!missing(mTh)) {
     if(length(mTh) != m) 
       stop("length of 'mTh' should be equal to 'm'")
     z <- xx %*% mTh #threshold variable
     dim(x) <- NULL
-  } else if(!missing(thVar)) {
-    if(length(thVar)>nrow(xx)) {
+  }
+  else if(!missing(thVar)) {
+    if(length(thVar) > nrow(xx)) {
       z <- thVar[1:nrow(xx)]
       if(trace) 
         cat("Using only first", nrow(xx), "elements of thVar\n")
@@ -62,7 +64,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     else 
       z <- thVar
     externThVar <- TRUE
-  } else {
+  }
+  else {
     if(trace) 
       cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
