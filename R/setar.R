@@ -27,8 +27,8 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
   if(missing(series))
     series <- deparse(substitute(x))
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	xx <- str$xx
-	yy <- str$yy
+	xx <- getXX(str)
+	yy <- getYY(str)
 	externThVar <- FALSE
 	if (missing(mL)) {
 		mL <- m
@@ -166,7 +166,7 @@ summary.setar <- function(object, ...) {
 	ans$fixedTh <- mod$fixedTh
 	ans$externThVar <- mod$externThVar
 	ans$lowRegProp <- mod$lowRegProp
-	n <- object$str$n.used
+	n <- getNUsed(object$str)
 	coef <- object$coef[-length(object$coef)]
 	p <- length(coef)
 	resvar <- mse(object)*n/(n-p)
@@ -212,13 +212,13 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 	par(ask=ask)
 	NextMethod(ask=ask, ...)
 	str <- x$str
-	xx <- str$xx
-	yy <- str$yy
+	xx <- getXX(str)
+	yy <- getYY(str)
 	nms <- colnames(xx)
 	m <- str$m
 	d <- str$d
 	lags <- c((0:(m-1))*(-d), str$steps)
-	xxyy <- cbind(xx,yy)	#construct design matrix
+	xxyy <- getXXYY(str)
 	x.old <- x
 	x <- c(x, x$model.specific)
 	series <- str$x

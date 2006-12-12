@@ -18,7 +18,7 @@
 #Neural Network fitter
 nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) {
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	args <- c(list(str$xx, str$yy, size=size, linout=TRUE), list(control=control))
+	args <- c(list(getXX(str), getYY(str), size=size, linout=TRUE), list(control=control))
 	res <- do.call(nnet::nnet, args)
 	res$k <- length(res$wts)
 	res$fitted <- res$fitted.values	

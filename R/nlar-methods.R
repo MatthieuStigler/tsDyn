@@ -42,6 +42,28 @@ nlar.struct <- function(x, m, d=1, steps=d, series) {
          xx=xxyy[,1:m,drop=FALSE], yy=xxyy[,m+1], n.used=length(x))
 }
 
+getXXYY <- function(obj, ...) UseMethod("getXXYY")
+
+getXXYY.nlar.struct <- function(obj, ...) {
+	x <- obj$x
+	m <- obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getXX <- function(obj, ...)
+	getXXYY(obj,...)[ , 1:obj$m , drop=FALSE]
+
+getYY <- function(obj, ...)
+	getXXYY(obj, ...)[ , obj$m+1]
+
+getNUsed <- function(obj, ...)
+	UseMethod("getNUsed")
+
+getNUsed.nlar.struct <- function(obj, ...)
+	length(obj$x)
+
 #non-linear autoregressive model fitting
 #str: result of a call to nlar.struct
 nlar <- function(str, coefficients, fitted.values, residuals, k,

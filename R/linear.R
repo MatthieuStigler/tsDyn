@@ -19,8 +19,8 @@
 #str: call to nlar.struct
 linear <- function(x, m, d=1, steps=d, series) {
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	xx <- str$xx
-	yy <- str$yy
+	xx <- getXX(str)
+	yy <- getYY(str)
 	xx <- cbind(1,xx)
 	colnames(xx) <- c("(intercept)", paste("phi",1:(ncol(xx)-1), sep="."))
 	res <- lm.fit(xx, yy)
