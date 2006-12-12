@@ -1,4 +1,4 @@
-## Copyright (C) 2005/2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2005, 2006/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -169,9 +169,12 @@ plot.nlar <- function(x, ask = interactive(), ...) {
   invisible(x)
 }
 
-predict.nlar <- function(object, newdata, n.ahead=1, ...) {
+predict.nlar <- function(object, newdata, n.ahead=1, ...)
+{
+
   if(missing(newdata)) 
     newdata <- object$str$x
+
   res <- newdata
   n.used <- length(res)
   m <- object$str$m
@@ -181,11 +184,16 @@ predict.nlar <- function(object, newdata, n.ahead=1, ...) {
   class(res) <- NULL
   res <- c(res, rep(0, n.ahead))
   xrange <- (m-1)*d + steps - ((m-1):0)*d
-  for(i in (n.used+ 1:n.ahead))
-    res[i] <- oneStep(object, newdata = t(as.matrix(res[i - xrange])), itime=(i-n.used), ...)
+
+  for(i in (n.used + 1:n.ahead))
+    res[i] <- oneStep(object, newdata = t(as.matrix(res[i - xrange])),
+                      itime=(i - n.used), ...)
+
   pred <- res[n.used + 1:n.ahead]
-  pred <- ts(pred, start = tsp(newdata)[2] + deltat(newdata), frequency=frequency(newdata))
+  pred <- ts(pred, start = tsp(newdata)[2] + deltat(newdata),
+             frequency=frequency(newdata))
   return(pred)
+  
 }
 
 oneStep <- function(object, newdata, ...)
