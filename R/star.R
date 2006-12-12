@@ -166,10 +166,8 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
 ################################
   
   #Results storing################
-  res$coefficients <- c(phi_1, phi_2)
   res$phi_1 <- phi_1
   res$phi_2 <- phi_2
-  res$m <- m
   res$externThVar <- externThVar
 
   if(!externThVar) {
@@ -182,16 +180,16 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
 
   res$thVar <- z
   
-  res$fitted <- F(res$phi_1, res$phi_2)
-  res$residuals <- yy - res$fitted
-  dim(res$residuals) <- NULL	#this should be a vector, not a matrix
+  fitted <- F(phi_1, phi_2)
+  residuals <- yy - fitted
+  dim(residuals) <- NULL	#this should be a vector, not a matrix
 
-  res$k <- length(res$coefficients)
+  res$noRegimes <- noRegimes
   
   return(extend(nlar(str, 
-                     coef=res$coef,
-                     fit =res$fitted,
-                     res =res$residuals,
+                     coef= res$coef,
+                     fit = fitted,
+                     res = residuals,
                      k   =res$k,
                      model.specific=res), "star"))
 }
@@ -230,15 +228,6 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
     result <- accum
   }
   
-#  z <- plogis(z, th, 1/gamma)
-
-#  if(nrow(newdata)>1) {
-#    xL <- cbind(1,newdata[,1:mL])
-#    xH <- cbind(1,newdata[,1:mH])
-#  } else {
-#    xL <- c(1,newdata[,1:mL])
-#    xH <- c(1,newdata[,1:mH])
-#  }
-#  (xL %*% phi1) * z + (xH %*% phi2) * (1-z)
 }
+
 

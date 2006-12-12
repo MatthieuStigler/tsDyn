@@ -93,25 +93,10 @@ isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE, ...)
   lmStatTaylor1 <- pf(F_1, m, T - m - n, lower.tail = FALSE);
   
   # Regress y_t on the restrictions and compute the RSS
-  aux_data2 <- data.frame(y_t = y_t, a = x_t, b = x_t * s_t,
-                          c = x_t * s_t^2, d = x_t * s_t^3)
-  aux_regression2 <- lm(y_t ~ ., data=aux_data2)
-  SSR2 <- sum(aux_regression2$residuals^2);
-  
-  # Compute the third order statistic
-  n <- object$m + 1;
-  m <- dim(aux_data2)[2] - n;
-  F_2 = ((SSR0 - SSR2) / m) / (SSR2 / (T - m - n));
-  
-  # Look up the statistic in the table, get the p-value
-  lmStatTaylor3 <- pf(F_2, m, T - m - n, lower.tail = FALSE);
-  
-  # Regress y_t on the restrictions and compute the RSS
   aux_data3 <- data.frame(y_t = y_t, a = x_t, b = x_t * s_t,
-                          c = x_t * s_t^2, d = x_t * s_t^3,
-                          e = x_t * s_t^4, d = x_t * s_t^5)
+                          c = x_t * s_t^2, d = x_t * s_t^3)
   aux_regression3 <- lm(y_t ~ ., data=aux_data3)
-  SSR3 <- sum(aux_regression2$residuals^2);
+  SSR3 <- sum(aux_regression3$residuals^2);
   
   # Compute the third order statistic
   n <- object$m + 1;
@@ -119,7 +104,22 @@ isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE, ...)
   F_3 = ((SSR0 - SSR3) / m) / (SSR3 / (T - m - n));
   
   # Look up the statistic in the table, get the p-value
-  lmStatTaylor5 <- pf(F_3, m, T - m - n, lower.tail = FALSE);
+  lmStatTaylor3 <- pf(F_3, m, T - m - n, lower.tail = FALSE);
+  
+  # Regress y_t on the restrictions and compute the RSS
+  aux_data5 <- data.frame(y_t = y_t, a = x_t, b = x_t * s_t,
+                          c = x_t * s_t^2, d = x_t * s_t^3,
+                          e = x_t * s_t^4, d = x_t * s_t^5)
+  aux_regression5 <- lm(y_t ~ ., data=aux_data5)
+  SSR5 <- sum(aux_regression5$residuals^2);
+  
+  # Compute the fifth order statistic
+  n <- object$m + 1;
+  m <- dim(aux_data5)[2] - n;
+  F_5 = ((SSR0 - SSR5) / m) / (SSR5 / (T - m - n));
+  
+  # Look up the statistic in the table, get the p-value
+  lmStatTaylor5 <- pf(F_5, m, T - m - n, lower.tail = FALSE);
   
   c(firstOrderTest = lmStatTaylor1, thirdOrderTest = lmStatTaylor3,
     fifthOrderTest = lmStatTaylor5)
