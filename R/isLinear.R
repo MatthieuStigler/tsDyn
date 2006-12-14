@@ -15,7 +15,6 @@ isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE, ...)
 
 # Reading function arguments  
   
-#  str <- tsDyn:::nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
   externThVar <- FALSE
   
   if(!missing(thDelay)) {

@@ -28,6 +28,14 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
                   mTh, thDelay=1, thVar, trace=TRUE, control=list())
 {
 
+  if(noRegimes == 1) {
+    # return a linear model
+  }
+ 
+  if(noRegimes == 2) {
+    # return an LSTAR model
+  } 
+
   if(missing(m))
     m <- max(maxRegressors, thDelay+1)
 
@@ -89,7 +97,7 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
       cat('Missing starting transition values. Using uniform distribution.\n')
     }
   }
-  
+
 #############################################
 
   #Logistic transition function
@@ -190,7 +198,8 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
                      coef= res$coef,
                      fit = fitted,
                      res = residuals,
-                     k   =res$k,
+                     k   = length(as.vector(phi_1)) +
+                                 length(as.vector(phi_2)),
                      model.specific=res), "star"))
 }
 
@@ -231,3 +240,109 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
 }
 
 
+# Tests (within the LM framework), being the null hypothesis H_0 that the
+#    model 'object' is complex enough and the alternative H_1 that an extra
+#    regime should be considered.
+#
+# object: a STAR model already built with at least 2 regimes.
+#
+# returns the p-values of the F statistics (from 1st to 5th order)
+addRegime <- function(object, ...)
+{
+
+  str <- object$str
+#  if(object$model.specific$noRegimes < 2)
+    # 
+  
+  T <- NROW(str$xx);  # The number of lagged samples
+  
+  #Logistic transition function
+  #y: variable
+  #g: smoothing parameter
+  #c: threshold value
+  G <- function(z, g, c) {
+    if((length(c) > 1) && (length(g) > 1))
+      t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
+    else
+      plogis(z, c, 1/g)
+  }
+
+  # Build the regressand vector
+  y_t <- str$yy;
+  
+  # Build the regressors matrix
+  if (object$model.specific$externThVar) {
+    x_t <- cbind(1, str$xx)
+  } else x_t <- str$xx
+
+  # Get the transition variable
+  s_t <- object$model.specific$thVar
+
+  # Get the residuals
+  e_t <- object$residuals
+  
+  # Build the Gradient Matrix (w/o derivative terms)
+  gmatrix <- x_t
+  for (i in 2:object$model.specific$noRegimes) {
+    gmatrix <- cbind(gmatrix, x_t *
+                     G(s_t, object$model$phi_2[i,2],
+                       object$model$phi_2[i,1])
+#                     , phi_1 * x_t * dGdc() deriv G / deriv c
+#                     , phi_1 * x_t * dGds() dG / d sigma
+                   )
+  }
+  
+  # 1. Regress the residuals on the gradient matrix, get SSR0
+  regression1 <- lm(e_t ~ ., data=data.frame(gmatrix));
+  SSR0 <- sum(regression1$residuals^2);
+  
+  # 2. Regress the residuals of regression1 on the gmatrix and on 
+  aux_data1 <- data.frame(gmatrix = gmatrix, a = x_t, b = x_t * s_t);
+  aux_regression1 <- lm(regression1$residuals ~ ., data=aux_data1);
+  SSR1 <- sum(aux_regression1$residuals^2);
+  
+  # 3. Compute the first order statistic
+  n <- object$k # (number of parameters under the null)
+  m <- dim(aux_data1)[2] - dim(gmatrix)[2];
+  F_1 <- ((SSR0 - SSR1) / m) / (SSR1 / (T - n - m));
+  cat("Degrees of freedom: n = ",n,", m = ",m,"\n")
+  
+  # Look up the statistic in the table, get the p-value
+  lmStatTaylor1 <- pf(F_1, m, T - m - n, lower.tail = FALSE);
+  
+  # Regress y_t on the restrictions and compute the RSS
+  aux_data3 <- data.frame(gmatrix = gmatrix, a = x_t, b = x_t * s_t,
+                          c = x_t * s_t^2, d = x_t * s_t^3)
+  aux_regression3 <- lm(y_t ~ ., data=aux_data3)
+  SSR3 <- sum(aux_regression3$residuals^2);
+  
+  # Compute the third order statistic
+  n <- object$k;
+  m <- dim(aux_data1)[2] - dim(gmatrix)[2];
+#  m <- dim(aux_data3)[2] - n;
+  F_3 = ((SSR0 - SSR3) / m) / (SSR3 / (T - m - n));
+  
+  # Look up the statistic in the table, get the p-value
+  lmStatTaylor3 <- pf(F_3, m, T - m - n, lower.tail = FALSE);
+  
+  # Regress y_t on the restrictions and compute the RSS
+  aux_data5 <- data.frame(gmatrix = gmatrix, a = x_t, b = x_t * s_t,
+                          c = x_t * s_t^2, d = x_t * s_t^3,
+                          e = x_t * s_t^4, d = x_t * s_t^5)
+  aux_regression5 <- lm(y_t ~ ., data=aux_data5)
+  SSR5 <- sum(aux_regression5$residuals^2);
+  
+  # Compute the fifth order statistic
+  n <- object$k;
+  m <- dim(aux_data1)[2] - dim(gmatrix)[2];
+#  m <- dim(aux_data5)[2] - n;
+  F_5 = ((SSR0 - SSR5) / m) / (SSR5 / (T - m - n));
+  
+  # Look up the statistic in the table, get the p-value
+  lmStatTaylor5 <- pf(F_5, m, T - m - n, lower.tail = FALSE);
+  
+  c(firstOrderTest = lmStatTaylor1,
+    thirdOrderTest = lmStatTaylor3,
+    fifthOrderTest = lmStatTaylor5)
+
+}
