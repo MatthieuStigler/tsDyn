@@ -240,6 +240,9 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
 }
 
 
+addRegime <- function(object, ...)
+	UseMethod("addRegime")
+
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
 #    regime should be considered.
@@ -247,7 +250,7 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
 # object: a STAR model already built with at least 2 regimes.
 #
 # returns the p-values of the F statistics (from 1st to 5th order)
-addRegime <- function(object, ...)
+addRegime.star <- function(object, ...)
 {
 
   str <- object$str
