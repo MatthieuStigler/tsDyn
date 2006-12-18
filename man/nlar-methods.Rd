@@ -25,7 +25,7 @@ Generic \sQuote{nlar} methods
 \method{residuals}{nlar}(object, \dots)
 \method{summary}{nlar}(object, \dots)
 \method{plot}{nlar}(x, ask=interactive(), \dots)
-\method{predict}{nlar}(object, newdata, n.ahead, \dots)
+\method{predict}{nlar}(object, newdata, n.ahead, simulate=FALSE, \dots)
 \method{toLatex}{nlar}(object, \dots)
 }
 
@@ -33,6 +33,7 @@ Generic \sQuote{nlar} methods
   \item{x, object}{ fitted \sQuote{nlar} object }
   \item{newdata}{ data to which to apply the prediction }
   \item{n.ahead}{ number of steps ahead at which to predict }
+  \item{simulate}{ if \code{TRUE}, new observations are simulated from underlying Data Generating Process }
   \item{ask}{ graphical option. See \code{\link{par}}}
   \item{digits}{See \code{\link{printCoefmat}} }
   \item{\dots}{ further arguments to be passed to and from other methods }
