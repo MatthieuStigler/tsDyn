@@ -1,4 +1,4 @@
-## Copyright (C) 2005, 2006/2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2005, 2006, 2007/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 
 # LSTAR fitter
 #	mTh: as in setar
-#	phi1, phi2, th, gamma: initial guesses for model parameters
+#	phi1, phi2, c, gamma: initial guesses for model parameters
 #	trace: should infos be printed?
 #	control: 'control' options to be passed to optim
 lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
-                  thVar, th, phi1, phi2, gamma, trace=TRUE, control=list())
+                  thVar, c, phi1, phi2, gamma, trace=TRUE, control=list())
 {
 
   if(missing(m))
@@ -61,56 +61,21 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       if(trace) 
         cat("Using only first", nrow(xx), "elements of thVar\n")
     }
-    else 
+    else {
       z <- thVar
-    externThVar <- TRUE
+      externThVar <- TRUE
+    }
   }
   else {
     if(trace) 
       cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
+    thDelay = 0
   }
   
-#Automatic starting values####################
-  if(missing(phi1) | missing(phi2) | missing(th)) {
-    tmp <- setar(x, m, d, steps, mL=mL, mH=mH, thVar=z, trace=FALSE)
-    phi1 <- tmp$coeff[1:(mL+1)]
-    phi2 <- tmp$coeff[(mL+2):(mL+mH+2)]
-    th <- tmp$coeff[mL+mH+3]
-    if(trace) {
-      cat('Missing starting values. Using SETAR estimations:\n')
-      print(tmp$coefficients)
-    }
-  }
-  
-  if(missing(gamma)) {
-    gamma <- 8
-    if(trace) cat("Missing starting value for 'gamma'. Using gamma = ",
-                  gamma,"\n")
-  }
-  
-#############################################
   xxL <- cbind(1,xx[,1:mL])
   xxH <- cbind(1,xx[,1:mH])
   
-  #Transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-  G <- function(y, g, c) 
-    plogis(y, c, 1/g)
-  
-  #Sum of squares function
-  #p: vector of parameters
-  SS <- function(p) {
-    phi1 <- p[1:(mL+1)]			#Extract parms from vector p
-    phi2 <- p[(mL+2):(mL + mH + 2)]	#Extract parms from vector p
-    g <- p[mL + mH + 3]			#Extract parms from vector p
-    c <- p[mL + mH + 4]			#Extract parms from vector p
-    y.hat <- F(phi1, phi2, g, c)
-    crossprod(yy - y.hat)
-  }
- 
   #Fitted values, given parameters
   #phi1: vector of 'low regime' parameters
   #phi2: vector of 'high regime' parameters
@@ -125,8 +90,101 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
         #	I.e., .Call("F", xxL, xxH, tmp, phi1, phi2, g, c)
   }
   
+#Automatic starting values####################
+  if(missing(phi2)) {
+    if (trace)
+      cat("Performing grid search for starting values\n");
+
+    bestCost <- 999999999999;
+
+    # Maximum and minimum values for gamma
+    maxGamma <- 40;
+    minGamma <- 1;
+    rateGamma <- 5;
+
+    # Maximum and minimum values for c
+    minC <- quantile(z, .1) # percentil 10 de z
+    maxC <- quantile(z, .9) # percentil 90 de z
+    rateC <- (maxC - minC) / 100;
+
+    gamma <- 0;
+    c <- 0;
+    for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
+      for(newC in seq(minC, maxC, rateC)) {
+        # We fix the linear parameters.
+        tmp <- rep(cbind(1,xx), 2);
+        dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
+        tmp[,,1] <- tmp[,,1] * (1 - G(z, newGamma, newC));
+        tmp[,,2] <- tmp[,,2] * G(z, newGamma, newC);
+
+        new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
+
+        # Get the sum of squares
+        y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newC);
+        cost <- crossprod(yy - y.hat)
+
+        if(cost <= bestCost) {
+          bestCost <- cost;
+          gamma <- newGamma;
+          c <- newC;
+          phi1 <- new_phi[1:(mL+1)]
+          phi2 <- new_phi[(mL+2):(mL+mH+2)]
+        }
+      }
+    }
+
+    if (trace)
+      cat("Starting values fixed: c = ", c, ", gamma = ", gamma, "\n");
+    
+  }
+  
+#  if(missing(phi1) | missing(phi2) | missing(c)) {
+#    tmp <- setar(x, m, d, steps, mL=mL, mH=mH, thVar=z, trace=FALSE)
+#    phi1 <- tmp$coeff[1:(mL+1)]
+#    phi2 <- tmp$coeff[(mL+2):(mL+mH+2)]
+#    c <- tmp$coeff[mL+mH+3]
+#    if(trace) {
+#      cat('Missing starting values. Using SETAR estimations:\n')
+#      print(tmp$coefficients)
+#    }
+#  }
+  
+#  if(missing(gamma)) {
+#    gamma <- 8
+#    if(trace) cat("Missing starting value for 'gamma'. Using gamma = ",
+#                  gamma,"\n")
+#  }
+  
+#############################################
+  #Transition function
+  #y: variable
+  #g: smoothing parameter
+  #c: threshold value
+  G <- function(y, g, c) 
+    plogis(y, c, 1/g)
+  
+  #Sum of squares function
+  #p: vector of parameters
+  SS <- function(p) {
+    # First fix the linear parameters
+    tmp <- rep(cbind(1,xx), 2);
+    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
+    tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, c));
+    tmp[,,2] <- tmp[,,2] * G(z, gamma, c);
+    
+    new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
+    phi1ss <- new_phi[1:(mL+1)]	
+    phi2ss <- new_phi[(mL+2):(mL + mH + 2)]
+
+    # Now compute the cost / sum of squares
+    g <- p[1]	#Extract parms from vector p
+    c <- p[2]	#Extract parms from vector p
+    y.hat <- F(phi1ss, phi2ss, g, c)
+    crossprod(yy - y.hat)
+  }
+ 
   #Numerical minimization##########
-  p <- c(phi1, phi2, gamma, th)		#pack parameters in one vector
+  p <- c(gamma, c)   #pack parameters in one vector
   res <- optim(p, SS, hessian = TRUE, control = control)
 
   if(trace)
@@ -136,11 +194,24 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       cat("Optimization algorithm converged\n")
   ################################
   
+  gamma <- res$par[1]
+  c <- res$par[2]
+  
+  # Fix the linear parameters one more time
+  tmp <- rep(cbind(1,xx), 2);
+  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
+  tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, c));
+  tmp[,,2] <- tmp[,,2] * G(z, gamma, c);
+  
+  new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
+  phi1 <- new_phi[1:(mL+1)]	
+  phi2 <- new_phi[(mL+2):(mL + mH + 2)]
+
   #Results storing################
-  res$coefficients <- res$par
+  res$coefficients <- c(phi1, phi2, res$par)
   names(res$coefficients) <- c(paste("phi1", 0:mL, sep="."),
                                paste("phi2", 0:mH, sep="."),
-                               "gamma", "th")
+                               "gamma", "c")
   res$mL <- mL
   res$mH <- mH
   res$externThVar <- externThVar
@@ -153,8 +224,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   }
 
   res$thVar <- z
-  res$fitted <- F(res$coef[1:(mL+1)], res$coef[(mL+2):(mL+mH+2)], 
-                  res$coef[mL+mH+3], res$coef[mL+mH+4])
+  res$fitted <- F(phi1, phi2, res$par[1], res$par[2])
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
@@ -176,10 +246,11 @@ print.lstar <- function(x, ...) {
   order.L <- x$mL
   order.H <- x$mH
   lowCoef <- x$coef[1:(order.L+1)]
-  highCoef<- x$coef[(order.L+1)+1:(order.H+1)]
+  highCoef<- x$coef[(order.L + 2):(order.L + order.H + 2)]
   gammaCoef <- x$coef[order.L + order.H + 3]
-  thCoef <- x$coef[order.L+order.H+4]
+  thCoef <- x$coef[order.L + order.H + 4]
   externThVar <- x$externThVar
+  
   cat("Coefficients:\n")
   cat("Low regime:\n")
   print(lowCoef, ...)
@@ -284,7 +355,7 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   yy <- str$yy
   nms <- colnames(xx)
   z <- x$mod$thVar
-  z <- plogis(z, x$coefficients["th"], 1/x$coefficients["gamma"])
+  z <- plogis(z, x$coefficients["c"], 1/x$coefficients["gamma"])
   regime.id <- cut(z, breaks=quantile(z, 0:5/5), include.lowest=TRUE)
   regime.id <- as.numeric(regime.id)
   if(length(regime.id)<=300) {
@@ -341,8 +412,9 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   phi1 <- object$coefficients[1:(mL+1)]
   phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
   gamma <- object$coefficients["gamma"]
-  th <- object$coefficients["th"]
+  c <- object$coefficients["c"]
   ext <- object$model$externThVar
+
   if(ext) {
     z <- thVar[itime]
   }
@@ -350,7 +422,8 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
     z <- newdata %*% object$model$mTh
     dim(z) <- NULL
   }
-  z <- plogis(z, th, 1/gamma)
+  z <- plogis(z, c, 1/gamma)
+
   if(nrow(newdata)>1) {
     xL <- cbind(1,newdata[,1:mL])
     xH <- cbind(1,newdata[,1:mH])
@@ -415,11 +488,11 @@ showDialog.lstar <- function(x, ...) {
   onFinish <- function() {
     mL <- as.numeric(tclObj(vML))
     mH <- as.numeric(tclObj(vMH))
-    th <- as.numeric(tclObj(vTh))
+    c <- as.numeric(tclObj(vTh))
     thDelay <- as.numeric(tclObj(vThDelay))
     maxit <- as.numeric(tclObj(vMaxit))
     tkdestroy(frRoot$tkvar)
-    res <- lstar(x, mL=mL, mH=mH, th=th, thDelay=thDelay, control=list(maxit=maxit))
+    res <- lstar(x, mL=mL, mH=mH, c=c, thDelay=thDelay, control=list(maxit=maxit))
     assign("nlarModel", res, .GlobalEnv)
   }
   onCancel <- function()
