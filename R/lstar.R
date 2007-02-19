@@ -21,7 +21,7 @@
 #	trace: should infos be printed?
 #	control: 'control' options to be passed to optim
 lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
-                  thVar, c, phi1, phi2, gamma, trace=TRUE, control=list())
+                  thVar, th, phi1, phi2, gamma, trace=TRUE, control=list())
 {
 
   if(missing(m))
@@ -83,12 +83,20 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   #c: threshold value
   #Model covariates are 'xxL', 'xxH' and 'x', as defined in the
   #   beginning of that function
-  F <- function(phi1, phi2, g, c){
-    tmp <- G(z, g, c)
+  F <- function(phi1, phi2, g, th){
+    tmp <- G(z, g, th)
     (xxL %*% phi1) * (1-tmp) + (xxH %*% phi2) * tmp
         #Possible performance bottleneck. Should be coded in C? 
         #	I.e., .Call("F", xxL, xxH, tmp, phi1, phi2, g, c)
   }
+  
+#############################################
+  #Transition function
+  #y: variable
+  #g: smoothing parameter
+  #c: threshold value
+  G <- function(y, g, th) 
+    plogis(y, th, 1/g)
   
 #Automatic starting values####################
   if(missing(phi2)) {
@@ -103,30 +111,30 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     rateGamma <- 5;
 
     # Maximum and minimum values for c
-    minC <- quantile(z, .1) # percentil 10 de z
-    maxC <- quantile(z, .9) # percentil 90 de z
-    rateC <- (maxC - minC) / 100;
+    minTh <- quantile(z, .1) # percentil 10 de z
+    maxTh <- quantile(z, .9) # percentil 90 de z
+    rateTh <- (maxTh - minTh) / 100;
 
     gamma <- 0;
     c <- 0;
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
-      for(newC in seq(minC, maxC, rateC)) {
+      for(newTh in seq(minTh, maxTh, rateTh)) {
         # We fix the linear parameters.
         tmp <- rep(cbind(1,xx), 2);
         dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
-        tmp[,,1] <- tmp[,,1] * (1 - G(z, newGamma, newC));
-        tmp[,,2] <- tmp[,,2] * G(z, newGamma, newC);
+        tmp[,,1] <- tmp[,,1] * (1 - G(z, newGamma, newTh));
+        tmp[,,2] <- tmp[,,2] * G(z, newGamma, newTh);
 
         new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
 
         # Get the sum of squares
-        y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newC);
+        y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newTh);
         cost <- crossprod(yy - y.hat)
 
         if(cost <= bestCost) {
           bestCost <- cost;
           gamma <- newGamma;
-          c <- newC;
+          th <- newTh;
           phi1 <- new_phi[1:(mL+1)]
           phi2 <- new_phi[(mL+2):(mL+mH+2)]
         }
@@ -134,7 +142,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
 
     if (trace)
-      cat("Starting values fixed: c = ", c, ", gamma = ", gamma, "\n");
+      cat("Starting values fixed: th = ", th, ", gamma = ", gamma, "\n");
     
   }
   
@@ -155,14 +163,6 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 #                  gamma,"\n")
 #  }
   
-#############################################
-  #Transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-  G <- function(y, g, c) 
-    plogis(y, c, 1/g)
-  
   #Sum of squares function
   #p: vector of parameters
   SS <- function(p) {
@@ -178,13 +178,13 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     # Now compute the cost / sum of squares
     g <- p[1]	#Extract parms from vector p
-    c <- p[2]	#Extract parms from vector p
-    y.hat <- F(phi1ss, phi2ss, g, c)
+    th <- p[2]	#Extract parms from vector p
+    y.hat <- F(phi1ss, phi2ss, g, th)
     crossprod(yy - y.hat)
   }
  
   #Numerical minimization##########
-  p <- c(gamma, c)   #pack parameters in one vector
+  p <- c(gamma, th)   #pack parameters in one vector
   res <- optim(p, SS, hessian = TRUE, control = control)
 
   if(trace)
@@ -195,13 +195,13 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   ################################
   
   gamma <- res$par[1]
-  c <- res$par[2]
+  th <- res$par[2]
   
   # Fix the linear parameters one more time
   tmp <- rep(cbind(1,xx), 2);
   dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
-  tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, c));
-  tmp[,,2] <- tmp[,,2] * G(z, gamma, c);
+  tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, th));
+  tmp[,,2] <- tmp[,,2] * G(z, gamma, th);
   
   new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
   phi1 <- new_phi[1:(mL+1)]	
@@ -211,7 +211,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   res$coefficients <- c(phi1, phi2, res$par)
   names(res$coefficients) <- c(paste("phi1", 0:mL, sep="."),
                                paste("phi2", 0:mH, sep="."),
-                               "gamma", "c")
+                               "gamma", "th")
   res$mL <- mL
   res$mH <- mH
   res$externThVar <- externThVar
