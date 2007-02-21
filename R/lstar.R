@@ -53,7 +53,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if(length(mTh) != m) 
       stop("length of 'mTh' should be equal to 'm'")
     z <- xx %*% mTh #threshold variable
-    dim(x) <- NULL
+    dim(z) <- NULL
   }
   else if(!missing(thVar)) {
     if(length(thVar) > nrow(xx)) {
@@ -86,18 +86,10 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   F <- function(phi1, phi2, g, th){
     tmp <- G(z, g, th)
     (xxL %*% phi1) * (1-tmp) + (xxH %*% phi2) * tmp
-        #Possible performance bottleneck. Should be coded in C? 
-        #	I.e., .Call("F", xxL, xxH, tmp, phi1, phi2, g, c)
+                                        #Possible performance bottleneck. Should be coded in C? 
+                                        #	I.e., .Call("F", xxL, xxH, tmp, phi1, phi2, g, c)
   }
-  
-#############################################
-  #Transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-  G <- function(y, g, th) 
-    plogis(y, th, 1/g)
-  
+
 #Automatic starting values####################
   if(missing(phi2)) {
     if (trace)
@@ -146,40 +138,24 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     
   }
   
-#  if(missing(phi1) | missing(phi2) | missing(c)) {
-#    tmp <- setar(x, m, d, steps, mL=mL, mH=mH, thVar=z, trace=FALSE)
-#    phi1 <- tmp$coeff[1:(mL+1)]
-#    phi2 <- tmp$coeff[(mL+2):(mL+mH+2)]
-#    c <- tmp$coeff[mL+mH+3]
-#    if(trace) {
-#      cat('Missing starting values. Using SETAR estimations:\n')
-#      print(tmp$coefficients)
-#    }
-#  }
-  
-#  if(missing(gamma)) {
-#    gamma <- 8
-#    if(trace) cat("Missing starting value for 'gamma'. Using gamma = ",
-#                  gamma,"\n")
-#  }
-  
   #Sum of squares function
   #p: vector of parameters
   SS <- function(p) {
+    gamma <- p[1]  #Extract parms from vector p
+    th <- p[2] 	     #Extract parms from vector p
+
     # First fix the linear parameters
     tmp <- rep(cbind(1,xx), 2);
     dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
-    tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, c));
-    tmp[,,2] <- tmp[,,2] * G(z, gamma, c);
+    tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, th));
+    tmp[,,2] <- tmp[,,2] * G(z, gamma, th);
     
     new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
     phi1ss <- new_phi[1:(mL+1)]	
     phi2ss <- new_phi[(mL+2):(mL + mH + 2)]
 
     # Now compute the cost / sum of squares
-    g <- p[1]	#Extract parms from vector p
-    th <- p[2]	#Extract parms from vector p
-    y.hat <- F(phi1ss, phi2ss, g, th)
+    y.hat <- F(phi1ss, phi2ss, gamma, th)
     crossprod(yy - y.hat)
   }
  
@@ -239,6 +215,14 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
                      model.specific=res), "lstar"))
 }
 
+#############################################
+  #Transition function
+  #y: variable
+  #g: smoothing parameter
+  #c: threshold value
+G <- function(y, g, th) 
+  plogis(y, th, 1/g)
+  
 print.lstar <- function(x, ...) {
   NextMethod(...)
   cat("\nLSTAR model\n")
