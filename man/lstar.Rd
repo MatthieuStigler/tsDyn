@@ -7,17 +7,17 @@ Logistic Smooth Transition AutoRegressive model.
 }
 \synopsis{
 lstar(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay, 
-			thVar, th, phi1, phi2, gamma, trace=TRUE, control=list())
+			thVar, th, gamma, trace=TRUE, control=list())
 }
 \usage{
 lstar(x, m, d=1, steps=d, series, mL, mH, thDelay, 
-			th, phi1, phi2, gamma, trace=TRUE, control=list())
+			th, gamma, trace=TRUE, control=list())
 
 lstar(series, m, d, steps, mL, mH, mTh,
-    phi1, phi2, th, gamma, trace=TRUE, control=list())
+    th, gamma, trace=TRUE, control=list())
 
 lstar(series, m, d, steps, mL=m, mH=m, thVar,
-    phi1, phi2, th, gamma, trace=TRUE, control=list())
+    th, gamma, trace=TRUE, control=list())
 }
 \value{
   An object of class \code{nlar}, subclass \code{lstar}, i.e. a list
@@ -44,8 +44,7 @@ lstar(series, m, d, steps, mL=m, mH=m, thVar,
 \item{mTh}{coefficients for the lagged time series, to obtain the
   threshold variable}
 \item{thVar}{external threshold variable}
-\item{phi1, phi2, th, gamma}{starting values for coefficients in the
-  LSTAR model. If missing, SETAR estimations are used}
+\item{th, gamma}{starting values for coefficients in the LSTAR model. If missing, a grid search is performed}
 \item{trace}{should additional infos be printed? (logical)}
 \item{control}{further arguments to be passed as \code{control} list to
   \code{\link{optim}}}
@@ -68,7 +67,7 @@ The threshold variable can alternatively be specified by:
 \item{thVar}{ \eqn{z[t] = thVar[t]} }
 }
 
-Note that if starting values for phi1 and phi2 are provided, isn't necessary to specify mL and mH. Further, the user has to specify only one parameter between mTh, thDelay and thVar for indicating the threshold variable.
+Note that the user has to specify only one parameter between mTh, thDelay and thVar for indicating the threshold variable.
 
 Estimation is done by minimizing residuals sum of squares with respect
 to \var{phi1}, \var{phi2}, \var{th} and \var{gamma}, using the
@@ -77,8 +76,6 @@ can pass further arguments directly to the 'control' list argument of
 this function. For example, the option \code{maxit} maybe useful when
 there are convergence issues (see examples).
 
-Note that \code{lstar} is only a convenience wrapper to nlar (for not
-having to specify \code{m}, which can be deduced from the other parameters).
 }
 \seealso{
 \code{\link{plot.lstar}} for details on plots produced for this model from the \code{plot} generic.

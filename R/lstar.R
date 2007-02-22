@@ -21,7 +21,7 @@
 #	trace: should infos be printed?
 #	control: 'control' options to be passed to optim
 lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
-                  thVar, th, phi1, phi2, gamma, trace=TRUE, control=list())
+                  thVar, th, gamma, trace=TRUE, control=list())
 {
 
   if(missing(m))
@@ -91,7 +91,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   }
 
 #Automatic starting values####################
-  if(missing(phi2)) {
+  if(missing(th)||missing(gamma)) {
     if (trace)
       cat("Performing grid search for starting values\n");
 
@@ -259,25 +259,7 @@ print.lstar <- function(x, ...) {
 }
 
 summary.lstar <- function(object, ...) {
-  ans <- list()
-  # Taken from 'arma.R' in package tseries####
-  coef <- object$coefficients
-  n <- object$str$n.used
-  rank <- qr(object$mod$hessian, 1e-07)$rank
-  if(rank != length(coef)) {
-    se <- rep(NA, length(coef))
-    warning("singular Hessian\n")
-  } else{
-    di <- diag(2*object$mod$value/n*solve(object$mod$hessian))
-    if(any(di < 0))
-      warning("Hessian negative-semidefinite\n")
-    se <- sqrt(di)
-  }
-  tval <- coef / se
-  ans$coef <- cbind(coef, se, tval, 2 * ( 1 - pnorm( abs(tval) ) ) )
-  dimnames(ans$coef) <- list(names(object$coef),
-                          c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
-  
+  ans <- list()  
 ############################################
   
   #Non-linearity test############
@@ -308,8 +290,6 @@ print.summary.lstar <- function(x, digits=max(3, getOption("digits") - 2),
                        signif.stars = getOption("show.signif.stars"), ...)
 {
   NextMethod(digits=digits, signif.stars=signif.stars, ...)
-  cat("\nCoefficient(s):\n")
-  printCoefmat(x$coef, digits = digits, signif.stars = signif.stars, ...)
   cat("\nNon-linearity test of full-order LSTAR model against full-order AR model\n")
   cat(" F =", format(x$nlTest.value, digits=digits),"; p-value =", format(x$nlTest.pval, digits=digits),"\n")
   cat("\nThreshold ")
@@ -339,7 +319,7 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   yy <- str$yy
   nms <- colnames(xx)
   z <- x$mod$thVar
-  z <- plogis(z, x$coefficients["c"], 1/x$coefficients["gamma"])
+  z <- plogis(z, x$coefficients["th"], 1/x$coefficients["gamma"])
   regime.id <- cut(z, breaks=quantile(z, 0:5/5), include.lowest=TRUE)
   regime.id <- as.numeric(regime.id)
   if(length(regime.id)<=300) {
@@ -396,7 +376,7 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   phi1 <- object$coefficients[1:(mL+1)]
   phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
   gamma <- object$coefficients["gamma"]
-  c <- object$coefficients["c"]
+  c <- object$coefficients["th"]
   ext <- object$model$externThVar
 
   if(ext) {
@@ -430,7 +410,7 @@ selectLSTAR <- function(x, m, d=1, steps=d, mL = 1:m, mH = 1:m, thDelay=0:(m-1))
     mHVal <- parms[3]
     thDelayVal <- parms[1]
     m <- max(mLVal,mHVal,thDelayVal+1)
-    return(AIC( lstar(x, m=m, mL=mLVal, mH=mHVal, thDelay=thDelayVal,
+    return(AIC( lstar(x, m=m, mL=mLVal, mH=mHVal, thDelay=thDelayVal, trace=FALSE,
                       control=list(maxit=1e2)) ) )
   }
   IDS <- as.matrix( expand.grid(thDelay, mL, mH) )

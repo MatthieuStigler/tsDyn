@@ -20,9 +20,9 @@ lag.plot <- function(x, ...)
 \begin{titlepage}
 {\centering \huge Nonlinear autoregressive\\[0.5cm]
 time series models in R\\[0.5cm]
-using \tsDyn version 0.5\\}
+using \tsDyn version 0.6\\}
 \vfill\par
-{\centering last revised 21/05/2006 by Antonio, Fabio Di Narzo\\}
+{\centering last revised 22/02/2007 by Antonio, Fabio Di Narzo\\}
 \end{titlepage}
 
 \section{Introduction} \tsDyn is an R package for the estimation of
@@ -196,9 +196,9 @@ Note that in R there are plenty of functions for AR (and, more generally, ARMA) 
 \begin{equation}
 X_{t+s} = \left\{
 \begin{array}{lr}
-\phi_1 + \phi_{10} X_t + \phi_{11} X_{t-d} + \ldots + \phi_{1L} X_{t-(L-1)d} + \epsilon_{t+s} & Z_t \leq c\\
+\phi_1 + \phi_{10} X_t + \phi_{11} X_{t-d} + \ldots + \phi_{1L} X_{t-(L-1)d} + \epsilon_{t+s} & Z_t \leq \text{th}\\
 \\
-\phi_2 + \phi_{20} X_t + \phi_{21} X_{t-d} + \ldots + \phi_{2H} X_{t-(H-1)d} + \epsilon_{t+s} & Z_t > c
+\phi_2 + \phi_{20} X_t + \phi_{21} X_{t-d} + \ldots + \phi_{2H} X_{t-(H-1)d} + \epsilon_{t+s} & Z_t > \text{th}
 \end{array} \right.
 \end{equation}
 with $Z_t$ a threshold variable. How is one to define $Z_t$? 
@@ -232,10 +232,10 @@ obj <- setar(x, m=, d=, steps=, thDelay = , mL =, mH =)
 \end{Scode}
 If not specified, \texttt{mL} and \texttt{mH} defaults to \texttt{m}.
 
-Another hyper-parameter one can specify is the threshold value $c$, via the additional argument \texttt{th}.
-If not specified, this is estimated by fitting the model for a grid of different, reasonable values of $c$, and taking the best fit as the final $c$ estimate.
+Another hyper-parameter one can specify is the threshold value $\text{th}$, via the additional argument \texttt{th}.
+If not specified, this is estimated by fitting the model for a grid of different, reasonable values of $\text{th}$, and taking the best fit as the final $\text{th}$ estimate.
 
-Note that, conditional on $\{Z_t\leq c\}$, the model is linear. So, for a fixed threshold value, the CLS estimation is straightforward.
+Note that, conditional on $\{Z_t\leq \text{th}\}$, the model is linear. So, for a fixed threshold value, the CLS estimation is straightforward.
 
 The summary command for this model returns asymptotic standard errors for the estimated $\phi$ coefficients, based on the assumption that $\epsilon_t$ are normally distributed.
 
@@ -244,16 +244,14 @@ The LSTAR model can be viewed as a generalization of the above defined SETAR mod
 \begin{eqnarray*}
 X_{t+s} =& 
 ( \phi_1 + \phi_{10} X_t + \phi_{11} X_{t-d} + \ldots + \phi_{1L} X_{t-(L-1)d} )
-	( 1 - G(Z_t, \gamma, c) ) \\
+	( 1 - G(Z_t, \gamma, \text{th}) ) \\
 	 & + ( \phi_2 + \phi_{20} X_t + \phi_{21} X_{t-d} + \ldots + \phi_{2H} X_{t-(H-1)d} )
-	 G( Z_t, \gamma, c) + \epsilon_{t+s}
+	 G( Z_t, \gamma, \text{th}) + \epsilon_{t+s}
 \end{eqnarray*}
-with $G$ the logistic function, and $Z_t$ the threshold variable. For $Z_t$, $L$ and $H$ specification, the same convention as that of SETAR models is followed. In addition, for LSTAR models one has to specify some starting values for all the parameters to be estimated: $(\phi, \gamma, c)$.
-If not provided, $\phi$ and $c$ starting values are taken from the corresponding SETAR model estimation.
+with $G$ the logistic function, and $Z_t$ the threshold variable. For $Z_t$, $L$ and $H$ specification, the same convention as that of SETAR models is followed. In addition, for LSTAR models one has to specify some starting values for all the parameters to be estimated: $(\phi, \gamma, \text{th})$.
 
 Once again, estimation is done using CLS, but here an exact solution does not extist, so a numerical minimization algorithm has to be used.
-
-Standard errors provided in the summary are asymptotical, but may not make sense if the error criterion minimization isn't achieved during parameter estimation. Be aware of this!
+If not provided, starting values for $(\gamma, \text{th})$ are obtained by rough grid search.
 
 \subsection{Neural Network models}
 A neural network model with linear output, $D$ \emph{hidden units} and activation function $g$, is represented as:
