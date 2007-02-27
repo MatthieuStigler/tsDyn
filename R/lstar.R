@@ -84,14 +84,11 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   #Model covariates are 'xxL', 'xxH' and 'x', as defined in the
   #   beginning of that function
   F <- function(phi1, phi2, g, th){
-    tmp <- G(z, g, th)
-    (xxL %*% phi1) * (1-tmp) + (xxH %*% phi2) * tmp
-                                        #Possible performance bottleneck. Should be coded in C? 
-                                        #	I.e., .Call("F", xxL, xxH, tmp, phi1, phi2, g, c)
+    xxL %*% phi1 + (xxH %*% phi2) * G(z, g, th)
   }
 
 #Automatic starting values####################
-  if(missing(th)||missing(gamma)) {
+  if(missing(th) || missing(gamma)) {
     if (trace)
       cat("Performing grid search for starting values\n");
 
@@ -112,12 +109,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
       for(newTh in seq(minTh, maxTh, rateTh)) {
         # We fix the linear parameters.
-        tmp <- rep(cbind(1,xx), 2);
-        dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
-        tmp[,,1] <- tmp[,,1] * (1 - G(z, newGamma, newTh));
-        tmp[,,2] <- tmp[,,2] * G(z, newGamma, newTh);
+        tmp <- data.frame(xxL, xxH * G(z, newGamma, newTh));
 
-        new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
+        new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
 
         # Get the sum of squares
         y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newTh);
@@ -134,7 +128,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
 
     if (trace)
-      cat("Starting values fixed: th = ", th, ", gamma = ", gamma, "\n");
+      cat("Starting values fixed: th = ", th, ", gamma = ", gamma,
+          "; SSE = ", bestCost, "\n");
     
   }
   
@@ -145,12 +140,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     th <- p[2] 	     #Extract parms from vector p
 
     # First fix the linear parameters
-    tmp <- rep(cbind(1,xx), 2);
-    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
-    tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, th));
-    tmp[,,2] <- tmp[,,2] * G(z, gamma, th);
+    tmp <- data.frame(xxL, xxH * G(z, gamma, th));
     
-    new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
+    new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
     phi1ss <- new_phi[1:(mL+1)]	
     phi2ss <- new_phi[(mL+2):(mL + mH + 2)]
 
@@ -174,17 +166,14 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   th <- res$par[2]
   
   # Fix the linear parameters one more time
-  tmp <- rep(cbind(1,xx), 2);
-  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, 2);
-  tmp[,,1] <- tmp[,,1] * (1 - G(z, gamma, th));
-  tmp[,,2] <- tmp[,,2] * G(z, gamma, th);
+  tmp <- data.frame(xxL, xxH * G(z, gamma, th));
   
-  new_phi<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients;
+  new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
   phi1 <- new_phi[1:(mL+1)]	
   phi2 <- new_phi[(mL+2):(mL + mH + 2)]
 
   #Results storing################
-  res$coefficients <- c(phi1, phi2, res$par)
+  res$coefficients <- c(phi1, phi2, res$par[1], res$par[2])
   names(res$coefficients) <- c(paste("phi1", 0:mL, sep="."),
                                paste("phi2", 0:mH, sep="."),
                                "gamma", "th")
