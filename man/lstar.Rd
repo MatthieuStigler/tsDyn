@@ -85,10 +85,7 @@ parameters \var{th} and \var{gamma}, the program uses the
 can pass further arguments directly to the 'control' list argument of
 this function. For example, the option \code{maxit} maybe useful when
 there are convergence issues (see examples).
-
-Note that \code{lstar} is only a convenience wrapper to nlar (for not
-having to specify \code{m}, which can be deduced from the other
-parameters). }
+}
 
 \seealso{
 \code{\link{plot.lstar}} for details on plots produced for this model
