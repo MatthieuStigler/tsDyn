@@ -384,7 +384,7 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
     xL <- c(1,newdata[,1:mL])
     xH <- c(1,newdata[,1:mH])
   }
-  (xL %*% phi1) * z + (xH %*% phi2) * (1-z)
+  xL %*% phi1 + (xH %*% phi2) * z
 }
 
 #Exhaustive search over a grid of model parameters
