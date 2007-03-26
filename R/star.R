@@ -28,31 +28,11 @@
 #   series
 #   rob
 #   sig
-#star <- function(x, m, d = 1, steps = d, series, rob = FALSE,
-#                 sig=.05, trace=TRUE, control=list())
-#{
-
-  # 1. Build the nlar object
-#  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-  
-  # 2. Linearity testing
-#  isLinear <- linearityTest(str, rob, sig)
-  
-  # 3. Add-regime loop
-  
-#}
-star <- function(x, m, noRegimes, d=1, steps=d, series,
-                  maxRegressors, phi_1, phi_2,
-                  mTh, thDelay=1, thVar, trace=TRUE, control=list())
+star <- function(x, m, d = 1, steps = d, series, rob = FALSE,
+                 sig=.05, trace=TRUE, control=list())
 {
 
-  if(noRegimes == 1) 
-   stop("A STAR with 1 regime is an AR model: use the linear model instead.")
-  
-  if(noRegimes == 2) {
-    return(lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list()))
-  } 
-
+  # 1. Build the nlar object and associated variables.
   if(missing(m))
     m <- max(maxRegressors, thDelay+1)
 
@@ -60,6 +40,7 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
     series <- deparse(substitute(x))
 
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+
   xx <- str$xx
   yy <- str$yy
   externThVar <- FALSE
@@ -96,128 +77,17 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
     z <- xx[,1]
   }
   
-#Automatic starting values####################
-  if(missing(phi_2)) {         
-    phi_2 <- array(0, c(noRegimes, 2))
-    range <- range(z)
-    phi_2[1:noRegimes,1] <-
-      range[1] + ((range[2] - range[1]) / (noRegimes)) * (0:(noRegimes-1))
-    phi_2[,2] <- 4
-    if(trace) {
-      cat('Missing starting transition values. Using uniform distribution.\n')
-    }
-  }
+  # 2. Linearity testing
+  testResults <- linearityTest(str, rob, sig)
+  pValue <- test-results$pValue;
 
-  if(missing(phi_1)) {
-    phi_1 <- array(rnorm(noRegimes * m+1), c(noRegimes, m+1))
-    if(trace) {
-      cat('Missing starting linear values. Using random values.\n')
-    }
-  }
-
-#############################################
-
-  #Logistic transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-  G <- function(z, g, c) {
-    if((length(c) > 1) && (length(g) > 1))
-      t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
-    else
-      plogis(z, c, 1/g)
-  }
-
-  #Sum of squares function
-  #p: vector of parameters
-  SS <- function(phi_2) {
-    dim(phi_2) <- c(noRegimes, 2)
-    
-    # We fix the linear parameters here, before optimizing the nonlinear.
-    tmp <- rep(cbind(1,xx), noRegimes)
-    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-    for (i in 1:noRegimes) 
-      tmp[,,i] <- tmp[,,i] * G(z, phi_2[i,2], phi_2[i,1])
-
-    new_phi_1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-    dim(new_phi_1) <- c(noRegimes, m + 1)
-
-    # Return the sum of squares
-    y.hat <- F(new_phi_1, phi_2)
-    crossprod(yy - y.hat)
+  if(testResults$isLinear) {
+    cat("LM Linearity test: p-value = ", pValue)
+    stop("The series is linear. Use the linear model.")
   }
   
-  #Fitted values, given parameters
-  # phi_1: vector of linear parameters
-  # phi_2: vector of tr. functions' parameters
-  F <- function(phi_1, phi_2) {
-    local <- array(0, c(noRegimes, T))
-    int_xx <- cbind(1, xx)
-    for (i in 1:noRegimes) 
-      local[i,] <-
-        (int_xx %*% phi_1[i,]) * G(z, phi_2[i,2], phi_2[i,1])
-
-    result <- apply(local, 2, sum)
-    result
-  }
+  # 3. Add-regime loop
   
-#Numerical optimization##########
-  if(trace) 
-    cat('Optimizing...')
-
-  p <- as.vector(phi_2)
-  res <- optim(p, SS, hessian = TRUE, control = control)
-  phi_2 <- res$par
-  dim(phi_2) <- c(noRegimes,2)
-
-  # A last linear optimization
-  tmp <- rep(cbind(1,xx), noRegimes)
-  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-  for (i in 1:noRegimes) 
-    tmp[,,i] <- tmp[,,i] * G(z, phi_2[i,2], phi_2[i,1])
-  
-  dim(tmp) <- c(NROW(xx), (NCOL(xx) + 1) * noRegimes)
-  phi_1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-  dim(phi_1) <- c(noRegimes, m+1)
-
-  if(trace) 
-    cat(' Done.\n')
-
-  if(trace)
-    if(res$convergence!=0)
-      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
-    else
-      cat("Optimization algorithm converged\n")
-################################
-  
-  #Results storing################
-  res$phi_1 <- phi_1
-  res$phi_2 <- phi_2
-  res$externThVar <- externThVar
-
-  if(!externThVar) {
-    if(missing(mTh)) {
-      mTh <- rep(0,m)
-      mTh[thDelay+1] <- 1
-    }
-    res$mTh <- mTh
-  }
-
-  res$thVar <- z
-  
-  fitted <- F(phi_1, phi_2)
-  residuals <- yy - fitted
-  dim(residuals) <- NULL	#this should be a vector, not a matrix
-
-  res$noRegimes <- noRegimes
-  
-  return(extend(nlar(str, 
-                     coef= res$coef,
-                     fit = fitted,
-                     res = residuals,
-                     k   = length(as.vector(phi_1)) +
-                                 length(as.vector(phi_2)),
-                     model.specific=res), "star"))
 }
 
 
@@ -226,6 +96,7 @@ star <- function(x, m, noRegimes, d=1, steps=d, series,
 #   Builds a STAR with a fixed number of regimes ('noRegimes') and
 #     fixed parameters phi_1 and phi_2. If no parameters are given
 #     they are set to random and evenly distributed, respectively.
+#                            TO-DO: proper initial values (grid serch)!!
 #
 #   mTh, thDelay, thVar: as in setar
 #   maxRegressors[i]: maximum number of autoregressors in regime i

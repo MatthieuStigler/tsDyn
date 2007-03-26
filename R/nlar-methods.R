@@ -1,4 +1,4 @@
-## Copyright (C) 2005, 2006/2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2005, 2006, 2007/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -203,8 +203,10 @@ predict.nlar <- function(object, newdata, n.ahead=1, simulate=FALSE, ...)
   d <- object$str$d
   sd <- sqrt( mse(object) )
   steps <- object$str$steps
+  
   tsp(res) <- NULL
   class(res) <- NULL
+
   res <- c(res, rep(0, n.ahead))
   xrange <- (m-1)*d + steps - ((m-1):0)*d
 
