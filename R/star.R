@@ -29,7 +29,7 @@
 #   rob
 #   sig
 star <- function(x, m, d = 1, steps = d, series, rob = FALSE,
-                 sig=.05, trace=TRUE, control=list())
+                 sig=.05, maxRegressors, trace=TRUE, control=list(), ...)
 {
 
   # 1. Build the nlar object and associated variables.
@@ -85,7 +85,10 @@ star <- function(x, m, d = 1, steps = d, series, rob = FALSE,
     cat("LM Linearity test: p-value = ", pValue)
     stop("The series is linear. Use the linear model.")
   }
-  
+  else {
+    cat("LM Linearity test: p-value = ", pValue,"\n")
+    cat("The series is nonlinear. Incremental building procedure:")
+  }
   # 3. Add-regime loop
   
 }
@@ -445,7 +448,7 @@ linearityTest <- function(object, ...)
 #   object
 #   rob
 #   sig
-linearityTest.star <- function(object, rob=FALSE, sig=0.05)
+linearityTest.star <- function(object, rob=FALSE, sig=0.05, ...)
 {
 
   str <- object$str
