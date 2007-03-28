@@ -243,3 +243,84 @@ toLatex.nlar <- function(object, ...) {
   res[4] <- ""
   return(structure(res, class="Latex"))
 }
+
+
+addRegime <- function(object, ...)
+  UseMethod("addRegime")
+
+linearityTest <- function(object, ...)
+	UseMethod("linearityTest")
+
+# LM linearity testing against 2 regime STAR
+#
+#   Performs an 3rd order Taylor expansion LM test
+#
+#   str: an nlar.struct object
+#   rob
+#   sig
+linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
+                                      rob=FALSE, sig=0.05, ...)
+{
+
+  T <- NROW(str$xx);  # The number of lagged samples
+
+  # Build the regressand vector
+  y_t <- str$yy;
+  
+  # Regressors under the null
+  xH0 <- cbind(1, str$xx)
+
+  # Get the transition variable
+  s_t <- thVar
+
+  # Linear Model (null hypothesis)
+  linearModel <- lm(y_t ~ . , data=data.frame(xH0))
+  u_t <- linearModel$residuals;
+  SSE0 <- sum(u_t^2)
+
+  # Regressors under the alternative
+  if (externThVar) {
+    tmp <- rep(s_t, NCOL(str$xx) + 1)
+    dim(tmp) <- c(length(s_t), NCOL(str$xx) + 1)
+    xH1 <- cbind(cbind(1, str$xx) * tmp, cbind(1, str$xx) * (tmp^2),
+                 cbind(1, str$xx) * (tmp^3))
+  } else {
+    tmp <- rep(s_t, NCOL(str$xx))
+    dim(tmp) <- c(length(s_t), NCOL(str$xx))
+    xH1 <- cbind(str$xx * tmp, str$xx * (tmp^2), str$xx * (tmp^3))
+  }
+
+  # Standarize the regressors
+  Z <- cbind(xH0, xH1);
+  nZ <- NCOL(Z);
+  sdZ <- sd(Z)
+  dim(sdZ) <- c(1, nZ)
+  sdZ <- kronecker(matrix(1,T,1), sd(Z)) # repeat sdZ T rows
+  Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
+  #####
+  #  ERROR: subindex outside limits
+  #####
+
+  # Nonlinear model (alternative hypothesis)
+  nonlinearModel <- lm(u_t ~ ., data=data.frame(Z));
+  e_t <- nonlinearModel$residuals;
+  SSE1 <- sum(e_t^2)
+
+  # Compute the test statistic
+  n <- dim(xH0)[2];
+  m <- dim(xH1)[2];
+  
+  F = ((SSE0 - SSE1) / m) / (SSE1 / (T - m - n));
+    
+  # Look up the statistic in the table, get the p-value
+  pValue <- pf(F, m, T - m - n, lower.tail = FALSE);
+
+  if (pValue < sig) {
+    return(list(isLinear = TRUE, pValue = pValue));
+  }
+  else {
+    return(list(isLinear = FALSE, pValue = pValue));
+  }
+
+}
+

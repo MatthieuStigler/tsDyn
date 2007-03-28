@@ -28,14 +28,11 @@
 #   series
 #   rob
 #   sig
-star <- function(x, m, d = 1, steps = d, series, rob = FALSE,
-                 sig=.05, maxRegressors, trace=TRUE, control=list(), ...)
+star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
+                 mTh, thDelay=1, thVar, sig=.05, trace=TRUE, control=list(), ...)
 {
 
   # 1. Build the nlar object and associated variables.
-  if(missing(m))
-    m <- max(maxRegressors, thDelay+1)
-
   if(missing(series))
     series <- deparse(substitute(x))
 
@@ -46,47 +43,51 @@ star <- function(x, m, d = 1, steps = d, series, rob = FALSE,
   externThVar <- FALSE
   T <- NROW(xx)
 
-  if (missing(maxRegressors)) {
-    maxRegressors <- rep(m, times = noRegimes)
-    if (trace) 
-      cat("Using maximum autoregressive order for all regimes: ", m,"\n")
-  }
-
   if(!missing(thDelay)) {
+    
     if(thDelay>=m) 
       stop(paste("thDelay too high: should be < m (=",m,")"))
     z <- xx[,thDelay+1]
+
   } else if(!missing(mTh)) {
+
     if(length(mTh) != m) 
       stop("length of 'mTh' should be equal to 'm'")
     z <- xx %*% mTh #threshold variable
     dim(x) <- NULL
+
   }
   else if(!missing(thVar)) {
+
     if(length(thVar)>nrow(xx)) {
       z <- thVar[1:nrow(xx)]
       if(trace) 
         cat("Using only first", nrow(xx), "elements of thVar\n")
+
     }
     else 
+
       z <- thVar
+
     externThVar <- TRUE
+
   } else {
+
     if(trace) 
       cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
+
   }
   
   # 2. Linearity testing
   testResults <- linearityTest(str, rob, sig)
   pValue <- test-results$pValue;
 
+  cat("LM Linearity test: p-value = ", pValue,"\n")
   if(testResults$isLinear) {
-    cat("LM Linearity test: p-value = ", pValue)
     stop("The series is linear. Use the linear model.")
   }
   else {
-    cat("LM Linearity test: p-value = ", pValue,"\n")
     cat("The series is nonlinear. Incremental building procedure:")
   }
   # 3. Add-regime loop
@@ -118,6 +119,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
    stop("A STAR with 1 regime is an AR model: use the linear model instead.")
   
   if(noRegimes == 2) {
+    # It would be nice to cast the lstar into a star.
     return(lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list()))
   } 
 
@@ -327,9 +329,6 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
 }
 
 
-addRegime <- function(object, ...)
-	UseMethod("addRegime")
-
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
 #    regime should be considered.
@@ -438,14 +437,11 @@ addRegime.star <- function(object, ...)
 }
 
 
-linearityTest <- function(object, ...)
-	UseMethod("linearityTest")
-
 # LM linearity testing against 2 regime STAR
 #
 #   Performs an 3rd order Taylor expansion LM test
 #
-#   object
+#   object: a star object
 #   rob
 #   sig
 linearityTest.star <- function(object, rob=FALSE, sig=0.05, ...)
