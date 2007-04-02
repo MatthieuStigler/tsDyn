@@ -481,7 +481,7 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, ...)
   nZ <- NCOL(Z);
   sdZ <- sd(Z)
   dim(sdZ) <- c(1, nZ)
-  sdZ <- kronecker(matrix(1,T,1), sd(Z)) # repeat sdZ T rows
+  sdZ <- kronecker(matrix(1,T,1), sdZ) # repeat sdZ T rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
 
   # Nonlinear model (alternative hypothesis)
