@@ -16,6 +16,33 @@
 ## Suite 330, Boston, MA  02111-1307  USA.
 
 
+#Logistic transition function
+#y: variable
+#g: smoothing parameter
+#c: threshold value
+G <- function(z, g, c) {
+  if((length(c) > 1) && (length(g) > 1))
+    t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
+  else
+    plogis(z, c, 1/g)
+}
+
+#Fitted values, given parameters
+# phi1: vector of linear parameters
+# phi2: vector of tr. functions' parameters
+# noRegimes
+# xx: matrix from an str object
+F <- function(phi1, phi2, noRegimes, xx) {
+  local <- array(0, c(noRegimes, T))
+  int_xx <- cbind(1, xx)
+  for (i in 1:noRegimes) 
+    local[i,] <-
+      (int_xx %*% phi1[i,]) * G(z, phi2[i,2], phi2[i,1])
+  
+  result <- apply(local, 2, sum)
+  result
+}
+
 # Incremental STAR fitter
 #
 #   Builds a STAR model with as many regimes as needed, using the
@@ -107,209 +134,95 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
   
 }
 
-
-# Predefined STAR model
+# Estimates the parameters of a given STAR model.
 #
-#   Builds a STAR with a fixed number of regimes ('noRegimes') and
-#     fixed parameters phi_1 (linear) and phi_2 (nonlinear). If no
-#     parameters are given they are set to random and evenly
-#     distributed, respectively.
-#                            TO-DO: proper initial values (grid serch)!!
+# object: a valid (estimated) STAR model.
 #
-#   mTh, thDelay, thVar: as in setar
-#   maxRegressors[i]: maximum number of autoregressors in regime i
-#   noRegimes: number of regimes of the model
-#   phi_1[i]: vector with the maxRegressors[i]+1 parameters of regime i
-#   phi_2[i]: vector with the parameters of tr. function i.
-#   trace: should infos be printed?
-#   control: 'control' options to be passed to optim
-#
-star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
-                  maxRegressors, phi_1, phi_2,
-                  mTh, thDelay=1, thVar, trace=TRUE, control=list())
+# Estimates object$model.specific$gradient
+#                   object$model.specific$phi_1
+#                   object$model.specific$phi_2
+estimateParams <- function(object, ...)
 {
 
-  if(noRegimes == 1) 
-   stop("A STAR with 1 regime is an AR model: use the linear model instead.")
-  
-  if(noRegimes == 2) {
-    temp <- lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list())
-    
-    return(extend(nlar(str=temp$str, 
-                       coefficients = temp$model.specific$coefficients,
-                       fitted.values = temp$fitted,
-                       residuals = temp$residuals,
-                       k   = temp$k,
-                       model.specific=temp$model.specific), "star"))
-  } 
+  # 1.- Find promising initial values
+  # 2.- Estimate nonlinear parameters
+  # 3.- Estimate linear parameters
+  # 4.- Compute yhat and ehat
+  # 5.- Compute the gradient
 
-  if(missing(m))
-    m <- max(maxRegressors, thDelay+1)
-
-  if(missing(series))
-    series <- deparse(substitute(x))
-
-  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-  xx <- str$xx
-  yy <- str$yy
-  externThVar <- FALSE
-  T <- NROW(xx)
-
-  if (missing(maxRegressors)) {
-    maxRegressors <- rep(m, times = noRegimes)
-    if (trace) 
-      cat("Using maximum autoregressive order for all regimes: ", m,"\n")
-  }
-
-  if(!missing(thDelay)) {
-    if(thDelay>=m) 
-      stop(paste("thDelay too high: should be < m (=",m,")"))
-    z <- xx[,thDelay+1]
-  } else if(!missing(mTh)) {
-    if(length(mTh) != m) 
-      stop("length of 'mTh' should be equal to 'm'")
-    z <- xx %*% mTh #threshold variable
-    dim(x) <- NULL
-  }
-  else if(!missing(thVar)) {
-    if(length(thVar)>nrow(xx)) {
-      z <- thVar[1:nrow(xx)]
-      if(trace) 
-        cat("Using only first", nrow(xx), "elements of thVar\n")
-    }
-    else 
-      z <- thVar
-    externThVar <- TRUE
-  } else {
-    if(trace) 
-      cat("Using default threshold variable: thDelay=0\n")
-    z <- xx[,1]
-  }
-  
-#Automatic starting values####################
-  if(missing(phi_2)) {         
-    phi_2 <- array(0, c(noRegimes, 2))
-    range <- range(z)
-    phi_2[1:noRegimes,1] <-
-      range[1] + ((range[2] - range[1]) / (noRegimes)) * (0:(noRegimes-1))
-    phi_2[,2] <- 4
-    if(trace) {
-      cat('Missing starting transition values. Using uniform distribution.\n')
-    }
-  }
-
-  if(missing(phi_1)) {
-    phi_1 <- array(rnorm(noRegimes * m+1), c(noRegimes, m+1))
-    if(trace) {
-      cat('Missing starting linear values. Using random values.\n')
-    }
-  }
-
-#############################################
-
-  #Logistic transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-  G <- function(z, g, c) {
-    if((length(c) > 1) && (length(g) > 1))
-      t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
-    else
-      plogis(z, c, 1/g)
-  }
-
-  #Sum of squares function
-  #p: vector of parameters
-  SS <- function(phi_2) {
-    dim(phi_2) <- c(noRegimes, 2)
-    
-    # We fix the linear parameters here, before optimizing the nonlinear.
-    tmp <- rep(cbind(1,xx), noRegimes)
-    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-    for (i in 1:noRegimes) 
-      tmp[,,i] <- tmp[,,i] * G(z, phi_2[i,2], phi_2[i,1])
-
-    new_phi_1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-    dim(new_phi_1) <- c(noRegimes, m + 1)
-
-    # Return the sum of squares
-    y.hat <- F(new_phi_1, phi_2)
-    crossprod(yy - y.hat)
-  }
-  
-  #Fitted values, given parameters
-  # phi_1: vector of linear parameters
-  # phi_2: vector of tr. functions' parameters
-  F <- function(phi_1, phi_2) {
-    local <- array(0, c(noRegimes, T))
-    int_xx <- cbind(1, xx)
-    for (i in 1:noRegimes) 
-      local[i,] <-
-        (int_xx %*% phi_1[i,]) * G(z, phi_2[i,2], phi_2[i,1])
-
-    result <- apply(local, 2, sum)
-    result
-  }
-  
-#Numerical optimization##########
-  if(trace) 
-    cat('Optimizing...')
-
-  p <- as.vector(phi_2)
-  res <- optim(p, SS, hessian = TRUE, control = control)
-  phi_2 <- res$par
-  dim(phi_2) <- c(noRegimes,2)
-
-  # A last linear optimization
-  tmp <- rep(cbind(1,xx), noRegimes)
-  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-  for (i in 1:noRegimes) 
-    tmp[,,i] <- tmp[,,i] * G(z, phi_2[i,2], phi_2[i,1])
-  
-  dim(tmp) <- c(NROW(xx), (NCOL(xx) + 1) * noRegimes)
-  phi_1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-  dim(phi_1) <- c(noRegimes, m+1)
-
-  if(trace) 
-    cat(' Done.\n')
-
-  if(trace)
-    if(res$convergence!=0)
-      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
-    else
-      cat("Optimization algorithm converged\n")
-################################
-  
-  #Results storing################
-  res$phi_1 <- phi_1
-  res$phi_2 <- phi_2
-  res$externThVar <- externThVar
-
-  if(!externThVar) {
-    if(missing(mTh)) {
-      mTh <- rep(0,m)
-      mTh[thDelay+1] <- 1
-    }
-    res$mTh <- mTh
-  }
-
-  res$thVar <- z
-  
-  fitted <- F(phi_1, phi_2)
-  residuals <- yy - fitted
-  dim(residuals) <- NULL	#this should be a vector, not a matrix
-
-  res$noRegimes <- noRegimes
-  
-  return(extend(nlar(str, 
-                     coef= c(phi_1, phi_2),
-                     fit = fitted,
-                     res = residuals,
-                     k   = length(as.vector(phi_1)) +
-                                 length(as.vector(phi_2)),
-                     model.specific=res), "star"))
 }
 
+# Find promising initial values for next regime
+#
+# object: a valid (estimated) STAR model with m regimes
+#
+# returns good starting values for gamma and th of regime noRegime.
+startingValues <- function(object, ...)
+{
+
+  s_t<- object$model.specific$thVar
+  noRegimes <- object$model.specific$noRegimes
+  xx <- object$str$xx
+  th <- object$model.specific$phi2[,1]
+  gamma <- object$model.specific$phi2[,2]
+  phi1 <- object$model.specific$phi1
+  
+  bestCost <- 999999999999;
+  
+  # Maximum and minimum values for gamma
+  maxGamma <- 40;
+  minGamma <- 1;
+  rateGamma <- 5;
+  
+  # Maximum and minimum values for c
+  minTh <- quantile(s_t, .1) # percentil 10 of s_t
+  maxTh <- quantile(s_t, .9) # percentil 90 of s_t
+  rateTh <- (maxTh - minTh) / 100;
+  
+  gamma <- 0;
+  c <- 0;
+  for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
+    for(newTh in seq(minTh, maxTh, rateTh)) {
+
+      # We fix the linear parameters.
+      fX <- array(1, c(length(s_t), noRegimes - 1))
+      int_xx <- cbind(1, xx)
+      tmp <- int_xx;
+      for(i in 2:(noRegimes - 1)) { # leave out the first and last regime
+        fX[,i - 1] <- sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
+        tmp <- cbind(tmp, int_xx * fX[,i - 1])
+      }
+      fX[,noRegimes - 1] <- sigmoid(newGamma * (s_t - newTh))
+      tmp <- cbind(tmp, int_xx * fX[,noRegimes - 1])
+      
+      newphi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
+      dim(newphi1) <- dim(phi1)
+      
+      local <- array(0, c(noRegimes, T))
+      local[1,] <- int_xx %*% newphi1[1,]
+      for (i in 2:noRegimes) 
+        local[i,] <-
+          (int_xx %*% new_phi1[i,]) * fX[,i - 1]
+      
+      y.hat <- apply(local, 2, sum)
+      
+      cost <- crossprod(yy - y.hat)
+      
+      if(cost <= bestCost) {
+        bestCost <- cost;
+        gamma <- newGamma;
+        th <- newTh;
+        phi1 <- new_phi[1:(mL+1)]
+        phi2 <- new_phi[(mL+2):(mL+mH+2)]
+      }
+    }
+  }
+  
+  if (trace)
+    cat("Starting values fixed for regime ", noRegimes, ": th = ", th,
+        ", gamma = ", gamma,"; SSE = ", bestCost, "\n");
+
+}
 
 oneStep.star <- function(object, newdata, itime, thVar, ...){
   m <- object$model.specific$m
@@ -348,79 +261,6 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
   
 }
 
-# Estimates the parameters of a given STAR model.
-#
-# object: a valid (estimated) STAR model.
-#
-# Estimates object$model.specific$gradient
-#                   object$model.specific$phi_1
-#                   object$model.specific$phi_2
-estimateParams <- function(object, ...)
-{
-
-  # 1.- Find promising initial values
-  # 2.- Estimate nonlinear parameters
-  # 3.- Estimate linear parameters
-  # 4.- Compute yhat and ehat
-  # 5.- Compute the gradient
-
-}
-
-# Find promising initial values for next regime
-#
-# object: a valid (estimated) STAR model with m regimes
-#
-# returns good starting values for gamma and th of regime m + 1.
-startingValues <- function(object, ...)
-{
-
-  # THIS IS NOT FINISHED, IT WON'T WORK
-  
-  z <- object$model.specific$thVar
-  
-  bestCost <- 999999999999;
-  
-    # Maximum and minimum values for gamma
-  maxGamma <- 40;
-  minGamma <- 1;
-  rateGamma <- 5;
-  
-    # Maximum and minimum values for c
-  minTh <- quantile(z, .1) # percentil 10 de z
-  maxTh <- quantile(z, .9) # percentil 90 de z
-  rateTh <- (maxTh - minTh) / 100;
-  
-  gamma <- 0;
-  c <- 0;
-  for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
-    for(newTh in seq(minTh, maxTh, rateTh)) {
-      # We fix the linear parameters.
-      tmp <- data.frame(xxL, xxH * G(z, newGamma, newTh));
-      
-      new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
-      
-        # Get the sum of squares
-      y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newTh);
-      cost <- crossprod(yy - y.hat)
-      
-      if(cost <= bestCost) {
-        bestCost <- cost;
-        gamma <- newGamma;
-        th <- newTh;
-        phi1 <- new_phi[1:(mL+1)]
-        phi2 <- new_phi[(mL+2):(mL+mH+2)]
-      }
-    }
-  }
-  
-  if (trace)
-    cat("Starting values fixed: th = ", th, ", gamma = ", gamma,
-        "; SSE = ", bestCost, "\n");
-    
-  
-
-}
-
 
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
@@ -436,17 +276,6 @@ addRegime.star <- function(object, ...)
   
   T <- NROW(str$xx);  # The number of lagged samples
   
-  #Logistic transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-  G <- function(z, g, c) {
-    if((length(c) > 1) && (length(g) > 1))
-      t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
-    else
-      plogis(z, c, 1/g)
-  }
-
   # Build the regressand vector
   y_t <- str$yy;
   
@@ -598,3 +427,194 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, ...)
 
 }
 
+# Predefined STAR model
+#
+#   Builds a STAR with a fixed number of regimes ('noRegimes') and
+#     fixed parameters phi1 (linear) and phi2 (nonlinear). If no
+#     parameters are given they are set to random and evenly
+#     distributed, respectively.
+#                            TO-DO: proper initial values (grid serch)!!
+#
+#   mTh, thDelay, thVar: as in setar
+#   maxRegressors[i]: maximum number of autoregressors in regime i
+#   noRegimes: number of regimes of the model
+#   phi1[i]: vector with the maxRegressors[i]+1 parameters of regime i
+#   phi2[i]: vector with the parameters of tr. function i.
+#   trace: should infos be printed?
+#   control: 'control' options to be passed to optim
+#
+star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
+                  maxRegressors, phi1, phi2,
+                  mTh, thDelay=1, thVar, trace=TRUE, control=list())
+{
+
+  if(noRegimes == 1) 
+   stop("A STAR with 1 regime is an AR model: use the linear model instead.")
+  
+  if(noRegimes == 2) {
+    temp <- lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list())
+    
+    return(extend(nlar(str=temp$str, 
+                       coefficients = temp$model.specific$coefficients,
+                       fitted.values = temp$fitted,
+                       residuals = temp$residuals,
+                       k   = temp$k,
+                       model.specific=temp$model.specific), "star"))
+  } 
+
+  if(missing(m))
+    m <- max(maxRegressors, thDelay+1)
+
+  if(missing(series))
+    series <- deparse(substitute(x))
+
+  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+  xx <- str$xx
+  yy <- str$yy
+  externThVar <- FALSE
+  T <- NROW(xx)
+
+  if (missing(maxRegressors)) {
+    maxRegressors <- rep(m, times = noRegimes)
+    if (trace) 
+      cat("Using maximum autoregressive order for all regimes: ", m,"\n")
+  }
+
+  if(!missing(thDelay)) {
+    if(thDelay>=m) 
+      stop(paste("thDelay too high: should be < m (=",m,")"))
+    z <- xx[,thDelay+1]
+  } else if(!missing(mTh)) {
+    if(length(mTh) != m) 
+      stop("length of 'mTh' should be equal to 'm'")
+    z <- xx %*% mTh #threshold variable
+    dim(x) <- NULL
+  }
+  else if(!missing(thVar)) {
+    if(length(thVar)>nrow(xx)) {
+      z <- thVar[1:nrow(xx)]
+      if(trace) 
+        cat("Using only first", nrow(xx), "elements of thVar\n")
+    }
+    else 
+      z <- thVar
+    externThVar <- TRUE
+  } else {
+    if(trace) 
+      cat("Using default threshold variable: thDelay=0\n")
+    z <- xx[,1]
+  }
+  
+#Automatic starting values####################
+# TO DO: grid search over phi2.
+  if(missing(phi2)) {         
+    phi2 <- array(0, c(noRegimes, 2))
+    range <- range(z)
+    phi2[1:noRegimes,1] <- # phi2[,1] = th
+      range[1] + ((range[2] - range[1]) / (noRegimes)) * (0:(noRegimes-1))
+    phi2[,2] <- 4                   # phi2[,2] = gamma
+    if(trace) {
+      cat('Missing starting transition values. Using uniform distribution.\n')
+    }
+  }
+
+  if(missing(phi1)) {
+    phi1 <- array(rnorm(noRegimes * m+1), c(noRegimes, m+1))
+    if(trace) {
+      cat('Missing starting linear values. Using random values.\n')
+    }
+  }
+
+#############################################
+
+  #Sum of squares function
+  #p: vector of parameters
+  SS <- function(phi2) {
+    dim(phi2) <- c(noRegimes, 2)
+    
+    # We fix the linear parameters here, before optimizing the nonlinear.
+    tmp <- rep(cbind(1,xx), noRegimes)
+    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+    for (i in 1:noRegimes) 
+      tmp[,,i] <- tmp[,,i] * G(z, phi2[i,2], phi2[i,1])
+
+    new_phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(new_phi1) <- c(noRegimes, m + 1)
+
+    # Return the sum of squares
+    y.hat <- F(new_phi1, phi2)
+    crossprod(yy - y.hat)
+  }
+  
+  #Fitted values, given parameters
+  # phi1: vector of linear parameters
+  # phi2: vector of tr. functions' parameters
+  F <- function(phi1, phi2) {
+    local <- array(0, c(noRegimes, T))
+    int_xx <- cbind(1, xx)
+    for (i in 1:noRegimes) 
+      local[i,] <-
+        (int_xx %*% phi1[i,]) * G(z, phi2[i,2], phi2[i,1])
+
+    result <- apply(local, 2, sum)
+    result
+  }
+  
+#Numerical optimization##########
+  if(trace) 
+    cat('Optimizing...')
+
+  p <- as.vector(phi2)
+  res <- optim(p, SS, hessian = TRUE, control = control)
+  phi2 <- res$par
+  dim(phi2) <- c(noRegimes,2)
+
+  # A last linear optimization
+  tmp <- rep(cbind(1,xx), noRegimes)
+  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+  for (i in 1:noRegimes) 
+    tmp[,,i] <- tmp[,,i] * G(z, phi2[i,2], phi2[i,1])
+  
+  dim(tmp) <- c(NROW(xx), (NCOL(xx) + 1) * noRegimes)
+  phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+  dim(phi1) <- c(noRegimes, m+1)
+
+  if(trace) 
+    cat(' Done.\n')
+
+  if(trace)
+    if(res$convergence!=0)
+      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
+    else
+      cat("Optimization algorithm converged\n")
+################################
+  
+  #Results storing################
+  res$phi1 <- phi1
+  res$phi2 <- phi2
+  res$externThVar <- externThVar
+
+  if(!externThVar) {
+    if(missing(mTh)) {
+      mTh <- rep(0,m)
+      mTh[thDelay+1] <- 1
+    }
+    res$mTh <- mTh
+  }
+
+  res$thVar <- z
+  
+  fitted <- F(phi1, phi2)
+  residuals <- yy - fitted
+  dim(residuals) <- NULL	#this should be a vector, not a matrix
+
+  res$noRegimes <- noRegimes
+  
+  return(extend(nlar(str, 
+                     coef= c(phi1, phi2),
+                     fit = fitted,
+                     res = residuals,
+                     k   = length(as.vector(phi1)) +
+                                 length(as.vector(phi2)),
+                     model.specific=res), "star"))
+}
