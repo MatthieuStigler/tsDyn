@@ -69,13 +69,13 @@ getNUsed.nlar.struct <- function(obj, ...)
 nlar <- function(str, coefficients, fitted.values, residuals, k,
                  model.specific=NULL, ...) {
   return(extend(list(), "nlar",
-		str=str,
-		coefficients = coefficients,
-		fitted.values= fitted.values,
-		residuals = residuals,
-		k=k,
-		model.specific=model.specific,
-		...
+                str=str,
+                coefficients = coefficients,
+                fitted.values= fitted.values,
+                residuals = residuals,
+                k=k,
+                model.specific=model.specific,
+                ...
                 ))
 }
 
@@ -280,11 +280,13 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
 
   # Regressors under the alternative
   if (externThVar) {
+#    if (rob) {} else {
     tmp <- rep(s_t, NCOL(str$xx) + 1)
     dim(tmp) <- c(length(s_t), NCOL(str$xx) + 1)
     xH1 <- cbind(cbind(1, str$xx) * tmp, cbind(1, str$xx) * (tmp^2),
                  cbind(1, str$xx) * (tmp^3))
   } else {
+#    if (rob) {} else {
     tmp <- rep(s_t, NCOL(str$xx))
     dim(tmp) <- c(length(s_t), NCOL(str$xx))
     xH1 <- cbind(str$xx * tmp, str$xx * (tmp^2), str$xx * (tmp^3))
@@ -297,9 +299,6 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
   dim(sdZ) <- c(1, nZ)
   sdZ <- kronecker(matrix(1,T,1), sdZ) # repeat sdZ T rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
-  #####
-  #  ERROR: subindex outside limits
-  #####
 
   # Nonlinear model (alternative hypothesis)
   nonlinearModel <- lm(u_t ~ ., data=data.frame(Z));
@@ -313,7 +312,7 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
   F = ((SSE0 - SSE1) / m) / (SSE1 / (T - m - n));
     
   # Look up the statistic in the table, get the p-value
-  pValue <- pf(F, m, T - m - n, lower.tail = FALSE);
+  pValue <- 1 - pf(F, m, T - m - n, lower.tail = FALSE);
 
   if (pValue < sig) {
     return(list(isLinear = TRUE, pValue = pValue));
