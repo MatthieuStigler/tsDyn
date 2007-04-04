@@ -201,7 +201,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
                      fit =res$fitted,
                      res =res$residuals,
                      k   =res$k,
-                     model.specific=res), "lstar"))
+                     model.specific=res),
+                "lstar"))
 }
 
 #############################################
