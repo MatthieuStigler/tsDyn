@@ -80,17 +80,30 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
   }
   
   # 2. Linearity testing
-  testResults <- linearityTest(str, rob, sig)
-  pValue <- test-results$pValue;
+  cat("Testing linearity...\n")
+  testResults <- linearityTest(str, z, rob, sig)
+  pValue <- testResults$pValue;
 
   cat("LM Linearity test: p-value = ", pValue,"\n")
   if(testResults$isLinear) {
-    stop("The series is linear. Use the linear model.")
+    increase <- ! testResults$isLinear;
+    cat("The series is linear. Use linear model instead.\n")
   }
   else {
-    cat("The series is nonlinear. Incremental building procedure:")
+    increase <- ! testResults$isLinear;
+    cat("The series is nonlinear. Incremental building procedure:\n")
   }
+
   # 3. Add-regime loop
+  m <- 0;
+  while (increase) {
+
+    m <- m + 1;
+
+    estimateParams();
+    addRegime();
+    
+  }
   
 }
 
@@ -98,8 +111,9 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 # Predefined STAR model
 #
 #   Builds a STAR with a fixed number of regimes ('noRegimes') and
-#     fixed parameters phi_1 and phi_2. If no parameters are given
-#     they are set to random and evenly distributed, respectively.
+#     fixed parameters phi_1 (linear) and phi_2 (nonlinear). If no
+#     parameters are given they are set to random and evenly
+#     distributed, respectively.
 #                            TO-DO: proper initial values (grid serch)!!
 #
 #   mTh, thDelay, thVar: as in setar
@@ -119,8 +133,14 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
    stop("A STAR with 1 regime is an AR model: use the linear model instead.")
   
   if(noRegimes == 2) {
-    # It would be nice to cast the lstar into a star.
-    return(lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list()))
+    temp <- lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list())
+    
+    return(extend(nlar(str=temp$str, 
+                       coefficients = temp$model.specific$coefficients,
+                       fitted.values = temp$fitted,
+                       residuals = temp$residuals,
+                       k   = temp$k,
+                       model.specific=temp$model.specific), "star"))
   } 
 
   if(missing(m))
@@ -282,7 +302,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   res$noRegimes <- noRegimes
   
   return(extend(nlar(str, 
-                     coef= res$coef,
+                     coef= c(phi_1, phi_2),
                      fit = fitted,
                      res = residuals,
                      k   = length(as.vector(phi_1)) +
@@ -328,6 +348,79 @@ oneStep.star <- function(object, newdata, itime, thVar, ...){
   
 }
 
+# Estimates the parameters of a given STAR model.
+#
+# object: a valid (estimated) STAR model.
+#
+# Estimates object$model.specific$gradient
+#                   object$model.specific$phi_1
+#                   object$model.specific$phi_2
+estimateParams <- function(object, ...)
+{
+
+  # 1.- Find promising initial values
+  # 2.- Estimate nonlinear parameters
+  # 3.- Estimate linear parameters
+  # 4.- Compute yhat and ehat
+  # 5.- Compute the gradient
+
+}
+
+# Find promising initial values for next regime
+#
+# object: a valid (estimated) STAR model with m regimes
+#
+# returns good starting values for gamma and th of regime m + 1.
+startingValues <- function(object, ...)
+{
+
+  # THIS IS NOT FINISHED, IT WON'T WORK
+  
+  z <- object$model.specific$thVar
+  
+  bestCost <- 999999999999;
+  
+    # Maximum and minimum values for gamma
+  maxGamma <- 40;
+  minGamma <- 1;
+  rateGamma <- 5;
+  
+    # Maximum and minimum values for c
+  minTh <- quantile(z, .1) # percentil 10 de z
+  maxTh <- quantile(z, .9) # percentil 90 de z
+  rateTh <- (maxTh - minTh) / 100;
+  
+  gamma <- 0;
+  c <- 0;
+  for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
+    for(newTh in seq(minTh, maxTh, rateTh)) {
+      # We fix the linear parameters.
+      tmp <- data.frame(xxL, xxH * G(z, newGamma, newTh));
+      
+      new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
+      
+        # Get the sum of squares
+      y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newTh);
+      cost <- crossprod(yy - y.hat)
+      
+      if(cost <= bestCost) {
+        bestCost <- cost;
+        gamma <- newGamma;
+        th <- newTh;
+        phi1 <- new_phi[1:(mL+1)]
+        phi2 <- new_phi[(mL+2):(mL+mH+2)]
+      }
+    }
+  }
+  
+  if (trace)
+    cat("Starting values fixed: th = ", th, ", gamma = ", gamma,
+        "; SSE = ", bestCost, "\n");
+    
+  
+
+}
+
 
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
@@ -340,8 +433,6 @@ addRegime.star <- function(object, ...)
 {
 
   str <- object$str
-#  if(object$model.specific$noRegimes < 2)
-    # 
   
   T <- NROW(str$xx);  # The number of lagged samples
   
