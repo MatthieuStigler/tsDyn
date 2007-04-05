@@ -7,7 +7,7 @@ importFrom(tseries, na.remove)
 export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        autopairs, autotriples, autotriples.rgl,
        delta, delta.test, delta.lin, delta.lin.test,
-       llar, llar.predict, llar.fitted,
+       llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
        setar, lstar, availableModels, nlarDialog, 
        linear, isLinear, nnetTs, aar, tarch, star.predefined,
        star, addRegime, linearityTest)

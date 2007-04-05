@@ -160,7 +160,7 @@ estimateParams <- function(object, ...)
 #
 # returns good starting values for gamma and th of regime noRegime.
 
-startingValues <- function(object, ...)
+startingValues <- function(object, trace=FALSE, ...)
 {
 
   s_t<- object$model.specific$thVar
@@ -170,6 +170,7 @@ startingValues <- function(object, ...)
   th <- object$model.specific$phi2[,1]
   gamma <- object$model.specific$phi2[,2]
   phi1 <- object$model.specific$phi1
+  T <- NROW(object$str$xx)
   
   bestCost <- 999999999999;
   
@@ -187,24 +188,21 @@ startingValues <- function(object, ...)
     for(newTh in seq(minTh, maxTh, rateTh)) {
 
       # We fix the linear parameters.
-      fX <- array(1, c(length(s_t), noRegimes - 1))
       int_xx <- cbind(1, xx)
       tmp <- int_xx;
-      for(i in 2:(noRegimes - 1)) { # leave out the first and last regime
-        fX[,i - 1] <- sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
-        tmp <- cbind(tmp, int_xx * fX[,i - 1])
+      for(i in 1:(noRegimes - 2)) { # leave out the first and last regime
+        tmp <- cbind(tmp, int_xx * sigmoid(gamma[i] * (s_t - th[i])))
       }
-      fX[,noRegimes - 1] <- sigmoid(newGamma * (s_t - newTh))
-      tmp <- cbind(tmp, int_xx * fX[,noRegimes - 1])
+      tmp <- cbind(tmp, int_xx * sigmoid(newGamma * (s_t - newTh)))
       
-      newphi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
-      dim(newphi1) <- dim(phi1)
+      newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
+      dim(newPhi1) <- dim(phi1)
       
       local <- array(0, c(noRegimes, T))
-      local[1,] <- int_xx %*% newphi1[1,]
+      local[1,] <- int_xx %*% newPhi1[1,]
       for (i in 2:noRegimes) 
         local[i,] <-
-          (int_xx %*% newPhi1[i,]) * fX[,i - 1]
+          (int_xx %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
       
       y.hat <- apply(local, 2, sum)
       
@@ -220,8 +218,9 @@ startingValues <- function(object, ...)
   }
   
   if (trace)
-    cat("Starting values fixed for regime ", noRegimes, ": th = ", th,
-        ", gamma = ", gamma,"; SSE = ", bestCost, "\n");
+    cat("Starting values fixed for regime ", noRegimes, ": th = ",
+        th[noRegimes - 1], ", gamma = ", gamma[noRegimes - 1],
+        "; SSE = ", bestCost, "\n");
 
   object$model.specific$phi2[,1] = th;
   object$model.specific$phi2[,2] = gamma;
