@@ -35,9 +35,9 @@ G <- function(z, g, c) {
 F <- function(phi1, phi2, noRegimes, xx) {
   local <- array(0, c(noRegimes, T))
   int_xx <- cbind(1, xx)
-  for (i in 1:noRegimes) 
+  for (i in 2:noRegimes) 
     local[i,] <-
-      (int_xx %*% phi1[i,]) * G(z, phi2[i,2], phi2[i,1])
+      (int_xx %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1])
   
   result <- apply(local, 2, sum)
   result
@@ -139,12 +139,14 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 # object: a valid (estimated) STAR model.
 #
 # Estimates object$model.specific$gradient
-#                   object$model.specific$phi_1
-#                   object$model.specific$phi_2
+#                   object$model.specific$phi1
+#                   object$model.specific$phi2
 estimateParams <- function(object, ...)
 {
 
   # 1.- Find promising initial values
+  startingValues(object)
+  
   # 2.- Estimate nonlinear parameters
   # 3.- Estimate linear parameters
   # 4.- Compute yhat and ehat
@@ -157,12 +159,14 @@ estimateParams <- function(object, ...)
 # object: a valid (estimated) STAR model with m regimes
 #
 # returns good starting values for gamma and th of regime noRegime.
+
 startingValues <- function(object, ...)
 {
 
   s_t<- object$model.specific$thVar
   noRegimes <- object$model.specific$noRegimes
   xx <- object$str$xx
+  yy <- object$str$yy
   th <- object$model.specific$phi2[,1]
   gamma <- object$model.specific$phi2[,2]
   phi1 <- object$model.specific$phi1
@@ -179,8 +183,6 @@ startingValues <- function(object, ...)
   maxTh <- quantile(s_t, .9) # percentil 90 of s_t
   rateTh <- (maxTh - minTh) / 100;
   
-  gamma <- 0;
-  c <- 0;
   for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
     for(newTh in seq(minTh, maxTh, rateTh)) {
 
@@ -202,7 +204,7 @@ startingValues <- function(object, ...)
       local[1,] <- int_xx %*% newphi1[1,]
       for (i in 2:noRegimes) 
         local[i,] <-
-          (int_xx %*% new_phi1[i,]) * fX[,i - 1]
+          (int_xx %*% newPhi1[i,]) * fX[,i - 1]
       
       y.hat <- apply(local, 2, sum)
       
@@ -210,10 +212,9 @@ startingValues <- function(object, ...)
       
       if(cost <= bestCost) {
         bestCost <- cost;
-        gamma <- newGamma;
-        th <- newTh;
-        phi1 <- new_phi[1:(mL+1)]
-        phi2 <- new_phi[(mL+2):(mL+mH+2)]
+        gamma[noRegimes - 1] <- newGamma;
+        th[noRegimes - 1] <- newTh;
+        phi1 <- newPhi1
       }
     }
   }
@@ -222,45 +223,12 @@ startingValues <- function(object, ...)
     cat("Starting values fixed for regime ", noRegimes, ": th = ", th,
         ", gamma = ", gamma,"; SSE = ", bestCost, "\n");
 
-}
-
-oneStep.star <- function(object, newdata, itime, thVar, ...){
-  m <- object$model.specific$m
-
-  phi_1 <- object$model.specific$phi_1
-  phi_2 <- object$model.specific$phi_2
-  
-  th <- object$coefficients["th"]
-  ext <- object$model.specific$externThVar
-
-  if(ext) {
-    z <- thVar[itime]
-  } else {
-    z <- newdata %*% object$model$mTh
-    dim(z) <- NULL
-  }
-
-  if(nrow(newdata) > 1) {
-    accum <- array(0, c(noRegimes, nrow(newdata)))
-    for (i in 1:noRegimes) 
-      accum[i,] <-
-        (cbind(1,newdata) %*% phi_1[i,]) * G(z, phi_2[i,2], phi_2[i,1])
-    
-    result <- apply(accum, 2, sum)
-  }
-  else {
-    accum <- 0
-    for (i in 1:noRegimes) 
-      accum <- accum + 
-        (c(1,newdata) %*% phi_1[i,]) * G(z, phi_2[i,2], phi_2[i,1])
-    
-    result <- accum
-  }
-
-  result
+  object$model.specific$phi2[,1] = th;
+  object$model.specific$phi2[,2] = gamma;
+  object$model.specific$phi1 = phi1;
+#  return(c(gamma = newGamma, th = newTh, phi1 = newPhi1))
   
 }
-
 
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
@@ -294,10 +262,9 @@ addRegime.star <- function(object, ...)
   gmatrix <- x_t
   for (i in 2:object$model.specific$noRegimes) {
     gmatrix <- cbind(gmatrix, x_t *
-                     G(s_t, object$model$phi_2[i,2],
-                       object$model$phi_2[i,1])
-#                     , phi_1 * x_t * dGdc() deriv G / deriv c
-#                     , phi_1 * x_t * dGds() dG / d sigma
+                     G(s_t, object$model$phi2[i,2], object$model$phi2[i,1])
+#                     , phi1 * x_t * dGdc() deriv G / deriv c
+#                     , phi1 * x_t * dGds() dG / d sigma
                    )
   }
   
@@ -508,10 +475,10 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
 #Automatic starting values####################
 # TO DO: grid search over phi2.
   if(missing(phi2)) {         
-    phi2 <- array(0, c(noRegimes, 2))
+    phi2 <- array(0, c(noRegimes - 1, 2))
     range <- range(z)
-    phi2[1:noRegimes,1] <- # phi2[,1] = th
-      range[1] + ((range[2] - range[1]) / (noRegimes)) * (0:(noRegimes-1))
+    phi2[1:(noRegimes - 1),1] <- # phi2[,1] = th
+      range[1] + ((range[2] - range[1]) / (noRegimes - 1)) * (0:(noRegimes-2))
     phi2[,2] <- 4                   # phi2[,2] = gamma
     if(trace) {
       cat('Missing starting transition values. Using uniform distribution.\n')
@@ -530,19 +497,19 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   #Sum of squares function
   #p: vector of parameters
   SS <- function(phi2) {
-    dim(phi2) <- c(noRegimes, 2)
+    dim(phi2) <- c(noRegimes - 1, 2)
     
     # We fix the linear parameters here, before optimizing the nonlinear.
     tmp <- rep(cbind(1,xx), noRegimes)
     dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-    for (i in 1:noRegimes) 
-      tmp[,,i] <- tmp[,,i] * G(z, phi2[i,2], phi2[i,1])
+    for (i in 2:noRegimes) 
+      tmp[,,i] <- tmp[,,i] * G(z, phi2[i - 1,2], phi2[i - 1,1])
 
-    new_phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-    dim(new_phi1) <- c(noRegimes, m + 1)
+    newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(newPhi1) <- c(noRegimes, m + 1)
 
     # Return the sum of squares
-    y.hat <- F(new_phi1, phi2)
+    y.hat <- F(newPhi1, phi2)
     crossprod(yy - y.hat)
   }
   
@@ -552,9 +519,10 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   F <- function(phi1, phi2) {
     local <- array(0, c(noRegimes, T))
     int_xx <- cbind(1, xx)
-    for (i in 1:noRegimes) 
+    local[1,] <- int_xx %*% phi1[1,];
+    for (i in 2:noRegimes) 
       local[i,] <-
-        (int_xx %*% phi1[i,]) * G(z, phi2[i,2], phi2[i,1])
+        (int_xx %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1]);
 
     result <- apply(local, 2, sum)
     result
@@ -567,14 +535,17 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   p <- as.vector(phi2)
   res <- optim(p, SS, hessian = TRUE, control = control)
   phi2 <- res$par
-  dim(phi2) <- c(noRegimes,2)
+  dim(phi2) <- c(noRegimes - 1,2)
 
   # A last linear optimization
   tmp <- rep(cbind(1,xx), noRegimes)
-  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-  for (i in 1:noRegimes) 
-    tmp[,,i] <- tmp[,,i] * G(z, phi2[i,2], phi2[i,1])
   
+  # Make tmp 3-dimensional
+  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+  for (i in 2:noRegimes) 
+    tmp[,,i] <- tmp[,,i] * G(z, phi2[i - 1,2], phi2[i - 1,1])
+
+  # Make tmp 2-dimensional
   dim(tmp) <- c(NROW(xx), (NCOL(xx) + 1) * noRegimes)
   phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
   dim(phi1) <- c(noRegimes, m+1)
@@ -617,4 +588,43 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                      k   = length(as.vector(phi1)) +
                                  length(as.vector(phi2)),
                      model.specific=res), "star"))
+}
+
+oneStep.star <- function(object, newdata, itime, thVar, ...){
+  m <- object$model.specific$m;
+  noRegimes <- object$model.specific$noRegimes;
+
+  phi1 <- object$model.specific$phi1
+  phi2 <- object$model.specific$phi2
+  
+  th <- object$coefficients["th"]
+  ext <- object$model.specific$externThVar
+
+  if(ext) {
+    z <- thVar[itime]
+  } else {
+    z <- newdata %*% object$model$mTh
+    dim(z) <- NULL
+  }
+
+  if(nrow(newdata) > 1) {
+    accum <- array(0, c(noRegimes, nrow(newdata)))
+    accum[1,] <- (cbind(1,newdata) %*% phi1[1,]);
+    for (i in 2:noRegimes) 
+      accum[i,] <-
+        (cbind(1,newdata) %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1])
+    
+    result <- apply(accum, 2, sum)
+  }
+  else {
+    accum <- c(1, newdata) %*% phi1[1,];
+    for (i in 2:noRegimes) 
+      accum <- accum + 
+        (c(1, newdata) %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1])
+    
+    result <- accum
+  }
+
+  result
+  
 }
