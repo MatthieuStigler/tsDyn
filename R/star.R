@@ -61,12 +61,14 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
     
     if(thDelay>=m) 
       stop(paste("thDelay too high: should be < m (=",m,")"))
+    
     z <- xx[,thDelay+1]
 
   } else if(!missing(mTh)) {
 
     if(length(mTh) != m) 
       stop("length of 'mTh' should be equal to 'm'")
+
     z <- xx %*% mTh #threshold variable
     dim(x) <- NULL
 
@@ -75,8 +77,8 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 
     if(length(thVar)>nrow(xx)) {
       z <- thVar[1:nrow(xx)]
-      if(trace) 
-        cat("Using only first", nrow(xx), "elements of thVar\n")
+
+      if(trace) cat("Using only first", nrow(xx), "elements of thVar\n")
 
     }
     else 
@@ -87,52 +89,53 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 
   } else {
 
-    if(trace) 
-      cat("Using default threshold variable: thDelay=0\n")
+    if(trace) cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
 
   }
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 2. Linearity testing
-  cat("Testing linearity...   ")
-  testResults <- linearityTest(str, z, rob, sig, trace)
+  if (trace) cat("Testing linearity...   ")
+  testResults <- linearityTest(str, z, rob=rob, sig=sig, trace = trace)
   pValue <- testResults$pValue;
   increase <- ! testResults$isLinear;
 
-  cat("p-value = ", pValue,"\n")
+  if(trace) cat("p-Value = ", pValue,"\n")
   if(testResults$isLinear) {
-    cat("The series is linear. Use linear model instead.\n")
+    if(trace) cat("The series is linear. Use linear model instead.\n")
+    return(str);
   }
   else {
-    cat("The series is nonlinear. Incremental building procedure:\n")
+    if(trace) cat("The series is nonlinear. Incremental building procedure:\n")
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 3. Build the 2-regime star
-    object <- star.predefined(x, noRegimes=2, m, d, steps, series, rob,
-                              mTh, thDelay, thVar, sig, trace, control)
+    object <- star.predefined(x, noRegimes=2, m=m, d=d, steps=steps,
+                              series=series, mTh=mTh, thDelay=thDelay,
+                              thVar=thVar, trace=trace, control=control)
   
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 4. Add-regime loop
     count <- 1; # Number of nonlinear terms in the model
     while (increase) {
       
-      object <- estimateParams(object, control, trace);
+      object <- estimateParams(object, control=control, trace=trace);
 
       G <- computeGradient(object);
       
-      cat("\tTesting for addition of regime ", count, "...");
+      if(trace) cat("\tTesting for addition of regime ", count, "...");
       
-      testResults <- addRegime(object, G, rob, sig, trace);
+      testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
       increase <- testResults$remainingNonLinearity;
       
       if(increase) {
         count <- count + 1;
-        cat("OK (p-value = ", testResults$pValue, ")\n");
+        if(trace) cat("OK (p-value = ", testResults$pValue, ")\n");
       }
       
     }
-    cat("Finished building a MRSTAR with ",count, " regimes\n");
+    if(trace) cat("Finished building a MRSTAR with ",count, " regimes\n");
   }
   
 }
@@ -142,25 +145,26 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 #    regime should be considered.
 #
 # object: a STAR model already built with at least 2 regimes.
-# gmatrix: the gradient matrix obtained by using computeGradient()
+# G: the gradient matrix obtained by using computeGradient()
 # rob: boolean indicating if robust tests should be used or not.
 # sig: significance level of the tests
 # 
 # returns a list containing the p-value of the F statistic and a boolean,
 #      true if there is some remaining nonlinearity and false otherwise.
-addRegime.star <- function(object, gmatrix, rob=FALSE, sig=0.05, trace = TRUE, ...)
+addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 {
 
   e <-  object$residuals;
   s_t <- object$model.specific$thVar;
-  nG <- NCOL(gmatrix);
+  nG <- NCOL(G);
   normG <- norm(Matrix(G * e))
+  n.used <- object$str$n.used
 
   # Compute the rank of G' * G
   G2 <- t(G) %*% G;
   s <- svd(G2);
   tol <- max(dim(G2)) * s[1]$d * 2.2204e-16
-  qr(G2, tol)$rank
+  rG <- qr(G2, tol)$rank
 #  rG <- sum(svd(G2)$d > tol);
 
   if (normG > 1e+6) {
@@ -305,7 +309,7 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 1.- Find promising initial values
-  object <- startingValues(object);
+  object <- startingValues(object, trace=trace, control=control);
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 2.- Estimate nonlinear parameters
@@ -331,7 +335,6 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     
     newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
     dim(newPhi1) <- c(noRegimes, NCOL(x_t))
-        
     
     # Return the sum of squares
     local <- array(0, c(noRegimes, n.used))
@@ -362,9 +365,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 
   if(trace)
     if(res$convergence != 0)
-      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
+      if(trace) cat("Convergence problem. Convergence code: ",res$convergence,"\n")
     else
-      cat("Optimization algorithm converged\n")
+      if(trace) cat("Optimization algorithm converged\n")
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 3.- Estimate linear parameters
@@ -468,8 +471,7 @@ startingValues <- function(object, trace=TRUE, ...)
     }
   }
   
-  if (trace)
-    cat("Starting values fixed for regime ", noRegimes, ":\n\t th = ",
+  if (trace) cat("Starting values fixed for regime ", noRegimes, ":\n\t th = ",
         th[noRegimes - 1], ",\n\t gamma = ", gamma[noRegimes - 1],
         ";\n\t SSE = ", bestCost, "\n");
 
@@ -544,7 +546,7 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
   pValue <- pf(F, m, n.used - m - n, lower.tail = FALSE);
 
   if (pValue < sig) {
-    return(list(isLinear = TRUE, pValue = pValue));
+    return(list(isLinear = TRUE,  pValue = pValue));
   }
   else {
     return(list(isLinear = FALSE, pValue = pValue));
@@ -577,7 +579,9 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
    stop("A STAR with 1 regime is an AR model: use the linear model instead.")
   
   if(noRegimes == 2) {
-    temp <- lstar(x, m, d, steps, series, mTh, mH=m, mL=m, thDelay, thVar, control=list())
+    temp <- lstar(x, m=m, d=d, steps=steps, series=series, mTh=mTh,
+                  mH=m, mL=m, thDelay=thDelay, thVar=thVar,
+                  trace=trace, control=list())
 
     # Cast the lstar into a valid star object
     temp$model.specific$noRegimes <- noRegimes;

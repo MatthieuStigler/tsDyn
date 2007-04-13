@@ -259,10 +259,10 @@ linearityTest <- function(object, ...)
 #   rob
 #   sig
 linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
-                                      rob=FALSE, sig=0.05, ...)
+                                      rob=FALSE, sig=0.05, trace=TRUE, ...)
 {
 
-  T <- NROW(str$xx);  # The number of lagged samples
+  n.used <- NROW(str$xx);  # The number of lagged samples
 
   # Build the regressand vector
   y_t <- str$yy;
@@ -297,7 +297,7 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
   nZ <- NCOL(Z);
   sdZ <- sd(Z)
   dim(sdZ) <- c(1, nZ)
-  sdZ <- kronecker(matrix(1,T,1), sdZ) # repeat sdZ T rows
+  sdZ <- kronecker(matrix(1,n.used,1), sdZ) # repeat sdZ n.used rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
 
   # Nonlinear model (alternative hypothesis)
@@ -306,13 +306,13 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
   SSE1 <- sum(e_t^2)
 
   # Compute the test statistic
-  n <- dim(xH0)[2];
-  m <- dim(xH1)[2];
+  n <- NCOL(xH0);
+  m <- NCOL(xH1);
   
-  F = ((SSE0 - SSE1) / m) / (SSE1 / (T - m - n));
+  F = ((SSE0 - SSE1) / m) / (SSE1 / (n.used - m - n));
     
   # Look up the statistic in the table, get the p-value
-  pValue <- 1 - pf(F, m, T - m - n, lower.tail = FALSE);
+  pValue <- 1- pf(F, m, n.used - m - n, lower.tail = FALSE);
 
   if (pValue < sig) {
     return(list(isLinear = TRUE, pValue = pValue));
