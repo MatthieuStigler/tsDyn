@@ -115,27 +115,36 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
                               series=series, mTh=mTh, thDelay=thDelay,
                               thVar=thVar, trace=trace, control=control)
   
+    if(trace) cat("\tTesting for addition of regime 3...  ");
+    
+#  object <- estimateParams(object, control=control, trace=trace);
+    G <- computeGradient(object);
+    testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
+    increase <- testResults$remainingNonLinearity;
+    
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 4. Add-regime loop
-    count <- 1; # Number of nonlinear terms in the model
+    count <- 2; # Number of nonlinear terms in the model
     while (increase) {
       
       object <- estimateParams(object, control=control, trace=trace);
 
       G <- computeGradient(object);
       
-      if(trace) cat("\tTesting for addition of regime ", count, "...");
+      if(trace) cat("\tTesting for addition of regime ", count + 1, "...  ");
       
       testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
       increase <- testResults$remainingNonLinearity;
       
       if(increase) {
         count <- count + 1;
-        if(trace) cat("OK (p-value = ", testResults$pValue, ")\n");
+        if(trace) cat("Accepted (p-value = ", testResults$pValue, ")\n");
+      } else {
+        if(trace) cat("Rejected (p-value = ", testResults$pValue, ")\n");
       }
       
     }
-    if(trace) cat("Finished building a MRSTAR with ",count, " regimes\n");
+    if(trace) cat("Finished building a MRSTAR with ",count + 1, " regimes\n");
   }
   
 }
@@ -158,7 +167,7 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   s_t <- object$model.specific$thVar;
   nG <- NCOL(G);
   normG <- norm(Matrix(G * e))
-  n.used <- object$str$n.used
+  n.used <- length(e);
 
   # Compute the rank of G' * G
   G2 <- t(G) %*% G;
@@ -235,7 +244,7 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   # Compute the third order statistic
   F = ((SSE0 - SSE) / nxH1) / (SSE / (n.used - nxH0 - nxH1));
 
-  pValue <- pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
+  pValue <- 1 - pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
 #  cat("F statistic, method 1:", pValue,"\n")  
 
   if (pValue < sig) {
@@ -295,13 +304,12 @@ computeGradient <- function(object, ...)
 #
 # object: a valid STAR model.
 #
-# Estimates object$model.specific$gradient
-#                   object$model.specific$phi1
+# Estimates object$model.specific$phi1
 #                   object$model.specific$phi2
 estimateParams <- function(object, trace=TRUE, control=list(), ...)
 {
 
-  noRegimes <- object$model.specific$noRegimes
+  noRegimes <- object$model.specific$noRegimes + 1; # ADD 1 REGIME
   s_t<- object$model.specific$thVar;
   xx <- object$str$xx
   yy <- object$str$yy
@@ -415,16 +423,24 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 startingValues <- function(object, trace=TRUE, ...)
 {
 
+  # # # # # # # # # # # # # # # # # # # # # 
+  # First, add 1 regime to the model
+  object$model.specific$noRegimes <- object$model.specific$noRegimes + 1;
+  
   s_t<- object$model.specific$thVar;
   noRegimes <- object$model.specific$noRegimes;
+
+  th <- object$model.specific$phi2[,1];
+  th[noRegimes - 1] <- 0;
+  gamma <- object$model.specific$phi2[,2];
+  gamma[noRegimes - 1] <- 0;
+  
+  phi1 <- object$model.specific$phi1;
+  phi1 <- rbind(phi1, rnorm(3));
+  
   xx <- object$str$xx;
   yy <- object$str$yy;
-  th <- object$model.specific$phi2[,1];
-  gamma <- object$model.specific$phi2[,2];
-  phi1 <- object$model.specific$phi1;
   n.used <- NROW(object$str$xx);
-  
-  bestCost <- 999999999999;
   
   # Maximum and minimum values for gamma
   maxGamma <- 40;
@@ -435,6 +451,8 @@ startingValues <- function(object, trace=TRUE, ...)
   minTh <- quantile(s_t, .1) # percentil 10 of s_t
   maxTh <- quantile(s_t, .9) # percentil 90 of s_t
   rateTh <- (maxTh - minTh) / 100;
+  
+  bestCost <- Inf;
   
   for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
     for(newTh in seq(minTh, maxTh, rateTh)) {
@@ -454,9 +472,11 @@ startingValues <- function(object, trace=TRUE, ...)
       
       local <- array(0, c(noRegimes, n.used))
       local[1,] <- x_t %*% newPhi1[1,]
-      for (i in 2:noRegimes) 
+      for (i in 2:(noRegimes - 1)) 
         local[i,] <-
           (x_t %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
+      local[noRegimes,] <- (x_t %*% newPhi1[noRegimes,]) *
+        sigmoid(newGamma * (s_t - newTh))
       
       y.hat <- apply(local, 2, sum)
       
@@ -475,8 +495,7 @@ startingValues <- function(object, trace=TRUE, ...)
         th[noRegimes - 1], ",\n\t gamma = ", gamma[noRegimes - 1],
         ";\n\t SSE = ", bestCost, "\n");
 
-  object$model.specific$phi2[,1] <- th;
-  object$model.specific$phi2[,2] <- gamma;
+  object$model.specific$phi2 <- rbind(th, gamma);
   object$model.specific$phi1 <- phi1;
 
   return(object);
