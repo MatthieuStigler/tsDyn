@@ -34,9 +34,9 @@ G <- function(z, g, c) {
 #   Builds a STAR model with as many regimes as needed, using the
 #     bottom-up strategy proposed by Teräsvirta et al.
 #
-#   x
-#   m
-#   d
+#   x: the time series 
+#   m: the order of the autoregressive terms
+#   d: 
 #   steps
 #   series
 #   rob
@@ -118,8 +118,8 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
     if(trace) cat("\tTesting for addition of regime 3...  ");
     
 #  object <- estimateParams(object, control=control, trace=trace);
-    G <- computeGradient(object);
-    testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
+#    G <- computeGradient(object);
+#    testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
     increase <- testResults$remainingNonLinearity;
     
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -131,7 +131,7 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 
       G <- computeGradient(object);
       
-      if(trace) cat("\tTesting for addition of regime ", count + 1, "...  ");
+      if(trace) cat("\tTesting for addition of regime ", count + 2, "...  ");
       
       testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
       increase <- testResults$remainingNonLinearity;
@@ -332,14 +332,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     # We fix the linear parameters here, before optimizing the nonlinear.
     x_t <- cbind(1, xx)
     tmp <- x_t;
-#  if (noRegimes > 2) {
     for(i in 1:(noRegimes - 1)) {
       tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
     }
-#  }
-#  else {
-#    tmp <- cbind(tmp, x_t * sigmoid(gamma * (s_t - th)));
-#  }
     
     newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
     dim(newPhi1) <- c(noRegimes, NCOL(x_t))
@@ -381,14 +376,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
   # 3.- Estimate linear parameters
   x_t <- cbind(1, xx)
   tmp <- x_t;
-#  if (noRegimes > 2) {
-    for(i in 1:(noRegimes - 1)) {
-      tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
-    }
-#  }
-#  else {
-#    tmp <- cbind(tmp, x_t * sigmoid(gamma * (s_t - th)));
-#  }
+  for(i in 1:(noRegimes - 1)) {
+    tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
+  }
   
   newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
   dim(newPhi1) <- c(noRegimes, NCOL(x_t));
@@ -597,7 +587,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   if(noRegimes == 1) 
    stop("A STAR with 1 regime is an AR model: use the linear model instead.")
   
-  if(noRegimes == 2) {
+  if((noRegimes == 2) && missing(phi1) && missing(phi2)) {
     temp <- lstar(x, m=m, d=d, steps=steps, series=series, mTh=mTh,
                   mH=m, mL=m, thDelay=thDelay, thVar=thVar,
                   trace=trace, control=list())
@@ -678,6 +668,10 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     if(trace) {
       cat('Missing starting transition values. Using uniform distribution.\n')
     }
+    optimize <- TRUE
+  }
+  else {
+    optimize <- FALSE
   }
 
   if(missing(phi1)) {
@@ -712,52 +706,74 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   # phi1: vector of linear parameters
   # phi2: vector of tr. functions' parameters
   F <- function(phi1, phi2) {
-    local <- array(0, c(noRegimes, n.used))
     x_t <- cbind(1, xx)
+    local <- array(0, c(noRegimes, n.used))
     local[1,] <- x_t %*% phi1[1,];
-    for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1]);
-
+    if(noRegimes == 2) {
+      local[2,] <-
+        (x_t %*% phi1[2,]) * sigmoid(phi2[1,2] * (z - phi2[1, 1]))
+    }
+    else {
+      for (i in 2:noRegimes) 
+        local[i,] <-
+          (x_t %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1]);
+    }
+    
     result <- apply(local, 2, sum)
     result
   }
   
 #Numerical optimization##########
-  if(trace) 
-    cat('Optimizing...')
+  res <- list()
+  res$convergence <- NA
+  res$hessian <- NA
+  res$message <- NA
+  res$value <- NA
+  if(optimize) {
+    if(trace) cat('Optimizing...')
+    
+    p <- as.vector(phi2)
+    
+    res <- optim(p, SS, hessian = TRUE, control = control)
+    
+    phi2 <- res$par
+    dim(phi2) <- c(noRegimes - 1,2)
+    
+    for (i in 1:(noRegimes - 1))
+      if(phi2[i,2] <0)
+        phi2[i,2] <- - phi2[i,2];
 
-  p <- as.vector(phi2)
-  res <- optim(p, SS, hessian = TRUE, control = control)
-  phi2 <- res$par
-  dim(phi2) <- c(noRegimes - 1,2)
+    x_t <- cbind(1,xx);
+    local <- array(0, c(noRegimes, n.used))
+    local[1,] <- x_t %*% phi1[1,]
+    if(noRegimes == 2) {
+      local[2,] <-
+        (x_t %*% phi1[2,]) * sigmoid(phi2[1,2] * (z - phi2[1, 1]))
+    }
+    else {
+      for (i in 2:noRegimes) 
+        local[i,] <-
+          (x_t %*% phi1[i,]) * sigmoid(phi2[i - 1,2] * (z - phi2[i - 1, 1]))
+    }
+    
+    phi1<- lm(yy ~ . - 1, as.data.frame(local))$coefficients
+    dim(phi1) <- c(noRegimes, m+1)
+    
+    if(trace) 
+      cat(' Done.\n')
 
-  # A last linear optimization
-  tmp <- rep(cbind(1,xx), noRegimes)
-  
-  # Make tmp 3-dimensional
-  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
-  for (i in 2:noRegimes) 
-    tmp[,,i] <- tmp[,,i] * G(z, phi2[i - 1,2], phi2[i - 1,1])
-
-  # Make tmp 2-dimensional
-  dim(tmp) <- c(NROW(xx), (NCOL(xx) + 1) * noRegimes)
-  phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-  dim(phi1) <- c(noRegimes, m+1)
-
-  if(trace) 
-    cat(' Done.\n')
-
-  if(trace)
-    if(res$convergence!=0)
-      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
-    else
-      cat("Optimization algorithm converged\n")
+    if(trace)
+      if(res$convergence!=0)
+        cat("Convergence problem. Convergence code: ",res$convergence,"\n")
+      else
+       cat("Optimization algorithm converged\n")
+  }
 ################################
   
   #Results storing################
   res$phi1 <- phi1
   res$phi2 <- phi2
+  
   res$externThVar <- externThVar
 
   if(!externThVar) {
@@ -767,14 +783,26 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     }
     res$mTh <- mTh
   }
-
+  
   res$thVar <- z
   
   fitted <- F(phi1, phi2)
+  
   residuals <- yy - fitted
   dim(residuals) <- NULL	#this should be a vector, not a matrix
 
   res$noRegimes <- noRegimes
+  
+  if(!optimize) {
+    res$convergence=NA
+    res$hessian=NA
+    res$message=NA
+    res$value=NA
+    res$fitted <- fitted
+    res$residuals <- residuals
+    dim(res$residuals) <- NULL #this should be a vector, not a matrix
+    res$k <- length(as.vector(phi1)) + length(as.vector(phi2))
+  }
   
   return(extend(nlar(str, 
                      coef= c(phi1, phi2),
