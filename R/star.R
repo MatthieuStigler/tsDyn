@@ -102,7 +102,7 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
   increase <- ! testResults$isLinear;
 
   if(trace) cat("p-Value = ", pValue,"\n")
-  if(testResults$isLinear) {
+  if(!increase) {
     if(trace) cat("The series is linear. Use linear model instead.\n")
     return(str);
   }
@@ -115,12 +115,17 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
                               series=series, mTh=mTh, thDelay=thDelay,
                               thVar=thVar, trace=trace, control=control)
   
-    if(trace) cat("\tTesting for addition of regime 3...  ");
+    if(trace) cat("Testing for addition of regime 3...  ");
     
-#  object <- estimateParams(object, control=control, trace=trace);
-#    G <- computeGradient(object);
-#    testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
+    if(trace) cat("  Estimating parameters for regimes 1 and 2...\n");
+    object <- estimateParams(object, control=control, trace=trace);
+    if(trace) cat("  Done. Estimating gradient matrix...\n");
+    G <- computeGradient(object);
+    if(trace) cat("  Done. Testing for regime 3...\n");
+    testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
     increase <- testResults$remainingNonLinearity;
+    if(increase && trace) { cat("  Done. Regime 3 is needed.\n"); }
+    else {cat("  Done. Regime 3 is NOT accepted.\n");}
     
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 4. Add-regime loop
@@ -317,6 +322,7 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 1.- Find promising initial values
+#  if(trace) cat("Estimating starting values for parameters.");
   object <- startingValues(object, trace=trace, control=control);
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -597,13 +603,15 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     vecLength <- NCOL(temp$str$xx); # length of phi[i,]
 
     temp$model.specific$phi1 <-
-      temp$model.specific$coefficients[1:((vecLength + 1) * noRegimes)];
-    dim(temp$model.specific$phi1) <- c(noRegimes, vecLength + 1)
+      temp$model.specific$coefficients[1:((vecLength + 1) * 2)];
+    dim(temp$model.specific$phi1) <- c(2, vecLength + 1)
 
     temp$model.specific$phi2 <-
-      temp$model.specific$coefficients[((vecLength + 1) * noRegimes + 1):
-                                       ((vecLength+1) * noRegimes + 2)];
-    dim(temp$model.specific$phi2) <- c(noRegimes - 1, 2)
+      temp$model.specific$coefficients[(((vecLength + 1) * 2) + 1):
+                                       (((vecLength+1) * 2) + 2)];
+    dim(temp$model.specific$phi2) <- c(1, 2)
+
+    cat("gamma = ",temp$model.specific$phi2[1], ", th=", temp$model.specific$phi2[2], "\n")
     
     return(extend(nlar(str=temp$str, 
                        coefficients = temp$model.specific$coefficients,

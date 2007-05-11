@@ -92,7 +92,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if (trace)
       cat("Performing grid search for starting values\n");
 
-    bestCost <- 999999999999;
+    bestCost <- Inf;
 
     # Maximum and minimum values for gamma
     maxGamma <- 40;
@@ -143,11 +143,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     tmp <- data.frame(xxL, xxH * G(z, gamma, th));
     
     new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
-    phi1ss <- new_phi[1:(mL+1)]	
-    phi2ss <- new_phi[(mL+2):(mL + mH + 2)]
 
     # Now compute the cost / sum of squares
-    y.hat <- F(phi1ss, phi2ss, gamma, th)
+    y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL + mH + 2)], gamma, th)
     crossprod(yy - y.hat)
   }
  
