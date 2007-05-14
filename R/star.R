@@ -279,7 +279,9 @@ computeGradient <- function(object, ...)
 
   gamma <- object$model.specific$phi2[,1];
   th <- object$model.specific$phi2[,2];
+
   phi1 <- object$model.specific$phi1;
+
   n.used <- NROW(object$str$xx);
   s_t<- object$model.specific$thVar;
   x_t <- cbind(1, object$str$xx);
@@ -322,7 +324,7 @@ estimateParams <- function(object, add=FALSE, trace=TRUE, control=list(), ...)
 {
 
   if(add) {
-    if(trace) cat("Adding regime ",object$model.specific$noRegimes + 1,".\n");
+    if(trace) cat("Adding regime ",object$model.specific$noRegimes + 1,"...");
 
     object$model.specific$noRegimes <- object$model.specific$noRegimes + 1;
     noRegimes <- object$model.specific$noRegimes;
@@ -330,19 +332,19 @@ estimateParams <- function(object, add=FALSE, trace=TRUE, control=list(), ...)
     gamma <- object$model.specific$phi2[,1];
     gamma[noRegimes - 1] <- 0.0;
     th <- object$model.specific$phi2[,2];
-    th[noRegimes - 1] <- 0;
-    object$model.specific$phi2 <- rbind(th, gamma);
+    th[noRegimes - 1] <- 0.0;
+    object$model.specific$phi2 <- rbind(gamma, th);
     
     phi1 <- object$model.specific$phi1;
     phi1 <- rbind(phi1, rnorm(3));
     object$model.specific$phi1 <- phi1;
 
-    object$model.specific$coefficients <- c(phi1, rbind(th,gamma));
-    object$coefficients <- c(phi1, rbind(th,gamma));
+    object$model.specific$coefficients <- c(phi1, rbind(gamma, th));
+    object$coefficients <- c(phi1, rbind(gamma, th));
     object$model.specific$k <- length(object$coefficients)
     object$k <- length(object$coefficients);
 
-    if(trace) cat("OK: added regime ",object$model.specific$noRegimes,".\n");
+    if(trace) cat(" OK.\n");
   }
   
   s_t<- object$model.specific$thVar;
@@ -358,66 +360,103 @@ estimateParams <- function(object, add=FALSE, trace=TRUE, control=list(), ...)
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 2.- Estimate nonlinear parameters
 
+  #Fitted values, given parameters
+  # phi1: vector of linear parameters
+  # phi2: vector of tr. functions' parameters
+  F <- function(phi1, phi2) {
+    x_t <- cbind(1, xx)
+    local <- array(0, c(noRegimes, n.used))
+    local[1,] <- x_t %*% phi1[1,];
+
+    for (i in 2:noRegimes) 
+      local[i,] <-
+        (x_t %*% phi1[i,]) * G(s_t, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
+    
+    result <- apply(local, 2, sum)
+    result
+  }
+  
   # Sum of squares function
   # phi2: vector of parameters
   SS <- function(phi2) {
     dim(phi2) <- c(noRegimes - 1, 2)
-    th <- phi2[,1]
-    gamma <- phi2[,2]
     
     # We fix the linear parameters here, before optimizing the nonlinear.
-    x_t <- cbind(1, xx)
-    tmp <- x_t;
-    for(i in 1:(noRegimes - 1)) {
-      tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
-    }
-    
-    newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
-    dim(newPhi1) <- c(noRegimes, NCOL(x_t))
-    
-    # Return the sum of squares
-    local <- array(0, c(noRegimes, n.used))
-    local[1,] <- x_t %*% newPhi1[1,]
+    tmp <- rep(cbind(1,xx), noRegimes)
+    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
     for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
-    
-    y.hat <- apply(local, 2, sum)
+      tmp[,,i] <- tmp[,,i] * G(s_t, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
+
+    newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1)
+
+    # Return the sum of squares
+    y.hat <- F(newPhi1, phi2)
     crossprod(yy - y.hat)
   }
   
-  if(trace) cat("Optimizing... ")
+#  SS <- function(phi2) {
+#    dim(phi2) <- c(noRegimes - 1, 2)
+#    gamma <- phi2[,1]
+#    th <- phi2[,2]
+    
+    # We fix the linear parameters here, before optimizing the nonlinear.
+#    x_t <- cbind(1, xx)
+#    tmp <- x_t;
+#    for(i in 1:(noRegimes - 1)) {
+#      tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
+#    }
+    
+#    newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
+#    dim(newPhi1) <- c(noRegimes, NCOL(x_t))
+    
+    # Return the sum of squares
+#    local <- array(0, c(noRegimes, n.used))
+#    local[1,] <- x_t %*% newPhi1[1,]
+#    for (i in 2:noRegimes) 
+#      local[i,] <-
+#        (x_t %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
+    
+#    y.hat <- apply(local, 2, sum)
+#    crossprod(yy - y.hat)
+#  }
+  
+  if(trace) cat('Optimizing...')
+    
   p <- as.vector(object$model.specific$phi2)
-
+    
   res <- optim(p, SS, hessian = TRUE, control = control)
+    
+  if(trace) cat(' Nonlinear optimisation done.')
 
   newPhi2 <- res$par
   dim(newPhi2) <- c(noRegimes - 1, 2)
-  th <- newPhi2[,1]
-
+    
   for (i in 1:(object$model.specific$noRegimes - 1))
-    if(newPhi2[i,2] <0)
-      newPhi2[i,2] <- - newPhi2[i,2];
-  gamma <- newPhi2[,2]
+    if(newPhi2[i,1] <0)
+      newPhi2[i,1] <- - newPhi2[i,1];
+  
+  gamma <- newPhi2[,1]
+  th <- newPhi2[,2]
 
-  if(trace) cat(' Done.\n')
-
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # 3.- Estimate linear parameters
+  tmp <- rep(cbind(1,xx), noRegimes)
+  dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+  for (i in 2:noRegimes) 
+    tmp[,,i] <- tmp[,,i] * G(s_t, gamma = gamma[i - 1], th = th[i - 1])
+  
+  newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
+  dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1);
+  
+  if(trace) 
+    cat(' Linear optimisation done.\n')
+  
   if(trace)
-    if(res$convergence != 0)
+    if(res$convergence!=0)
       cat("Convergence problem. Convergence code: ",res$convergence,"\n")
     else
       cat("Optimization algorithm converged\n")
-  
-  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-  # 3.- Estimate linear parameters
-  x_t <- cbind(1, xx)
-  tmp <- x_t;
-  for(i in 1:(noRegimes - 1)) {
-    tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
-  }
-  
-  newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
-  dim(newPhi1) <- c(noRegimes, NCOL(x_t));
 
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -507,14 +546,15 @@ startingValues <- function(object, trace=TRUE, ...)
     }
   }
   
-  if (trace) cat("Starting values fixed for regime ", noRegimes, ":\n\t th = ",
-        th[noRegimes - 1], ",\n\t gamma = ", gamma[noRegimes - 1],
-        ";\n\t SSE = ", bestCost, "\n");
+  if (trace) cat("Starting values fixed for regime ", noRegimes,
+                 ": gamma = ", gamma[noRegimes - 1],
+                 ", th = ", th[noRegimes - 1], 
+                 "; SSE = ", bestCost, "\n");
 
-  object$model.specific$phi2 <- rbind(th, gamma);
+  object$model.specific$phi2 <- rbind(gamma, th);
   object$model.specific$phi1 <- phi1;
-  object$model.specific$coefficients <- c(phi1, rbind(th,gamma));
-  object$coefficients <- c(phi1, rbind(th,gamma));
+  object$model.specific$coefficients <- c(phi1, rbind(gamma, th));
+  object$coefficients <- c(phi1, rbind(gamma, th));
   object$model.specific$k <- length(object$coefficients)
   object$k <- length(object$coefficients)
   
