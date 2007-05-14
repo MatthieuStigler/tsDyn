@@ -19,14 +19,14 @@
 ##    and is indebted to him.
 
 #Logistic transition function
-#y: variable
-#g: smoothing parameter
-#c: threshold value
-G <- function(z, g, c) {
-  if((length(c) > 1) && (length(g) > 1))
-    t( apply( as.matrix(z) , 1, plogis, c, 1/g ) )
+# y: variable
+# gamma: smoothing parameter
+# th: threshold value
+G <- function(z, gamma, th) {
+  if((length(th) > 1) && (length(gamma) > 1))
+    t( apply( as.matrix(z) , 1, plogis, th, 1/gamma) )
   else
-    plogis(z, c, 1/g)
+    plogis(z, th, 1/gamma)
 }
 
 # Incremental STAR fitter
@@ -111,32 +111,37 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 3. Build the 2-regime star
+    if(trace) cat("Building a 2 regime STAR.\n")
     object <- star.predefined(x, noRegimes=2, m=m, d=d, steps=steps,
                               series=series, mTh=mTh, thDelay=thDelay,
                               thVar=thVar, trace=trace, control=control)
   
-    if(trace) cat("Testing for addition of regime 3...  ");
+    if(trace) cat("Testing for addition of regime 3.\n");
     
-    if(trace) cat("  Estimating parameters for regimes 1 and 2...\n");
-    object <- estimateParams(object, control=control, trace=trace);
-    if(trace) cat("  Done. Estimating gradient matrix...\n");
+#    if(trace) cat("  Estimating parameters for regimes 1 and 2...\n");
+#    object <- estimateParams(object, add=FALSE, control=control, trace=trace);
+    if(trace) cat("  Estimating gradient matrix...\n");
     G <- computeGradient(object);
-    if(trace) cat("  Done. Testing for regime 3...\n");
+    if(trace) cat("  Done. Computing the test statistic...\n");
     testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
     increase <- testResults$remainingNonLinearity;
-    if(increase && trace) { cat("  Done. Regime 3 is needed.\n"); }
-    else {cat("  Done. Regime 3 is NOT accepted.\n");}
+    if(increase && trace) { cat("  Done. Regime 3 is needed (p-Value = ",
+                                testResults$pValue,").\n"); }
+    else {cat("  Done. Regime 3 is NOT accepted (p-Value = ",
+                                testResults$pValue,").\n");}
     
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 4. Add-regime loop
     count <- 2; # Number of nonlinear terms in the model
     while (increase) {
       
-      object <- estimateParams(object, control=control, trace=trace);
+#      if(trace) cat("\tEstimating parameters for regime ", count + 2, "...  ");
+      
+      object <- estimateParams(object, add=TRUE, control=control, trace=trace);
 
       G <- computeGradient(object);
       
-      if(trace) cat("\tTesting for addition of regime ", count + 2, "...  ");
+      if(trace) cat("\tTesting for addition of regime ", count + 2, "...  \n");
       
       testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
       increase <- testResults$remainingNonLinearity;
@@ -149,7 +154,9 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
       }
       
     }
-    if(trace) cat("Finished building a MRSTAR with ",count + 1, " regimes\n");
+
+    if(trace) cat("Finished building a MRSTAR with ",count, " regimes\n");
+
   }
   
 }
@@ -270,8 +277,8 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 computeGradient <- function(object, ...)
 {
 
-  th <- object$model.specific$phi2[,1];
-  gamma <- object$model.specific$phi2[,2];
+  gamma <- object$model.specific$phi2[,1];
+  th <- object$model.specific$phi2[,2];
   phi1 <- object$model.specific$phi1;
   n.used <- NROW(object$str$xx);
   s_t<- object$model.specific$thVar;
@@ -311,10 +318,33 @@ computeGradient <- function(object, ...)
 #
 # Estimates object$model.specific$phi1
 #                   object$model.specific$phi2
-estimateParams <- function(object, trace=TRUE, control=list(), ...)
+estimateParams <- function(object, add=FALSE, trace=TRUE, control=list(), ...)
 {
 
-  noRegimes <- object$model.specific$noRegimes + 1; # ADD 1 REGIME
+  if(add) {
+    if(trace) cat("Adding regime ",object$model.specific$noRegimes + 1,".\n");
+
+    object$model.specific$noRegimes <- object$model.specific$noRegimes + 1;
+    noRegimes <- object$model.specific$noRegimes;
+
+    gamma <- object$model.specific$phi2[,1];
+    gamma[noRegimes - 1] <- 0.0;
+    th <- object$model.specific$phi2[,2];
+    th[noRegimes - 1] <- 0;
+    object$model.specific$phi2 <- rbind(th, gamma);
+    
+    phi1 <- object$model.specific$phi1;
+    phi1 <- rbind(phi1, rnorm(3));
+    object$model.specific$phi1 <- phi1;
+
+    object$model.specific$coefficients <- c(phi1, rbind(th,gamma));
+    object$coefficients <- c(phi1, rbind(th,gamma));
+    object$model.specific$k <- length(object$coefficients)
+    object$k <- length(object$coefficients);
+
+    if(trace) cat("OK: added regime ",object$model.specific$noRegimes,".\n");
+  }
+  
   s_t<- object$model.specific$thVar;
   xx <- object$str$xx
   yy <- object$str$yy
@@ -356,7 +386,7 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     crossprod(yy - y.hat)
   }
   
-  if(trace) cat("Optimizing...")
+  if(trace) cat("Optimizing... ")
   p <- as.vector(object$model.specific$phi2)
 
   res <- optim(p, SS, hessian = TRUE, control = control)
@@ -374,9 +404,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 
   if(trace)
     if(res$convergence != 0)
-      if(trace) cat("Convergence problem. Convergence code: ",res$convergence,"\n")
+      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
     else
-      if(trace) cat("Optimization algorithm converged\n")
+      cat("Optimization algorithm converged\n")
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 3.- Estimate linear parameters
@@ -415,25 +445,15 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 # returns a modified copy of 'object' with good starting values for
 #      gamma[noRegime-1] and th[noRegime-1]. It also modifies the linear
 #      parameters phi1 (as they are estimated for the new gamma and th).
-
 startingValues <- function(object, trace=TRUE, ...)
 {
 
-  # # # # # # # # # # # # # # # # # # # # # 
-  # First, add 1 regime to the model
-  object$model.specific$noRegimes <- object$model.specific$noRegimes + 1;
-  
+  gamma <- object$model.specific$phi2[,1];
+  th <- object$model.specific$phi2[,2];
+     
   s_t<- object$model.specific$thVar;
   noRegimes <- object$model.specific$noRegimes;
 
-  th <- object$model.specific$phi2[,1];
-  th[noRegimes - 1] <- 0;
-  gamma <- object$model.specific$phi2[,2];
-  gamma[noRegimes - 1] <- 0;
-  
-  phi1 <- object$model.specific$phi1;
-  phi1 <- rbind(phi1, rnorm(3));
-  
   xx <- object$str$xx;
   yy <- object$str$yy;
   n.used <- NROW(object$str$xx);
@@ -462,7 +482,7 @@ startingValues <- function(object, trace=TRUE, ...)
         }
       }
       tmp <- cbind(tmp, x_t * sigmoid(newGamma * (s_t - newTh)))
-      
+
       newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
       dim(newPhi1) <- c(noRegimes, NCOL(x_t));
       
@@ -482,7 +502,7 @@ startingValues <- function(object, trace=TRUE, ...)
         bestCost <- cost;
         gamma[noRegimes - 1] <- newGamma;
         th[noRegimes - 1] <- newTh;
-        phi1 <- newPhi1
+        phi1 <- newPhi1;
       }
     }
   }
@@ -493,7 +513,11 @@ startingValues <- function(object, trace=TRUE, ...)
 
   object$model.specific$phi2 <- rbind(th, gamma);
   object$model.specific$phi1 <- phi1;
-
+  object$model.specific$coefficients <- c(phi1, rbind(th,gamma));
+  object$coefficients <- c(phi1, rbind(th,gamma));
+  object$model.specific$k <- length(object$coefficients)
+  object$k <- length(object$coefficients)
+  
   return(object);
   
 }
@@ -600,13 +624,13 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
 
     # Cast the lstar into a valid star object
     temp$model.specific$noRegimes <- noRegimes;
-    vecLength <- NCOL(temp$str$xx); # length of phi[i,]
+    vecLength <- NCOL(temp$str$xx); # number of linear parameters on each rule
 
-    temp$model.specific$phi1 <-
+    temp$model.specific$phi1 <- # Linear parameters
       temp$model.specific$coefficients[1:((vecLength + 1) * 2)];
     dim(temp$model.specific$phi1) <- c(2, vecLength + 1)
 
-    temp$model.specific$phi2 <-
+    temp$model.specific$phi2 <- # Non linear parameters
       temp$model.specific$coefficients[(((vecLength + 1) * 2) + 1):
                                        (((vecLength+1) * 2) + 2)];
     dim(temp$model.specific$phi2) <- c(1, 2)
@@ -629,7 +653,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     series <- deparse(substitute(x))
 
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-  xx <- str$xx
+  xx <- str$xx *3
   yy <- str$yy
   externThVar <- FALSE
   n.used <- NROW(xx)
@@ -667,12 +691,13 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   
 #Automatic starting values####################
 # TO DO: grid search over phi2.
+
   if(missing(phi2)) {         
     phi2 <- array(0, c(noRegimes - 1, 2))
     range <- range(z)
-    phi2[1:(noRegimes - 1),1] <- # phi2[,1] = th
+    phi2[,1] <- 0.5                   # phi2[,1] = gamma
+    phi2[1:(noRegimes - 1),2] <- # phi2[,2] = th
       range[1] + ((range[2] - range[1]) / (noRegimes - 1)) * (0:(noRegimes-2))
-    phi2[,2] <- 4                   # phi2[,2] = gamma
     if(trace) {
       cat('Missing starting transition values. Using uniform distribution.\n')
     }
@@ -700,7 +725,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     tmp <- rep(cbind(1,xx), noRegimes)
     dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
     for (i in 2:noRegimes) 
-      tmp[,,i] <- tmp[,,i] * G(z, phi2[i - 1,2], phi2[i - 1,1])
+      tmp[,,i] <- tmp[,,i] * G(z, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
 
     newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
     dim(newPhi1) <- c(noRegimes, m + 1)
@@ -717,15 +742,10 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     x_t <- cbind(1, xx)
     local <- array(0, c(noRegimes, n.used))
     local[1,] <- x_t %*% phi1[1,];
-    if(noRegimes == 2) {
-      local[2,] <-
-        (x_t %*% phi1[2,]) * sigmoid(phi2[1,2] * (z - phi2[1, 1]))
-    }
-    else {
-      for (i in 2:noRegimes) 
-        local[i,] <-
-          (x_t %*% phi1[i,]) * G(z, phi2[i - 1,2], phi2[i - 1,1]);
-    }
+
+    for (i in 2:noRegimes) 
+      local[i,] <-
+        (x_t %*% phi1[i,]) * G(z, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
     
     result <- apply(local, 2, sum)
     result
@@ -737,6 +757,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   res$hessian <- NA
   res$message <- NA
   res$value <- NA
+
   if(optimize) {
     if(trace) cat('Optimizing...')
     
@@ -744,31 +765,37 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     
     res <- optim(p, SS, hessian = TRUE, control = control)
     
+    if(trace) 
+      cat(' Nonlinear optimisation done.')
+
     phi2 <- res$par
     dim(phi2) <- c(noRegimes - 1,2)
     
     for (i in 1:(noRegimes - 1))
-      if(phi2[i,2] <0)
-        phi2[i,2] <- - phi2[i,2];
+      if(phi2[i,1] <0)
+        phi2[i,1] <- - phi2[i,1];
 
-    x_t <- cbind(1,xx);
-    local <- array(0, c(noRegimes, n.used))
-    local[1,] <- x_t %*% phi1[1,]
-    if(noRegimes == 2) {
-      local[2,] <-
-        (x_t %*% phi1[2,]) * sigmoid(phi2[1,2] * (z - phi2[1, 1]))
-    }
-    else {
-      for (i in 2:noRegimes) 
-        local[i,] <-
-          (x_t %*% phi1[i,]) * sigmoid(phi2[i - 1,2] * (z - phi2[i - 1, 1]))
-    }
+#    x_t <- cbind(1,xx);
+#    local <- array(0, c(noRegimes, n.used))
+#    local[1,] <- x_t %*% phi1[1,]
+#    for (i in 2:noRegimes) 
+#      local[i,] <-
+#        (x_t %*% phi1[i,]) * sigmoid(phi2[i - 1,1] * (z - phi2[i - 1, 2]))
     
-    phi1<- lm(yy ~ . - 1, as.data.frame(local))$coefficients
-    dim(phi1) <- c(noRegimes, m+1)
+#    phi1<- lm(yy ~ . - 1, as.data.frame(local))$coefficients
+#    dim(phi1) <- c(noRegimes, m+1)
     
+    # We fix the linear parameters here, before optimizing the nonlinear.
+    tmp <- rep(cbind(1,xx), noRegimes)
+    dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
+    for (i in 2:noRegimes) 
+      tmp[,,i] <- tmp[,,i] * G(z, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
+
+    phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(phi1) <- c(noRegimes, m + 1)
+
     if(trace) 
-      cat(' Done.\n')
+      cat(' Linear optimisation done.\n')
 
     if(trace)
       if(res$convergence!=0)

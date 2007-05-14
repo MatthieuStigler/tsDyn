@@ -104,8 +104,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     maxTh <- quantile(z, .9) # percentil 90 de z
     rateTh <- (maxTh - minTh) / 100;
 
-    gamma <- 0;
-    c <- 0;
+#    gamma <- 0;
+#    c <- 0;
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
       for(newTh in seq(minTh, maxTh, rateTh)) {
         # We fix the linear parameters.
@@ -114,7 +114,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
         new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
 
         # Get the sum of squares
-        y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)], newGamma, newTh);
+        y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)],
+                   newGamma, newTh);
         cost <- crossprod(yy - y.hat)
 
         if(cost <= bestCost) {
