@@ -118,8 +118,6 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
   
     if(trace) cat("Testing for addition of regime 3.\n");
     
-#    if(trace) cat("  Estimating parameters for regimes 1 and 2...\n");
-#    object <- estimateParams(object, add=FALSE, control=control, trace=trace);
     if(trace) cat("  Estimating gradient matrix...\n");
     G <- computeGradient(object);
     if(trace) cat("  Done. Computing the test statistic...\n");
@@ -127,7 +125,7 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
     increase <- testResults$remainingNonLinearity;
     if(increase && trace) { cat("  Done. Regime 3 is needed (p-Value = ",
                                 testResults$pValue,").\n"); }
-    else {cat("  Done. Regime 3 is NOT accepted (p-Value = ",
+    else {if(trace) cat("  Done. Regime 3 is NOT accepted (p-Value = ",
                                 testResults$pValue,").\n");}
     
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -135,11 +133,10 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
     count <- 2; # Number of nonlinear terms in the model
     while (increase) {
       
-#      if(trace) cat("\tEstimating parameters for regime ", count + 2, "...  ");
-      
       object <- estimateParams(object, control=control, trace=trace);
+      count <- count + 1;
 
-      if(trace) cat("Testing for addition of regime ", count + 2, "...  \n");
+      if(trace) cat("Testing for addition of regime ", count + 1, "...  \n");
       
       if(trace) cat("  Estimating gradient matrix...\n");
       G <- computeGradient(object);
@@ -147,19 +144,16 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
       testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
       increase <- testResults$remainingNonLinearity;
       if(increase && trace) {
-        cat("  Done. Regime ", count + 2," is needed (p-Value = ",
+        cat("  Done. Regime ", count + 1," is needed (p-Value = ",
                                   testResults$pValue,").\n"); 
-        count <- count + 1;
       }
       else {
-        cat("  Done. Regime ", count + 2," is NOT accepted (p-Value = ",
+        cat("  Done. Regime ", count + 1," is NOT accepted (p-Value = ",
                 testResults$pValue,").\n");
-      }
-            
+      }            
     }
-
     if(trace) cat("Finished building a MRSTAR with ",count, " regimes\n");
-
+    return(object);
   }
   
 }
@@ -260,9 +254,8 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   F = ((SSE0 - SSE) / nxH1) / (SSE / (n.used - nxH0 - nxH1));
 
   pValue <- 1 - pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
-#  cat("F statistic, method 1:", pValue,"\n")  
 
-  if (pValue < sig) {
+  if (pValue > 1- sig) {
     return(list(remainingNonLinearity = FALSE, pValue = pValue));
   }
   else {
@@ -404,12 +397,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     
   if(trace) cat('Optimizing...\n')
     
-#  cat("\n nonlinear parameters ",object$model.specific$phi2,", dim = ", dim(object$model.specific$phi2), "\n")    
-    
   p <- as.vector(object$model.specific$phi2)
 
-  res <- optim(p, SS, hessian = TRUE, control = control)
-  if(trace) cat(' Nonlinear optimisation done.\n')
+  res <- optim(p, SS, control = control)
 
   newPhi2 <- res$par
   dim(newPhi2) <- c(noRegimes - 1, 2)
@@ -433,8 +423,6 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
   
   newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
   dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1);
-  
-#  if(trace)     cat(' Linear optimisation done.\n')
   
   if(trace)
     if(res$convergence!=0)
@@ -471,16 +459,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
 startingValues <- function(object, trace=TRUE, ...)
 {
 
-#  cat("\n* nonlinear parameters ",object$model.specific$phi2,", dim = ", dim(object$model.specific$phi2), "\n")    
   noRegimes <- object$model.specific$noRegimes;
-#  if(noRegimes == 2) {
-#    gamma <- object$model.specific$phi2[1];
-#    th <- object$model.specific$phi2[2];
-#  }
-#  else {
-    gamma <- object$model.specific$phi2[,1];
-    th <- object$model.specific$phi2[,2];
-#  }
+  gamma <- object$model.specific$phi2[,1];
+  th <- object$model.specific$phi2[,2];
 
   s_t<- object$model.specific$thVar;
   noRegimes <- object$model.specific$noRegimes;
@@ -490,9 +471,9 @@ startingValues <- function(object, trace=TRUE, ...)
   n.used <- NROW(object$str$xx);
   
   # Maximum and minimum values for gamma
-  maxGamma <- 40;
+  maxGamma <- 400;
   minGamma <- 1;
-  rateGamma <- 5;
+  rateGamma <- 40;
   
   # Maximum and minimum values for c
   minTh <- quantile(s_t, .1) # percentil 10 of s_t
@@ -500,6 +481,8 @@ startingValues <- function(object, trace=TRUE, ...)
   rateTh <- (maxTh - minTh) / 100;
   
   bestCost <- Inf;
+
+  if(trace) cat("Performing grid search for starting values\n");
   
   for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
     for(newTh in seq(minTh, maxTh, rateTh)) {
@@ -668,7 +651,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                                        (((vecLength+1) * 2) + 2)];
     dim(temp$model.specific$phi2) <- c(1, 2)
 
-    cat("Optimized values: gamma = ",temp$model.specific$phi2[1], ", th =", temp$model.specific$phi2[2], "\n")
+    if(trace) cat("Optimized values: gamma = ",temp$model.specific$phi2[1], ", th =", temp$model.specific$phi2[2], "\n")
     
     return(extend(nlar(str=temp$str, 
                        coefficients = temp$model.specific$coefficients,
