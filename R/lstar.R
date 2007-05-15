@@ -129,7 +129,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
 
     if (trace)
-      cat("Starting values fixed: th = ", th, ", gamma = ", gamma,
+      cat("Starting values fixed: gamma = ", gamma,", th = ", th, 
           "; SSE = ", bestCost, "\n");
     
   }
