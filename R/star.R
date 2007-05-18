@@ -386,6 +386,15 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
     for (i in 2:noRegimes) 
       tmp[,,i] <- tmp[,,i] * G(s_t, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
+      
+    # Compute the rank of tmp' * tmp
+#    dim(tmp) <- c(NROW(xx), (NCOL(xx) + 1) * noRegimes)
+#    tmp2 <- t(tmp) %*% tmp;
+#    s <- svd(tmp2);
+#    tol <- max(dim(tmp2)) * s[1]$d * 2.2204e-16
+#    rtmp <- qr(tmp2, tol)$rank
+#    if(rtmp < NCOL(tmp2))
+#      stop("Multicollinearity problem. Aborting.\n")
 
     newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
     dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1)
@@ -586,6 +595,13 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
   sdZ <- kronecker(matrix(1, n.used, 1), sdZ) # repeat sdZ n.used rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
 
+  # Compute the rank of Z
+  s <- svd(Z);
+  tol <- max(dim(Z)) * s[1]$d * 2.2204e-16
+  rZ <- qr(Z, tol)$rank
+  if(rZ < NCOL(Z))
+    stop("Multicollinearity problem. Aborting.\n")
+      
   # Nonlinear model (alternative hypothesis)
   nonlinearModel <- lm(u_t ~ ., data=data.frame(Z));
   e_t <- nonlinearModel$residuals;
@@ -743,6 +759,13 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     for (i in 2:noRegimes) 
       tmp[,,i] <- tmp[,,i] * G(z, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
 
+    # Compute the rank of tmp
+    s <- svd(tmp);
+    tol <- max(dim(tmp)) * s[1]$d * 2.2204e-16
+    rtmp <- qr(tmp, tol)$rank
+    if(rtmp < NCOL(tmp))
+      stop("Multicollinearity problem. Aborting.\n")
+      
     newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
     dim(newPhi1) <- c(noRegimes, m + 1)
 
