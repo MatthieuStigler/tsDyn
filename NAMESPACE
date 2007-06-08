@@ -12,7 +12,6 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        linear, isLinear, nnetTs, aar, tarch, star, addRegime)
 S3method(extend, list)
 S3method(isLinear, lstar)
-S3method(isLinear, star)
 S3method(addRegime, star)
 S3method(toLatex, setar)
 S3method(plot, nlar)

@@ -625,8 +625,6 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
 
 }
 
-isLinear.star <- linearityTest.star
-
 # Predefined STAR model
 #
 #   Builds a STAR with a fixed number of regimes ('noRegimes') and

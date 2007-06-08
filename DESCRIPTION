@@ -3,7 +3,7 @@ Type: Package
 Title: Time series analysis based on dynamical systems theory
 Version: 0.6
 Date: $Date: 2006-09-21 12:52:11 +0200 (gio, 21 set 2006) $
-Depends: mgcv
+Depends: mgcv, Matrix
 Imports: nnet, tseriesChaos, tseries, utils
 Suggests: tcltk, sm, scatterplot3d, rgl
 Author: Antonio Fabio Di Narzo, Jose Luis Aznarte
