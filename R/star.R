@@ -32,7 +32,7 @@ G <- function(z, gamma, th) {
 # Incremental STAR fitter
 #
 #   Builds a STAR model with as many regimes as needed, using the
-#     bottom-up strategy proposed by Teräsvirta et al.
+#     bottom-up strategy proposed by Terï¿½svirta et al.
 #
 #   x: the time series 
 #   m: the order of the autoregressive terms
@@ -624,6 +624,8 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
   }
 
 }
+
+isLinear.star <- linearityTest.star
 
 # Predefined STAR model
 #

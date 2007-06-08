@@ -4,19 +4,16 @@ importFrom(tseriesChaos, mutual)
 importFrom(tseriesChaos, d2)
 importFrom(nnet, nnet)
 importFrom(tseries, na.remove)
-importFrom(Matrix, norm)
 export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        autopairs, autotriples, autotriples.rgl,
        delta, delta.test, delta.lin, delta.lin.test,
        llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
        setar, lstar, availableModels, nlarDialog, 
-       linear, isLinear, nnetTs, aar, tarch, star.predefined,
-       star, addRegime, linearityTest)
+       linear, isLinear, nnetTs, aar, tarch, star, addRegime)
 S3method(extend, list)
 S3method(isLinear, lstar)
+S3method(isLinear, star)
 S3method(addRegime, star)
-S3method(linearityTest, star)
-S3method(linearityTest, nlar.struct)
 S3method(toLatex, setar)
 S3method(plot, nlar)
 S3method(plot, setar)
