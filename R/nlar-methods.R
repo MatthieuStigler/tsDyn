@@ -275,6 +275,7 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
 
   # Linear Model (null hypothesis)
   linearModel <- lm(y_t ~ . , data=data.frame(xH0))
+    
   u_t <- linearModel$residuals;
   SSE0 <- sum(u_t^2)
 
@@ -310,11 +311,11 @@ linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
   m <- NCOL(xH1);
   
   F = ((SSE0 - SSE1) / m) / (SSE1 / (n.used - m - n));
-    
+  
   # Look up the statistic in the table, get the p-value
-  pValue <- 1- pf(F, m, n.used - m - n, lower.tail = FALSE);
-
-  if (pValue < sig) {
+  pValue <- pf(F, m, n.used - m - n, lower.tail = FALSE);
+ 
+  if (pValue >= sig) {
     return(list(isLinear = TRUE, pValue = pValue));
   }
   else {

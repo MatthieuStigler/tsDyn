@@ -233,9 +233,8 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
     xH1 <- cbind(xx * tmp, xx * (tmp^2), xx * (tmp^3))
   }
 
-  Z <- cbind(xH0, xH1)
-
   # Standarize the regressors
+  Z <- cbind(xH0, xH1)
   nZ <- NCOL(Z);
   sdZ <- sd(Z)
   dim(sdZ) <- c(1, nZ)
@@ -253,9 +252,9 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   # Compute the third order statistic
   F = ((SSE0 - SSE) / nxH1) / (SSE / (n.used - nxH0 - nxH1));
 
-  pValue <- 1 - pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
+  pValue <- pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
 
-  if (pValue > 1- sig) {
+  if (pValue >= sig) {
     return(list(remainingNonLinearity = FALSE, pValue = pValue));
   }
   else {
@@ -551,6 +550,7 @@ startingValues <- function(object, trace=TRUE, ...)
 # LM linearity testing against 2 regime STAR
 #
 #   Performs an 3rd order Taylor expansion LM test
+#   NOTE: this is NOT the function used in star(), see nlar-methods.R.
 #
 #   object: a star object
 #   rob
@@ -615,8 +615,8 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
     
   # Look up the statistic in the table, get the p-value
   pValue <- pf(F, m, n.used - m - n, lower.tail = FALSE);
-
-  if (pValue < sig) {
+  
+  if (pValue >= sig) {
     return(list(isLinear = TRUE,  pValue = pValue));
   }
   else {
