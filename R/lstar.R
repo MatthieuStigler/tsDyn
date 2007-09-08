@@ -33,6 +33,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
   xx <- str$xx
   yy <- str$yy
+  
   externThVar <- FALSE
   if (missing(mL)) {
     mL <- m
@@ -75,6 +76,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   
   xxL <- cbind(1,xx[,1:mL])
   xxH <- cbind(1,xx[,1:mH])
+
+  # Linear model
+  linearModel <- lm(yy ~ .  - 1, data=data.frame(xxL));
   
   #Fitted values, given parameters
   #phi1: vector of 'low regime' parameters
@@ -96,34 +100,35 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     # Maximum and minimum values for gamma
     maxGamma <- 40;
-    minGamma <- 1;
+    minGamma <- 10;
     rateGamma <- 5;
 
     # Maximum and minimum values for c
     minTh <- quantile(z, .1) # percentil 10 de z
     maxTh <- quantile(z, .9) # percentil 90 de z
-    rateTh <- (maxTh - minTh) / 100;
+    rateTh <- (maxTh - minTh) / 200;
 
 #    gamma <- 0;
 #    c <- 0;
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
       for(newTh in seq(minTh, maxTh, rateTh)) {
         # We fix the linear parameters.
-        tmp <- data.frame(xxL, xxH * G(z, newGamma, newTh));
-
-        new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
+        tmp <- lm(yy ~ . - 1, data.frame(xxL, xxH * G(z, newGamma, newTh)))$coefficients;
+        new_phi1 <- tmp[1:(mL+1)]
+        new_phi2 <- tmp[(mL+2):(mL+mH+2)]
 
         # Get the sum of squares
-        y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL+mH+2)],
-                   newGamma, newTh);
-        cost <- crossprod(yy - y.hat)
+        y.hat <- F(new_phi1, new_phi2, newGamma, newTh);
+        cost <- crossprod(yy - y.hat);
 
         if(cost <= bestCost) {
+#          cat("Gamma = ", newGamma, "; Th = ", newTh, "\n")
+        
           bestCost <- cost;
           gamma <- newGamma;
           th <- newTh;
-          phi1 <- new_phi[1:(mL+1)]
-          phi2 <- new_phi[(mL+2):(mL+mH+2)]
+          phi1 <- new_phi1
+          phi2 <- new_phi2
         }
       }
     }
@@ -142,11 +147,11 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     # First fix the linear parameters
     tmp <- data.frame(xxL, xxH * G(z, gamma, th));
+    new_phi1 <- tmp[1:(mL+1)]
+    new_phi2 <- tmp[(mL+2):(mL+mH+2)]
     
-    new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
-
     # Now compute the cost / sum of squares
-    y.hat <- F(new_phi[1:(mL+1)], new_phi[(mL+2):(mL + mH + 2)], gamma, th)
+    y.hat <- F(new_phi1, new_phi2, gamma, th)
     crossprod(yy - y.hat)
   }
  

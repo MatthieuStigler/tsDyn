@@ -246,10 +246,10 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   v <- u - Z %*% c;
   SSE <- sum(v^2);
 
+  # Compute the third order statistic
   nxH0 <- NCOL(xH0);
   nxH1 <- NCOL(xH1);
   
-  # Compute the third order statistic
   F = ((SSE0 - SSE) / nxH1) / (SSE / (n.used - nxH0 - nxH1));
 
   pValue <- pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
