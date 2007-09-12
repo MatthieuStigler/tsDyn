@@ -106,10 +106,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     # Maximum and minimum values for c
     minTh <- quantile(as.ts(z), .1) # percentil 10 de z
     maxTh <- quantile(as.ts(z), .9) # percentil 90 de z
-    rateTh <- (maxTh - minTh) / 200;#10; ##################C H A N G E   T H I S   T O    2 0 0
-
-#    gamma <- 0;
-#    c <- 0;
+    rateTh <- (maxTh - minTh) / 200;
+    
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
       for(newTh in seq(minTh, maxTh, rateTh)) {
         # We fix the linear parameters.
@@ -122,8 +120,6 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
         cost <- crossprod(yy - y.hat);
 
         if(cost <= bestCost) {
-#          cat("Gamma = ", newGamma, "; Th = ", newTh, "\n")
-        
           bestCost <- cost;
           gamma <- newGamma;
           th <- newTh;
@@ -136,22 +132,17 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if (trace) {
       cat("Starting values fixed: gamma = ", gamma,", th = ", th, 
           "; SSE = ", bestCost, "\n");
-#      cat("phi1=", phi1, "; phi2 = ", phi2, "\n");
     }
   }
   
-  # Computes the gradient under the null hypothesis
+  # Computes the gradient 
   #
   # Returns the gradient with respect to the error
-  gradEhat <- function(p)
+  gradEhat <- function(p, phi1, phi2)
     {
       gamma <- p[1]  #Extract parms from vector p
       th          <- p[2] 	     #Extract parms from vector p
 
-      tmp <- lm(yy ~ . - 1, as.data.frame(data.frame(xxL, xxH * G(z, gamma, th))))$coefficients
-      phi1 <- tmp[1:(mL+1)]
-      phi2 <- tmp[(mL+2):(mL+mH+2)]
-      
       y.hat <- F(phi1, phi2, gamma, th)
       e.hat <- yy - y.hat
 
@@ -169,7 +160,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   
   #Sum of squares function
   #p: vector of parameters
-  SS <- function(p) {
+  SS <- function(p, phi1, phi2) {
     gamma <- p[1]                            #Extract parms from vector p
     th          <- p[2] 	     #Extract parms from vector p
 
@@ -186,7 +177,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
  
   #Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
-  res <- optim(p, SS, gradEhat, hessian = TRUE, control = control)
+  res <- optim(p, SS, gradEhat, hessian = TRUE, control = control, phi1 = phi1, phi2 = phi2)
 
   if(trace)
     if(res$convergence!=0)

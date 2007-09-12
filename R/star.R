@@ -158,6 +158,58 @@ star <- function(x, m=3, d = 1, steps = d, series, rob = FALSE,
   
 }
 
+# Computes the gradient
+#
+# object: a valid STAR model.
+#
+# Returns a list of the gradients with respect to  the linear and
+#     nonlinear parameters
+computeGradient <- function(object, ...)
+{
+ 
+  noRegimes <- object$model.specific$noRegimes;
+  if(noRegimes == 2) {
+    gamma <- object$model.specific$phi2[1];
+    th <- object$model.specific$phi2[2];
+  }
+  else {
+    gamma <- object$model.specific$phi2[,1];
+    th <- object$model.specific$phi2[,2];
+  }
+
+  phi1 <- object$model.specific$phi1;
+
+  n.used <- NROW(object$str$xx);
+  s_t<- object$model.specific$thVar;
+  x_t <- cbind(1, object$str$xx);
+
+  fX <- array(0, c(noRegimes - 1, n.used));
+  dfX <- array(0, c(noRegimes - 1, n.used));
+  gPhi <- x_t;
+  for (i in 1:(noRegimes - 1)) {
+    fX[i,] <- sigmoid(gamma[i] * (s_t - th[i]));
+    dfX[i,] <- dsigmoid(fX[i,]);
+    gPhi <- cbind(gPhi, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
+  }
+  
+  if (noRegimes > 2) {
+    gGamma <- array(0, c(n.used, noRegimes-1));
+    gTh <- array(0, c(n.used, noRegimes-1))
+    for (i in 1:(noRegimes - 1)) {
+      gGamma[, i] <- as.vector(x_t %*% phi1[i + 1,]) *
+                                                                             as.vector(dfX[i,] * (s_t - th[i]));
+      gTh[,i] <- - as.vector(x_t %*% phi1[i+1,]) *
+                                                                          as.vector(gamma[i] * dfX[i,]);
+    }
+  } else {
+    gGamma <- as.vector(x_t %*% phi1[2,]) * as.vector(dfX * (s_t - th));
+    gTh <- - as.vector(x_t %*% phi1[2,]) * as.vector(gamma * dfX);
+  }
+  
+  return(cbind(gPhi, gGamma, gTh))
+
+}
+
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
 #    regime should be considered.
@@ -263,58 +315,6 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
  
 }
 
-# Computes the gradient under the null hypothesis
-#
-# object: a valid STAR model.
-#
-# Returns a list of the gradients with respect to  the linear and
-#     nonlinear parameters
-computeGradient <- function(object, ...)
-{
- 
-  noRegimes <- object$model.specific$noRegimes;
-  if(noRegimes == 2) {
-    gamma <- object$model.specific$phi2[1];
-    th <- object$model.specific$phi2[2];
-  }
-  else {
-    gamma <- object$model.specific$phi2[,1];
-    th <- object$model.specific$phi2[,2];
-  }
-
-  phi1 <- object$model.specific$phi1;
-
-  n.used <- NROW(object$str$xx);
-  s_t<- object$model.specific$thVar;
-  x_t <- cbind(1, object$str$xx);
-
-  fX <- array(0, c(noRegimes - 1, n.used));
-  dfX <- array(0, c(noRegimes - 1, n.used));
-  gPhi <- x_t;
-  for (i in 1:(noRegimes - 1)) {
-    fX[i,] <- sigmoid(gamma[i] * (s_t - th[i]));
-    dfX[i,] <- dsigmoid(fX[i,]);
-    gPhi <- cbind(gPhi, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
-  }
-  
-  if (noRegimes > 2) {
-    gGamma <- array(0, c(n.used, noRegimes-1));
-    gTh <- array(0, c(n.used, noRegimes-1))
-    for (i in 1:(noRegimes - 1)) {
-      gGamma[, i] <- as.vector(x_t %*% phi1[i + 1,]) *
-                                                                             as.vector(dfX[i,] * (s_t - th[i]));
-      gTh[,i] <- - as.vector(x_t %*% phi1[i+1,]) *
-                                                                          as.vector(gamma[i] * dfX[i,]);
-    }
-  } else {
-    gGamma <- as.vector(x_t %*% phi1[2,]) * as.vector(dfX * (s_t - th));
-    gTh <- - as.vector(x_t %*% phi1[2,]) * as.vector(gamma * dfX);
-  }
-  
-  return(cbind(gPhi, gGamma, gTh))
-
-}
-
 # Estimates the parameters of a given STAR model.
 #
 # object: a valid STAR model.
@@ -371,14 +371,52 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
       local[i,] <-
         (x_t %*% phi1[i,]) * G(s_t, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
     
-    result <- apply(local, 2, sum)
-    result
+    return(apply(local, 2, sum));
   }
   
-  # Sum of squares function
-  # phi2: vector of parameters
-  SS <- function(phi2) {
+  # Function to compute the gradient 
+  #
+  # Returns the gradient with respect to the error
+  gradEhat <- function(phi2, phi1) {
     dim(phi2) <- c(noRegimes - 1, 2)
+    gamma <- phi2[,1];
+    th <- phi2[,2];
+
+    y.hat <- F(phi1, phi2)
+    e.hat <- yy - y.hat;
+
+    fX <- array(0, c(noRegimes - 1, n.used));
+    dfX <- array(0, c(noRegimes - 1, n.used));
+    gPhi <- x_t;
+    for (i in 1:(noRegimes - 1)) {
+      fX[i,] <- sigmoid(gamma[i] * (s_t - th[i]));
+      dfX[i,] <- dsigmoid(fX[i,]);
+      gPhi <- cbind(gPhi, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
+    }
+    
+    gGamma <- array(0, c(n.used, noRegimes-1));
+    gTh <- array(0, c(n.used, noRegimes-1))
+    for (i in 1:(noRegimes - 1)) {
+      gGamma[, i] <- as.vector(x_t %*% phi1[i + 1,]) *
+        as.vector(dfX[i,] * (s_t - th[i]));
+      gTh[,i] <- - as.vector(x_t %*% phi1[i+1,]) *
+        as.vector(gamma[i] * dfX[i,]);
+    }
+    
+    J = - cbind(gGamma, gTh) / sqrt(n.used)
+      
+    return(2 * t(e.hat) %*% J)
+    
+  }
+
+ # Sum of squares function
+  # phi2: vector of parameters
+  SS <- function(phi2, phi1) {
+    dim(phi2) <- c(noRegimes - 1, 2)
+
+    for (i in 1:(noRegimes - 1))
+      if(phi2[i,1] <0)
+        phi2[i,1] <- - phi2[i,1];
     
     # We fix the linear parameters here, before optimizing the nonlinear.
     tmp <- rep(cbind(1,xx), noRegimes)
@@ -405,25 +443,30 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     
   if(trace) cat('Optimizing...\n')
     
-  p <- as.vector(object$model.specific$phi2)
-
-  res <- optim(p, SS, control = control)
+  res <- optim(object$model.specific$phi2, SS, gradEhat, control = control, phi1 = phi1)
 
   newPhi2 <- res$par
   dim(newPhi2) <- c(noRegimes - 1, 2)
     
-  for (i in 1:(object$model.specific$noRegimes - 1))
-    if(newPhi2[i,1] <0)
-      newPhi2[i,1] <- - newPhi2[i,1];
-  
   gamma <- newPhi2[,1]
   th <- newPhi2[,2]
+  
+  for (i in 1:(noRegimes - 1))
+    if(gamma[i] <0)
+      gamma[i] <- - gamma[i];
+  
   if (trace) cat("Optimized values fixed for regime ", noRegimes,
                  ": gamma = ", gamma[noRegimes - 1],
                  ", th = ", th[noRegimes - 1],"\n");
 
+  if(trace) 
+    if(res$convergence != 0)
+      cat("*** Convergence problem. Code: ",res$convergence,"\n")
+    else
+      cat("Optimization algorithm converged\n")
+
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-  # 3.- Estimate linear parameters
+  # 3.- Estimate linear parameters again
   tmp <- rep(cbind(1,xx), noRegimes)
   dim(tmp) <- c(NROW(xx), NCOL(xx) + 1, noRegimes)
   for (i in 2:noRegimes) 
@@ -431,13 +474,6 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
   
   newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
   dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1);
-  
-  if(trace)
-    if(res$convergence!=0)
-      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
-    else
-      cat("Optimization algorithm converged\n")
-
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 4.- Compute yhat and ehat
@@ -447,8 +483,8 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     local[i,] <-
       (x_t %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
   
-  object$fitted.values <- apply(local, 2, sum);
-  object$residuals <- yy - object$fitted.values;
+  object$fitted.values <- apply(local, 2, sum); # y.hat
+  object$residuals <- yy - object$fitted.values; # e.hat
   object$coefficients <- c(newPhi1, newPhi2)
   object$model.specific$phi1 <- newPhi1
   object$model.specific$phi2 <- cbind(gamma, th);
@@ -479,14 +515,14 @@ startingValues <- function(object, trace=TRUE, ...)
   n.used <- NROW(object$str$xx);
   
   # Maximum and minimum values for gamma
-  maxGamma <- 400;
-  minGamma <- 1;
-  rateGamma <- 40;
+  maxGamma <- 40;
+  minGamma <- 10;
+  rateGamma <- 5;
   
   # Maximum and minimum values for c
-  minTh <- quantile(s_t, .1) # percentil 10 of s_t
-  maxTh <- quantile(s_t, .9) # percentil 90 of s_t
-  rateTh <- (maxTh - minTh) / 100;
+  minTh <- quantile(as.ts(s_t), .1) # percentil 10 of s_t
+  maxTh <- quantile(as.ts(s_t), .9) # percentil 90 of s_t
+  rateTh <- (maxTh - minTh) / 200;
   
   bestCost <- Inf;
 
@@ -499,9 +535,8 @@ startingValues <- function(object, trace=TRUE, ...)
       x_t <- cbind(1, xx)
       tmp <- x_t;
       if (noRegimes > 2) {
-        for(i in 1:(noRegimes - 2)) { # leave out the first and last regime
+        for(i in 1:(noRegimes - 2))  # leave out the first and last regime
           tmp <- cbind(tmp, x_t * sigmoid(gamma[i] * (s_t - th[i])))
-        }
       }
       tmp <- cbind(tmp, x_t * sigmoid(newGamma * (s_t - newTh)))
 
@@ -511,13 +546,11 @@ startingValues <- function(object, trace=TRUE, ...)
       local <- array(0, c(noRegimes, n.used))
       local[1,] <- x_t %*% newPhi1[1,]
       for (i in 2:(noRegimes - 1)) 
-        local[i,] <-
-          (x_t %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
+        local[i,] <- (x_t %*% newPhi1[i,]) * sigmoid(gamma[i - 1] * (s_t - th[i - 1]))
       local[noRegimes,] <- (x_t %*% newPhi1[noRegimes,]) *
         sigmoid(newGamma * (s_t - newTh))
       
       y.hat <- apply(local, 2, sum)
-      
       cost <- crossprod(yy - y.hat)
       
       if(cost <= bestCost) {
