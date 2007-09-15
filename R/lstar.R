@@ -110,8 +110,10 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
       for(newTh in seq(minTh, maxTh, rateTh)) {
+        
         # We fix the linear parameters.
-        tmp <- lm(yy ~ . - 1, data.frame(xxL, xxH * G(z, newGamma, newTh)))$coefficients;
+        tmp <- lm(yy ~ . - 1,
+                  data.frame(xxL, xxH * G(z, newGamma, newTh)))$coefficients;
         new_phi1 <- tmp[1:(mL+1)]
         new_phi2 <- tmp[(mL+2):(mL+mH+2)]
 
