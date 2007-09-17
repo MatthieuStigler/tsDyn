@@ -31,6 +31,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     series <- deparse(substitute(x))
 
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+
   xx <- str$xx
   yy <- str$yy
   

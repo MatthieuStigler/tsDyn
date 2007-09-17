@@ -56,7 +56,7 @@ F <- function(phi1, phi2) {
 #   rob
 #   sig
 star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
-                 mTh, thDelay=1, thVar, sig=0.05, trace=TRUE, control=list(), ...)
+                 mTh, thDelay, thVar, sig=0.05, trace=TRUE, control=list(), ...)
 {
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -129,7 +129,8 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 3. Build the 2-regime star
     if(trace) cat("Building a 2 regime STAR.\n")
-    object <- star.predefined(x, m=m, noRegimes=2, thVar=z,
+    object <- star.predefined(x, m=m, noRegimes=2, thVar=thVar,
+                              d=d, steps=steps, mTh=mTh, thDelay=thDelay,
                               series=series, trace=trace, control=control)
     if(noRegimes==2) {
       if(trace) cat("Finished building a MRSTAR with 2 regimes\n");
@@ -140,11 +141,11 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     
     if(trace) cat("  Estimating gradient matrix...\n");
     G <- computeGradient(object);
+
     if(trace) cat("  Done. Computing the test statistic...\n");
-
     testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
-    increase <- testResults$remainingNonLinearity;
 
+    increase <- testResults$remainingNonLinearity;
     if(increase && trace) {
       cat("  Done. Regime 3 is needed (p-Value = ", testResults$pValue,").\n");
     }
@@ -165,8 +166,10 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       
       if(trace) cat("  Estimating gradient matrix...\n");
       G <- computeGradient(object);
+
       if(trace) cat("  Done. Computing the test statistic...\n");
       testResults <- addRegime(object, G = G, rob = rob, sig = sig, trace=trace);
+
       increase <- testResults$remainingNonLinearity;
       if(increase && trace) {
         cat("  Done. Regime ", count + 1," is needed (p-Value = ",
@@ -251,7 +254,7 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 
   if (normG > 1e-6) {
     if(rG < nG) {
-      cat("A1")
+      cat("A1\n")
       PCtmp <- princomp(G);
       PC <- PCtmp$loadings;
 #      GPCA <- PCtmp$scores;
@@ -263,7 +266,7 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
       u <-  e - GPCA %*% b;
       xH0 <- GPCA;
     } else {
-      cat("A2")
+      cat("A2\n")
       b <- solve(t(G) %*% G) %*% t(G) %*% e;
       u <- e - G %*% b;
       xH0 <- G;
@@ -271,7 +274,7 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   } else {
     u <- e;
     if(rG < nG) {
-      cat("B1")
+      cat("B1\n")
       PCtmp <- princomp(G);
       PC <- PCtmp$loadings;
 #      GPCA <- PCtmp$scores;
@@ -281,7 +284,7 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
       GPCA <- GPCA[, 1:indmin];
       xH0 <- GPCA;
     } else {
-      cat("B2")
+      cat("B2\n")
       xH0 = G;
     }
   }
@@ -289,21 +292,27 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   SSE0 <- sum(u^2);
 
   # Regressors under the alternative:
-  xx <- object$str$xx;
+  xx <- cbind(1, object$str$xx);
+  nX <- NCOL(xx);
   if (object$model.specific$externThVar) {
-    x_t <- cbind(1, xx);
-    tmp <- rep(s_t, NCOL(x_t))
-    dim(tmp) <- c(length(s_t), NCOL(x_t))
-    xH1 <- cbind(x_t * tmp, x_t * (tmp^2), x_t * (tmp^3))
+    s <- kronecker(matrix(1, 1, nX), s_t);
+    xH1 <- cbind(xx * s, xx * (s^2), xx * (s^3))
+    
+#    tmp <- rep(s_t, nX)
+#    dim(tmp) <- c(length(s_t), nX)
+#    xH1 <- cbind(xx * tmp, xx * (tmp^2), xx * (tmp^3))
   } else {
-    tmp <- rep(s_t, NCOL(xx))
-    dim(tmp) <- c(length(s_t), NCOL(xx))
-    xH1 <- cbind(xx * tmp, xx * (tmp^2), xx * (tmp^3))
+    s <- kronecker(matrix(1, 1, nX - 1), s_t);
+    xH1 <- cbind(xx[,2:nX] * s, xx[,2:nX] * (s^2), xx[,2:nX] * (s^3))
+    
+#    tmp <- rep(s_t, NCOL(xx))
+#    dim(tmp) <- c(length(s_t), NCOL(xx))
+#    xH1 <- cbind(xx * tmp, xx * (tmp^2), xx * (tmp^3))
   }
 
-  # Standarize the regressors
   Z <- cbind(xH0, xH1)
-cat(Z[,1])
+
+  # Standarize the regressors
   nZ <- NCOL(Z);
   sdZ <- sd(Z)
   dim(sdZ) <- c(1, nZ)
@@ -532,12 +541,12 @@ startingValues <- function(object, trace=TRUE, ...)
   # Maximum and minimum values for gamma
   maxGamma <- 40;
   minGamma <- 10;
-  rateGamma <- 10; #5; ###################################################!!!
+  rateGamma <- 5; ###################################################!!!
   
   # Maximum and minimum values for c
   minTh <- quantile(as.ts(s_t), .1) # percentil 10 of s_t
   maxTh <- quantile(as.ts(s_t), .9) # percentil 90 of s_t
-  rateTh <- (maxTh - minTh) / 20;#200; #######################################!!!
+  rateTh <- (maxTh - minTh) / 200; #######################################!!!
   
   for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
     for(newTh in seq(minTh, maxTh, rateTh)) {
@@ -551,14 +560,7 @@ startingValues <- function(object, trace=TRUE, ...)
       newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
       dim(newPhi1) <- c(noRegimes, NCOL(x_t));
       
-#      local <- array(0, c(noRegimes, n.used));
-#      local[1,] <- x_t %*% newPhi1[1,];
-#      for (i in 1:(noRegimes - 1)) 
-#        local[i + 1,] <- (x_t %*% newPhi1[i + 1,]) * G(s_t, gamma[i], th[i]);
-#      local[noRegimes,] <- (x_t %*% newPhi1[noRegimes,]) *
-#        G(s_t, newGamma, newTh)
-      
-      y.hat <- F(newPhi1, cbind(gamma, th));#apply(local, 2, sum)
+      y.hat <- F(newPhi1, cbind(gamma, th));
       cost <- crossprod(yy - y.hat)
       
       if(cost <= bestCost) {
@@ -690,7 +692,9 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   if(noRegimes == 1) 
    stop("A STAR with 1 regime is an AR model: use the linear model instead.")
   
-  if((noRegimes == 2) && missing(phi1) && missing(phi2)) {
+  if(noRegimes == 2)
+  {
+
     temp <- lstar(x, m=m, d=d, steps=steps, series=series, mTh=mTh,
                   mH=m, mL=m, thDelay=thDelay, thVar=thVar,
                   trace=trace, control=list())
@@ -698,7 +702,11 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     # Cast the lstar into a valid star object
     temp$model.specific$noRegimes <- noRegimes;
     temp$model.specific$m <- m;
-    
+
+#    if(missing(thVar))
+#      temp$model.specific$externThVar <- FALSE
+#    else temp$model.specific$externThVar <- TRUE
+
     vecLength <- NCOL(temp$str$xx); # number of linear parameters on each rule
 
     temp$model.specific$phi1 <- # Linear parameters
@@ -717,7 +725,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                        fitted.values = temp$fitted,
                        residuals = temp$residuals,
                        noRegimes = noRegimes,
-                       k   = temp$k,
+                       k = temp$k,
                        model.specific = temp$model.specific), "star"))
   } 
 
@@ -739,17 +747,20 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
       cat("Using maximum autoregressive order for all regimes: ", m,"\n")
   }
 
-  if(!missing(thDelay)) {
+  if(!missing(thDelay))
+  {
     if(thDelay>=m) 
       stop(paste("thDelay too high: should be < m (=",m,")"))
     z <- xx[,thDelay+1]
-  } else if(!missing(mTh)) {
+  } else if(!missing(mTh))
+  {
     if(length(mTh) != m) 
       stop("length of 'mTh' should be equal to 'm'")
     z <- xx %*% mTh #threshold variable
     dim(x) <- NULL
   }
-  else if(!missing(thVar)) {
+  else if(!missing(thVar))
+  {
     if(length(thVar)>nrow(xx)) {
       z <- thVar[1:nrow(xx)]
       if(trace) 
@@ -758,7 +769,8 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     else 
       z <- thVar
     externThVar <- TRUE
-  } else {
+  } else
+  {
     if(trace) 
       cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
