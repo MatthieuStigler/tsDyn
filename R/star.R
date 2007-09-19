@@ -32,14 +32,16 @@ G <- function(z, gamma, th) {
 #Fitted values, given parameters
 # phi1: vector of linear parameters
 # phi2: vector of tr. functions' parameters
-F <- function(phi1, phi2) {
-  local <- array(0, c(noRegimes, n.used))
-  local[1,] <- x_t %*% phi1[1,];
-  
+F <- function(phi1, phi2, x_t, s_t) {
+  noRegimes <- dim(phi1)[1];
+
+  local <- array(0, c(noRegimes, dim(x_t)[1]))
+
+  local[1,] <- x_t %*% phi1[1,];  
   for (i in 2:noRegimes) 
     local[i,] <-
       (x_t %*% phi1[i,]) * G(s_t, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
-  
+
   return(apply(local, 2, sum));
 }
 
@@ -297,17 +299,9 @@ addRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   if (object$model.specific$externThVar) {
     s <- kronecker(matrix(1, 1, nX), s_t);
     xH1 <- cbind(xx * s, xx * (s^2), xx * (s^3))
-    
-#    tmp <- rep(s_t, nX)
-#    dim(tmp) <- c(length(s_t), nX)
-#    xH1 <- cbind(xx * tmp, xx * (tmp^2), xx * (tmp^3))
   } else {
     s <- kronecker(matrix(1, 1, nX - 1), s_t);
     xH1 <- cbind(xx[,2:nX] * s, xx[,2:nX] * (s^2), xx[,2:nX] * (s^3))
-    
-#    tmp <- rep(s_t, NCOL(xx))
-#    dim(tmp) <- c(length(s_t), NCOL(xx))
-#    xH1 <- cbind(xx * tmp, xx * (tmp^2), xx * (tmp^3))
   }
 
   Z <- cbind(xH0, xH1)
@@ -401,7 +395,7 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     gamma <- phi2[,1];
     th <- phi2[,2];
 
-    y.hat <- F(phi1, phi2)
+    y.hat <- F(phi1, phi2, x_t, s_t)
     e.hat <- yy - y.hat;
 
     fX <- array(0, c(noRegimes - 1, n.used));
@@ -456,7 +450,7 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
     dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1)
 
     # Return the sum of squares
-    y.hat <- F(newPhi1, phi2)
+    y.hat <- F(newPhi1, phi2, cbind(1, xx), s_t)
     crossprod(yy - y.hat)
   }
     
@@ -534,7 +528,7 @@ startingValues <- function(object, trace=TRUE, ...)
   yy <- object$str$yy;
   n.used <- NROW(object$str$xx);
   
-  if(trace) cat("Performing grid search for starting values\n");
+  if(trace) cat("Performing grid search for starting values of regime ", noRegimes,"\n");
   
   bestCost <- Inf;
 
@@ -552,15 +546,19 @@ startingValues <- function(object, trace=TRUE, ...)
     for(newTh in seq(minTh, maxTh, rateTh)) {
 
       # We fix the linear parameters.
-      tmp <- x_t;
-      for(i in 1:(noRegimes - 1))  # leave out the first and last regime
-          tmp <- cbind(tmp, x_t * G(s_t, gamma[i], th[i]))
+      for(i in 1:(noRegimes - 1))  { # leave out the first and last regime
+        if(i == 1) {
+          tmp <- x_t;
+        } else {
+          tmp <- cbind(tmp, x_t * G(s_t, gamma[i - 1], th[i - 1]))
+        }
+      }
       tmp <- cbind(tmp, x_t * G(s_t, newGamma, newTh))
 
       newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
       dim(newPhi1) <- c(noRegimes, NCOL(x_t));
-      
-      y.hat <- F(newPhi1, cbind(gamma, th));
+
+      y.hat <- F(newPhi1, cbind(gamma, th), x_t, s_t);
       cost <- crossprod(yy - y.hat)
       
       if(cost <= bestCost) {
@@ -803,6 +801,22 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
 
 #############################################
 
+  #Fitted values, given parameters
+  # phi1: vector of linear parameters
+  # phi2: vector of tr. functions' parameters
+  F <- function(phi1, phi2) {
+    x_t <- cbind(1, xx)
+    local <- array(0, c(noRegimes, n.used))
+    local[1,] <- x_t %*% phi1[1,];
+
+    for (i in 2:noRegimes) 
+      local[i,] <-
+        (x_t %*% phi1[i,]) * G(z, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
+    
+    result <- apply(local, 2, sum)
+    result
+  }
+  
   #Sum of squares function
   #p: vector of parameters
   SS <- function(phi2) {
@@ -827,22 +841,6 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     # Return the sum of squares
     y.hat <- F(newPhi1, phi2)
     crossprod(yy - y.hat)
-  }
-  
-  #Fitted values, given parameters
-  # phi1: vector of linear parameters
-  # phi2: vector of tr. functions' parameters
-  F <- function(phi1, phi2) {
-    x_t <- cbind(1, xx)
-    local <- array(0, c(noRegimes, n.used))
-    local[1,] <- x_t %*% phi1[1,];
-
-    for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% phi1[i,]) * G(z, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
-    
-    result <- apply(local, 2, sum)
-    result
   }
   
 #Numerical optimization##########
