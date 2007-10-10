@@ -168,7 +168,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     th          <- p[2] 	     #Extract parms from vector p
 
     # First fix the linear parameters
-    tmp <- lm(yy ~ . - 1, as.data.frame(data.frame(xxL, xxH * G(z, gamma, th))))$coefficients
+    tmp <- lm(yy ~ . - 1, data.frame(xxL, xxH * G(z, gamma, th)))$coefficients
 
     new_phi1 <- tmp[1:(mL+1)]
     new_phi2 <- tmp[(mL+2):(mL+mH+2)]
@@ -180,7 +180,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
  
   #Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
-  res <- optim(p, SS, gradEhat, hessian = TRUE, control = control, phi1 = phi1, phi2 = phi2)
+  res <- optim(p, SS, gradEhat, hessian = TRUE, control = control,
+               phi1 = phi1, phi2 = phi2)
 
   if(trace)
     if(res$convergence!=0)

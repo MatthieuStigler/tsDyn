@@ -9,10 +9,9 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        delta, delta.test, delta.lin, delta.lin.test,
        llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
        setar, lstar, availableModels, nlarDialog, 
-       linear, isLinear, nnetTs, aar, tarch, star, addRegime)
+       linear, isLinear, nnetTs, aar, tarch, star)
 S3method(extend, list)
 S3method(isLinear, lstar)
-S3method(addRegime, star)
 S3method(toLatex, setar)
 S3method(plot, nlar)
 S3method(plot, setar)
@@ -25,6 +24,7 @@ S3method(print, linear)
 S3method(print, nnetTs)
 S3method(print, setar)
 S3method(print, lstar)
+S3method(print, star)
 S3method(print, aar)
 S3method(print, tarch)
 S3method(summary, nlar)
