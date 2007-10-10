@@ -65,8 +65,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
     else {
       z <- thVar
-      externThVar <- TRUE
     }
+    externThVar <- TRUE
   }
   else {
     if(trace) 
