@@ -33,16 +33,16 @@ G <- function(z, gamma, th) {
 # phi1: vector of linear parameters
 # phi2: vector of tr. functions' parameters
 F <- function(phi1, phi2, x_t, s_t) {
-  noRegimes <- dim(phi1)[1];
+  noRegimes <- dim(phi1)[1]
 
   local <- array(0, c(noRegimes, dim(x_t)[1]))
 
-  local[1,] <- x_t %*% phi1[1,];  
+  local[1,] <- x_t %*% phi1[1,]
   for (i in 2:noRegimes) 
     local[i,] <-
-      (x_t %*% phi1[i,]) * G(s_t, gamma= phi2[i - 1,1], th= phi2[i - 1,2]);
+      (x_t %*% phi1[i,]) * G(s_t, gamma= phi2[i - 1,1], th= phi2[i - 1,2])
 
-  return(apply(local, 2, sum));
+  return(apply(local, 2, sum))
 }
 
 # Computes the gradient
@@ -53,35 +53,31 @@ F <- function(phi1, phi2, x_t, s_t) {
 #     nonlinear parameters
 computeGradient <- function(object, ...)
 {
- 
-  noRegimes <- object$model.specific$noRegimes;
-  gamma <- object$model.specific$phi2[,1];
-  th <- object$model.specific$phi2[,2];
+  noRegimes <- object$model.specific$noRegimes
+  gamma <- object$model.specific$phi2[,1]
+  th <- object$model.specific$phi2[,2]
 
-  phi1 <- object$model.specific$phi1;
+  phi1 <- object$model.specific$phi1
 
-  n.used <- NROW(object$str$xx);
-  s_t<- object$model.specific$thVar;
-  x_t <- cbind(1, object$str$xx);
+  n.used <- NROW(object$str$xx)
+  s_t<- object$model.specific$thVar
+  x_t <- cbind(1, object$str$xx)
 
-  fX <- array(0, c(noRegimes - 1, n.used));
-  dfX <- array(0, c(noRegimes - 1, n.used));
-  gPhi <- x_t;
+  fX <- array(0, c(noRegimes - 1, n.used))
+  dfX <- array(0, c(noRegimes - 1, n.used))
+  gPhi <- x_t
   for (i in 1:(noRegimes - 1)) {
-    fX[i,] <- G(s_t, gamma[i], th[i]);
-    dfX[i,] <- G(s_t, gamma[i], th[i]) * (1 - G(s_t, gamma[i], th[i]));
+    fX[i,] <- G(s_t, gamma[i], th[i])
+    dfX[i,] <- G(s_t, gamma[i], th[i]) * (1 - G(s_t, gamma[i], th[i]))
     gPhi <- cbind(gPhi, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
   }
-  
-  gGamma <- array(0, c(n.used, noRegimes-1));
+  gGamma <- array(0, c(n.used, noRegimes-1))
   gTh <- array(0, c(n.used, noRegimes-1))
   for (i in 1:(noRegimes - 1)) {
-    gGamma[, i] <- (x_t %*% phi1[i + 1,]) * (dfX[i,] * (s_t - th[i]));
-    gTh[,i] <-         - (x_t %*% phi1[i + 1,]) * (gamma[i] * dfX[i,]);
+    gGamma[, i] <- (x_t %*% phi1[i + 1,]) * (dfX[i,] * (s_t - th[i]))
+    gTh[,i] <- - (x_t %*% phi1[i + 1,]) * (gamma[i] * dfX[i,])
   }
-  
   return(cbind(gPhi, gGamma, gTh))
-
 }
 
 # Tests (within the LM framework), being the null hypothesis H_0 that the
@@ -98,18 +94,18 @@ computeGradient <- function(object, ...)
 testRegime <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 {
 
-  e <-  object$residuals;
-  s_t <- object$model.specific$thVar;
-  nG <- NCOL(G);
-  T <- length(e);
+  e <-  object$residuals
+  s_t <- object$model.specific$thVar
+  nG <- NCOL(G)
+  T <- length(e)
 
   normG <- norm(Matrix(t(G)) %*% e)
   norm2G <-  sum(abs(t(G) %*% e)^2)^(1/2) 
 #  cat("norm2G = ", norm2G, "normG = ", normG, "\n");
 
   # Compute the rank of G' * G
-  G2 <- t(G) %*% G;
-  s <- svd(G2);
+  G2 <- t(G) %*% G
+  s <- svd(G2)
   tol <- max(dim(G2)) * s[1]$d * 2.2204e-16
   rG <- qr(G2, tol)$rank
 #  cat("rango G = ", rG, "\n");
@@ -119,119 +115,112 @@ testRegime <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   if (normG > 1e-6) {
     if(rG < nG) {
 #      cat("A1\n")
-      PCtmp <- princomp(G);
-      PC <- PCtmp$loadings;
+      PCtmp <- princomp(G)
+      PC <- PCtmp$loadings
 #      GPCA <- PCtmp$scores;
-      lambda <- cumsum(PCtmp$sdev^2 / sum(PCtmp$sdev^2));
-      indmin <- min(which(lambda > 0.99999));
-      GPCA <- t(PC%*%t(G));
-      GPCA <- GPCA[, 1:indmin];
-#      b <- solve(t(GPCA) %*% GPCA) %*% t(GPCA) %*% e;
-      b <- lm(e ~ . -1, data = data.frame(GPCA))$coefficients
-      dim(b) <- c(NCOL(GPCA), 1);
-      u <-  e - GPCA %*% b;
-      xH0 <- GPCA;
+      lambda <- cumsum(PCtmp$sdev^2) / sum(PCtmp$sdev^2)
+      indmin <- min(which(lambda > 0.99999))
+      GPCA <- t(PC%*%t(G))[, 1:indmin]
+      b <- lm.fit(GPCA, e)$coefficients
+      u <-  e - GPCA %*% b
+      xH0 <- GPCA
     } else {
 #      cat("A2\n")
 #      b <- solve(t(G) %*% G) %*% t(G) %*% e;
-      b <- lm(e ~ . -1, data=data.frame(G))$coefficients;
-      u <- e - G %*% b;
-      xH0 <- G;
+      b <- lm.fit(G, e)$coefficients
+      u <- e - G %*% b
+      xH0 <- G
     }
   } else {
-    u <- e;
+    u <- e
     if(rG < nG) {
 #     cat("B1\n")
-      PCtmp <- princomp(G);
-      PC <- PCtmp$loadings;
+      PCtmp <- princomp(G)
+      PC <- PCtmp$loadings
 #      GPCA <- PCtmp$scores;
-      lambda <- cumsum(PCtmp$sdev^2 / sum(PCtmp$sdev^2));
-      indmin <- min(which(lambda> 0.99999));
-      GPCA <- t(PC%*%t(G));
-      GPCA <- GPCA[, 1:indmin];
-      xH0 <- GPCA;
+      lambda <- cumsum(PCtmp$sdev^2 / sum(PCtmp$sdev^2))
+      indmin <- min(which(lambda> 0.99999))
+      GPCA <- t(PC%*%t(G))
+      GPCA <- GPCA[, 1:indmin]
+      xH0 <- GPCA
     } else {
 #      cat("B2\n")
-      xH0 = G;
+      xH0 = G
     }
   }
 
-  SSE0 <- sum(u^2);
+  SSE0 <- sum(u^2)
 
   # Regressors under the alternative:
-  xx <- cbind(1, object$str$xx);
-  nX <- NCOL(xx);
+  xx <- cbind(1, object$str$xx)
+  nX <- NCOL(xx)
   if (object$model.specific$externThVar) {
-    s <- kronecker(matrix(1, 1, nX), s_t);
+    s <- kronecker(matrix(1, 1, nX), s_t)
     xH1 <- cbind(xx * s, xx * (s^2), xx * (s^3))
   } else {
-    s <- kronecker(matrix(1, 1, nX - 1), s_t);
+    s <- kronecker(matrix(1, 1, nX - 1), s_t)
     xH1 <- cbind(xx[,2:nX] * s, xx[,2:nX] * (s^2), xx[,2:nX] * (s^3))
   }
 
   Z <- cbind(xH0, xH1)
 
   # Standarize the regressors
-  nZ <- NCOL(Z);
+  nZ <- NCOL(Z)
   sdZ <- sd(Z)
   dim(sdZ) <- c(1, nZ)
   sdZ <- kronecker(matrix(1, T, 1), sdZ) # repeat sdZ T rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
 
    # Compute the rank of Z
-  s <- svd(Z);
+  s <- svd(Z)
   tol <- max(dim(Z)) * s[1]$d * 2.2204e-16
   rZ <- qr(Z, tol)$rank
   if(rZ < NCOL(Z)) warning("Multicollinearity problem. Aborting.\n")
 
  # Nonlinear model (Alternative hypothesis)
 #  c <- solve(t(Z) %*% Z) %*% t(Z) %*% u;
-  c <- lm(u ~ . - 1, data=data.frame(Z))$coefficients
-  dim(c) <- c(NCOL(Z), 1);
-  v <- u - Z %*% c;
-  SSE <- sum(v^2);
+  c <- lm.fit(Z, u)$coefficients
+  v <- u - Z %*% c
+  SSE <- sum(v^2)
 
   # Compute the third order statistic
-  nxH0 <- NCOL(xH0);
-  nxH1 <- NCOL(xH1);
+  nxH0 <- NCOL(xH0)
+  nxH1 <- NCOL(xH1)
   
-  F = ((SSE0 - SSE) / nxH1) / (SSE / (T - nxH0 - nxH1));
+  F = ((SSE0 - SSE) / nxH1) / (SSE / (T - nxH0 - nxH1))
 
-  pValue <- pf(F, nxH1, T - nxH0 - nxH1, lower.tail = FALSE);
+  pValue <- pf(F, nxH1, T - nxH0 - nxH1, lower.tail = FALSE)
 
   if (pValue >= sig) {
-    return(list(remainingNonLinearity = FALSE, pValue = pValue));
+    return(list(remainingNonLinearity = FALSE, pValue = pValue))
   }
   else {
-    return(list(remainingNonLinearity = TRUE, pValue = pValue));
+    return(list(remainingNonLinearity = TRUE, pValue = pValue))
   }
 }
   
 addRegime <- function(object)
 {
-
-  noRegimes <- object$model.specific$noRegimes;
+  noRegimes <- object$model.specific$noRegimes
   
-  gamma <- object$model.specific$phi2[,1];
-  th <- object$model.specific$phi2[,2];
-  gamma[noRegimes] <- 0.0;
-  th[noRegimes] <- 0.0;
+  gamma <- object$model.specific$phi2[,1]
+  th <- object$model.specific$phi2[,2]
+  gamma[noRegimes] <- 0.0
+  th[noRegimes] <- 0.0
 
-  object$model.specific$noRegimes <- object$model.specific$noRegimes + 1;
-  object$noRegimes <- object$noRegimes + 1;
+  object$model.specific$noRegimes <- object$model.specific$noRegimes + 1
+  object$noRegimes <- object$noRegimes + 1
   
-  object$model.specific$phi2 <- cbind(gamma, th);
+  object$model.specific$phi2 <- cbind(gamma, th)
 
-  object$model.specific$phi1 <- rbind(object$model.specific$phi1, rnorm(3));
+  object$model.specific$phi1 <- rbind(object$model.specific$phi1, rnorm(3))
 
-  object$model.specific$coefficients <-
-                                          c(object$model.specific$phi1, cbind(gamma, th));
-  object$coefficients <- c(object$model.specific$phi1, cbind(gamma, th));
+  object$model.specific$coefficients <- c(object$model.specific$phi1, cbind(gamma, th))
+  object$coefficients <- c(object$model.specific$phi1, cbind(gamma, th))
   object$model.specific$k <- length(object$coefficients)
-  object$k <- length(object$coefficients);
+  object$k <- length(object$coefficients)
 
-  return(object);
-  
+  return(object)
 }
 
 # Find promising initial values for next regime
@@ -274,8 +263,8 @@ startingValues <- function(object, trace=TRUE, ...)
 
       tmp <- cbind(x_t, matrix(apply(G(s_t, gamma, th), 2, "*",x_t), 
                                nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
-      newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
-      dim(newPhi1) <- c(NCOL(x_t), noRegimes);
+      newPhi1 <- lm.fit(tmp, yy)$coefficients
+      dim(newPhi1) <- c(NCOL(x_t), noRegimes)
       newPhi1 <- t(newPhi1);
 
       y.hat <- F(newPhi1, cbind(gamma, th), x_t, s_t);
@@ -386,9 +375,9 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
                  matrix(apply(G(s_t, gamma = phi2[,1], th = phi2[,2]), 2, "*", x_t),
                              nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
 
-    newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    newPhi1<- lm.fit(tmp, yy)$coefficients
     dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
-    newPhi1 <- t(newPhi1);
+    newPhi1 <- t(newPhi1)
 
     # Return the sum of squares
     y.hat <- F(newPhi1, phi2, x_t, s_t)
@@ -423,8 +412,8 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
   # 3.- Estimate linear parameters again
   tmp <- cbind(x_t, matrix(apply(G(s_t, gamma = gamma, th = th), 2, "*", x_t),
                            nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
-  
-  newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+
+  newPhi1<- lm.fit(tmp, yy)$coefficients
   dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
   newPhi1 <- t(newPhi1)
 
@@ -472,8 +461,8 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
   s_t <- object$model.specific$thVar
 
   # Linear Model (null hypothesis)
-  linearModel <- lm(y_t ~ . , data=data.frame(xH0))
-  u_t <- linearModel$residuals;
+  linearModel <- lm.fit(xH0, y_t)
+  u_t <- linearModel$residuals
   SSE0 <- sum(u_t^2)
 
   # Regressors under the alternative
@@ -501,28 +490,25 @@ linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
   tol <- max(dim(Z)) * s[1]$d * 2.2204e-16
   rZ <- qr(Z, tol)$rank
   if(rZ < NCOL(Z)) warning("Multicollinearity problem.\n")
-      
+
   # Nonlinear model (alternative hypothesis)
-  nonlinearModel <- lm(u_t ~ ., data=data.frame(Z));
-  e_t <- nonlinearModel$residuals;
+  nonlinearModel <- lm.fit(Z, u_t)
+  e_t <- nonlinearModel$residuals
   SSE1 <- sum(e_t^2)
 
   # Compute the test statistic
-  nxH0 <- NCOL(xH0);
-  nxH1 <- NCOL(xH1);
-  
+  nxH0 <- NCOL(xH0)
+  nxH1 <- NCOL(xH1)
+
   F = ((SSE0 - SSE1) / nxH1) / (SSE1 / (n.used - nxH1 - nxH0));
-    
+
   # Look up the statistic in the table, get the p-value
   pValue <- pf(F, m, n.used - m - n, lower.tail = FALSE);
-  
-  if (pValue >= sig) {
-    return(list(isLinear = TRUE,  pValue = pValue));
-  }
-  else {
-    return(list(isLinear = FALSE, pValue = pValue));
-  }
 
+  if (pValue >= sig)
+    return(list(isLinear = TRUE,  pValue = pValue))
+  else
+    return(list(isLinear = FALSE, pValue = pValue))
 }
 
 # Incremental STAR fitter
@@ -853,7 +839,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     if(rtmp < NCOL(tmp))
       stop("Multicollinearity problem. Aborting.\n")
       
-    newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    newPhi1<- lm.fit(tmp, yy)$coefficients
     dim(newPhi1) <- c(noRegimes, m + 1)
 
     # Return the sum of squares
@@ -901,7 +887,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     for (i in 2:noRegimes) 
       tmp[,,i] <- tmp[,,i] * G(z, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
 
-    phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    phi1<- lm.fit(tmp, yy)$coefficients
     dim(phi1) <- c(noRegimes, m + 1)
 
     if(trace) 
@@ -993,9 +979,7 @@ oneStep.star <- function(object, newdata, itime, thVar, ...)
   }
 
   result
-  
 }
-
 
 print.star <- function(x, ...) {
   NextMethod(...)
@@ -1004,19 +988,13 @@ print.star <- function(x, ...) {
   
   for (i in 1:x$noRegimes) {
     cat("Regime ", i, ":\n")
-
     cat("    Linear parameters: ")
-    print(x$phi1[i,])
-    cat("\n")
-
+    cat(paste(x$phi1[i,], collapse=", "), '\n')
     if(i > 1) {
       cat("    Non-linear parameters:\n")
-      print(x$phi2[i - 1,])
-    }  
-
+      cat(paste(x$phi1[i,], collapse=", "))
+    }
     cat("\n")
-
   }
-  
   invisible(x)
 }

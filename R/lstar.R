@@ -78,9 +78,6 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   xxL <- cbind(1,xx[,1:mL])
   xxH <- cbind(1,xx[,1:mH])
 
-  # Linear model
-  linearModel <- lm(yy ~ .  - 1, data=data.frame(xxL));
-  
   #Fitted values, given parameters
   #phi1: vector of 'low regime' parameters
   #phi2: vector of 'high regime' parameters
@@ -113,8 +110,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       for(newTh in seq(minTh, maxTh, rateTh)) {
         
         # We fix the linear parameters.
-        tmp <- lm(yy ~ . - 1,
-                  data.frame(xxL, xxH * G(z, newGamma, newTh)))$coefficients;
+        tmp <- lm.fit(cbind(xxL, xxH * G(z, newGamma, newTh)), yy)$coefficients
         new_phi1 <- tmp[1:(mL+1)]
         new_phi2 <- tmp[(mL+2):(mL+mH+2)]
 
@@ -168,7 +164,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     th          <- p[2] 	     #Extract parms from vector p
 
     # First fix the linear parameters
-    tmp <- lm(yy ~ . - 1, data.frame(xxL, xxH * G(z, gamma, th)))$coefficients
+    tmp <- lm.fit(cbind(xxL, xxH * G(z, gamma, th)), yy)$coefficients
 
     new_phi1 <- tmp[1:(mL+1)]
     new_phi2 <- tmp[(mL+2):(mL+mH+2)]
@@ -192,12 +188,10 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   
   gamma <- res$par[1]
   th <- res$par[2]
-  
+
   # Fix the linear parameters one more time
-  tmp <- data.frame(xxL, xxH * G(z, gamma, th));
-  
-  new_phi<- lm(yy ~ . - 1, tmp)$coefficients;
-  phi1 <- new_phi[1:(mL+1)]	
+  new_phi<- lm.fit(cbind(xxL, xxH * G(z, gamma, th)), yy)$coefficients
+  phi1 <- new_phi[1:(mL+1)]
   phi2 <- new_phi[(mL+2):(mL + mH + 2)]
 
   #Results storing################
