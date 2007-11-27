@@ -17,8 +17,8 @@
 
 #FAR fitter
 far <- function(str, ...){
-	xx <- str$xx
-	yy <- str$yy
+  xx <- str$xx
+  yy <- str$yy
   dat <- data.frame(cbind(xx,y=yy))
   predNames <- names(dat)
   form <- as.formula(paste("y ~", predNames))

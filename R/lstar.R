@@ -160,11 +160,16 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   #Sum of squares function
   #p: vector of parameters
   SS <- function(p, phi1, phi2) {
-    gamma <- p[1]                            #Extract parms from vector p
-    th          <- p[2] 	     #Extract parms from vector p
+    gamma <- p[1]   #Extract parms from vector p
+    th <- p[2]      #Extract parms from vector p
 
     # First fix the linear parameters
-    tmp <- lm.fit(cbind(xxL, xxH * G(z, gamma, th)), yy)$coefficients
+    xx <- cbind(xxL, xxH * G(z, gamma, th))
+    if(any(is.na(as.vector(xx)))) {
+      message('missing value during computations')
+      return (Inf)
+    }
+    tmp <- lm.fit(xx, yy)$coefficients
 
     new_phi1 <- tmp[1:(mL+1)]
     new_phi2 <- tmp[(mL+2):(mL+mH+2)]
@@ -464,11 +469,11 @@ showDialog.lstar <- function(x, ...) {
   onFinish <- function() {
     mL <- as.numeric(tclObj(vML))
     mH <- as.numeric(tclObj(vMH))
-    c <- as.numeric(tclObj(vTh))
+    th <- as.numeric(tclObj(vTh))
     thDelay <- as.numeric(tclObj(vThDelay))
     maxit <- as.numeric(tclObj(vMaxit))
     tkdestroy(frRoot$tkvar)
-    res <- lstar(x, mL=mL, mH=mH, c=c, thDelay=thDelay, control=list(maxit=maxit))
+    res <- lstar(x, mL=mL, mH=mH, th=th, thDelay=thDelay, control=list(maxit=maxit))
     assign("nlarModel", res, .GlobalEnv)
   }
   onCancel <- function()

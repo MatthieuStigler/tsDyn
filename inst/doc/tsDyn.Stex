@@ -104,7 +104,7 @@ can be plotted with the generic \texttt{plot} method. So, a typical
 usage would be:\\ 
 \begin{Scode}{fig=TRUE, height=4} 
 obj <- llar(log(lynx), m=3)
-plot(obj) 
+plot(obj)
 \end{Scode}
 
 However, the \texttt{obj} object can be explicitely converted in an ordinary data.frame:
@@ -482,7 +482,7 @@ lag.plot(x.new, 1)
 A stable periodic cycle.
 
 \begin{Scode}{fig=TRUE, width=3.5, height=3.5}
-x.new <- predict(mod[["nnet"]], n.ahead=100)
+x.new <- predict(mod[["nnetTs"]], n.ahead=100)
 lag.plot(x.new, 1)
 \end{Scode}
 

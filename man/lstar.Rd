@@ -83,7 +83,7 @@ until convergence is achieved. For the nonlinear estimation of the
 parameters \var{th} and \var{gamma}, the program uses the
 \code{\link{optim}} function, with its default optimization method. You 
 can pass further arguments directly to the 'control' list argument of
-this function. For example, the option \code{maxit} maybe useful when
+this function. For istance, the option \code{maxit} maybe useful when
 there are convergence issues (see examples).
 }
 

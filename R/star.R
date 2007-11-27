@@ -436,81 +436,6 @@ estimateParams <- function(object, trace=TRUE, control=list(), ...)
   
 }
 
-
-# LM linearity testing against 2 regime STAR
-#
-#   Performs an 3rd order Taylor expansion LM test
-#   NOTE: this is NOT the function used in star(), see nlar-methods.R.
-#
-#   object: a star object
-#   rob
-#   sig
-linearityTest.star <- function(object, rob=FALSE, sig=0.05, trace=TRUE,...)
-{
-
-  str <- object$str
-  n.used <- NROW(str$xx);  # The number of lagged samples
-
-  # Build the regressand vector
-  y_t <- str$yy;
-  
-  # Regressors under the null
-  xH0 <- cbind(1, str$xx)
-
-  # Get the transition variable
-  s_t <- object$model.specific$thVar
-
-  # Linear Model (null hypothesis)
-  linearModel <- lm.fit(xH0, y_t)
-  u_t <- linearModel$residuals
-  SSE0 <- sum(u_t^2)
-
-  # Regressors under the alternative
-  if (object$model.specific$externThVar) {
-    tmp <- rep(s_t, NCOL(str$xx) + 1)
-    dim(tmp) <- c(length(s_t), NCOL(str$xx) + 1)
-    xH1 <- cbind(cbind(1, str$xx) * tmp, cbind(1, str$xx) * (tmp^2),
-                 cbind(1, str$xx) * (tmp^3))
-  } else {
-    tmp <- rep(s_t, NCOL(str$xx))
-    dim(tmp) <- c(length(s_t), NCOL(str$xx))
-    xH1 <- cbind(str$xx * tmp, str$xx * (tmp^2), str$xx * (tmp^3))
-  }
-
-  # Standarize the regressors
-  Z <- cbind(xH0, xH1);
-  nZ <- NCOL(Z);
-  sdZ <- sd(Z)
-  dim(sdZ) <- c(1, nZ)
-  sdZ <- kronecker(matrix(1, n.used, 1), sdZ) # repeat sdZ n.used rows
-  Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
-
-  # Compute the rank of Z
-  s <- svd(Z);
-  tol <- max(dim(Z)) * s[1]$d * 2.2204e-16
-  rZ <- qr(Z, tol)$rank
-  if(rZ < NCOL(Z)) warning("Multicollinearity problem.\n")
-
-  # Nonlinear model (alternative hypothesis)
-  nonlinearModel <- lm.fit(Z, u_t)
-  e_t <- nonlinearModel$residuals
-  SSE1 <- sum(e_t^2)
-
-  # Compute the test statistic
-  nxH0 <- NCOL(xH0)
-  nxH1 <- NCOL(xH1)
-
-  F = ((SSE0 - SSE1) / nxH1) / (SSE1 / (n.used - nxH1 - nxH0));
-
-  # Look up the statistic in the table, get the p-value
-  pValue <- pf(F, m, n.used - m - n, lower.tail = FALSE);
-
-  if (pValue >= sig)
-    return(list(isLinear = TRUE,  pValue = pValue))
-  else
-    return(list(isLinear = FALSE, pValue = pValue))
-}
-
 # Incremental STAR fitter
 #
 #   Builds a STAR model with as many regimes as needed, using the
@@ -541,7 +466,7 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
   n.used <- NROW(xx)
 
   if(missing(noRegimes))
-     noRegimes <- Inf;     
+     noRegimes <- Inf;
     
   if(!missing(thDelay)) {
     
@@ -567,17 +492,12 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       if(trace) cat("Using only first", nrow(xx), "elements of thVar\n")
 
     }
-    else 
-
+    else
       z <- thVar
-
     externThVar <- TRUE
-
   } else {
-
     if(trace) cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
-
   }
   
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -985,15 +905,58 @@ print.star <- function(x, ...) {
   NextMethod(...)
   cat("\nMultiple regime STAR model\n\n")
   x <- x$model.specific
+  dg <- options()$digits
   for (i in 1:x$noRegimes) {
     cat("Regime ", i, ":\n")
     cat("    Linear parameters: ")
-    cat(paste(x$phi1[i,], collapse=", "), '\n')
+    cat(paste(round(x$phi1[i,],dg), collapse=", "), '\n')
     if(i > 1) {
       cat("    Non-linear parameters:\n")
-      cat(paste(x$phi2[i-1,], collapse=", "))
+      cat(paste(round(x$phi2[i-1,],dg), collapse=", "))
     }
     cat("\n")
   }
   invisible(x)
+}
+
+showDialog.star <- function(x, ...) {
+  vD <- tclVar(1)
+  vSteps <- tclVar(1)
+  vML  <- tclVar(1)
+  vMH  <- tclVar(1)
+  vThDelay <- tclVar(0)
+  vTh <- tclVar(0)
+  frTop <- Frame(opts=list(side="left"))
+  frLeft <- Frame()
+  add(frLeft,
+    namedSpinbox("low reg. AR order", vML, from=1, to=1000, increment=1, width=4),
+    namedSpinbox("high reg. AR order", vMH, from=1, to=1000, increment=1, width=4)
+  )
+  frRight <- Frame()
+  add(frRight,
+    namedSpinbox("treshold delay", vThDelay, from=0, to=1000)
+  )
+  frExtra <- Frame()
+  add(frExtra,
+          namedSpinbox("time delay", vD, from=1, to=1000),
+          namedSpinbox("forecasting steps", vSteps, from=1, to=1000)
+  )
+  add(frTop, frExtra, frLeft, frRight)
+  frRoot <- Frame()	
+
+  onFinish <- function() {
+    d <- as.numeric(tclObj(vD))
+    steps <- as.numeric(tclObj(vSteps))
+    mL <- as.numeric(tclObj(vML))
+    mH <- as.numeric(tclObj(vMH))
+    thDelay <- as.numeric(tclObj(vThDelay))
+    tkdestroy(frRoot$tkvar)
+    res <- star(x, d=d, steps=steps, mL=mL, mH=mH, thDelay=thDelay)
+    assign("nlarModel", res, .GlobalEnv)
+  }
+  onCancel <- function()
+    tkdestroy(frRoot$tkvar)
+  bttnFrame <- makeButtonsFrame(list(Finish=onFinish, Cancel=onCancel))
+  add(frRoot, frTop, bttnFrame)
+  buildDialog(title="STAR model", frRoot)
 }

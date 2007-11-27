@@ -51,7 +51,7 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 		dim(z) <- NULL
 	} else if(!missing(thVar)) {
 		if(length(thVar)>nrow(xx)) {
-			z <- thVar[1:nrow(xx)]
+			z <- thVar[seq_len(nrow(xx))]
 			if(trace) 
 				cat("Using only first", nrow(xx), "elements of thVar\n")
 		}
@@ -90,8 +90,8 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 		return(res)
 	} else {	#else fit with the specified threshold
 		isL <- 0+(z <= th)		#regime-switching indicator variable
-		xxL <- cbind(1,xx[,1:mL])*isL
-		xxH <- cbind(1,xx[,1:mH])*(1-isL)
+		xxL <- cbind(1,xx[,seq_len(mL)])*isL
+		xxH <- cbind(1,xx[,seq_len(mH)])*(1-isL)
 		res <- lm.fit(cbind(xxL, xxH), yy)
 		res$coefficients <- c(res$coefficients, th)
 		names(res$coefficients) <- c(paste("phi1", 0:mL, sep="."), 

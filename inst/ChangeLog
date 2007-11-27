@@ -1,4 +1,17 @@
+-version 0.6 released
+-fixed Matrix dependency in DESCRIPTION
+-added minimal docs for newly created internal objects
+-added STAR model option to the tcltk GUI
+-added a new STAR-fitting function with automatic selection of the number of regimes
+-fixed bugs in lstar
+-fixed bugs in some internal functions
 -added google codebase project URL to DESCRIPTION
+
+-version 0.5-6
+-fixed bug in setar model when mL and/or mH=0
+
+-version 0.5-5 released
+-fixed bug in lstar model out-of-sample forecasting
 
 -version 0.5-4 released
 -fixed some warnings issued in R-2.4.0 check script

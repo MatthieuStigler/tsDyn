@@ -6,13 +6,13 @@
 STAR model fitting
 }
 \usage{
-star(x, m=3, d = 1, steps = d, series, rob = FALSE,
-	mTh, thDelay=1, thVar, 
-	sig=0.05, trace=TRUE, control=list(), ...)
+star(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
+                 mTh, thDelay, thVar, sig=0.05, trace=TRUE, control=list(), ...)
 }
 \arguments{
 \item{x}{ time series }
 \item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
+\item{noRegimes}{ max number of regimes }
 \item{series}{ time series name (optional) }
 \item{rob}{perform robust test?}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of
@@ -37,5 +37,6 @@ TODO
 \author{ J. L. Aznarte }
 \examples{
 mod.star <- star(log10(lynx), m=2, mTh=c(0,1), control=list(maxit=3000))
+mod.star
 }
 \keyword{ ts }

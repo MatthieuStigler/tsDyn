@@ -23,10 +23,10 @@ print.MyEnv <- function(x, ...) {
 Node <- function(parent=NULL, childs=NULL, opts=NULL, tkvar=NULL, ...) {
 	this <- extend(MyEnv(), "Node", parent=NULL, childs=NULL, tkvar=tkvar, opts=opts)
 	if(!is.null(parent))
-		addChild(parent, this)
+		add(parent, this)
 	if(!is.null(childs))
 		for(nd in childs)
-			addChild(this, nd)
+			add(this, nd)
 	return(this)
 }
 

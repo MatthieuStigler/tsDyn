@@ -258,10 +258,10 @@ linearityTest <- function(object, ...)
 #   str: an nlar.struct object
 #   rob
 #   sig
-linearityTest.nlar.struct <- function(str, thVar, externThVar=FALSE,
+linearityTest.nlar.struct <- function(object, thVar, externThVar=FALSE,
                                       rob=FALSE, sig=0.05, trace=TRUE, ...)
 {
-
+  str <- object
   n.used <- NROW(str$xx);  # The number of lagged samples
 
   # Build the regressand vector

@@ -17,8 +17,6 @@
 
 .onLoad <- function(libname, pkgname) {
 	where <- parent.env(environment())
-	fitters <- c("linear","nnetTs","setar","lstar","aar"
-#                        ,"far"
-		)
+	fitters <- c("linear","nnetTs","setar","lstar","star","aar")
 	assign("fitters", fitters, env=where)	
 }
