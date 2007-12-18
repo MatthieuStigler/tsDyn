@@ -8,7 +8,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        autopairs, autotriples, autotriples.rgl,
        delta, delta.test, delta.lin, delta.lin.test,
        llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
-       setar, lstar, availableModels, nlarDialog, 
+       setar, lstar, star, ncstar, availableModels, nlarDialog, 
        linear, isLinear, nnetTs, aar, star)
 S3method(extend, list)
 S3method(isLinear, lstar)
