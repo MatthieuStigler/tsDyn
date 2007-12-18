@@ -561,41 +561,6 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # Estimate nonlinear parameters
   
-  # Function to compute the gradient 
-  #
-  # Returns the gradient with respect to the error
-  gradEhat <- function(phi2, phi1) {
-    dim(phi2) <- c(noRegimes - 1, 2)
-    gamma <- phi2[,1];
-    th <- phi2[,2];
-
-    y.hat <- F(phi1, phi2, x_t, s_t)
-    e.hat <- yy - y.hat;
-
-    fX <- array(0, c(noRegimes - 1, n.used));
-    dfX <- array(0, c(noRegimes - 1, n.used));
-    gPhi <- x_t;
-    for (i in 1:(noRegimes - 1)) {
-      fX[i,]   <- G(s_t, gamma[i], th[i]);
-      dfX[i,] <- G(s_t, gamma[i], th[i]) * (1 - G(s_t, gamma[i], th[i]));
-      gPhi <- cbind(gPhi, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
-    }
-    
-    gGamma <- array(0, c(n.used, noRegimes-1));
-    gTh <- array(0, c(n.used, noRegimes-1))
-    for (i in 1:(noRegimes - 1)) {
-      gGamma[, i] <- as.vector(x_t %*% phi1[i + 1,]) * as.vector(dfX[i,] *
-                                                                 (s_t - th[i]));
-      gTh[,i] <-         - as.vector(x_t %*% phi1[i + 1,]) * as.vector(gamma[i] *
-                                                                       dfX[i,]);
-    }
-    
-    J = - cbind(gGamma, gTh) / sqrt(n.used)
-      
-    return(2 * t(e.hat) %*% J)
-    
-  }
-
   #Fitted values, given parameters
   # phi1: matrix of linear parameters
   # phi2omega: vector of tr. functions' parameters
@@ -627,9 +592,56 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     result
   }
   
+  # Function to compute the gradient 
+  #
+  # Returns the gradient with respect to the error
+  gradEhat <- function(phi2omega, phi1) {
+    # phi2 contains parameters gamma and th for each regime
+    phi2 <- phi2omega[1:((noRegimes-1) * 2)];
+    dim(phi2) <- c(noRegimes - 1, 2)
+
+    gamma <- phi2[,1]
+    th <- phi2[,2]
+
+    # omega (one vector for each regime)
+    omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
+    dim(omega) <- c(NCOL(xx), noRegimes - 1)
+
+    y.hat <- F(phi1, phi2omega)
+    e.hat <- yy - y.hat;
+
+    fX <- array(0, c(noRegimes - 1, n.used));
+    dfX <- array(0, c(noRegimes - 1, n.used));
+    gPhi <- x_t;
+    gOmega <- array(0, c(n.used, (noRegimes - 1), NCOL(xx)))
+    for (i in 1:(noRegimes - 1)) {
+      fX[i,] <- sigmoid(gamma[i] * (xx %*% omega[,i] - th[i]));
+      dfX[i,] <- sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])) *
+                                                     (1 - sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])));
+      gPhi1 <- cbind(gPhi1, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
+    }
+    
+    gGamma <- array(0, c(n.used, noRegimes-1));
+    gTh <- array(0, c(n.used, noRegimes-1))
+    gOmega <- array(0, c(n.used, (noRegimes - 1), NCOL(xx)))
+    for (i in 1:(noRegimes - 1)) {
+      gTh[,i] <-         - (x_t %*% phi1[i + 1,]) * (gamma[i] * dfX[i,]);
+      gGamma[, i] <- (x_t %*% phi1[i + 1,]) * (dfX[i,] * (xx %*% omega[,i] - th[i]));
+      for (j in 1:NCOL(xx)) 
+        gOmega[, i, j] <-  (x_t %*% phi1[i + 1,]) * (dfX[i,] * gamma[i] * xx[i,j])
+    }
+    dim(gOmega) <- c(n.used, (noRegimes - 1) * NCOL(xx))
+
+    
+    J = - cbind(gGamma, gTh, gOmega) / sqrt(n.used)
+      
+    return(2 * t(e.hat) %*% J)
+    
+  }
+
   #Sum of squares function
   #p: vector of parameters
-  SS <- function(phi2omega) {
+  SS <- function(phi2omega, phi1) {
     # phi2 contains parameters gamma and th for each regime
     phi2 <- phi2omega[1:((noRegimes-1) * 2)];
     dim(phi2) <- c(noRegimes - 1, 2)
@@ -663,8 +675,8 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     crossprod(yy - y.hat)
   }
   
-  res <- optim(object$model.specific$phi2omega, SS, #gradEhat,
-               control = control)#, phi1 = object$model.specific$phi1)
+  res <- optim(object$model.specific$phi2omega, SS, gradEhat,
+               control = control, phi1 = object$model.specific$phi1)
 
   newPhi2 <- res$par[1:((noRegimes-1) * 2)];
   dim(newPhi2) <- c(noRegimes - 1, 2)
