@@ -612,13 +612,13 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
 
     fX <- array(0, c(noRegimes - 1, n.used));
     dfX <- array(0, c(noRegimes - 1, n.used));
-    gPhi <- x_t;
+#    gPhi1 <- x_t;
     gOmega <- array(0, c(n.used, (noRegimes - 1), NCOL(xx)))
     for (i in 1:(noRegimes - 1)) {
       fX[i,] <- sigmoid(gamma[i] * (xx %*% omega[,i] - th[i]));
       dfX[i,] <- sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])) *
                                                      (1 - sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])));
-      gPhi1 <- cbind(gPhi1, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
+#      gPhi1 <- cbind(gPhi1, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
     }
     
     gGamma <- array(0, c(n.used, noRegimes-1));
@@ -676,7 +676,8 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
   }
   
   res <- optim(object$model.specific$phi2omega, SS, gradEhat,
-               control = control, phi1 = object$model.specific$phi1)
+               control = control, phi1 = object$model.specific$phi1,
+               method="BFGS")
 
   newPhi2 <- res$par[1:((noRegimes-1) * 2)];
   dim(newPhi2) <- c(noRegimes - 1, 2)
