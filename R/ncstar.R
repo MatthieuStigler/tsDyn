@@ -27,6 +27,9 @@ G <- function(z, gamma, th) {
     plogis(z, th, 1/gamma)
 }
 
+computeGradient <- function(object, ...)
+  UseMethod("computeGradient")
+
 # Computes the gradient
 #
 # object: a valid STAR model.
@@ -81,6 +84,9 @@ computeGradient.ncstar <- function(object, ...)
   return(cbind(gPhi1, gGamma, gTh, gOmega))
 
 }
+
+testRegime <- function(object, ...)
+  UseMethod("testRegime")
 
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
@@ -199,7 +205,7 @@ testRegime.ncstar <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 }
 
 addRegime <- function(object, ...)
-  UseMethod("addRegime.ncstar")
+  UseMethod("addRegime")
 
 addRegime.ncstar <- function(object)
 {
@@ -269,7 +275,7 @@ addRegime.ncstar <- function(object)
 }
 
 startingValues <- function(object, ...)
-  UseMethod("startingValues.ncstar")
+  UseMethod("startingValues")
 
 # Find promising initial values for next regime
 #
@@ -534,7 +540,8 @@ startingValues2.ncstar <- function(object, trace=TRUE, ...)
   
 }
 
-
+estimateParams <- function(object, ...)
+  UseMethod("estimateParams")
 
 # Estimates the parameters of a given STAR model.
 #
@@ -829,24 +836,24 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       
       if(trace) cat("Adding regime ",
                     object$model.specific$noRegimes + 1,".\n");
-      object <- addRegime.ncstar(object);
+      object <- addRegime(object);
 
       if(trace) cat("Fixing good starting values for regime ",
                     object$model.specific$noRegimes,"...\n");
-      object <- startingValues.ncstar(object, control=control, trace=trace);
+      object <- startingValues(object, control=control, trace=trace);
 
       if(trace) cat('Estimating parameters of regime',
                     object$model.specific$noRegimes, '...\n')
-      object <- estimateParams.ncstar(object, control=control, trace=trace);
+      object <- estimateParams(object, control=control, trace=trace);
       
       if(trace) cat("Ok. \n Testing for addition of regime ",
                     object$model.specific$noRegimes + 1, ".\n");
       
       if(trace) cat("  Estimating gradient matrix...\n");
-      G <- computeGradient.ncstar(object);
+      G <- computeGradient(object);
 
       if(trace) cat("  Computing the test statistic...\n");
-      testResults <- testRegime.ncstar(object, G = G,
+      testResults <- testRegime(object, G = G,
                                        rob = rob, sig = sig, trace=trace);
 
       increase <- testResults$remainingNonLinearity;

@@ -45,6 +45,9 @@ F <- function(phi1, phi2, x_t, s_t) {
   return(apply(local, 2, sum));
 }
 
+computeGradient <- function(object, ...)
+  UseMethod("computeGradient")
+
 # Computes the gradient
 #
 # object: a valid STAR model.
@@ -83,6 +86,9 @@ computeGradient.star <- function(object, ...)
   return(cbind(gPhi, gGamma, gTh))
 
 }
+
+testRegime <- function(object, ...)
+  UseMethod("testRegime")
 
 # Tests (within the LM framework), being the null hypothesis H_0 that the
 #    model 'object' is complex enough and the alternative H_1 that an extra
@@ -208,7 +214,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 }
   
 addRegime <- function(object, ...)
-  UseMethod("addRegime.star")
+  UseMethod("addRegime")
 
 addRegime.star <- function(object)
 {
@@ -236,6 +242,9 @@ addRegime.star <- function(object)
   return(object);
   
 }
+
+startingValues <- function(object, ...)
+  UseMethod("startingValues")
 
 # Find promising initial values for next regime
 #
@@ -320,7 +329,8 @@ startingValues.star <- function(object, trace=TRUE, ...)
   
 }
 
-
+estimateParams <- function(object, ...)
+  UseMethod("estimateParams")
 
 # Estimates the parameters of a given STAR model.
 #
@@ -565,8 +575,6 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       if(trace) cat("Adding regime ",
                     object$model.specific$noRegimes + 1,".\n");
       object <- addRegime(object);
-
-#debug(startingValues);
       
       if(trace) cat("Fixing good starting values for regime ",
                     object$model.specific$noRegimes,"...\n");

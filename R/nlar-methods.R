@@ -245,18 +245,6 @@ toLatex.nlar <- function(object, ...) {
 }
 
 
-computeGradient <- function(object, ...)
-  UseMethod("computeGradient.star")
-
-computeGradient <- function(object, ...)
-  UseMethod("computeGradient.ncstar")
-
-linearityTest <- function(object, ...)
-	UseMethod("linearityTest.star")
-
-linearityTest <- function(object, ...)
-	UseMethod("linearityTest.ncstar")
-
 # LM linearity testing against 2 regime STAR
 #
 #   Performs an 3rd order Taylor expansion LM test
