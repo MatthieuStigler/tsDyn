@@ -1,4 +1,4 @@
-## Copyright (C) 2005, 2006, 2007  Antonio, Fabio Di Narzo;
+## Copyright (C) 2005, 2006, 2007, 2008  Antonio, Fabio Di Narzo;
 ##                                                           José Luis Aznarte M.
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,30 @@
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
 
-#Logistic transition function
-# z: transition variables
-# gamma: smoothing parameters
-# th: threshold values
-G <- function(z, gamma, th) {
-  if((length(th) > 1) && (length(gamma) > 1))
-    t( apply( as.matrix(z) , 1, plogis, th, 1/gamma) )
-  else
-    plogis(z, th, 1/gamma)
+
+#Fitted values, given parameters
+# phi1: matrix of linear parameters
+# phi2omega: vector of tr. functions' parameters
+#                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
+FF <- function(phi1, phi2omega, xx) {
+  noRegimes <- NROW(phi1)
+  
+  phi2 <- phi2omega[1:((noRegimes-1) * 2)];
+  dim(phi2) <- c(noRegimes - 1, 2)
+  gamma <- phi2[,1]
+  th <- phi2[,2]
+  omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
+  dim(omega) <- c(NCOL(xx), noRegimes - 1)
+
+  local <- array(0, c(noRegimes, NROW(xx)))
+  local[1,] <- cbind(1,xx) %*% phi1[1,];
+  for (i in 2:noRegimes) 
+    local[i,] <-
+      (cbind(1,xx) %*% phi1[i,]) *
+        sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1]));
+  
+  result <- apply(local, 2, sum)
+  result
 }
 
 computeGradient <- function(object, ...)
@@ -116,29 +131,24 @@ testRegime.ncstar <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   G2 <- t(G) %*% G;
   s <- svd(G2);
   tol <- max(dim(G2)) * s[1]$d * 2.2204e-16
+#  rG <- sum(svd(G2)$d > tol); # Alternative methods
   rG <- qr(G2, tol)$rank
 #  cat("rango G = ", rG, "\n");
-  
-#  rG <- sum(svd(G2)$d > tol);
 
   if (normG > 1e-6) {
     if(rG < nG) {
 #      cat("A1\n")
       PCtmp <- princomp(G);
       PC <- PCtmp$loadings;
-#      GPCA <- PCtmp$scores;
       lambda <- cumsum(PCtmp$sdev^2 / sum(PCtmp$sdev^2));
       indmin <- min(which(lambda > 0.99999));
       GPCA <- t(PC%*%t(G));
       GPCA <- GPCA[, 1:indmin];
-#      b <- solve(t(GPCA) %*% GPCA) %*% t(GPCA) %*% e;
       b <- lm(e ~ . -1, data = data.frame(GPCA))$coefficients
-      dim(b) <- c(NCOL(GPCA), 1);
       u <-  e - GPCA %*% b;
       xH0 <- GPCA;
     } else {
 #      cat("A2\n")
-#      b <- solve(t(G) %*% G) %*% t(G) %*% e;
       b <- lm(e ~ . -1, data=data.frame(G))$coefficients;
       u <- e - G %*% b;
       xH0 <- G;
@@ -149,14 +159,12 @@ testRegime.ncstar <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 #     cat("B1\n")
       PCtmp <- princomp(G);
       PC <- PCtmp$loadings;
-#      GPCA <- PCtmp$scores;
       lambda <- cumsum(PCtmp$sdev^2 / sum(PCtmp$sdev^2));
       indmin <- min(which(lambda> 0.99999));
       GPCA <- t(PC%*%t(G));
       GPCA <- GPCA[, 1:indmin];
       xH0 <- GPCA;
     } else {
-#      cat("B2\n")
       xH0 = G;
     }
   }
@@ -175,14 +183,13 @@ testRegime.ncstar <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   sdZ <- kronecker(matrix(1, T, 1), sdZ) # repeat sdZ T rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
 
-   # Compute the rank of Z
+  # Compute the rank of Z
   s <- svd(Z);
   tol <- max(dim(Z)) * s[1]$d * 2.2204e-16
   rZ <- qr(Z, tol)$rank
   if(rZ < NCOL(Z)) stop("Multicollinearity problem.\n")
 
  # Nonlinear model (Alternative hypothesis)
-#  c <- solve(t(Z) %*% Z) %*% t(Z) %*% u;
   c <- lm(u ~ . - 1, data=data.frame(Z))$coefficients
   dim(c) <- c(NCOL(Z), 1);
   v <- u - Z %*% c;
@@ -218,7 +225,7 @@ addRegime.ncstar <- function(object)
 
     # omega is random but has norm equal to 1
     omega <- c(runif(1, 0.000000001, 1), runif(NCOL(xx) - 1, -1,1))
-    omega <- omega * (1/norm(Matrix(omega)))
+    omega <- omega * (1 / norm(Matrix(omega), "f"))
     dim(omega) <- c(NCOL(xx), 1)
 
     gamma <- 0
@@ -248,7 +255,7 @@ addRegime.ncstar <- function(object)
     dim(omega) <- c(NCOL(xx), noRegimes - 1)
 
     newOmega <- c(runif(1, 0.000000001, 1), runif(NCOL(xx) - 1, -1,1))
-    newOmega <- newOmega * (1 / norm(Matrix(omega)))
+    newOmega <- newOmega * (1 / norm(Matrix(newOmega), "f"))
     dim(newOmega) <- c(NCOL(xx), 1)
     
     omega <- cbind(omega, newOmega); # Add one (random) vector
@@ -290,37 +297,6 @@ startingValues.ncstar <- function(object, trace=TRUE, ...)
   noRegimes <- object$model.specific$noRegimes;
   xx <- object$str$xx;
   
-  #Fitted values, given parameters
-  # phi1: matrix of linear parameters
-  # phi2omega: vector of tr. functions' parameters
-  #                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
-  F <- function(phi1, phi2omega) {
-    # phi2 contains parameters gamma and th for each regime
-    phi2 <- phi2omega[1:((noRegimes-1) * 2)];
-    dim(phi2) <- c(noRegimes - 1, 2)
-
-    gamma <- phi2[,1]
-    th <- phi2[,2]
-
-    # omega (one vector for each regime)
-    omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
-    dim(omega) <- c(NCOL(xx), noRegimes - 1)
-
-    # To store partial results for each regime
-    local <- array(0, c(noRegimes, n.used))
-    
-    # Partial results for linear regime
-    local[1,] <- x_t %*% phi1[1,];
-
-    for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% phi1[i,]) *
-          sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1]));
-    
-    result <- apply(local, 2, sum)
-    result
-  }
-  
   phi2omega <- object$model.specific$phi2omega
   
   # phi2 contains parameters gamma and th for each regime
@@ -357,17 +333,16 @@ startingValues.ncstar <- function(object, trace=TRUE, ...)
       th[noRegimes - 1] <- newTh;
 
       # We fix the linear parameters here, before optimizing the nonlinear.
-      tmp <- rep(x_t, noRegimes)
-      dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-      for (i in 2:noRegimes) 
-        tmp[,,i] <- tmp[,,i] *
-          as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
+      tmp <- cbind(x_t,
+                   matrix(apply(G(xx %*% omega, gamma, th),
+                                2, "*", x_t), nrow = n.used,
+                          ncol = (noRegimes - 1) * NCOL(x_t)))
 
       newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
       dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
       newPhi1 <- t(newPhi1)
 
-      y.hat <- F(newPhi1, c(cbind(gamma, th), omega));
+      y.hat <- FF(newPhi1, c(cbind(gamma, th), omega, xx));
       cost <- crossprod(yy - y.hat)
 
       if(! is.na(cost)) {
@@ -415,37 +390,6 @@ startingValues2.ncstar <- function(object, trace=TRUE, ...)
   noRegimes <- object$model.specific$noRegimes;
   xx <- object$str$xx;
   
-  #Fitted values, given parameters
-  # phi1: matrix of linear parameters
-  # phi2omega: vector of tr. functions' parameters
-  #                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
-  F <- function(phi1, phi2omega) {
-    # phi2 contains parameters gamma and th for each regime
-    phi2 <- phi2omega[1:((noRegimes-1) * 2)];
-    dim(phi2) <- c(noRegimes - 1, 2)
-
-    gamma <- phi2[,1]
-    th <- phi2[,2]
-
-    # omega (one vector for each regime)
-    omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
-    dim(omega) <- c(NCOL(xx), noRegimes - 1)
-
-    # To store partial results for each regime
-    local <- array(0, c(noRegimes, n.used))
-    
-    # Partial results for linear regime
-    local[1,] <- x_t %*% phi1[1,];
-
-    for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% phi1[i,]) *
-          sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1]));
-    
-    result <- apply(local, 2, sum)
-    result
-  }
-  
   phi2omega <- object$model.specific$phi2omega
   
   # phi2 contains parameters gamma and th for each regime
@@ -470,33 +414,34 @@ startingValues2.ncstar <- function(object, trace=TRUE, ...)
   minGamma <- 10;
   rateGamma <- 5; ############################################!!!
   
-  for(i in 1:1000) {
+  for(i in 1:500) {
+
+    if ((i %% 10 == 0) && trace) cat(".")
 
     newOmega <- c(runif(1, min=0, max=1),
                                 runif(NCOL(xx) - 1, min=-1, max=1))
-    newOmega <- newOmega * (1 / norm(Matrix(newOmega)))
+    newOmega <- newOmega * (1 / norm(Matrix(newOmega), "f"))
     dim(newOmega) <- c(NCOL(xx), 1)
 
     newTh <- median(xx %*% newOmega)
+    th[noRegimes - 1] <- newTh;
     
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
 
       gamma[noRegimes - 1] <- newGamma;
-      th[noRegimes - 1] <- newTh;
       omega[, noRegimes - 1] <- newOmega;
 
       # We fix the linear parameters here, before optimizing the nonlinear.
-      tmp <- rep(x_t, noRegimes)
-      dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-      for (i in 2:noRegimes) 
-        tmp[,,i] <- tmp[,,i] *
-          as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
+      tmp <- cbind(x_t,
+                   matrix(apply(G(xx %*% omega, gamma, th),
+                                2, "*", x_t), nrow = n.used,
+                          ncol = (noRegimes - 1) * NCOL(x_t)))
 
       newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
       dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
       newPhi1 <- t(newPhi1)
 
-      y.hat <- F(newPhi1, c(cbind(gamma, th), omega));
+      y.hat <- FF(newPhi1, c(cbind(gamma, th), omega), xx);
       cost <- crossprod(yy - y.hat)
 
       if(! is.na(cost)) {
@@ -511,28 +456,37 @@ startingValues2.ncstar <- function(object, trace=TRUE, ...)
     }
   }
 
-  gamma[noRegimes - 1] <- bestGamma;
-  th[noRegimes - 1] <- bestTh;
-  omega[, noRegimes - 1] <- bestOmega;
+  if (trace) cat("\nStarting values fixed for regime ", noRegimes,
+                 ": gamma = ", gamma[noRegimes - 1],
+                 ", th = ", th[noRegimes - 1],"\n");
   
-  if (trace) cat("Starting values fixed for regime ", noRegimes,
-                 "\n   gamma = ", gamma[noRegimes - 1],
-                 ", th = ", th[noRegimes - 1], 
-                 "; SSE = ", bestCost, "\n");
+  # Reorder the regimes according to the values of th
+  if (noRegimes > 2) {
+    if(trace) cat("Reordering regimes...\n")
+    th <- sort(th, index.return=TRUE)$x
+    ordering <-  sort(th, index.return=TRUE)$ix
+    gamma <- gamma[ordering]
+    omega <- omega[, ordering]
 
-#  if(trace) {
-#    cat("   Starting linear values: \n");
-#    for(i in 1:noRegimes)
-#      cat("   ", phi1[i,], "\n")
-#  }
-
-
-  phi2 <- cbind(gamma, th);
-  object$model.specific$phi2omega <- c(phi2, omega)
+    # reestimate phi's
+    tmp <- cbind(x_t,
+                          matrix(apply(G(xx %*% omega, gamma, th),
+                                       2, "*", x_t), nrow = n.used,
+                                 ncol = (noRegimes - 1) * NCOL(x_t)))
+    phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
+    phi1 <- t(phi1)
+  }
+  else {
+    gamma[1] <- bestGamma;
+    th[1] <- bestTh;
+    omega[, 1] <- bestOmega;    
+  }
   
+  object$model.specific$phi2omega <- c(cbind(gamma, th), omega)
   object$model.specific$phi1 <- phi1;
-  object$model.specific$coefficients <- c(phi1, c(phi2, omega));
-  object$coefficients <- c(phi1, c(phi2, omega));
+  object$model.specific$coefficients <- c(phi1, c(cbind(gamma, th), omega));
+  object$coefficients <- c(phi1, c(cbind(gamma, th), omega));
   object$model.specific$k <- length(object$coefficients)
   object$k <- length(object$coefficients)
   
@@ -560,38 +514,7 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # Estimate nonlinear parameters
-  
-  #Fitted values, given parameters
-  # phi1: matrix of linear parameters
-  # phi2omega: vector of tr. functions' parameters
-  #                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
-  F <- function(phi1, phi2omega) {
-    # phi2 contains parameters gamma and th for each regime
-    phi2 <- phi2omega[1:((noRegimes-1) * 2)];
-    dim(phi2) <- c(noRegimes - 1, 2)
-
-    gamma <- phi2[,1]
-    th <- phi2[,2]
-
-    # omega (one vector for each regime)
-    omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
-    dim(omega) <- c(NCOL(xx), noRegimes - 1)
-
-    # To store partial results for each regime
-    local <- array(0, c(noRegimes, n.used))
     
-    # Partial results for linear regime
-    local[1,] <- x_t %*% phi1[1,];
-
-    for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% phi1[i,]) *
-          sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1]));
-    
-    result <- apply(local, 2, sum)
-    result
-  }
-  
   # Function to compute the gradient 
   #
   # Returns the gradient with respect to the error
@@ -607,7 +530,7 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
     dim(omega) <- c(NCOL(xx), noRegimes - 1)
 
-    y.hat <- F(phi1, phi2omega)
+    y.hat <- FF(phi1, phi2omega, xx)
     e.hat <- yy - y.hat;
 
     fX <- array(0, c(noRegimes - 1, n.used));
@@ -617,7 +540,7 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     for (i in 1:(noRegimes - 1)) {
       fX[i,] <- sigmoid(gamma[i] * (xx %*% omega[,i] - th[i]));
       dfX[i,] <- sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])) *
-                                                     (1 - sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])));
+                                              (1 - sigmoid(gamma[i] * (xx %*% omega[,i] - th[i])));
 #      gPhi1 <- cbind(gPhi1, kronecker(matrix(1, 1, NCOL(x_t)), fX[i,]) * x_t)
     }
     
@@ -631,7 +554,6 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
         gOmega[, i, j] <-  (x_t %*% phi1[i + 1,]) * (dfX[i,] * gamma[i] * xx[i,j])
     }
     dim(gOmega) <- c(n.used, (noRegimes - 1) * NCOL(xx))
-
     
     J = - cbind(gGamma, gTh, gOmega) / sqrt(n.used)
       
@@ -654,28 +576,20 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     dim(omega) <- c(NCOL(xx), noRegimes - 1)
 
     # We fix the linear parameters here, before optimizing the nonlinear.
-    tmp <- rep(x_t, noRegimes)
-    dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-    for (i in 2:noRegimes) 
-      tmp[,,i] <- tmp[,,i] *
-        as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
-
-    # Compute the rank of tmp
-#    s <- svd(tmp);
-#    tol <- max(dim(tmp)) * s[1]$d * 2.2204e-16
-#    rtmp <- qr(tmp, tol)$rank
-#    if(rtmp < NCOL(tmp))
-#      warning("Multicollinearity problem. Aborting.\n")
-      
+    tmp <- cbind(x_t,
+                 matrix(apply(G(xx %*% omega, gamma, th),
+                              2, "*", x_t), nrow = n.used,
+                        ncol = (noRegimes - 1) * NCOL(x_t)))
     newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-    dim(newPhi1) <- c(noRegimes, NCOL(xx) + 1)
+    dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
+    newPhi1 <- t(newPhi1)
 
     # Return the sum of squares
-    y.hat <- F(newPhi1, phi2omega)
+    y.hat <- FF(newPhi1, phi2omega, xx)
     crossprod(yy - y.hat)
   }
   
-  res <- optim(object$model.specific$phi2omega, SS, gradEhat,
+  res <- optim(object$model.specific$phi2omega, SS, gr = gradEhat,
                control = control, phi1 = object$model.specific$phi1,
                method="BFGS")
 
@@ -709,20 +623,12 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     if(gamma[i] <0)
       gamma[i] <- - gamma[i];
   
-  tmp <- rep(x_t, noRegimes)
-  dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-  for (i in 2:noRegimes) 
-    tmp[,,i] <- tmp[,,i] *
-      as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
-  
-    # Compute the rank of tmp.
-  s <- svd(tmp);
-  tol <- max(dim(tmp)) * s[1]$d * 2.2204e-16
-  rtmp <- qr(tmp, tol)$rank
-  if(rtmp < NCOL(tmp)) warning("Multicollinearity problem.\n")
-  
+  tmp <- cbind(x_t, matrix(apply(G(xx %*% omega, gamma, th),
+                            2, "*", x_t), nrow = n.used,
+                      ncol = (noRegimes - 1) * NCOL(x_t)))
   phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
-  dim(phi1) <- c(noRegimes, NCOL(xx) + 1)
+  dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
+  phi1 <- t(phi1)
 
   if(trace) {
     cat("Optimized linear values: \n");
@@ -733,11 +639,11 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 4.- Compute yhat and ehat
   
-  object$fitted.values <- F(phi1, c(cbind(gamma, th), omega)); # y.hat
+  object$fitted.values <- FF(phi1, c(cbind(gamma, th), omega), xx); # y.hat
   object$residuals <- yy - object$fitted.values; # e.hat
   object$coefficients <- c(phi1, c(cbind(gamma, th), omega))
   object$model.specific$phi1 <- phi1
-  object$model.specific$phi2 <- c(cbind(gamma, th), omega);
+  object$model.specific$phi2omega <- c(cbind(gamma, th), omega);
   
   return(object)
   
@@ -758,7 +664,7 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
 ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
                  mTh, thDelay, thVar, sig=0.05, trace=TRUE, control=list(), ...)
 {
-
+  
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 1. Build the nlar object and associated variables.
   if(missing(series))   series <- deparse(substitute(x))
@@ -797,7 +703,7 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     linearModel <- lm(yy ~ .  - 1, data = data.frame(x_t));
 
     phi1= linearModel$coefficients
-    dim(phi1) = c(1, NCOL(x_t)) # one row per regime
+    dim(phi1) = c(1, NCOL(x_t)) # one row, one regime
     
     # Create the ncstar object
     list = list(noRegimes=1, m = m, fitted = linearModel$fitted.values,  
@@ -847,21 +753,18 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     # 4. Add-regime loop
     while (increase && (object$model.specific$noRegimes < noRegimes)) {
       
-      if(trace) cat("Adding regime ",
-                    object$model.specific$noRegimes + 1,".\n");
+      nR <- object$model.specific$noRegimes + 1
+      
+      if(trace) cat("Adding regime ", nR, ".\n");
       object <- addRegime(object);
 
-      if(trace) cat("Fixing good starting values for regime ",
-                    object$model.specific$noRegimes,"...\n");
-      object <- startingValues(object, control=control, trace=trace);
+      if(trace) cat("Fixing good starting values for regime ", nR);
+      object <- startingValues2.ncstar(object, control=control, trace=trace);
 
-      if(trace) cat('Estimating parameters of regime',
-                    object$model.specific$noRegimes, '...\n')
+      if(trace) cat('Estimating parameters of regime', nR, '...\n')
       object <- estimateParams(object, control=control, trace=trace);
       
-      if(trace) cat("Ok. \n Testing for addition of regime ",
-                    object$model.specific$noRegimes + 1, ".\n");
-      
+      if(trace) cat("Ok. \n Testing for addition of regime ", nR + 1, ".\n");
       if(trace) cat("  Estimating gradient matrix...\n");
       G <- computeGradient(object);
 
@@ -871,14 +774,15 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
 
       increase <- testResults$remainingNonLinearity;
       if(increase) {
-        if(trace) cat("Regime ", object$model.specific$noRegimes + 1,
-            " is needed (p-Value = ", testResults$pValue,").\n"); 
+        if(trace) cat("Regime ", nR + 1, " is needed (p-Value = ",
+                      testResults$pValue,").\n"); 
       }
       else {
-        if(trace) cat("Regime ", object$model.specific$noRegimes + 1,
-            " is NOT accepted (p-Value = ", testResults$pValue,").\n");
+        if(trace) cat("Regime ", nR + 1, " is NOT accepted (p-Value = ",
+                      testResults$pValue,").\n");
       }            
     }
+    
     if(trace) cat("\nFinished building a MRSTAR with ",
                   object$model.specific$noRegimes, " regimes\n");
     return(object);
@@ -998,37 +902,6 @@ ncstar.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
 
 #############################################
 
-  #Fitted values, given parameters
-  # phi1: matrix of linear parameters
-  # phi2omega: vector of tr. functions' parameters
-  #                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
-  F <- function(phi1, phi2omega) {
-    # phi2 contains parameters gamma and th for each regime
-    phi2 <- phi2omega[1:((noRegimes-1) * 2)];
-    dim(phi2) <- c(noRegimes - 1, 2)
-
-    gamma <- phi2[,1]
-    th <- phi2[,2]
-
-    # omega (one vector for each regime)
-    omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
-    dim(omega) <- c(NCOL(xx), noRegimes - 1)
-
-    # To store partial results for each regime
-    local <- array(0, c(noRegimes, n.used))
-    
-    # Partial results for linear regime
-    local[1,] <- x_t %*% phi1[1,];
-
-    for (i in 2:noRegimes) 
-      local[i,] <-
-        (x_t %*% phi1[i,]) *
-          sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1]));
-    
-    result <- apply(local, 2, sum)
-    result
-  }
-  
   #Sum of squares function
   #p: vector of parameters
   SS <- function(phi2omega) {
@@ -1044,25 +917,15 @@ ncstar.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     dim(omega) <- c(NCOL(xx), noRegimes - 1)
     
     # We fix the linear parameters here, before optimizing the nonlinear.
-    tmp <- rep(x_t, noRegimes)
-    dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-    for (i in 2:noRegimes) 
-      tmp[,,i] <- tmp[,,i] *
-        as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
-
-    # Compute the rank of tmp
-#    s <- svd(tmp);
-#    tol <- max(dim(tmp)) * s[1]$d * 2.2204e-16
-#    rtmp <- qr(tmp, tol)$rank
-#    if(rtmp < NCOL(tmp))
-#      warning("Multicollinearity problem. Aborting.\n")
-      
+    tmp <- cbind(x_t, matrix(apply(G(xx %*% omega, gamma, th),
+                                   2, "*", x_t), nrow = n.used,
+                             ncol = (noRegimes - 1) * NCOL(x_t)))
     newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
     dim(newPhi1) <- c(m + 1, noRegimes)
     newPhi1 <- t(newPhi1)
     
     # Return the sum of squares
-    y.hat <- F(newPhi1, phi2omega)
+    y.hat <- FF(newPhi1, phi2omega, xx)
     crossprod(yy - y.hat)
   }
   
@@ -1077,19 +940,9 @@ ncstar.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     if(trace) cat('Optimizing...')
     
     # We fix the linear parameters here, before optimizing the nonlinear.
-    tmp <- rep(x_t, noRegimes)
-    dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-    for (i in 2:noRegimes) 
-      tmp[,,i] <- tmp[,,i] *
-        as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
-
-    # Compute the rank of tmp
-    s <- svd(tmp);
-    tol <- max(dim(tmp)) * s[1]$d * 2.2204e-16
-    rtmp <- qr(tmp, tol)$rank
-    if(rtmp < NCOL(tmp))
-      warning("Multicollinearity problem. Aborting.\n")
-      
+    tmp <- cbind(x_t, matrix(apply(G(xx %*% omega, gamma, th),
+                                   2, "*", x_t), nrow = n.used,
+                             ncol = (noRegimes - 1) * NCOL(x_t)))
     phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
     dim(phi1) <- c(m + 1, noRegimes)
     phi1 <- t(phi1)
@@ -1118,18 +971,9 @@ ncstar.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
         gamma[i] <- - gamma[i];
     
     # We fix the linear parameters again.
-    tmp <- rep(x_t, noRegimes)
-    dim(tmp) <- c(NROW(x_t), NCOL(x_t), noRegimes)
-    for (i in 2:noRegimes) 
-      tmp[,,i] <- tmp[,,i] *
-        as.vector(sigmoid(gamma[i-1] * (xx %*% omega[,i-1] - th[i-1])))
-
-    # Compute the rank of tmp.
-    s <- svd(tmp);
-    tol <- max(dim(tmp)) * s[1]$d * 2.2204e-16
-    rtmp <- qr(tmp, tol)$rank
-    if(rtmp < NCOL(tmp)) warning("Multicollinearity problem. Aborting.\n")
-
+    tmp <- cbind(x_t, matrix(apply(G(xx %*% omega, gamma, th),
+                                   2, "*", x_t), nrow = n.used,
+                             ncol = (noRegimes - 1) * NCOL(x_t)))
     phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
     dim(phi1) <- c(m+1, noRegimes)
     phi1 <- t(phi1)
@@ -1151,7 +995,7 @@ ncstar.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   
   res$thVar <- x_t
   
-  fitted <- F(phi1, c(phi2, omega))
+  fitted <- FF(phi1, c(phi2, omega), xx)
   
   residuals <- yy - fitted
   dim(residuals) <- NULL	#this should be a vector, not a matrix

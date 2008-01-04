@@ -194,6 +194,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   gamma <- res$par[1]
   th <- res$par[2]
 
+  if (trace) cat("Optimized values fixed for regime 2 ",
+                 ": gamma = ", gamma, ", th = ", th,"\n");
+  
   # Fix the linear parameters one more time
   new_phi<- lm.fit(cbind(xxL, xxH * G(z, gamma, th)), yy)$coefficients
   phi1 <- new_phi[1:(mL+1)]

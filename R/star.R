@@ -1,4 +1,4 @@
-## Copyright (C) 2005, 2006, 2007/2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2005, 2006, 2007, 2008/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 ##    and is indebted to him.
 
 #Logistic transition function
-# y: variable
+# z: variable
 # gamma: smoothing parameter
 # th: threshold value
 G <- function(z, gamma, th) {
@@ -302,8 +302,24 @@ startingValues.star <- function(object, trace=TRUE, ...)
     }
   }
 
-  gamma[noRegimes - 1] <- bestGamma;
-  th[noRegimes - 1] <- bestTh;
+  # Reorder the regimes according to the values of th
+  if (noRegimes > 2) {
+    cat("Reordering regimes...\n")
+    th <- sort(th, index.return=TRUE)$x
+    ordering <-  sort(th, index.return=TRUE)$ix
+    gamma <- gamma[ordering]
+
+    # reestimate phi's
+    tmp <- cbind(x_t, matrix(apply(G(s_t, gamma, th), 2, "*",x_t), 
+                             nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
+    phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
+    phi1 <- t(phi1)
+  }
+  else {
+    gamma[1] <- bestGamma;
+    th[1] <- bestTh;
+  }
   
 #  if (trace) cat("Starting values fixed for regime ", noRegimes,
 #                 "\n   gamma = ", gamma[noRegimes - 1],
@@ -476,12 +492,13 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
                  mTh, thDelay, thVar, sig=0.05, trace=TRUE, control=list(), ...)
 {
 
-#  debug(addRegime);
-  
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 1. Build the nlar object and associated variables.
   if(missing(series))   series <- deparse(substitute(x))
 
+  # Normalize the series.
+  x <- (x - mean(x)) / sd(x);
+  
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 
   xx <- str$xx
@@ -527,7 +544,7 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 2. Linearity testing
   if (trace) cat("Testing linearity...   ")
-  testResults <- lTestSTAR(str, z, rob=rob, sig=sig, trace = trace)
+  testResults <- linearityTest.star(str, z, rob=rob, sig=sig, trace = trace)
   pValue <- testResults$pValue;
   increase <- ! testResults$isLinear;
 

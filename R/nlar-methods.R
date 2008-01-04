@@ -255,7 +255,6 @@ toLatex.nlar <- function(object, ...) {
 linearityTest.star <- function(str, thVar, externThVar=FALSE,
                                       rob=FALSE, sig=0.05, trace=TRUE, ...)
 {
-  str <- object
   n.used <- NROW(str$xx);  # The number of lagged samples
 
   # Build the regressand vector
