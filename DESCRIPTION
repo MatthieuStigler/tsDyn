@@ -1,8 +1,8 @@
 Package: tsDyn
 Type: Package
 Title: Time series analysis based on dynamical systems theory
-Version: 0.6
-Date: 17/11/2007
+Version: 0.7
+Date: 03/02/2008
 Depends: mgcv, Matrix
 Imports: nnet, tseriesChaos, tseries, utils
 Suggests: tcltk, sm, scatterplot3d, rgl

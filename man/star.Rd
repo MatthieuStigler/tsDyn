@@ -3,7 +3,7 @@
 \alias{star}
 \title{STAR model}
 \description{
-STAR model fitting
+STAR model fitting with automatic number of regimes selection
 }
 \usage{
 star(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,

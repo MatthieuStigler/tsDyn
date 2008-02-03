@@ -1,4 +1,4 @@
--version 0.6 released
+-version 0.6-0 released
 -fixed Matrix dependency in DESCRIPTION
 -added minimal docs for newly created internal objects
 -added STAR model option to the tcltk GUI
