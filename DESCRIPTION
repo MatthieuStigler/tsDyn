@@ -9,5 +9,5 @@ Suggests: tcltk, sm, scatterplot3d, rgl
 Author: Antonio Fabio Di Narzo, Jose Luis Aznarte
 Maintainer: Antonio Fabio Di Narzo <antonio.dinarzo@unibo.it>
 Description: Time series analysis based on dynamical systems theory
-License: GPL version 2 or later
+License: GPL (>= 2)
 URL: http://tsdyn.googlecode.com
