@@ -9,7 +9,8 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        delta, delta.test, delta.lin, delta.lin.test,
        llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
        setar, lstar, star, ncstar, availableModels, nlarDialog, 
-       linear, isLinear, nnetTs, aar, star)
+       linear, isLinear, nnetTs, aar, star,
+	OlsTVAR)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)

@@ -1,0 +1,327 @@
+OlsTVAR <- function(data, lag, type=c("level", "difference"),trend=TRUE, nthresh=1,trim=0.1,ngrid, gamma=NULL, thDelay=1, mTh=1, thVar,around, plot=TRUE){
+y <- as.matrix(data)
+Torigin <- nrow(y) 	#Size of original sample
+#if(type=="difference") {y<-diff(y)}
+T <- nrow(y) 		#Size of start sample
+p <- lag
+t <- T-p 		#Size of end sample
+k <- ncol(y) 		#Number of variables
+
+if(is.null(colnames(data)))
+	colnames(data)<-paste("Var", c(1:k), sep="")
+if(max(thDelay)>p)
+	stop("Max of thDelay should be smaller or equal to the number of lags")
+
+Y <- y[(p+1):T,] #
+Z <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
+if(trend==TRUE)
+	Z <- cbind(1,Z)
+npar <- ncol(Z)			#Number of parameters
+
+########################
+### Threshold variable
+########################
+
+###External threshold variable
+if (!missing(thVar)) {		
+        if (length(thVar) > Torigin) {
+		z <- thVar[seq_len(Torigin)]
+		warning("The external threshold variable is not of same length as the original variable")
+        }
+        else
+		z <- thVar
+	z<-embed(z,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+} ###Combination (or single value indicating position) of contemporaneous variables
+else {
+	if (length(mTh) > k)
+		stop("length of 'mTh' should be equal to the number of variables, or just one")
+	if(length(mTh)==1) {
+		if(mTh>p)
+			stop("mTh too big, should be smaller or equal to the number of variables")
+		combin <- matrix(0,ncol=1, nrow=k)
+		combin[mTh,]<-1
+	}
+	zcombin <- y %*% combin
+	z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+}
+
+trans<-as.matrix(z)
+
+###############################
+###Grid for transition variable
+###############################
+
+allgammas <- sort(unique(trans[,1]))
+nga <- length(allgammas)
+ninter <- round(trim*nga)
+gammas <- allgammas[(trim*nga):((1-trim)*nga)]
+if(!missing(ngrid)){
+	gammas <- allgammas[seq(from=ceiling(trim*nga), to=floor((1-trim)*nga), length.out=ngrid)]
+}
+if(!missing(gamma))
+	gammas<-gamma
+Y<-t(Y)					#dim k x t
+
+aroundGrid <- function(around,allgammas,ngrid,trim){
+	ng <- length(allgammas)
+	wh.around <- which(round(allgammas,5)==round(around,5))
+	if(length(wh.around)==0)
+		stop("Sorry, the value you gave for the around argument did not match")
+	ar <- c((wh.around-round(ngrid/2)): (wh.around+round(ngrid/2)))		#Values around the point
+	ar2 <- ar[ar>=round(trim*ng)&ar<=round((1-trim)*ng)]			#Bounding with trim 
+	gammas <- allgammas[ar2]
+	return(gammas)
+}#end if missing around
+
+if(!missing(around)){
+	if(length(around)==1)
+		gammas <- aroundGrid(around, allgammas,ngrid,trim)
+	if(length(around)==2) {
+		gammas <- aroundGrid(around[1], allgammas,ngrid,trim)
+		gamas2 <- aroundGrid(around[2], allgammas,ngrid,trim)
+	}
+}
+
+######################
+###One threshold model					
+######################
+
+loop1 <- function(gam1, d){
+	##Threshold dummies
+	regimedown <- ifelse(trans[,d]<gam1, 1,0) * Z
+	##SSR
+	Z1 <- t(cbind(regimedown, Z))		# dim k(p+1) x t
+	B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
+	crossprod(c( Y - B1 %*% Z1))
+} #end of the function
+
+onesearch <- function(thDelay,gammas){
+	grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
+	store <- mapply(loop1,d=grid1[,1],gam1=grid1[,2])			#search for values of grid
+	posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
+
+	if(plot){
+		result1 <- cbind(grid1,store)
+		col <- rep(thDelay,length.out=nrow(result1))
+		plot(result1[,2], result1[,3], col=col,xlab="Treshold Value",ylab="SSR", main="Results of the grid search")
+		legend("topleft", pch=1, legend=paste("Threshold Delay", thDelay), col=thDelay)
+	}
+	cat("Best unique threshold", grid1[posBestThresh,2],"\n")
+	if(length(thDelay)>1)
+		cat("Best Delay", grid1[posBestThresh,1],"\n")
+	list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1])
+}#end of function one search
+
+#######################
+###Two thresholds model
+#######################
+
+loop2 <- function(gam1, gam2,d){
+	##Threshold dummies
+	dummydown <- ifelse(trans[,d]<gam1, 1, 0)
+	regimedown <- dummydown*Z
+	ndown <- mean(dummydown)
+	dummyup <- ifelse(trans[,d]>=gam2, 1, 0)
+	regimeup <- dummyup*Z
+	nup <- mean(dummyup)
+	##SSR from TVAR(3)
+	#print(c(ndown,1-nup-ndown,nup))
+	if(min(nup, ndown, 1-nup-ndown)>trim){
+		Z2 <- t(cbind(regimedown, Z, regimeup))						# dim k(p+1) x t
+		res <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+	}
+	else
+		res <- NA
+	return(res)
+}
+
+############################
+###Search for one threshold
+############################
+if(nthresh==1){
+if(!missing(around))
+	gammas <- aroundgrid(around,allgammas,ngrid,trim)
+bestone <- onesearch(thDelay,gammas)
+bestThresh <- bestone$bestThresh
+bestDelay <- bestone$bestDelay
+}
+
+############################
+###Search for two threshold
+############################
+
+###Conditional search
+if(nthresh==2){
+if(!missing(ngrid))
+	warning("The search method is made for full grid, providing a restricted grid could alter the result")
+
+###Conditionnal step
+bestone <- onesearch(thDelay, gammas)
+bestThresh <- bestone$bestThresh
+bestDelay <- bestone$bestDelay
+
+wh.thresh <- which(gammas==bestThresh)
+
+#search for a second threshold smaller than the first
+if(wh.thresh>ninter){gammaMinus<-gammas[1:(wh.thresh-ninter/2)]
+	storeMinus <- mapply(loop2,gam1=gammaMinus,gam2=bestThresh, d=bestDelay)	
+}
+else
+	storeMinus <- NA
+
+#search for a second threshold higher than the first
+if(length(gammas)-wh.thresh>ninter){
+	gammaPlus <- gammas[(wh.thresh+ninter/2):length(gammas)]
+	storePlus <- mapply(loop2,gam1=bestThresh,gam2=gammaPlus, d=bestDelay)
+}
+else
+	storePlus <- NA
+
+#results
+store2 <- c(storeMinus, storePlus)
+
+positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
+if(positionSecond<=length(storeMinus))
+	secondBestThresh<-gammaMinus[positionSecond]
+else
+	secondBestThresh<-gammaPlus[positionSecond]
+
+cat("Second best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE), "\n")
+
+###Iterative step
+smallThresh <- min(bestThresh,secondBestThresh)
+gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim)
+
+bigThresh <- max(bestThresh,secondBestThresh)
+gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim)
+
+storeIter <- matrix(NA,ncol=length(gammasUp), nrow=length(gammasDown))
+
+#Grid search
+for(i in seq_len(length(gammasDown))){
+	gam1 <- gammasDown[i]
+	for(j in 1: length(gammasUp)){
+		gam2 <- gammasUp[j]
+		storeIter[i,j] <- loop2(gam1=gam1, gam2=gam2, d=bestDelay)
+	}
+}
+
+#Finding the best result
+positionIter <- which(storeIter==min(storeIter, na.rm=TRUE), arr.ind=TRUE)
+rIter <- positionIter[1]
+cIter <- positionIter[2]
+
+gamma1Iter <- gammasDown[rIter]
+gamma2Iter <- gammasUp[cIter]
+
+bestThresh <- c(gamma1Iter, gamma2Iter)
+
+cat("\nSecond step best thresholds", bestThresh, "\t\t\t SSR", min(storeIter, na.rm=TRUE), "\n")
+}#end if nthresh=2
+
+###Search both thresholds with d given
+
+if(nthresh==3){
+bestDelay <- thDelay
+if(missing(gamma)==FALSE){
+	gammas <- gamma[1]
+	gammas2 <- gamma[2]
+	ninter<- 2
+}
+if(missing(around)==FALSE){
+	if(length(around)!=2)
+		stop("Please give two thresholds possible values to search around")
+	gammas <- aroundGrid(min(around), allgammas, ngrid=ngrid, trim=trim)
+	gammas2 <- aroundGrid(max(around), allgammas, ngrid=ngrid, trim=trim)
+}
+else {
+	gammas2 <- gammas
+	if(length (gammas) * length(gammas2)/2>10000)
+		cat("The function will compute about", length(gammas)*length(gammas2)/2, "operations. Take a coffee and come back\n")
+}
+if(length(thDelay)>1) stop("length of thDelay should not be bigger than 1. The whole search is made only upon the thresholds with given delay")
+
+store3 <- matrix(NA,ncol=length(gammas2), nrow=length(gammas))
+
+###Loop
+for(i in seq_len(length(gammas))){
+	gam1 <- gammas[i]
+	for (j in seq_len(length(gammas))){
+		gam2 <- gammas2[j]
+		store3[i,j] <- loop2(gam1, gam2, d=bestDelay)
+	}
+}
+
+position <- which(store3==min(store3, na.rm=TRUE), arr.ind=TRUE)
+print(position)
+r <- position[1]
+c <- position[2]
+
+gamma1 <- gammas[r]
+gamma2 <- gammas2[c]
+bestThresh <- c(gamma1, gamma2)
+
+}#end n
+
+#############
+###Best Model
+#############
+if(nthresh==1){
+	dummydown <- ifelse(trans[,bestDelay]<bestThresh, 1, 0)
+	ndown <- mean(dummydown)
+	regimedown <- dummydown*Z
+	Zbest <- t(cbind(regimedown,Z))		# dim k(p+1) x t
+}
+if(nthresh==2|nthresh==3){
+	dummydown <- ifelse(trans[,bestDelay]<bestThresh[1], 1,0)
+	ndown <- mean(dummydown)
+	regimedown <- dummydown*Z
+	dummyup <- ifelse(trans[,bestDelay]>=bestThresh[2], 1,0)
+	nup <- mean(dummyup)
+	regimeup <- dummyup*Z
+	Zbest <- t(cbind(regimedown,Z, regimeup))	# dim k(p+1) x t
+}
+
+Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
+rownames(Bbest) <- paste("Equation", colnames(data))
+Bcolnames <- c("Trend", c(paste(rep(colnames(data),p),"t", -rep(1:p, each=k))))
+if(!trend)
+	Bnames<-c(c(paste(rep(colnames(data),p), "t",-rep(1:p, each=k))))
+resbest <- Y - Bbest %*% Zbest
+SSRbest <- crossprod(c(resbest))
+
+if(nthresh==1)
+	colnames(Bbest) <- rep(Bcolnames,2)
+else
+	colnames(Bbest)<-rep(Bcolnames,3)
+
+if(nthresh==1){
+	Bdown <- Bbest[,c(1:npar)]
+	Bup <- Bbest[,-c(1:npar)]
+	Blist <- list(Bdown=Bdown, Bup=Bup)
+	nobs <- list(ndown=ndown, nup=1-ndown)
+} else {
+	Bdown <- Bbest[,c(1:npar)]
+	Bmiddle <- Bbest[,c(1:npar)+npar]
+	Bup <- Bbest[,c(1:npar)+2*npar]
+	colnames(Bmiddle) <- Bcolnames
+	Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)
+	nobs <- list(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
+}
+
+list(Thresh=bestThresh, Parameters=Blist, SSR=SSRbest, nobs_regimes=nobs)
+}	#end of the whole function
+
+if(FALSE) { #usage example
+###Hansen Seo data
+zeroyld <- read.table(file="/media/sda5/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
+#Windows
+#zeroyld <- read.table(file="E:/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
+#data<-dat[,c(30,13)]; 
+
+data<-zeroyld[,c(36,19)]
+colnames(data)<-c("short", "long")
+
+OlsTVAR(data, lag=2, nthresh=3, thDelay=1,trim=0.1, mTh=1,ngrid, plot=FALSE)
+#lag2, 2 thresh, trim00.05: 561.46
+}
