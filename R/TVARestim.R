@@ -200,7 +200,7 @@ positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
 if(positionSecond<=length(storeMinus))
 	secondBestThresh<-gammaMinus[positionSecond]
 else
-	secondBestThresh<-gammaPlus[positionSecond]
+	secondBestThresh<-gammaPlus[positionSecond-length(storeMinus)]
 
 cat("Second best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE), "\n")
 
