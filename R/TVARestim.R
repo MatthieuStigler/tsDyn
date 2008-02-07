@@ -11,7 +11,7 @@ if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 if(max(thDelay)>p)
 	stop("Max of thDelay should be smaller or equal to the number of lags")
-if(dummyToBothRegimes=FALSE&nthresh!= 1) warning("The 'dummyToBothRegimes' argument is only relevant for one threshold models")
+if(dummyToBothRegimes==FALSE&nthresh!= 1) warning("The 'dummyToBothRegimes' argument is only relevant for one threshold models")
 Y <- y[(p+1):T,] #
 Z <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 if(trend==TRUE)
