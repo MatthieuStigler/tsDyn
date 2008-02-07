@@ -6,7 +6,7 @@
 Estimate a multivariate Threshold VAR
 }
 \usage{
-OlsTVAR(data, lag, type=c("level", "difference"), trend=TRUE, nthresh=1, trim=0.1, ngrid, gamma=NULL, thDelay=1, mTh=1, thVar, around, plot=TRUE)
+OlsTVAR(data, lag, type=c("level", "difference"), trend=TRUE, nthresh=1, trim=0.1, ngrid, gamma=NULL, thDelay=1, mTh=1, thVar, around, plot=TRUE,dummyToBothRegimes=TRUE)
 }
 \value{
 Fitted model data
@@ -23,16 +23,17 @@ Fitted model data
 \item{nthresh}{number of threshold (see details)}
 \item{ngrid}{number of elements of the grid, especially for \code{nthresh=3}}
 \item{around}{The grid search is restricted to \var{ngrid} values around this point. Especially useful for \code{nthresh=3}. }
-\item{Trim}{trimming parameter indicating the minimal percentage of observations in each regime}
+\item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
+\item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
 }
 \details{
 For fixed \code{th} and threshold variable, the model is linear, so estimation can be done directly by CLS (Conditional Least Squares). The search of the parameters values is made upon a grid of potential values. So it is pretty slow.
 
 nthresh=1: estimation of one threshold model (two regimes) upon a grid of \var{ngrid} values (default to ALL) possible thresholds and delays values. 
 
-nthresh=2: conditional estimation: conditional on the threshold found in model where nthresh=1, the second thresghold is searced. When both are foun, a second grid search is made with 30 values around each threshold
+nthresh=2: estimation of two thresholds model (three regimes) Conditional on the threshold found in model where nthresh=1, the second threshold is searched. When both are found, a second grid search is made with 30 values around each threshold.
 
-nthresh=3: DOES NOT estimate a 3 thresholds model, but a 2 thresholds model with a whole grid over the parameters, is there rather to check the consistency of the method nthresh=2
+nthresh=3: DOES NOT estimate a 3 thresholds model, but a 2 thresholds model with a whole grid over the threholds parameters (so is realy slow) with a given delay, is there rather to check the consistency of the method nthresh=2
 }
 \seealso{
 TODO

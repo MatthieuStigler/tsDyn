@@ -1,4 +1,4 @@
-OlsTVAR <- function(data, lag, type=c("level", "difference"),trend=TRUE, nthresh=1,trim=0.1,ngrid, gamma=NULL, thDelay=1, mTh=1, thVar,around, plot=TRUE){
+OlsTVAR <- function(data, lag, type=c("level", "difference"),trend=TRUE, nthresh=1,trim=0.1,ngrid, gamma=NULL, thDelay=1, mTh=1, thVar,around, plot=TRUE, dummyToBothRegimes=TRUE){
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
 #if(type=="difference") {y<-diff(y)}
@@ -11,7 +11,7 @@ if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 if(max(thDelay)>p)
 	stop("Max of thDelay should be smaller or equal to the number of lags")
-
+if(dummyToBothRegimes=FALSE&nthresh!= 1) warning("The 'dummyToBothRegimes' argument is only relevant for one threshold models")
 Y <- y[(p+1):T,] #
 Z <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 if(trend==TRUE)
@@ -74,6 +74,7 @@ aroundGrid <- function(around,allgammas,ngrid,trim){
 }#end if missing around
 
 if(!missing(around)){
+	if(missing(ngrid)) ngrid<-20
 	if(length(around)==1)
 		gammas <- aroundGrid(around, allgammas,ngrid,trim)
 	if(length(around)==2) {
@@ -86,18 +87,33 @@ if(!missing(around)){
 ###One threshold model					
 ######################
 
-loop1 <- function(gam1, d){
+#Model with dummy applied to only one regime
+loop1_onedummy <- function(gam1, d){
 	##Threshold dummies
-	regimedown <- ifelse(trans[,d]<gam1, 1,0) * Z
+	regimeDown <- ifelse(trans[,d]<gam1, 1,0) * Z
 	##SSR
-	Z1 <- t(cbind(regimedown, Z))		# dim k(p+1) x t
+	Z1 <- t(cbind(regimeDown, Z))		# dim k(p+1) x t
+	B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
+	crossprod(c( Y - B1 %*% Z1))
+} #end of the function
+
+#Model with dummy applied to both regimes
+loop1_twodummy <- function(gam1, d){
+	##Threshold dummies
+	d1<-ifelse(trans[,d]<gam1, 1,0)
+	regimeDown <- d1 * Z
+	regimeUp<-(1-d1)*Z
+	##SSR
+	Z1 <- t(cbind(regimeDown, regimeUp))		# dim k(p+1) x t
 	B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
 	crossprod(c( Y - B1 %*% Z1))
 } #end of the function
 
 onesearch <- function(thDelay,gammas){
 	grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
-	store <- mapply(loop1,d=grid1[,1],gam1=grid1[,2])			#search for values of grid
+	if(dummyToBothRegimes)
+		store <- mapply(loop1_twodummy,d=grid1[,1],gam1=grid1[,2])	#search for values of grid
+	else	store <- mapply(loop1_onedummy,d=grid1[,1],gam1=grid1[,2])
 	posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
 
 	if(plot){
@@ -127,7 +143,7 @@ loop2 <- function(gam1, gam2,d){
 	##SSR from TVAR(3)
 	#print(c(ndown,1-nup-ndown,nup))
 	if(min(nup, ndown, 1-nup-ndown)>trim){
-		Z2 <- t(cbind(regimedown, Z, regimeup))						# dim k(p+1) x t
+		Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
 		res <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
 	}
 	else
@@ -253,7 +269,6 @@ for(i in seq_len(length(gammas))){
 }
 
 position <- which(store3==min(store3, na.rm=TRUE), arr.ind=TRUE)
-print(position)
 r <- position[1]
 c <- position[2]
 
@@ -269,8 +284,11 @@ bestThresh <- c(gamma1, gamma2)
 if(nthresh==1){
 	dummydown <- ifelse(trans[,bestDelay]<bestThresh, 1, 0)
 	ndown <- mean(dummydown)
-	regimedown <- dummydown*Z
-	Zbest <- t(cbind(regimedown,Z))		# dim k(p+1) x t
+	regimeDown <- dummydown*Z
+	if(dummyToBothRegimes) 
+		regimeUp<-(1-dummydown)*Z
+	else regimeUp<-Z
+	Zbest <- t(cbind(regimeDown,regimeUp))		# dim k(p+1) x t
 }
 if(nthresh==2|nthresh==3){
 	dummydown <- ifelse(trans[,bestDelay]<bestThresh[1], 1,0)
@@ -279,7 +297,7 @@ if(nthresh==2|nthresh==3){
 	dummyup <- ifelse(trans[,bestDelay]>=bestThresh[2], 1,0)
 	nup <- mean(dummyup)
 	regimeup <- dummyup*Z
-	Zbest <- t(cbind(regimedown,Z, regimeup))	# dim k(p+1) x t
+	Zbest <- t(cbind(regimedown,(1-dummydown-dummyup)*Z, regimeup))	# dim k(p+1) x t
 }
 
 Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
@@ -288,7 +306,7 @@ Bcolnames <- c("Trend", c(paste(rep(colnames(data),p),"t", -rep(1:p, each=k))))
 if(!trend)
 	Bnames<-c(c(paste(rep(colnames(data),p), "t",-rep(1:p, each=k))))
 resbest <- Y - Bbest %*% Zbest
-SSRbest <- crossprod(c(resbest))
+SSRbest <- as.numeric(crossprod(c(resbest)))
 
 if(nthresh==1)
 	colnames(Bbest) <- rep(Bcolnames,2)
@@ -299,14 +317,14 @@ if(nthresh==1){
 	Bdown <- Bbest[,c(1:npar)]
 	Bup <- Bbest[,-c(1:npar)]
 	Blist <- list(Bdown=Bdown, Bup=Bup)
-	nobs <- list(ndown=ndown, nup=1-ndown)
+	nobs <- c(ndown=ndown, nup=1-ndown)
 } else {
 	Bdown <- Bbest[,c(1:npar)]
 	Bmiddle <- Bbest[,c(1:npar)+npar]
 	Bup <- Bbest[,c(1:npar)+2*npar]
 	colnames(Bmiddle) <- Bcolnames
 	Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)
-	nobs <- list(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
+	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 }
 
 list(Thresh=bestThresh, Parameters=Blist, SSR=SSRbest, nobs_regimes=nobs)
@@ -314,14 +332,10 @@ list(Thresh=bestThresh, Parameters=Blist, SSR=SSRbest, nobs_regimes=nobs)
 
 if(FALSE) { #usage example
 ###Hansen Seo data
-zeroyld <- read.table(file="/media/sda5/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-#Windows
-#zeroyld <- read.table(file="E:/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-#data<-dat[,c(30,13)]; 
-
+data(zeroyld)
 data<-zeroyld[,c(36,19)]
 colnames(data)<-c("short", "long")
 
-OlsTVAR(data, lag=2, nthresh=3, thDelay=1,trim=0.1, mTh=1,ngrid, plot=FALSE)
+OlsTVAR(data, lag=2, nthresh=2, thDelay=1:2,trim=0.1, plot=TRUE)
 #lag2, 2 thresh, trim00.05: 561.46
 }
