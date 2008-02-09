@@ -510,9 +510,10 @@ if(!model=="only_ECT"){
 
 
 
-
+if(FALSE) {
 data(zeroyld)
 data<-zeroyld[,c(36,19)]
 colnames(data)<-c("short", "long")
 
 TVECM(data, nthresh=2,lag=1, bn=20, ngridG=30, plot=TRUE,trim=0.05, model="All", trend=FALSE)
+}

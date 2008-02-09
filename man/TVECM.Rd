@@ -1,12 +1,11 @@
 \name{TVECM}
-\alias{TVAR}
-\alias{OlsTVAR}
+\alias{TVECM}
 \title{Treshold Vector Error Correction model (VECM)}
 \description{
 Estimate a Treshold Vector Error Correction model (VECM)
 }
 \usage{
-TVECM<-function(data,lag=1,trend=TRUE, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), methodMapply=FALSE )
+TVECM<-function(data,lag=1,trend=TRUE, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), rest=c("none", "equal", "signOp"), model=c("All", "only_ECT") )
 }
 \value{
 Fitted model data
@@ -14,7 +13,6 @@ Fitted model data
 \arguments{
 \item{data}{ time series }
 \item{lag}{Number of lags to include in each regime}
-\item{type}{If the variables are to be first differenced (difference) or not (level)}
 \item{trend}{If a trend should be included in the model}
 \item{nthresh}{number of threshold (see details)}
 \item{ngridG}{number of elements to search for the threshold value}
@@ -25,6 +23,9 @@ Fitted model data
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
 \item{rest} {Whether restrictions are put on the search.  }
+\item{methodMapply}{only for programming. Is to make the choice between a for loop or mapply implementation}
+\item{rest}{Currently not avalaible}
+\item{model}{The choice of the model. See details}
 }
 \details{
 For fixed threshold  and cointegrating vector, the model is linear, so estimation can be done directly by CLS (Conditional Least Squares). The search of the parameters values which minimize the residual sum of squares (SSR) is made upon a grid of potential values. The search on the threshold values is made upon existing ones, whereas the search for the cointegrating value is made ba default from a 
@@ -33,7 +34,7 @@ nthresh=1: estimation of one threshold model (two regimes) upon a grid of \var{n
 
 nthresh=2: estimation of two thresholds model (three regimes) Conditional on the threshold found in model where nthresh=1, the second threshold is searched. When both are found, a second grid search is made with 30 values around each threshold.
 
-
+The model can be either with a threshold effect on all variables ("All") or only on the error correction term (ECT) ("only_ECT"). In the second case, the value for the middle threshold is taken a null, as in Balke and Fomby (1997). 
 }
 \seealso{
 TODO
