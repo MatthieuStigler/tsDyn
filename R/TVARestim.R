@@ -18,6 +18,26 @@ if(trend==TRUE)
 	Z <- cbind(1,Z)
 npar <- ncol(Z)			#Number of parameters
 
+##################
+###Linear model
+#################
+ B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
+
+
+npar<-ncol(B)
+
+rownames(B)<-paste("Equation",colnames(data))
+if(trend==TRUE){colnames(B)<-c("Intercept",c(paste(rep(colnames(data),p), -rep(1:p, each=k))))}
+else {colnames(B)<-c(c(paste(rep(colnames(data),p), -rep(1:p, each=k)))) }
+
+res<-Y-Z%*%t(B)
+
+Sigma<- matrix(1/T*crossprod(res),ncol=k,dimnames=list(colnames(data), colnames(data)))
+nlike<-log(det(Sigma))/(T-p-1)		#	nlike=(t/2)*log(det(sige));
+aic<-nlike+2*(npar)/(T-p-1)
+bic<-nlike+log(T-p-1)*(npar)/(T-p-1)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
+
+
 ########################
 ### Threshold variable
 ########################
@@ -62,14 +82,17 @@ if(!missing(gamma))
 	gammas<-gamma
 Y<-t(Y)					#dim k x t
 
-aroundGrid <- function(around,allgammas,ngrid,trim){
-	ng <- length(allgammas)
-	wh.around <- which(round(allgammas,5)==round(around,5))
-	if(length(wh.around)==0)
-		stop("Sorry, the value you gave for the around argument did not match")
+aroundGrid <- function(around,allvalues,ngrid,trim){
+	ng <- length(allvalues)
+	wh.around <- which.min(abs(allvalues-around))
+	if(length(which(allvalues==around))==0)
+		stop("\nThe value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead")
+	if(length(wh.around)>1){
+		warning("\nThere were", length(wh.around)," values corresponding to the around argument. The first one was taken")
+		wh.around<-wh.around[1]}
 	ar <- c((wh.around-round(ngrid/2)): (wh.around+round(ngrid/2)))		#Values around the point
 	ar2 <- ar[ar>=round(trim*ng)&ar<=round((1-trim)*ng)]			#Bounding with trim 
-	gammas <- allgammas[ar2]
+	gammas <- allvalues[ar2]
 	return(gammas)
 }#end if missing around
 
@@ -108,6 +131,7 @@ loop1_twodummy <- function(gam1, d){
 	B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
 	crossprod(c( Y - B1 %*% Z1))
 } #end of the function
+
 
 onesearch <- function(thDelay,gammas){
 	grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
@@ -168,27 +192,29 @@ bestDelay <- bestone$bestDelay
 
 ###Conditional search
 if(nthresh==2){
-if(!missing(ngrid))
-	warning("The search method is made for full grid, providing a restricted grid could alter the result")
 
 ###Conditionnal step
 bestone <- onesearch(thDelay, gammas)
 bestThresh <- bestone$bestThresh
 bestDelay <- bestone$bestDelay
 
-wh.thresh <- which(gammas==bestThresh)
+
+condiStep<-function(allgammas, threshRef, delayRef,ninter, fun){
+
+wh.thresh <- which.min(abs(allgammas-threshRef))
 
 #search for a second threshold smaller than the first
-if(wh.thresh>ninter){gammaMinus<-gammas[1:(wh.thresh-ninter/2)]
-	storeMinus <- mapply(loop2,gam1=gammaMinus,gam2=bestThresh, d=bestDelay)	
+if(wh.thresh>2*ninter){
+	gammaMinus<-allgammas[seq(from=ninter, to=wh.thresh-ninter)]
+	storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, d=delayRef)	
 }
 else
 	storeMinus <- NA
 
 #search for a second threshold higher than the first
-if(length(gammas)-wh.thresh>ninter){
-	gammaPlus <- gammas[(wh.thresh+ninter/2):length(gammas)]
-	storePlus <- mapply(loop2,gam1=bestThresh,gam2=gammaPlus, d=bestDelay)
+if(length(wh.thresh<length(allgammas)-2*ninter)){
+	gammaPlus<-allgammas[seq(from=wh.thresh+ninter, to=length(allgammas)-ninter)]
+	storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, d=delayRef)
 }
 else
 	storePlus <- NA
@@ -198,13 +224,20 @@ store2 <- c(storeMinus, storePlus)
 
 positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
 if(positionSecond<=length(storeMinus))
-	secondBestThresh<-gammaMinus[positionSecond]
+	newThresh<-gammaMinus[positionSecond]
 else
-	secondBestThresh<-gammaPlus[positionSecond-length(storeMinus)]
+	newThresh<-gammaPlus[positionSecond-length(storeMinus)]
 
-cat("Second best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE), "\n")
+cat("Second best: ",newThresh, " (conditionnal on ",threshRef, " ) \t SSR", min(store2, na.rm=TRUE), "\n")
+list(threshRef=threshRef, newThresh=newThresh)
+}
+
+secondBestThresh<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay,ninter=ninter, fun=loop2)$newThresh
 
 ###Iterative step
+condiStep(allgammas, threshRef=secondBestThresh, delayRef=bestDelay,ninter=ninter, fun=loop2)
+
+###Alternative step: grid around the points from first step
 smallThresh <- min(bestThresh,secondBestThresh)
 gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim)
 
@@ -333,6 +366,7 @@ list(Thresh=bestThresh, Parameters=Blist, SSR=SSRbest, nobs_regimes=nobs)
 if(FALSE) { #usage example
 ###Hansen Seo data
 data(zeroyld)
+zeroyld <- read.table(file="/media/sda5/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
 data<-zeroyld[,c(36,19)]
 colnames(data)<-c("short", "long")
 

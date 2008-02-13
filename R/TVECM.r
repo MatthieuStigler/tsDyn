@@ -16,7 +16,7 @@ DeltaX<-embed(diff(y),p+1)[,-(1:k)]
 if(trend==TRUE){DeltaX<-cbind(rep(1,T-p-1), DeltaX)}
 
 ##Long-run relationship OLS estimation
-coint<-lm(y[,1]~ -1 +y[,2]) #Relation cointégrante estimée par OLS
+coint<-lm(y[,1]~ -1 +y[,2]) #Relation cointÃ©grante estimÃ©e par OLS
 
 betaLT<-coint$coef
 betaLT_std <- sqrt(diag(summary(coint)$sigma*summary(coint)$cov))
@@ -41,7 +41,7 @@ else {colnames(B)<-c("ECM",c(paste(rep(colnames(data),p), -rep(1:p, each=k)))) }
 
 res<-Y-Z%*%t(B)
 
-Sigma<- matrix(crossprod(res), nrow=k,dimnames=list(colnames(data), colnames(data)))
+Sigma<- matrix(1/T*crossprod(res),ncol=k,dimnames=list(colnames(data), colnames(data)))
 nlike<-log(det(Sigma))/(T-p-1)		#	nlike=(t/2)*log(det(sige));
 aic<-nlike+2*(npar)/(T-p-1)	
 bic<-nlike+log(T-p-1)*(npar)/(T-p-1)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
@@ -70,9 +70,9 @@ cat("BIC \t\t", bic, "\n")
 #Function to select values around a given point
 aroundGrid <- function(around,allvalues,ngrid,trim){
 	ng <- length(allvalues)
-	wh.around <- which(allvalues==around)
-	if(length(wh.around)==0)
-		stop("\nSorry, the value you gave for the around argument did not match")
+	wh.around <- which.min(abs(allvalues-around))
+	if(length(which(allvalues==around))==0)
+		stop("\nThe value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead")
 	if(length(wh.around)>1){
 		warning("\nThere were", length(wh.around)," values corresponding to the around argument. The first one was taken")
 		wh.around<-wh.around[1]}
@@ -98,8 +98,8 @@ if(is.null(gamma1$exact)==FALSE){
 	}
 #interval to search between given by user
 if(is.numeric(gamma1$int)){
-	intDown<-which(round(allgammas,3)==round(gamma1$int[1],3))
-	intUp<-which(round(allgammas,3)==round(gamma1$int[2],3))
+	intDown<-which.min(abs(allgammas-gamma1$int[1]))
+	intUp<-which.min(abs(allgammas-gamma1$int[2]))
 	gammas<-allgammas[seq(from=intDown, to=intUp, length.out=ngridG)]
 	}
 #value to search around	given by user
@@ -297,7 +297,7 @@ if(!is.null(gamma2$exact))
 if(is.null(gamma2$exact) & !is.numeric(gamma2$around)){
 
 
-wh.thresh <- which(allgammas==bestThresh)
+wh.thresh <- which.min(abs(allgammas-bestThresh))
 ninter<-round(trim*nrow(Xminus1))
 
 #search for a second threshold smaller than the first
@@ -430,8 +430,8 @@ nparTot<-npar+1+nthresh			#addition of threshold and cointegrating vector
 
 resbest <- Y - Zbest%*% t(Bbest)
 SSRbest <- as.numeric(crossprod(c(resbest)))
-Sigma<- matrix(1/T*crossprod(resbest), nrow=k)
-nlike_thresh<-log(det(Sigma))/(T-p-1)		#	nlike=(t/2)*log(det(sige));
+Sigmathresh<- matrix(1/T*crossprod(resbest), ncol=k)
+nlike_thresh<-log(det(Sigmathresh))/(T-p-1)		#	nlike=(t/2)*log(det(sige));
 aic_thresh<-nlike_thresh+2*(nparTot)/(T-p-1)
 bic_thresh<-nlike_thresh+log(T-p-1)*(nparTot)/(T-p-1)		#bic #=nlike+log10(t)*4*(1+k); ###BIC
 

@@ -26,6 +26,7 @@ Fitted model data
 \item{methodMapply}{only for programming. Is to make the choice between a for loop or mapply implementation}
 \item{rest}{Currently not avalaible}
 \item{model}{The choice of the model. See details}
+\item{plot}{Whether a grid with the SSR of each threshold should be printed}
 }
 \details{
 For fixed threshold  and cointegrating vector, the model is linear, so estimation can be done directly by CLS (Conditional Least Squares). The search of the parameters values which minimize the residual sum of squares (SSR) is made upon a grid of potential values. The search on the threshold values is made upon existing ones, whereas the search for the cointegrating value is made ba default from a 
