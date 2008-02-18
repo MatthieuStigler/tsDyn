@@ -301,7 +301,7 @@ if(plot==TRUE&nboot>0){
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 	}
 	else {
-	plot(density(Ftestboot23), xlab="Ftest12", xlim=c(0,max(Ftest23+1,Ftestboot23)), ylim=c(0,max(density(Ftestboot23)$y,dchisq(0:Ftest12, df=1+m))), main="Test 1 threshold TAR vs 2 thresholds TAR")
+	plot(density(Ftestboot23), xlab="Ftest23", xlim=c(0,max(Ftest23+1,Ftestboot23)), ylim=c(0,max(density(Ftestboot23)$y,dchisq(0:Ftest12, df=1+m))), main="Test 1 threshold TAR vs 2 thresholds TAR")
 	abline(v=Ftest23, lty=2, col=2)
 	curve(dchisq(x, df=1+m, ncp=0), from=0, n=Ftest23+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))

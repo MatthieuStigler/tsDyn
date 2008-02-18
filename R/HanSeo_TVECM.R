@@ -96,14 +96,20 @@ seb<-1/sqrt(hp)				#seb=1/sqrt(hp);
 ###VARIANCe COVARIANCE
 if (cov==1){
 	lz0<-ncol(z0) 			#Number of regressors (ECT, constant and lags)
-	xea<-z0*(e[,1]%*%matrix(c(rep(1,lz0)),ncol=lz0))
-	xe<-cbind(xea,xea)	# xe=[(z0.*(e(:,1)*ones(1,length(z0(1,:))))),(z0.*(e(:,1)*ones(1,length(z0(1,:)))))];
-	lr<-nrow(zz0)  #=length(zz0[,1])
-	lc<-ncol(zz0)  #=length(zz0[1,])
-	am0<-matrix(c(rep(0, lr*lc)), ncol=lc)
+	xea1<-z0*(e[,1]%*%matrix(1,ncol=lz0))
+	xea2<-z0*(e[,2]%*%matrix(1,ncol=lz0))
+	xe<-cbind(xea1,xea2)	# xe=[(z0.*(e(:,1)*ones(1,length(z0(1,:))))),(z0.*(e(:,1)*ones(1,length(z0(1,:)))))];
+	#lr<-nrow(zz0)  #=length(zz0[,1])
+	#lc<-ncol(zz0)  #=length(zz0[1,])
+	am0<-matrix(0, ncol=ncol(zz0), nrow=nrow(zz0))
 	m0<-rbind(cbind(zz0, am0),cbind( am0, zz0)) 
 		#m0=[zz0,zeros(length(zz0(:,1)),length(zz0(1,:)));zeros(length(zz0(:,1)),length(zz0(1,:))),zz0];
 	v<- m0%*%(t(xe)%*%xe)%*%m0		#v=m0*(xe*xe)*m0; taille attendue 2*para(cst +ECM+k*2
+	print(dim(v))
+	print(dim(sige%x%solve(t(z0)%*%z0)))
+print(lz0)
+print(dim(zz0))
+stop()
 	}
 #print(paste("dim v", dim(v)))
 #print(paste("dim sige", dim(sige)))
@@ -536,16 +542,13 @@ if(boot>0){
 if(FALSE) {#usage example
 ###Test
 
-zeroyld <- read.table(file="/media/sda5/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-#Windows
-#zeroyld <- read.table(file="E:/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-
-dat<-zeroyld[,7:62]
-dat<-dat[,c(30,13)]
-colnames(dat)<-c("short", "long")
-dat1<-zeroyld[,c(23, 49)]
-
-#rs<-matrix(c(c(0:18), c(21,24,30), c(seq(from=36, to=120, by=12))))
+#dat<-zeroyld[,7:62]
+#dat<-dat[,c(30,13)]
+#colnames(datax)<-c("short-run", "long-run")
+#dat1<-zeroyld[,c(23, 49)]
+#datax<-zeroyld[,c(36,19)]
+#write.table(datax, file="/home/mat/zeroyld.txt")
+#rs<-matrix(c(c(0:18), c(21,24,30), c(seq(from=63, to=120, by=12))))
 #rs
 #short<-12
 #long<-120
@@ -554,15 +557,13 @@ dat1<-zeroyld[,c(23, 49)]
 #dat<-dat[,c(30,13)]
 #dat
 #dim(dat)
+data(zeroyld)
+data<-zeroyld
 
 
-HanSeo_TVECM(dat, lag=1, intercept=TRUE, UserSpecified_beta=0.98, cov=1, UserSpecified_gamma=-0.63, bn=30, gn=30, boot=0)
+HanSeo_TVECM(data, lag=1, intercept=TRUE, UserSpecified_beta=0.98, cov=1, UserSpecified_gamma=-0.63, bn=30, gn=30, boot=0)
 
 
-###########Simul
-simul<-read.table(file="/media/sda5/Mes documents/Uni/Mémoire/DonnéesR/Scripts R/HanSeo/Tvecm_simul.txt")
-TVECMsimuli<-as.data.frame(simul)
 
-HanSeo_TVECM(TVECMsimuli, lag=2, intercept=TRUE, bn=100, gn=200,cov=1, boot=0, UserSpecified_gamma=NULL, UserSpecified_beta=NULL)
 }
 

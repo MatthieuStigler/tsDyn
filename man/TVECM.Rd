@@ -35,7 +35,7 @@ nthresh=1: estimation of one threshold model (two regimes) upon a grid of \var{n
 
 nthresh=2: estimation of two thresholds model (three regimes) Conditional on the threshold found in model where nthresh=1, the second threshold is searched. When both are found, a second grid search is made with 30 values around each threshold.
 
-The model can be either with a threshold effect on all variables ("All") or only on the error correction term (ECT) ("only_ECT"). In the second case, the value for the middle threshold is taken a null, as in Balke and Fomby (1997). 
+The model can be either with a threshold effect on all variables ("All") or only on the error correction term (ECT) (argument "only ECT"). In the second case, the value for the middle threshold is taken a null, as in Balke and Fomby (1997). 
 }
 \seealso{
 TODO
@@ -44,8 +44,8 @@ TODO
 \examples{
 
 data(zeroyld)
-data<-zeroyld[,c(36,19)]
-colnames(data)<-c("short", "long")
+data<-zeroyld
+
 
 TVECM(data, nthresh=2,lag=1, bn=20, ngridG=30, plot=TRUE,trim=0.05, model="All", trend=FALSE)
 }

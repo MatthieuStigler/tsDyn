@@ -133,9 +133,9 @@ for(i in (lag+2):(nrow(y)-1)){
 	if(ECTtminus1[i]>gamma2Sigma) {Yb[i,]<-apply(cbind(Bsig[,2]*ECTtminus1[i,],Yb[i,]),1,sum)}
 }
 
-yboot<-apply(rbind(y[1,],Yb),2,cumsum)			#same as diffinv but ti did not work
+yboot<-apply(rbind(y[1,],Yb),2,cumsum)			#same as diffinv but it did not work
 
-### Regression with the new serie
+### Regression on the new series
 DeltaYboot<-t(diff(yboot))[,(p+1):(T-1)] 		
 DeltaXboot<-rbind(rep(1,ncol(DeltaYboot)),t(embed(diff(yboot),p+1)[,-(1:k)]))
 Mboot<-diag(1,T-p-1)-t(DeltaXboot)%*%chol2inv(chol(tcrossprod(DeltaXboot)))%*%DeltaXboot
@@ -173,18 +173,8 @@ list(supWald=supWald,gamma1=gamma1, gamma2=gamma2, B=Bsig,PvalBoot=PvalBoot,Crit
 }
 
 if(FALSE) {#usage example
-#library(vars)
-#data(Canada)
-
-zeroyld <- read.table(file="/media/sda5/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-#Windows
-#zeroyld <- read.table(file="E:/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-
-dat<-zeroyld[,7:62]
-data<-dat[,c(30,13)]
-colnames(data)<-c("short", "long")
-dat1<-zeroyld[,c(23, 49)]	
-
+data(zeroyld)
+data<-zeroyld
 
 SeoTest(data[1:100,],lag=2, beta=1, trim=0.15, nboot=200)
 }

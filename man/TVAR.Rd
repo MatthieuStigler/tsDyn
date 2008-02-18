@@ -25,6 +25,7 @@ Fitted model data
 \item{around}{The grid search is restricted to \var{ngrid} values around this point. Especially useful for \code{nthresh=3}. }
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
+\item{plot} {Whether a plot showing the results of the grid search should be printed}
 }
 \details{
 For fixed \code{th} and threshold variable, the model is linear, so estimation can be done directly by CLS (Conditional Least Squares). The search of the parameters values is made upon a grid of potential values. So it is pretty slow.
@@ -41,8 +42,8 @@ TODO
 \author{Matthieu Stigler}
 \examples{
 data(zeroyld)
-data <- zeroyld[,c(36,19)]
-colnames(data) <- c("short", "long")
+
+data<-zeroyld
 
 OlsTVAR(data, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=TRUE)
 

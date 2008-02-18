@@ -53,14 +53,16 @@ if (!missing(thVar)) {
 	z<-embed(z,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
 } ###Combination (or single value indicating position) of contemporaneous variables
 else {
-	if (length(mTh) > k)
+	if (!length(mTh)%in%c(1,k))
 		stop("length of 'mTh' should be equal to the number of variables, or just one")
 	if(length(mTh)==1) {
-		if(mTh>p)
-			stop("mTh too big, should be smaller or equal to the number of variables")
+		if(mTh>k)
+			stop("Unable to select the ",mTh, "variable for the threshold. Please see again mTh ")
 		combin <- matrix(0,ncol=1, nrow=k)
 		combin[mTh,]<-1
 	}
+	else 
+		combin<-matrix(mTh,ncol=1, nrow=k)
 	zcombin <- y %*% combin
 	z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
 }
@@ -78,8 +80,9 @@ gammas <- allgammas[(trim*nga):((1-trim)*nga)]
 if(!missing(ngrid)){
 	gammas <- allgammas[seq(from=ceiling(trim*nga), to=floor((1-trim)*nga), length.out=ngrid)]
 }
-if(!missing(gamma))
+if(!missing(gamma)){
 	gammas<-gamma
+	plot<-FALSE}
 Y<-t(Y)					#dim k x t
 
 aroundGrid <- function(around,allvalues,ngrid,trim){
@@ -102,7 +105,7 @@ if(!missing(around)){
 		gammas <- aroundGrid(around, allgammas,ngrid,trim)
 	if(length(around)==2) {
 		gammas <- aroundGrid(around[1], allgammas,ngrid,trim)
-		gamas2 <- aroundGrid(around[2], allgammas,ngrid,trim)
+		gammas2 <- aroundGrid(around[2], allgammas,ngrid,trim)
 	}
 }
 
@@ -140,7 +143,7 @@ onesearch <- function(thDelay,gammas){
 	else	store <- mapply(loop1_onedummy,d=grid1[,1],gam1=grid1[,2])
 	posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
 
-	if(plot){
+	if(plot&is.null(gamma)){
 		result1 <- cbind(grid1,store)
 		col <- rep(thDelay,length.out=nrow(result1))
 		plot(result1[,2], result1[,3], col=col,xlab="Treshold Value",ylab="SSR", main="Results of the grid search")
@@ -366,9 +369,7 @@ list(Thresh=bestThresh, Parameters=Blist, SSR=SSRbest, nobs_regimes=nobs)
 if(FALSE) { #usage example
 ###Hansen Seo data
 data(zeroyld)
-zeroyld <- read.table(file="/media/sda5/Mes documents/Ordi/MatLab/commandes/Commandes Hansen Seo/zeroyld.txt", header=FALSE, sep='')
-data<-zeroyld[,c(36,19)]
-colnames(data)<-c("short", "long")
+data<-zeroyld
 
 OlsTVAR(data, lag=2, nthresh=2, thDelay=1:2,trim=0.1, plot=TRUE)
 #lag2, 2 thresh, trim00.05: 561.46

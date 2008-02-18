@@ -53,3 +53,54 @@ dsigmoid <- function(x) sigmoid(x) * (1 - sigmoid(x))
 d2sigmoid <- function(x) dsigmoid(x) * (1 - 2 * sigmoid(x))
 
 repmat <- function(a, b, c) kronecker(matrix(1,b,c), a)
+
+###Function to create the threshold in TVAR
+TVAR_thresh<-function(mTh,thDelay,thVar=NULL,y, p){
+T <- nrow(y) 
+k <- ncol(y) 
+if (!is.null(thVar)) {		
+        if (length(thVar) > T) {
+		z <- thVar[seq_len(T)]
+		warning("The external threshold variable is not of same length as the original variable")
+        }
+        else
+		z <- thVar
+	z<-embed(z,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+} ###Combination (or single value indicating position) of contemporaneous variables
+else {
+	if (!length(mTh)%in%c(1,k))
+		stop("length of 'mTh' should be equal to the number of variables, or just one")
+	if(!all(mTh%in%seq_len(k)))
+		stop("Unable to select the variable ",mTh[which(mTh%in%seq_len(k)==FALSE)], " for the threshold. Please see again mTh ")
+	if(length(mTh)==1) {
+		combin <- matrix(0,ncol=1, nrow=k)
+		combin[mTh,]<-1
+	}
+	else 
+		combin<-matrix(mTh,ncol=1, nrow=k)
+	zcombin <- y %*% combin
+	z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+}
+zcombin <- y %*% combin
+z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]	
+trans<-as.matrix(z)
+list(trans=trans, combin=combin)
+}
+
+#Function to obtain the number of digits of a value
+getndp <- function(x, tol=2*.Machine$double.eps)
+{
+internal<-function(x){
+  	ndp <- 0
+  	while(!isTRUE(all.equal(x, round(x, ndp), tol=tol))) ndp <- ndp+1 
+  	if(ndp > -log10(tol)) warning("Tolerance reached, ndp possibly underestimated.")
+  	ndp 
+}
+if(length(x)==1)
+	return(internal(x))
+else if(length(x) %in% c(2:20))
+	return(max(apply(matrix(x),1,internal)))
+else
+	return(max(apply(matrix(sample(x,size=20)),1,internal)))
+}
+
