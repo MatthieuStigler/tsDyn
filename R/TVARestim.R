@@ -183,7 +183,7 @@ loop2 <- function(gam1, gam2,d){
 ############################
 if(nthresh==1){
 if(!missing(around))
-	gammas <- aroundgrid(around,allgammas,ngrid,trim)
+	gammas <- aroundGrid(around,allgammas,ngrid,trim)
 bestone <- onesearch(thDelay,gammas)
 bestThresh <- bestone$bestThresh
 bestDelay <- bestone$bestDelay

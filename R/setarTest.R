@@ -10,7 +10,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
     if (missing(mL)) { mL <- m    }
     if (missing(mH)) { mH <- m    }
 	
-
+ndig<-getndp(x)
 ###Linear model
 xxlin<-cbind(1,xx)
 linear <- lm.fit(xxlin, yy)
@@ -191,7 +191,7 @@ resib2<-c(rep(0,m),sample(res1thresh, replace=TRUE))			#residual sampling,
 
 
 for(i in (m+1):length(x)){
-	if(round(z2[i-bestDelay-1],6)<=round(bestThresh,6)) 
+	if(round(z2[i-bestDelay-1],ndig)<=bestThresh) 
 		xboot2[i]<-sum(B1tDown[1],B1tDown[-1]*xboot2[i-c(1:m)],resib2[i])
 	else 
 		xboot2[i]<-sum(B1tUp[1],B1tUp[-1]*xboot2[i-c(1:m)],resib2[i])
@@ -207,7 +207,7 @@ bootModel<-switch(model, "1vs"=bootlinear, "2vs3"=boot1thresh)
 
 bootstraploop<-function(x, thVar=NULL){
 
-xboot<-round(bootModel(x=x),6)
+xboot<-round(bootModel(x=x),ndig)
 
 # SSR of linear boot model
 string<-embed(xboot,m+1)

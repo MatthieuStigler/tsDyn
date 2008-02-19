@@ -96,6 +96,8 @@ internal<-function(x){
   	if(ndp > -log10(tol)) warning("Tolerance reached, ndp possibly underestimated.")
   	ndp 
 }
+if(!is.null(dim(x)))
+	x<-c(x)
 if(length(x)==1)
 	return(internal(x))
 else if(length(x) %in% c(2:20))

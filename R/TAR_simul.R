@@ -51,10 +51,10 @@ if(trend)
         z <- xx %*% mTh
         dim(z) <- NULL
     }
-    else if (!missing(thVar)) {
+    else if (!missing(thVar)) { stop("thVar argument currenly not implemented")
         if (length(thVar) > nrow(x)) {thVar <- thVar[seq_len(nrow(x))]}
 	if (length(thVar) < nrow(x)) {stop("The threshold variable should not be smaller than the serie") }
-	z<-nlar.struct(x = thVar, m = m, d = d, steps = steps, series = deparse(substitute(z)))[, thDelay + 1]
+	z<-nlar.struct(x = thVar, m = m, d = 1, steps = 1, series = deparse(substitute(z)))[, thDelay + 1]
     }
     else {z <- xx[, thDelay]
     }
@@ -99,10 +99,9 @@ if(missing(sigma))
 ###Bootstrap for the F test
 ##############################
 #initial values
-Yb<-vector("numeric", length=length(x))		#Delta Y term
+Yb<-vector("numeric", length=length(y))		#Delta Y term
 Yb[1:p]<-y[1:p]
 
-if(!missing(thVar)) zext<-embed(thVar,m+1)[round(trim*ng):round((1-trim)*ng),]		
 
 z2<-vector("numeric", length=length(y))
 z2[1:p]<-y[1:p]

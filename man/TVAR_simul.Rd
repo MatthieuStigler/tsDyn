@@ -26,7 +26,7 @@ a list with the simulated/bootstraped data and the parameter matrix used.
 }
 \details{
 This function offers the possibility to generate series following a TVAR from two approaches: bootstrap or simulation. When the data is given, one can use a simple residual bootstrap or simulate a serie with the same parameter matrix and with normal distributed residuals (with variance pre-specified). The choice "check" is just there to check the function: one should obtain the same values as the given values. 
-When the parameter matrix is given, there is only the possibility to simulate series. The starting values (of length equal to the numer of lags) can be given. The user should take care for the choice of the starting values and parameters values, since it is not sure that the simulated values will cross the threshold even once.
+When the parameter matrix is given, there is only the possibility to simulate series. The starting values (of length equal to the number of lags) can be given. The user should take care for the choice of the starting values and parameters values, since it is not sure that the simulated values will cross the threshold even once.
 }
 \seealso{
 TODO
