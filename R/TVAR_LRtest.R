@@ -1,4 +1,4 @@
-TVAR_LRtest <- function (data, m=1, d = 1, steps = d, trend=TRUE, series, thDelay = 1:2, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3")) {
+TVAR_LRtest <- function (data, m=1, d = 1, steps = d, trend=TRUE, series, thDelay = 1:2, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE) {
     if (missing(series))  series <- deparse(substitute(x))
 y <- as.matrix(data) 
 Torigin <- nrow(y) 	#Size of original sample
@@ -64,7 +64,7 @@ else {
 	zcombin <- y %*% combin
 	z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
 }
-
+z<-as.matrix(z)
 
 
 
@@ -221,7 +221,8 @@ Yb[1:m,]<-y[1:m,]
 
 bootlinear<-function(x){
 resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin[sample(seq_len(nrow(res_lin)), replace=TRUE),])
-resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin)		#Uncomment this line to check the bootstrap
+if(check)
+	resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin)		#Uncomment this line to check the bootstrap
 
 for(i in (m+1):(nrow(y))){
 	Yb[i,]<-rowSums(cbind(B[,1], B[,-1]%*%matrix(t(Yb[i-c(1:m),]), ncol=1),resi[i,]))
@@ -246,9 +247,10 @@ Yb2[1:m,]<-y[1:m,]
 z2<-vector("numeric", length=nrow(y))
 z2[1:m]<-y[1:m,]%*%combin			
 
-boot1thresh<-function(x){
-resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)	
- resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
+boot1thresh<-function(x){	
+resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
+if(check)
+	resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)
 
 for(i in (m+1):(nrow(y))){
 	if(round(z2[i-bestDelay],ndig)<=bestThresh) 
@@ -265,6 +267,7 @@ return(Yb2)
 
 #####Bootstrap loop
 model<-match.arg(test)
+test<-switch(model, "1vs"="1vs", "2vs3"="2vs3")
 bootModel<-switch(model, "1vs"=bootlinear, "2vs3"=boot1thresh)
 
 bootstraploop<-function(x, thVar=NULL){
@@ -289,7 +292,7 @@ if(!missing(thVar))
 else 
 	zcombin<-xboot%*%combin
 zb <- embed(zcombin,m+1)[,seq_len(max(thDelay))+1]
-
+zb<-as.matrix(zb)
 
 #  print(cbind(z,zb))
 

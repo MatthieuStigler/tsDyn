@@ -104,9 +104,6 @@ resb<-rbind(matrix(0,nrow=p, ncol=k),innov)
 
 
 if(nthresh==0){
-	resi<-rbind(matrix(0,nrow=p, ncol=k),res[sample(seq_len(t), replace=TRUE),])
-	resi<-rbind(matrix(0,nrow=p, ncol=k),res)		#Uncomment this line to check the bootstrap
-
 	for(i in (p+1):T){
 		Yb[i,]<-rowSums(cbind(B[,1], B[,-1]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
 	}

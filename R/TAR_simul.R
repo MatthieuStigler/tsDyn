@@ -4,6 +4,7 @@ if(!missing(data)&!missing(B))
 	stop("You have to provide either B or y, but not both")
 p<-lag
 m<-lag
+type<-match.arg(type)
 
 if(!missing(B)){
 	if(type!="simul"){
@@ -60,11 +61,13 @@ if(trend)
     }
 trans<-z
 
+
 if(nthresh==1&missing(Thresh))
 	Thresh<-mean(trans)
 if(nthresh==2&missing(Thresh))
 	Thresh<-quantile(trans, probs=c(0.25, 0.75))
-Thresh<-round(Thresh, ndig)
+if(nthresh!=0)
+	Thresh<-round(Thresh, ndig)
 ##################
 ###Model
 #################
@@ -107,7 +110,7 @@ z2<-vector("numeric", length=length(y))
 z2[1:p]<-y[1:p]
 
 
-type<-match.arg(type)
+
 innov<-switch(type, "boot"=sample(res, replace=TRUE), "simul"=rnorm(length(y)-p,sd=sigma), "check"=res)
 resb<-c(rep(0,p),innov)	
 
