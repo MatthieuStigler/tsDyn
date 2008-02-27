@@ -1,7 +1,9 @@
 setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
-    mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3")) {
+    mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE) {
     if (missing(m)) m <- max(mL, mH, max(thDelay) + 1)
     if (missing(series))  series <- deparse(substitute(x))
+	ndig<-getndp(x)
+	x<-round(x,ndig)
     str <- nlar.struct(x = x, m = m, d = d, steps = steps, series = series)
     xx <- str$xx
     yy <- str$yy
@@ -10,40 +12,40 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
     if (missing(mL)) { mL <- m    }
     if (missing(mH)) { mH <- m    }
 	
-ndig<-getndp(x)
 ###Linear model
 xxlin<-cbind(1,xx)
 linear <- lm.fit(xxlin, yy)
 SSR<-as.numeric(crossprod(linear$residuals))
-
+B<-linear$coeff
 
 ###Threshold transition variable
 
-    if (!missing(thDelay)) {  
-      if (max(thDelay) >= m)             stop(paste("thDelay too high: should be < m (=",  m, ")"))
-        z <- xx[, seq_len(max(thDelay)+1)]
-    }
-    else if (!missing(mTh)) { stop("Currenly not implemented")
+
+    if (!missing(mTh)) { stop("Currenly not implemented")
 	    if (length(mTh) != m) stop("length of 'mTh' should be equal to 'm'")
         z <- xx %*% mTh
         dim(z) <- NULL
     }
-    else if (!missing(thVar)) {
+    if (!missing(thVar)) {
         if (length(thVar) > nrow(x)) {thVar <- thVar[seq_len(nrow(x))]}
 	if (length(thVar) < nrow(x)) {stop("The threshold variable should not be smaller than the serie") }
 	z<-nlar.struct(x = thVar, m = m, d = d, steps = steps, series = deparse(substitute(z)))[, thDelay + 1]
     }
-    else {z <- xx[, thDelay]
+    else {  
+      if (max(thDelay) >= m)             stop(paste("thDelay too high: should be < m (=",  m, ")"))
+        z <- xx[, seq_len(max(thDelay)+1)]
     }
 
-
 z<-as.matrix(z)
-if(length(thDelay)==1) b<-thDelay
-else b<-1
-allgammas<-sort(unique(z[,b]))
+if(length(thDelay)==1) 
+	b<-thDelay
+else 
+	b<-1
+trans<-z[,b+1]
+allgammas<-sort(trans)
 ng<-length(allgammas)
-ninter<-round(trim*ng)
-gammas<-allgammas[ceiling(trim*ng+1):floor((1-trim)*ng)]
+nmin<-round(trim*ng)
+gammas<-unique(allgammas[ceiling(trim*ng+1):floor((1-trim)*ng)])
 
 
 ### Threshold model
@@ -55,73 +57,109 @@ xxh <- cbind(1, xx[, seq_len(mH)])
 ###################
 ###Search function
 ##################
-SSRestim<-function(parameters,yy, xxl,xxh,z) {#
-	thDelay<-parameters[1]
+TAR1t_SSR<-function(parameters,yy, xxl,xxh,z) {#
+	Delay<-parameters[1]
 	gammai<-parameters[2]
-        isL <- ifelse(z[, thDelay + 1]<= gammai,1,0)	### isL: dummy 
+        isL <- ifelse(z[, Delay + 1]<= gammai,1,0)	### isL: dummy 
         xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
 	crossprod(yy - xxthresh %*% chol2inv(chol(crossprod(xxthresh)))%*%crossprod(xxthresh,yy))
         }
 
-SSRestim2 <- function(gam1,gam2,thDelay, yy, xx,z){
+TAR2t_SSR <- function(gam1,gam2,Delay, yy, xx,z){
 	##Threshold dummies
-	dummydown <- ifelse(z[, thDelay + 1]<=gam1, 1, 0)
+	dummydown <- ifelse(z[, Delay + 1]<=gam1, 1, 0)
 	regimedown <- dummydown*xx
 	ndown <- mean(dummydown)
-	dummyup <- ifelse(z[, thDelay + 1]>gam2, 1, 0)
+	dummyup <- ifelse(z[, Delay + 1]>gam2, 1, 0)
 	regimeup <- dummyup*xx
 	nup <- mean(dummyup)
+#  print(min(nup, ndown, 1-nup-ndown)>trim)
 	##SSR from TAR(3)
-	if(min(nup, ndown, 1-nup-ndown)>trim){
+	if(min(nup, ndown, 1-nup-ndown)>=trim){
 		XX <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)		# dim k(p+1) x t	
 		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSR
 	}
 	else
 		res <- NA
-# 	print(c(ndown,1-nup-ndown,nup, gam1, gam2,res))
+#   	print(c(ndown,1-nup-ndown,nup, gam1, gam2,res,min(nup, ndown, 1-nup-ndown)>trim))
+
 	return(res)
 }
+TAR1t_B<-function(Delay,gamma,yy, xxl,xxh,z,m) {#
+        isL <- ifelse(z[, Delay + 1]<= gamma,1,0)	### isL: dummy 
+	ndown<-mean(isL)
+        xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
+	B<-round(matrix(solve(crossprod(xxthresh))%*%crossprod(xxthresh,yy), nrow=1),5)
+	Bcolnames <- c("Trend", c(paste("t -", seq_len(m))))
+	colnames(B)<-rep(Bcolnames,2)
+	Bdown <- B[,seq_len(ncol(B)/2)]
+	Bup <- B[,-seq_len(ncol(B)/2)]
+	nobs <- c(ndown=ndown, nup=1-ndown)	
+	list(Bdown=Bdown, Bup=Bup, nobs=nobs)
+        }
 
+TAR2t_B <- function(gam1,gam2,Delay, yy, xx,z,m){
+	##Threshold dummies
+	dummydown <- ifelse(z[, Delay + 1]<=gam1, 1, 0)
+	regimedown <- dummydown*xx
+	ndown <- mean(dummydown)
+	dummyup <- ifelse(z[, Delay + 1]>gam2, 1, 0)
+	regimeup <- dummyup*xx
+	nup <- mean(dummyup)
+	##SSR from TAR(3)
+	XX <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)		# dim k(p+1) x t	
+	B <- round(matrix(solve(crossprod(XX))%*%crossprod(XX,yy),nrow=1),5)	#SSR
+	Bcolnames <- c("Trend", c(paste("t -", seq_len(m))))
+ 	colnames(B)<-rep(Bcolnames,3)
+	npar<-ncol(B)/3
+	Bdown <- B[,c(1:npar)]
+	Bmiddle <- B[,c(1:npar)+npar]
+	Bup <- B[,c(1:npar)+2*npar]
+	nobs <- c(ndown=ndown, nmiddle=1-ndown-nup,nup=nup)	
+	list(Bdown=Bdown, Bmiddle=Bmiddle, Bup=Bup, nobs=nobs)
+}
 ##################
-###One thresholds
+###One threshold
 ##################
 
 IDS<-as.matrix(expand.grid(thDelay, gammas))
-result <- apply(IDS, 1, SSRestim,yy=yy, xxl=xxl,xxh=xxh,z=z)#
+result <- apply(IDS, 1, TAR1t_SSR,yy=yy, xxl=xxl,xxh=xxh,z=z)#
+
 bestDelay<-IDS[which.min(result),1]
 bestThresh<-IDS[which.min(result),2]
 cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result), "\n")
-
+B1t<-TAR1t_B(Delay=bestDelay,gamma=bestThresh,yy=yy, xxl=xxl,xxh=xxh,z=z, m=m)
+print(B1t)
 ##################
 ###Two thresholds
 ##################
 
 ###Function for conditional search
-condiStep<-function(allgammas, threshRef, delayRef,ninter, fun,MoreArgs=NULL, target=NULL){
+condiStep<-function(allgammas, threshRef, MoreArgs=NULL, target=NULL){
 
 wh.thresh <- which.min(abs(allgammas-threshRef))
 Thr2<-which.min(abs(allgammas-target))
-#search for a second threshold smaller than the first
 
-if(wh.thresh>2*ninter){
-	gammaMinus<-allgammas[seq(from=max(ninter, Thr2-20), to=min(wh.thresh-ninter, Thr2+20))]
-	storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef,MoreArgs=MoreArgs)	
+#search for a second threshold smaller than the first
+if(wh.thresh>2*nmin){
+	gammaMinus<-unique(allgammas[seq(from=max(nmin, Thr2-20), to=min(wh.thresh-nmin, Thr2+20))])
+	storeMinus <- mapply(TAR2t_SSR,gam1=gammaMinus,gam2=threshRef,MoreArgs=MoreArgs)	
 }
 else
 	storeMinus <- NA
 
 #search for a second threshold higher than the first
-if(length(wh.thresh<length(allgammas)-2*ninter)){
-	gammaPlus<-allgammas[seq(from=max(wh.thresh+ninter,Thr2-20), to=min(length(allgammas)-ninter, Thr2+20))]
-	storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus,  MoreArgs=MoreArgs)
+if(wh.thresh<ng-2*nmin){
+	gammaPlus<-unique(allgammas[seq(from=max(wh.thresh+nmin,Thr2-20), to=min(ng-nmin, Thr2+20))])
+	storePlus <- mapply(TAR2t_SSR,gam1=threshRef,gam2=gammaPlus,  MoreArgs=MoreArgs)
 }
 else
 	storePlus <- NA
 
 #results
 store2 <- c(storeMinus, storePlus)
-
 positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)[1]
+
 if(positionSecond<=length(storeMinus))
 	newThresh<-gammaMinus[positionSecond]
 else
@@ -133,18 +171,28 @@ list(newThresh=newThresh, SSR=min(store2, na.rm=TRUE))
 
 
 ###Applying the function for conditional search to original data
-More<-list(thDelay=bestDelay, yy=yy, xx=xxlin,z=z)
-Thresh2<-condiStep(allgammas, bestThresh,ninter=ninter, fun=SSRestim2, MoreArgs=More)$newThresh
-Thresh3<-condiStep(allgammas, Thresh2,ninter=ninter, fun=SSRestim2, MoreArgs=More)
+More<-list(Delay=bestDelay, yy=yy, xx=xxlin,z=z)
+Thresh2<-condiStep(allgammas=sort(z[,bestDelay+1]), bestThresh, MoreArgs=More)$newThresh
+Thresh3<-condiStep(allgammas=sort(z[,bestDelay+1]), Thresh2, MoreArgs=More)
+
+B2t<-TAR2t_B(gam1=min(Thresh3$newThresh,Thresh2),gam2=max(Thresh3$newThresh,Thresh2),Delay=bestDelay, yy=yy, xx=xxlin,z=z,m=m)
+print(B2t)
 
 SSR1thresh<-min(result)
 SSR2thresh<-Thresh3$SSR
 SSRs<-matrix(c(SSR, SSR1thresh, SSR2thresh), ncol=3, dimnames=list("SSR", c("AR", "TAR(1)", "TAR(2)")))
 
+cat("Second best: ",Thresh2, " (conditionnal on ",bestThresh, ")\n")
+cat("Iterative best: ",Thresh3$newThresh, " (conditionnal on ",Thresh2, ")\n")
+Ndown<-mean(ifelse(z[,bestDelay+1]<=min(Thresh3$newThresh,Thresh2),1,0))
+Nup<-mean(ifelse(z[,bestDelay+1]>max(Thresh3$newThresh,Thresh2),1,0))
+cat("Percentage of observations in each regime",c(Ndown,1-Ndown-Nup,Nup), "\n" )
+
 ###F test for original data
 Ftest12<-as.numeric(n*(SSR-SSR1thresh)/SSR1thresh)
 Ftest13<-as.numeric(n*(SSR-SSR2thresh)/SSR2thresh)
 Ftest23<-as.numeric(n*(SSR1thresh-SSR2thresh)/SSR2thresh)
+Ftests<-matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
 
 ##############################
 ###Bootstrap for the F test
@@ -161,7 +209,8 @@ if(!missing(thVar)) zext<-embed(thVar,m+1)[round(trim*ng):round((1-trim)*ng),]
 #loop
 bootlinear<-function(x){
 resib1<-c(rep(0,m),sample(reslin, replace=TRUE))	#residual sampling, 
-#resib1<-c(rep(0,m),linear$residuals)				#uncomment this line to verify the bootstrap
+if(check)
+	resib1<-c(rep(0,m),linear$residuals)				#uncomment this line to verify the bootstrap
 for(i in (m+1):length(x)){
 	xboot[i]<-sum(B[1],B[-1]*xboot[i-c(1:m)],resib1[i])
 	}
@@ -202,8 +251,8 @@ return(xboot2)
 
 
 #####Bootstrap loop
-model<-match.arg(test)
-bootModel<-switch(model, "1vs"=bootlinear, "2vs3"=boot1thresh)
+test<-match.arg(test)
+bootModel<-switch(test, "1vs"=bootlinear, "2vs3"=boot1thresh)
 
 bootstraploop<-function(x, thVar=NULL){
 
@@ -211,7 +260,7 @@ xboot<-round(bootModel(x=x),ndig)
 
 # SSR of linear boot model
 string<-embed(xboot,m+1)
-stringxx<-string[,-1]
+stringxx<-matrix(string[,-1], ncol=m)
 xxb<-cbind(1,stringxx)
 yyb <- string[,1]
 SSRb<-crossprod(yyb-xxb%*%chol2inv(chol(crossprod(xxb)))%*%crossprod(xxb,yyb)) #SSR 
@@ -224,14 +273,14 @@ xxhb <- cbind(1, stringxx[, seq_len(mH)])
 if(!is.null(thVar)) zb<-as.matrix(zext)
 else zb<-as.matrix(stringxx[, seq_len(max(thDelay)+1)])
 
-allgammasb<-sort(unique(zb[,b]))
+allgammasb<-sort(zb[,b+1])
 ng<-length(allgammasb)
-gammasb<-allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)]
+gammasb<-unique(allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)])
 
 
 ###Search
 IDSb<-as.matrix(expand.grid(thDelay, gammasb))			#Combinations of thresold and delays
-storeb<-apply(IDSb, 1, SSRestim,yy=yyb,xxl=xxlb,xxh=xxhb,z=zb)				#Minimal SSR
+storeb<-apply(IDSb, 1, TAR1t_SSR,yy=yyb,xxl=xxlb,xxh=xxhb,z=zb)				#Minimal SSR
 SSR1threshb<-min(storeb, na.rm=TRUE)
 
 
@@ -239,10 +288,10 @@ SSR1threshb<-min(storeb, na.rm=TRUE)
 bestDelayb<-IDSb[which.min(storeb),1]
 bestThreshb<-IDSb[which.min(storeb),2]
 
-More<-list(thDelay=bestDelayb, yy=yyb, xx=xxb,z=zb)
-Thresh2<-condiStep(allgammasb, bestThreshb, ninter=ninter, fun=SSRestim2, MoreArgs=More)$newThresh
-Thresh3<-condiStep(allgammasb, Thresh2, ninter=ninter, fun=SSRestim2, MoreArgs=More, target=bestThreshb)
-SSR2threshb<-Thresh3$SSR
+More<-list(Delay=bestDelayb, yy=yyb, xx=xxb,z=zb)
+Thresh2b<-condiStep(allgammasb, bestThreshb,  MoreArgs=More)$newThresh
+Thresh3b<-condiStep(allgammasb, Thresh2b, MoreArgs=More, target=NULL)
+SSR2threshb<-Thresh3b$SSR
 
 #Test statistic
 
@@ -311,7 +360,7 @@ if(plot==TRUE&nboot>0){
 
 #nlar=extend(nlar(str, coef = res$coef, fit = res$fitted.values, res = res$residuals, k = res$k,
 #list( model.specific = res),"setar")
-return(list(bestDelay=bestDelay,SSR=SSRs, test.val=c(Ftest12, Ftest13, Ftest23), Pvalueboot=PvalBoot, CriticalValBoot=CriticalValBoot))
+return(list(bestDelay=bestDelay,SSR=SSRs, test.val=Ftests, Pvalueboot=PvalBoot, CriticalValBoot=CriticalValBoot))
 }#End of thw whole function
 
 
@@ -322,6 +371,5 @@ environment(setarTest)<-environment(setar)
 #Transformation like in Hansen 1999
 sun<-(sqrt(sunspot.year+1)-1)*2
 
-setarTest(sun, m=11, thDelay=0:1, nboot=5, plot=TRUE, trim=0.1, test="1vs")
+setarTest(sun, m=11, thDelay=0:1, nboot=2, plot=TRUE, trim=0.1, test="1vs")
 }
-

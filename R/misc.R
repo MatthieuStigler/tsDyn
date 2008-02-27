@@ -105,4 +105,37 @@ else if(length(x) %in% c(2:20))
 else
 	return(max(apply(matrix(sample(x,size=20)),1,internal)))
 }
-
+###Paramater matrix of tar with 1 threshold,  given the thresh and the delay
+TAR1t_B<-function(Delay,gamma,yy, xxl,xxh,z,m) {#
+        isL <- ifelse(z[, Delay + 1]<= gamma,1,0)	### isL: dummy 
+	ndown<-mean(isL)
+        xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
+	B<-round(matrix(solve(crossprod(xxthresh))%*%crossprod(xxthresh,yy), nrow=1),5)
+	Bcolnames <- c("Trend", c(paste("t -", seq_len(m))))
+	colnames(B)<-rep(Bcolnames,2)
+	Bdown <- B[,seq_len(ncol(B)/2)]
+	Bup <- B[,-seq_len(ncol(B)/2)]
+	nobs <- c(ndown=ndown, nup=1-ndown)	
+	list(Bdown=Bdown, Bup=Bup, nobs=nobs)
+        }
+###Paramater matrix of tar with 2 thresholds,  given the 2 thresh and the delay
+TAR2t_B <- function(gam1,gam2,Delay, yy, xx,z,m){
+	##Threshold dummies
+	dummydown <- ifelse(z[, Delay + 1]<=gam1, 1, 0)
+	regimedown <- dummydown*xx
+	ndown <- mean(dummydown)
+	dummyup <- ifelse(z[, Delay + 1]>gam2, 1, 0)
+	regimeup <- dummyup*xx
+	nup <- mean(dummyup)
+	##SSR from TAR(3)
+	XX <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)		# dim k(p+1) x t	
+	B <- round(matrix(solve(crossprod(XX))%*%crossprod(XX,yy),nrow=1),5)	#SSR
+	Bcolnames <- c("Trend", c(paste("t -", seq_len(m))))
+ 	colnames(B)<-rep(Bcolnames,3)
+	npar<-ncol(B)/3
+	Bdown <- B[,c(1:npar)]
+	Bmiddle <- B[,c(1:npar)+npar]
+	Bup <- B[,c(1:npar)+2*npar]
+	nobs <- c(ndown=ndown, nmiddle=1-ndown-nup,nup=nup)	
+	list(Bdown=Bdown, Bmiddle=Bmiddle, Bup=Bup, nobs=nobs)
+}

@@ -1,5 +1,5 @@
 TVAR_LRtest <- function (data, m=1, d = 1, steps = d, trend=TRUE, series, thDelay = 1:2, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE) {
-    if (missing(series))  series <- deparse(substitute(x))
+    if (missing(series))  series <- deparse(substitute(data))
 y <- as.matrix(data) 
 Torigin <- nrow(y) 	#Size of original sample
 #if(type=="difference") {y<-diff(y)}
@@ -30,7 +30,6 @@ cat("Warning: the thDelay values do not correspond to the univariate implementat
 B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
 res<-Y-Z%*%t(B)
 Sigma<- matrix(1/T*crossprod(res),ncol=k)
-
 
 Y<-t(Y)
 ########################
@@ -73,14 +72,15 @@ z<-as.matrix(z)
 ###############################
 
 if(length(thDelay)==1) 
+	b<-thDelay
+else 
 	b<-1
-else b<-thDelay
 	
-allgammas<-sort(unique(z[,b]))
+allgammas<-sort(z[,b])
 ng<-length(allgammas)
-ninter<-round(trim*ng)
-gammas<-allgammas[ceiling(trim*ng+1):floor((1-trim)*ng-1)]
-
+print(ng)
+nmin<-round(trim*ng)
+gammas<-unique(allgammas[ceiling(trim*ng+1):floor((1-trim)*ng-1)])
 
 ###################
 ###Search function
@@ -118,8 +118,8 @@ SSR_2thresh <- function(gam1,gam2,d,Z,Y,trans){
 	regimeup <- dummyup*Z
 	nup <- mean(dummyup)
 	##SSR from TVAR(3)
-	#print(c(ndown,1-nup-ndown,nup))
-	if(min(nup, ndown, 1-nup-ndown)>trim){
+ 	print(c(ndown,1-nup-ndown,nup))
+	if(min(nup, ndown, 1-nup-ndown)>=trim){
 		Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
 		resid <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
 	}
@@ -135,7 +135,6 @@ Sigma_2thresh <- function(gam1,gam2,d,Z,Y,trans){
 	dummyup <- ifelse(trans[,d]>=gam2, 1, 0)
 	regimeup <- dummyup*Z
 	##SSR from TVAR(3)
-	#print(c(ndown,1-nup-ndown,nup))
 	Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
 	matrix(1/T*tcrossprod(Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2),ncol=k)
 }
@@ -156,28 +155,30 @@ Sigma_mod1thresh<-Sigma_1thresh(gam1=bestThresh, d=bestDelay,Z=Z,Y=Y, trans=z)
 ##################
 
 ###Function for conditional search
-condiStep<-function(allgammas, threshRef, delayRef,ninter, fun,MoreArgs=NULL, target=NULL){
+condiStep<-function(allgammas, threshRef, delayRef, fun,MoreArgs=NULL, target=NULL){
 
 wh.thresh <- which.min(abs(allgammas-threshRef))
 Thr2<-which.min(abs(allgammas-target))
-#search for a second threshold smaller than the first
 
-if(wh.thresh>2*ninter){
-	gammaMinus<-allgammas[seq(from=max(ninter, Thr2-20), to=min(wh.thresh-ninter, Thr2+20))]
+#search for a second threshold smaller than the first
+if(wh.thresh>2*nmin){
+	gammaMinus<-unique(allgammas[seq(from=max(nmin, Thr2-20), to=min(wh.thresh-nmin, Thr2+20))])
 	storeMinus <- mapply(fun, gam1=gammaMinus,gam2=threshRef,MoreArgs=MoreArgs)	
 }
 else
 	storeMinus <- NA
 
 #search for a second threshold higher than the first
-if(length(wh.thresh<length(allgammas)-2*ninter)){
-	gammaPlus<-allgammas[seq(from=max(wh.thresh+ninter,Thr2-20), to=min(length(allgammas)-ninter, Thr2+20))]
+if(wh.thresh<ng-2*nmin){
+	gammaPlus<-unique(allgammas[seq(from=max(wh.thresh+nmin,Thr2-20), to=min(ng-nmin, Thr2+20))])
 	storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus,  MoreArgs=MoreArgs)
 }
 else
 	storePlus <- NA
 
 #results
+
+
 store2 <- c(storeMinus, storePlus)
 
 positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)[1]
@@ -193,8 +194,8 @@ list(newThresh=newThresh, SSR=min(store2, na.rm=TRUE))
 
 ###Applying the function for conditional search to original data
 More<-list(d=bestDelay, Z=Z, Y=Y,trans=z)
-Thresh2<-condiStep(allgammas, bestThresh,ninter=ninter, fun=SSR_2thresh, MoreArgs=More)$newThresh
-Thresh3<-condiStep(allgammas, Thresh2,ninter=ninter, fun=SSR_2thresh, MoreArgs=More)
+Thresh2<-condiStep(allgammas, bestThresh, fun=SSR_2thresh, MoreArgs=More)$newThresh
+Thresh3<-condiStep(allgammas, Thresh2, fun=SSR_2thresh, MoreArgs=More)
 smallThresh<-min(Thresh2, Thresh3$newThresh)
 bigThresh<-max(Thresh2, Thresh3$newThresh)
 
@@ -207,7 +208,7 @@ Sigma_mod2thresh<-Sigma_2thresh(gam1=smallThresh,gam2=bigThresh,d=bestDelay, Z=Z
 LRtest12<-as.numeric(t*(log(det(Sigma))-log(det(Sigma_mod1thresh))))
 LRtest13<-as.numeric(t*(log(det(Sigma))-log(det(Sigma_mod2thresh))))
 LRtest23<-as.numeric(t*(log(det(Sigma_mod1thresh))-log(det(Sigma_mod2thresh))))
-LRs<-c(LRtest12, LRtest13, LRtest23)
+LRs<-matrix(c(LRtest12, LRtest13, LRtest23),ncol=3, dimnames=list("LRtest", c("1vs2", "1vs3", "2vs3")))
 
 ##############################
 ###Bootstrap for the F test
@@ -259,7 +260,7 @@ for(i in (m+1):(nrow(y))){
 		Yb2[i,]<-rowSums(cbind(B1tUp[,1], B1tUp[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
 	z2[i]<-Yb2[i,]%*%combin
 	}
-# print(cbind(x,z2))
+# print(cbind(data,z2))
 return(Yb2)
 }#end boot1thresh
 
@@ -296,9 +297,8 @@ zb<-as.matrix(zb)
 
 #  print(cbind(z,zb))
 
-allgammasb<-sort(unique(zb[,b]))
-ng<-length(allgammasb)
-gammasb<-allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)]
+allgammasb<-sort(zb[,b])
+gammasb<-unique(allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)])
 
 
 ###One threshold Search on bootstrap data
@@ -309,11 +309,11 @@ bestDelayb<-IDSb[which.min(resultb),1]
 bestThreshb<-IDSb[which.min(resultb),2]
 
 Sigma_mod1threshb<-Sigma_1thresh(gam1=bestThreshb, d=bestDelayb,Z=Zb,Y=t(Yboot), trans=zb)
-
+print(bestThreshb)
 ###Two threshold Search (conditional and 1 iteration) on bootstrap data
 Moreb<-list(d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
-Thresh2b<-condiStep(allgammasb, bestThreshb,ninter=ninter, fun=SSR_2thresh, MoreArgs=Moreb)$newThresh
-Thresh3b<-condiStep(allgammasb, Thresh2b,ninter=ninter, fun=SSR_2thresh, MoreArgs=Moreb)
+Thresh2b<-condiStep(allgammasb, bestThreshb, fun=SSR_2thresh, MoreArgs=Moreb)$newThresh
+Thresh3b<-condiStep(allgammasb, Thresh2b, fun=SSR_2thresh, MoreArgs=Moreb)
 smallThreshb<-min(Thresh2b, Thresh3b$newThresh)
 bigThreshb<-max(Thresh2b, Thresh3b$newThresh)
 
@@ -385,11 +385,11 @@ return(list(bestDelay=bestDelay, LRtest.val=LRs, Pvalueboot=PvalBoot, CriticalVa
 
 
 if(FALSE){ #usage example
-environment(TVAR_LRtest)<-environment(star)
+# environment(TVAR_LRtest)<-environment(star)
 data(zeroyld)
 data<-zeroyld
 
-
 TVAR_LRtest(data, m=2, mTh=1,thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs")
+
 }
 
