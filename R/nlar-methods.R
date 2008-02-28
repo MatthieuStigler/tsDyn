@@ -118,11 +118,15 @@ mse.nlar <- function(object, ...)
   sum(object$residuals^2)/object$str$n.used
 
 #AIC for the fitted nlar model
-AIC.nlar <- function(object, ...){
+AIC.nlar <- function(object,k=2, ...){
   n <- object$str$n.used
-  k <- object$k
-  n * log( mse(object) ) + 2 * k
+  npar <- object$k
+  n * log( mse(object) ) + k * npar
 }
+
+#BIC for the fitted nlar model
+BIC.nlar <- function(object, ...)
+	AIC.nlar(object, k=log(object$str$n.used))
 
 #Mean Absolute Percent Error
 MAPE <- function(object, ...)

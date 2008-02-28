@@ -25,7 +25,7 @@ linear <- function(x, m, d=1, steps=d, series) {
 	colnames(xx) <- c("(intercept)", paste("phi",1:(ncol(xx)-1), sep="."))
 	res <- lm.fit(xx, yy)
 	return(extend(nlar(str, coefficients=res$coefficients, fitted.values=res$fitted.values,
-		residuals=res$residuals, k=res$df, model.specific=res), 
+		residuals=res$residuals, k=res$rank, model.specific=res), 
 		"linear"))
 }
 
