@@ -139,3 +139,38 @@ TAR2t_B <- function(gam1,gam2,Delay, yy, xx,z,m){
 	nobs <- c(ndown=ndown, nmiddle=1-ndown-nup,nup=nup)	
 	list(Bdown=Bdown, Bmiddle=Bmiddle, Bup=Bup, nobs=nobs)
 }
+
+###Check if the AR coefficients in each regime lie inside the unit circle
+is.InUnitCircle<-function(B,trend,m, nthresh){
+if(trend)
+	a<-1
+else
+	a<-0
+B<-as.vector(B)
+
+para<-B[a+seq_len(m)]
+charPol<-c(1, -para)
+
+val1<-polyroot(charPol)
+root<-Mod(val1)
+
+if(nthresh==1|nthresh==2){
+	para2<-B[a+seq_len(m)+m+a]
+	charPol2<-c(1, -para2)
+	val2<-polyroot(charPol2)
+	root<-matrix(c(root,Mod(val2)), nrow=1)
+	colnames(root)<-c(paste("reg", rep(1,m)),paste("reg", rep(2,m)))
+	if(nthresh==2){
+		para3<-B[a+seq_len(m)+2*(m+a)]
+		charPol3<-c(1, -para3)
+		val3<-polyroot(charPol3)
+		root<-matrix(c(root, Mod(val3)), nrow=1)
+		colnames(root)<-c(paste("reg", rep(1,m)),paste("reg", rep(2,m)),paste("reg", rep(3,m)))
+	}
+}
+
+if(any(root<=1))
+	list(warn=TRUE, root=root)
+else
+	list(warn=FALSE, root=root)
+}

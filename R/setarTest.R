@@ -11,13 +11,18 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
 	if(!missing(mL) |!missing(mH)) warning("The function may have some errors if you specify mL or mH")
     if (missing(mL)) { mL <- m    }
     if (missing(mH)) { mH <- m    }
-	
+
 ###Linear model
 xxlin<-cbind(1,xx)
 linear <- lm.fit(xxlin, yy)
 SSR<-as.numeric(crossprod(linear$residuals))
 B<-linear$coeff
 
+is<-is.InUnitCircle(B, trend=TRUE, m=m, nthresh=0)
+if(is$warn==TRUE){
+	warning("The AR coefficients of the linear model lie inside the unit circle,\n thus the serie can be non-stationnary and the bootstrap distribution biased")
+	cat("\nUnit roots\n")
+	print(is$root)}
 ###Threshold transition variable
 
 
@@ -41,11 +46,11 @@ if(length(thDelay)==1)
 	b<-thDelay
 else 
 	b<-1
-trans<-z[,b+1]
-allgammas<-sort(trans)
+
+allgammas<-sort(z[,b+1])
 ng<-length(allgammas)
 nmin<-round(trim*ng)
-gammas<-unique(allgammas[ceiling(trim*ng+1):floor((1-trim)*ng)])
+gammas<-unique(allgammas[(nmin+1):(ng-nmin-1)])
 
 
 ### Threshold model
@@ -61,8 +66,16 @@ TAR1t_SSR<-function(parameters,yy, xxl,xxh,z) {#
 	Delay<-parameters[1]
 	gammai<-parameters[2]
         isL <- ifelse(z[, Delay + 1]<= gammai,1,0)	### isL: dummy 
-        xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
-	crossprod(yy - xxthresh %*% chol2inv(chol(crossprod(xxthresh)))%*%crossprod(xxthresh,yy))
+	ndown<-mean(isL)	
+
+	if(min(ndown, 1-ndown)>=trim){
+# print(min(ndown, 1-ndown))
+        	xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
+# print(xxthresh)
+		res<-crossprod(yy - xxthresh %*% chol2inv(chol(crossprod(xxthresh)))%*%crossprod(xxthresh,yy))}
+	else
+		res<-NA
+	return(res)
         }
 
 TAR2t_SSR <- function(gam1,gam2,Delay, yy, xx,z){
@@ -75,49 +88,16 @@ TAR2t_SSR <- function(gam1,gam2,Delay, yy, xx,z){
 	nup <- mean(dummyup)
 #  print(min(nup, ndown, 1-nup-ndown)>trim)
 	##SSR from TAR(3)
+#  print(min(nup, ndown, 1-nup-ndown))
 	if(min(nup, ndown, 1-nup-ndown)>=trim){
 		XX <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)		# dim k(p+1) x t	
 		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSR
 	}
 	else
 		res <- NA
-#   	print(c(ndown,1-nup-ndown,nup, gam1, gam2,res,min(nup, ndown, 1-nup-ndown)>trim))
-
 	return(res)
 }
-TAR1t_B<-function(Delay,gamma,yy, xxl,xxh,z,m) {#
-        isL <- ifelse(z[, Delay + 1]<= gamma,1,0)	### isL: dummy 
-	ndown<-mean(isL)
-        xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
-	B<-round(matrix(solve(crossprod(xxthresh))%*%crossprod(xxthresh,yy), nrow=1),5)
-	Bcolnames <- c("Trend", c(paste("t -", seq_len(m))))
-	colnames(B)<-rep(Bcolnames,2)
-	Bdown <- B[,seq_len(ncol(B)/2)]
-	Bup <- B[,-seq_len(ncol(B)/2)]
-	nobs <- c(ndown=ndown, nup=1-ndown)	
-	list(Bdown=Bdown, Bup=Bup, nobs=nobs)
-        }
 
-TAR2t_B <- function(gam1,gam2,Delay, yy, xx,z,m){
-	##Threshold dummies
-	dummydown <- ifelse(z[, Delay + 1]<=gam1, 1, 0)
-	regimedown <- dummydown*xx
-	ndown <- mean(dummydown)
-	dummyup <- ifelse(z[, Delay + 1]>gam2, 1, 0)
-	regimeup <- dummyup*xx
-	nup <- mean(dummyup)
-	##SSR from TAR(3)
-	XX <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)		# dim k(p+1) x t	
-	B <- round(matrix(solve(crossprod(XX))%*%crossprod(XX,yy),nrow=1),5)	#SSR
-	Bcolnames <- c("Trend", c(paste("t -", seq_len(m))))
- 	colnames(B)<-rep(Bcolnames,3)
-	npar<-ncol(B)/3
-	Bdown <- B[,c(1:npar)]
-	Bmiddle <- B[,c(1:npar)+npar]
-	Bup <- B[,c(1:npar)+2*npar]
-	nobs <- c(ndown=ndown, nmiddle=1-ndown-nup,nup=nup)	
-	list(Bdown=Bdown, Bmiddle=Bmiddle, Bup=Bup, nobs=nobs)
-}
 ##################
 ###One threshold
 ##################
@@ -129,7 +109,7 @@ bestDelay<-IDS[which.min(result),1]
 bestThresh<-IDS[which.min(result),2]
 cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result), "\n")
 B1t<-TAR1t_B(Delay=bestDelay,gamma=bestThresh,yy=yy, xxl=xxl,xxh=xxh,z=z, m=m)
-print(B1t)
+
 ##################
 ###Two thresholds
 ##################
@@ -176,9 +156,23 @@ Thresh2<-condiStep(allgammas=sort(z[,bestDelay+1]), bestThresh, MoreArgs=More)$n
 Thresh3<-condiStep(allgammas=sort(z[,bestDelay+1]), Thresh2, MoreArgs=More)
 
 B2t<-TAR2t_B(gam1=min(Thresh3$newThresh,Thresh2),gam2=max(Thresh3$newThresh,Thresh2),Delay=bestDelay, yy=yy, xx=xxlin,z=z,m=m)
-print(B2t)
+print(list(thresh1=B1t, thresh2=B2t))
 
-SSR1thresh<-min(result)
+###Verification of stationarity of data
+is1t<-is.InUnitCircle(unlist(B1t), trend=TRUE, m=m, nthresh=1)
+if(is1t$warn==TRUE){
+	cat("Characteristic roots of 1 threshold model\n")
+ 	print(is1t$root)
+	warning("The AR coefficients of one regime of 1 threshold model lie inside the unit circle,\n thus the serie can be non-stationnary and the bootstrap distribution biased")
+}
+is2t<-is.InUnitCircle(unlist(B2t), trend=TRUE, m=m, nthresh=2)
+if(is2t$warn==TRUE){
+	cat("Characteristic roots of 2 thresholds model\n")
+ 	print(is2t$root)
+	warning("The AR coefficients of one regime of 2 thresholds model lie inside the unit circle,\n thus the serie can be non-stationnary")
+}
+
+SSR1thresh<-min(result, na.rm=TRUE)
 SSR2thresh<-Thresh3$SSR
 SSRs<-matrix(c(SSR, SSR1thresh, SSR2thresh), ncol=3, dimnames=list("SSR", c("AR", "TAR(1)", "TAR(2)")))
 
@@ -216,6 +210,7 @@ for(i in (m+1):length(x)){
 	}
 return(xboot)
 }
+
 ### Reconstruction of series from 1 thresh model for Ftest 2vs3
 #initial data
 isL <- ifelse(z[, bestDelay + 1]<= bestThresh,1,0)	### isL: dummy 
@@ -236,7 +231,8 @@ z2[1:m]<-x[1:m]
 #Loop
 boot1thresh<-function(x){
 resib2<-c(rep(0,m),sample(res1thresh, replace=TRUE))			#residual sampling, 
-#resib2<-c(rep(0,m),res1thresh)					#uncomment this line to verify the bootstrap
+if(check){
+	resib2<-c(rep(0,m),res1thresh)}					#uncomment this line to verify the bootstrap
 
 
 for(i in (m+1):length(x)){
@@ -248,7 +244,6 @@ for(i in (m+1):length(x)){
 	}
 return(xboot2)
 }
-
 
 #####Bootstrap loop
 test<-match.arg(test)
@@ -263,6 +258,7 @@ string<-embed(xboot,m+1)
 stringxx<-matrix(string[,-1], ncol=m)
 xxb<-cbind(1,stringxx)
 yyb <- string[,1]
+
 SSRb<-crossprod(yyb-xxb%*%chol2inv(chol(crossprod(xxb)))%*%crossprod(xxb,yyb)) #SSR 
 
 
@@ -310,9 +306,9 @@ Ftestboot23<-unlist(Ftestboot[3,])
 
 PvalBoot12<-mean(ifelse(Ftestboot12>Ftest12,1,0))
 CriticalValBoot12<-quantile(Ftestboot12, probs=c(0.9, 0.95, 0.975,0.99))
-PvalBoot13<-mean(ifelse(Ftestboot13>Ftest12,1,0))
+PvalBoot13<-mean(ifelse(Ftestboot13>Ftest13,1,0))
 CriticalValBoot13<-quantile(Ftestboot13, probs=c(0.9, 0.95, 0.975,0.99))
-PvalBoot23<-mean(ifelse(Ftestboot23>Ftest12,1,0))
+PvalBoot23<-mean(ifelse(Ftestboot23>Ftest23,1,0))
 CriticalValBoot23<-quantile(Ftestboot23, probs=c(0.9, 0.95, 0.975,0.99))
 
 if(test=="1vs"){
@@ -350,7 +346,7 @@ if(plot==TRUE&nboot>0){
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 	}
 	else {
-	plot(density(Ftestboot23), xlab="Ftest23", xlim=c(0,max(Ftest23+1,Ftestboot23)), ylim=c(0,max(density(Ftestboot23)$y,dchisq(0:Ftest12, df=1+m))), main="Test 1 threshold TAR vs 2 thresholds TAR")
+	plot(density(Ftestboot23), xlab="Ftest23", xlim=c(0,max(Ftest23+1,Ftestboot23)), ylim=c(0,max(density(Ftestboot23)$y)), main="Test 1 threshold TAR vs 2 thresholds TAR")
 	abline(v=Ftest23, lty=2, col=2)
 	curve(dchisq(x, df=1+m, ncp=0), from=0, n=Ftest23+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
@@ -371,5 +367,6 @@ environment(setarTest)<-environment(setar)
 #Transformation like in Hansen 1999
 sun<-(sqrt(sunspot.year+1)-1)*2
 
-setarTest(sun, m=11, thDelay=0:1, nboot=2, plot=TRUE, trim=0.1, test="1vs")
+setarTest(sun, m=11, thDelay=0:1, nboot=20, plot=TRUE, trim=0.1, test="2vs3")
 }
+

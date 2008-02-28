@@ -337,9 +337,9 @@ LRtestboot23<-unlist(LRtestboot[3,])
 
 PvalBoot12<-mean(ifelse(LRtestboot12>LRtest12,1,0))
 CriticalValBoot12<-quantile(LRtestboot12, probs=c(0.9, 0.95, 0.975,0.99))
-PvalBoot13<-mean(ifelse(LRtestboot13>LRtest12,1,0))
+PvalBoot13<-mean(ifelse(LRtestboot13>LRtest13,1,0))
 CriticalValBoot13<-quantile(LRtestboot13, probs=c(0.9, 0.95, 0.975,0.99))
-PvalBoot23<-mean(ifelse(LRtestboot23>LRtest12,1,0))
+PvalBoot23<-mean(ifelse(LRtestboot23>LRtest23,1,0))
 CriticalValBoot23<-quantile(LRtestboot23, probs=c(0.9, 0.95, 0.975,0.99))
 
 if(test=="1vs"){

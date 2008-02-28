@@ -41,6 +41,9 @@ if(ndig>.Options$digits){
 npar<-ncol(xx)
 if(trend)
 	npar<-ncol(xx)+1
+
+
+
 ###Threshold transition variable
 
     if (!missing(thDelay)) {  
@@ -98,8 +101,14 @@ if(missing(sigma))
 	sigma<-Sigma
 }
 
+###Verification of stability
+is<-is.InUnitCircle(B, trend=trend, m=m, nthresh=nthresh)
+if(is$warn==TRUE){
+	warning("The AR coefficients of one regime lie inside the unit circle, thus the serie can be non-stationnary")
+	cat("\nUnit roots\n")
+	print(is$root)}
 ##############################
-###Bootstrap for the F test
+###Bootstrap
 ##############################
 #initial values
 Yb<-vector("numeric", length=length(y))		#Delta Y term
@@ -184,3 +193,4 @@ TAR_simul(data=sun,nthresh=2,n=500, type="boot", Thresh=c(7,9))$serie
 cbind(TAR_simul(data=sun,nthresh=2,n=500, type="check", Thresh=c(7,9))$serie,sun)
 
 }
+
