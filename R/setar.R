@@ -356,11 +356,11 @@ toLatex.setar <- function(object, digits=3, ...) {
 	res[1] <- "\\["
   res[2] <- paste("X_{t+",steps,"} = \\left\\{\\begin{array}{lr}",sep="")
 	res[3] <- betaL[1]
-  for(j in 1:(mL-1))
+  for(j in seq_len(mL-1))
 		res[3] <- paste(res[3],betaL[j+1]," X_{t-",  (j-1)*d,"}",sep="")
 	res[3] <- paste(res[3],betaL[mL+1]," X_{t-",  (mL-1)*d,"}", "& Z_t \\leq ",beta["th"],"\\\\",sep="")
   res[4] <- betaH[1]
-  for(j in 1:(mH-1))
+  for(j in seq_len(mH-1))
     res[4] <- paste(res[4], betaH[j+1]," X_{t-",  (j-1)*d,"} ",sep="")
 	res[4] <- paste(res[4], betaH[mL+1]," X_{t-",  (mH-1)*d,"}", "& Z_t > ",beta["th"],"\\\\",sep="")
 	res[5] <- "\\end{array}\\right."
@@ -372,7 +372,7 @@ toLatex.setar <- function(object, digits=3, ...) {
     m <- obj$str$m
 		res[8] <- "\\["
 		res[9] <- "Z_t = "
-    for(j in 1:m) {
+    for(j in seq_len(m)) {
       if(obj$model$mTh[j]==1)
         res[9] <- paste(res[9],"X_{t-",(j-1)*d,"} ",sep="")
       else if(obj$model$mTh[j]!=0)
