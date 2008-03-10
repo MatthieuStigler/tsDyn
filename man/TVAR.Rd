@@ -6,7 +6,7 @@
 Estimate a multivariate Threshold VAR
 }
 \usage{
-OlsTVAR(data, lag, type=c("level", "difference"), trend=TRUE, nthresh=1, trim=0.1, ngrid, gamma=NULL, thDelay=1, mTh=1, thVar, around, plot=TRUE,dummyToBothRegimes=TRUE)
+OlsTVAR(data, lag, demean = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=TRUE, dummyToBothRegimes=TRUE)
 }
 \value{
 Fitted model data
@@ -14,18 +14,19 @@ Fitted model data
 \arguments{
 \item{data}{ time series }
 \item{lag}{Number of lags to include in each regime}
-\item{type}{If the variables are to be first differenced (difference) or not (level)}
-\item{trend}{If a trend should be included in the model}
-\item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases.  }
-\item{thVar}{external transition variable}
+\item{demean} {Type of deterministic regressors to include}
+\item{model}{If the transition variable is taken in levels (TAR) or difference (MTAR)}
+\item{commonInter}{Whether the deterministic regressors are regime specific (commonInter=FALSE) or not.}
+\item{nthresh}{Number of thresholds}
+\item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases. }
 \item{mTh}{combination of variables with same lag order for the transition variable. Either a single value (indicating which variable to take) or a combination}
-\item{gamma}{prespecified threshold values}
-\item{nthresh}{number of threshold (see details)}
-\item{ngrid}{number of elements of the grid, especially for \code{nthresh=3}}
-\item{around}{The grid search is restricted to \var{ngrid} values around this point. Especially useful for \code{nthresh=3}. }
+\item{thVar}{external transition variable}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
-\item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
+\item{ngrid}{number of elements of the grid, especially for \code{nthresh=3}}
+\item{gamma}{prespecified threshold values}
+\item{around}{The grid search is restricted to \var{ngrid} values around this point. Especially useful for \code{nthresh=3}. }
 \item{plot} {Whether a plot showing the results of the grid search should be printed}
+\item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
 }
 \details{
 For fixed \code{th} and threshold variable, the model is linear, so estimation can be done directly by CLS (Conditional Least Squares). The search of the parameters values is made upon a grid of potential values. So it is pretty slow.

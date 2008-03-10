@@ -7,18 +7,20 @@
 Self Exciting Threshold AutoRegressive model.
 }
 \synopsis{
-setar(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh,
-			thVar, th, trace=FALSE, nested=FALSE)
+setar(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,demean = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"))
 }
 \usage{
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thDelay=0, th,
-trace=FALSE)
+trace=FALSE,demean = c( "const", "trend","none", "both"), 
+common=FALSE, model=c("TAR", "MTAR"))
 
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, mTh, th,
-trace=FALSE)
+trace=FALSE,demean = c( "const", "trend","none", "both"), 
+common=FALSE, model=c("TAR", "MTAR"))
 
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thVar, th,
-trace=FALSE)
+trace=FALSE,demean = c( "const", "trend","none", "both"), 
+common=FALSE, model=c("TAR", "MTAR"))
 }
 \value{
   An object of class \code{nlar}, subclass \code{setar}
@@ -48,6 +50,9 @@ trace=FALSE)
 \item{thVar}{external threshold variable}
 \item{th}{threshold value (if missing, a search over a resonable grid is tried)}
 \item{trace}{should additional infos be printed? (logical)}
+\item{demean} {Type of deterministic regressors to include}
+\item{common}{Whether the deterministic regressors are regime specific (common=FALSE) or not.}
+\item{model}{Currently not implemented}
 \item{...}{further arguments to be passed to \code{nlar}}
 }
 \details{

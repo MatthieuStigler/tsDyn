@@ -1,4 +1,4 @@
-TVECM_SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE) {
+TVECM_SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, check=FALSE) {
 y<-as.matrix(data)
 T<-nrow(y)
 k<-ncol(y)
@@ -139,19 +139,21 @@ Xminus1[1:(lag+1),]<-y[(1):(lag+1),]
 ECTtminus1<-matrix(0,nrow=nrow(y), ncol=1)		#ECT term
 
 
-
-
 ###Boostrap the residuals
 bootstraploop<-function(vec_beta){
 
-resb<-rbind(0,apply(resSig,2,sample, replace=TRUE))
-#resb<-rbind(matrix(0,nrow=lag, ncol=k),resSig)		#uncomment this line to check the adequacy
+
+resb<-rbind(matrix(0,nrow=lag, ncol=k),apply(resSig,2,sample, replace=TRUE))
+if(check)
+	resb<-rbind(matrix(0,nrow=lag, ncol=k),resSig)		#uncomment this line to check the adequacy
 for(i in (lag+2):(nrow(y)-1)){
 	Xminus1[i,]<-Xminus1[i-1,]+Yb[i-1,]
 	ECTtminus1[i]<-Xminus1[i,]%*%vec_beta
-	Yb[i,]<-apply(cbind(Bsig[,3], Bsig[,-c(1:3)]%*%matrix(t(Yb[i-c(1:lag),]), ncol=1),resb[i,]),1,sum)
-	if(ECTtminus1[i]<gamma1Sigma) {Yb[i,]<-apply(cbind(Bsig[,1]*ECTtminus1[i,],Yb[i,]),1,sum)}
-	if(ECTtminus1[i]>gamma2Sigma) {Yb[i,]<-apply(cbind(Bsig[,2]*ECTtminus1[i,],Yb[i,]),1,sum)}
+	Yb[i,]<-apply(cbind(Bsig[,3], Bsig[,-c(1:3)]%*%matrix(t(Yb[i-c(1:lag),]),ncol=1),resb[i,]),1,sum)
+	if(ECTtminus1[i]<gamma1Sigma) {
+		Yb[i,]<-apply(cbind(Bsig[,1]*ECTtminus1[i,],Yb[i,]),1,sum)}
+	if(ECTtminus1[i]>gamma2Sigma) {
+		Yb[i,]<-apply(cbind(Bsig[,2]*ECTtminus1[i,],Yb[i,]),1,sum)}
 }
 
 yboot<-apply(rbind(y[1,],Yb),2,cumsum)			#same as diffinv but it did not work
@@ -167,6 +169,7 @@ gammasb<-sort(unique(ECTboot))[inf:sup]
 storeb<-matrix(0, nrow=ng,ncol=ng)
 
 ###Loop for values of the grid
+
 for(i in 1:length(gammasb)){
 	gam1<-gammasb[i]
 	for (j in 1:length(gammasb)){
@@ -206,5 +209,5 @@ data(zeroyld)
 data<-zeroyld
 
 
-TVECM_SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=1, plot=FALSE)
+TVECM_SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=1, plot=FALSE, check=TRUE)
 }

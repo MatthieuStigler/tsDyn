@@ -1,16 +1,23 @@
-TVAR_LRtest <- function (data, m=1, d = 1, steps = d, trend=TRUE, series, thDelay = 1:2, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE) {
-    if (missing(series))  series <- deparse(substitute(data))
+TVAR_LRtest <- function (data, m=1, d = 1, steps = d, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
+
+if (missing(series))  series <- deparse(substitute(data))
 y <- as.matrix(data) 
+ndig<-getndp(y)
+y<-round(y,ndig)
 Torigin <- nrow(y) 	#Size of original sample
-#if(type=="difference") {y<-diff(y)}
+
 T <- nrow(y) 		#Size of start sample
 t <- T-m 		#Size of end sample
 k <- ncol(y) 		#Number of variables
 p<-m
+
+model<-match.arg(model)
 if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", seq_len(k), sep="")
 if(max(thDelay)>m)
 	stop("Max of thDelay should be smaller or equal to the number of lags")
+if(m<1)
+	stop("m should be at least 1")
 ndig<-getndp(y)
 Y <- y[(m+1):T,] #
 Z <- embed(y, m+1)[, -seq_len(k)]	#Lags matrix
@@ -53,7 +60,7 @@ else {
 	if (length(mTh) > k)
 		stop("length of 'mTh' should be equal to the number of variables, or just one")
 	if(length(mTh)==1) {
-		if(mTh>p)
+		if(mTh>k)
 			stop("mTh too big, should be smaller or equal to the number of variables")
 		combin <- matrix(0,ncol=1, nrow=k)
 		combin[mTh,]<-1
@@ -61,10 +68,18 @@ else {
 	else 
 		combin<-matrix(mTh,ncol=1, nrow=k)
 	zcombin <- y %*% combin
-	z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+	if(model=="MTAR"){
+		if(max(thDelay)<p)
+			z<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
+		else if(max(thDelay)==p){
+			z<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
+			z<-rbind(0,as.matrix(z))}
+	}
+	else
+		z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
 }
 z<-as.matrix(z)
-
+z<-round(z,ndig)
 
 
 ###############################
@@ -78,9 +93,10 @@ else
 	
 allgammas<-sort(z[,b])
 ng<-length(allgammas)
-print(ng)
+# print(ng)
 nmin<-round(trim*ng)
 gammas<-unique(allgammas[ceiling(trim*ng+1):floor((1-trim)*ng-1)])
+
 
 ###################
 ###Search function
@@ -91,11 +107,13 @@ SSR_1thresh<- function(grid,Z,Y, trans){
 	gam1<-grid[2]
 	##Threshold dummies
 	d1<-ifelse(trans[,d]<gam1, 1,0)
-	regimeDown <- d1 * Z
-	regimeUp<-(1-d1)*Z
-	##SSR
-	Z1 <- t(cbind(regimeDown, regimeUp))		# dim k(p+1) x t
-	crossprod(c(Y - tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))%*% Z1))
+	ndown<-mean(d1)
+	if(min(ndown, 1-ndown)>=trim){
+		Z1 <- t(cbind(d1 * Z, (1-d1)*Z))		# dim k(p+1) x t
+		res<-crossprod(c(Y - tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))%*% Z1))}
+	else
+		res<-NA
+	return(res)
 } #end of the function
 
 Sigma_1thresh<- function(gam1, d,Z,Y, trans){
@@ -118,7 +136,7 @@ SSR_2thresh <- function(gam1,gam2,d,Z,Y,trans){
 	regimeup <- dummyup*Z
 	nup <- mean(dummyup)
 	##SSR from TVAR(3)
- 	print(c(ndown,1-nup-ndown,nup))
+#  	print(c(ndown,1-nup-ndown,nup))
 	if(min(nup, ndown, 1-nup-ndown)>=trim){
 		Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
 		resid <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
@@ -145,9 +163,11 @@ Sigma_2thresh <- function(gam1,gam2,d,Z,Y,trans){
 
 IDS<-as.matrix(expand.grid(thDelay, gammas)) 
 result <- apply(IDS, 1, SSR_1thresh,Z=Z, Y=Y,trans=z)
-bestDelay<-IDS[which.min(result),1]
-bestThresh<-IDS[which.min(result),2]
-cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result), "\n")
+posBest<-which(result==min(result, na.rm=TRUE))
+bestDelay<-IDS[posBest,1]
+bestThresh<-IDS[posBest,2]
+
+cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result, na.rm=TRUE), "\n")
 
 Sigma_mod1thresh<-Sigma_1thresh(gam1=bestThresh, d=bestDelay,Z=Z,Y=Y, trans=z)
 ##################
@@ -221,13 +241,12 @@ Yb<-matrix(0, nrow=nrow(y), ncol=k)		#Delta Y term
 Yb[1:m,]<-y[1:m,]			
 
 bootlinear<-function(x){
-resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin[sample(seq_len(nrow(res_lin)), replace=TRUE),])
-if(check)
-	resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin)		#Uncomment this line to check the bootstrap
-
-for(i in (m+1):(nrow(y))){
-	Yb[i,]<-rowSums(cbind(B[,1], B[,-1]%*%matrix(t(Yb[i-c(1:m),]), ncol=1),resi[i,]))
-}
+	resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin[sample(seq_len(nrow(res_lin)), replace=TRUE),])
+	if(check)
+		resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin)		#Uncomment this line to check the bootstrap
+	for(i in (m+1):(nrow(y))){
+		Yb[i,]<-rowSums(cbind(B[,1], B[,-1]%*%matrix(t(Yb[i-c(1:m),]), ncol=1),resi[i,]))
+	}
 return(Yb)
 }#end bootlinear
 # print(cbind(y, Yb))
@@ -249,27 +268,45 @@ z2<-vector("numeric", length=nrow(y))
 z2[1:m]<-y[1:m,]%*%combin			
 
 boot1thresh<-function(x){	
-resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
-if(check)
-	resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)
+	resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
+	if(check)
+		resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)
 
-for(i in (m+1):(nrow(y))){
-	if(round(z2[i-bestDelay],ndig)<=bestThresh) 
-		Yb2[i,]<-rowSums(cbind(B1tDown[,1], B1tDown[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
-	else
-		Yb2[i,]<-rowSums(cbind(B1tUp[,1], B1tUp[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
+	for(i in (m+1):(nrow(y))){
+		if(round(z2[i-bestDelay],ndig)<= bestThresh) 
+			Yb2[i,]<-rowSums(cbind(B1tDown[,1], B1tDown[,-1]%*%matrix(t(Yb2[i-c(1:m),]), 	ncol=1),resiT[i,]))
+		else
+			Yb2[i,]<-rowSums(cbind(B1tUp[,1], B1tUp[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
 	z2[i]<-Yb2[i,]%*%combin
 	}
 # print(cbind(data,z2))
+	return(Yb2)
+}#end boot1thresh
+
+boot1threshBIS<-function(x){	
+	resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
+	if(check)
+		resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)
+
+	for(i in (m+1):(nrow(y))){
+		if(round(z2[i-bestDelay]-z2[i-bestDelay-1],ndig)<= bestThresh) 
+			Yb2[i,]<-rowSums(cbind(B1tDown[,1], B1tDown[,-1]%*%matrix(t(Yb2[i-c(1:m),]), 	ncol=1),resiT[i,]))
+		else
+			Yb2[i,]<-rowSums(cbind(B1tUp[,1], B1tUp[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
+		z2[i]<-(Yb2[i,])%*%combin
+	}
 return(Yb2)
 }#end boot1thresh
 
-
-
 #####Bootstrap loop
-model<-match.arg(test)
-test<-switch(model, "1vs"="1vs", "2vs3"="2vs3")
-bootModel<-switch(model, "1vs"=bootlinear, "2vs3"=boot1thresh)
+test<-match.arg(test)
+test<-switch(test, "1vs"="1vs", "2vs3"="2vs3")
+if(model=="TAR")
+	bootThresh<-boot1thresh
+else
+	bootThresh<-boot1threshBIS
+	
+bootModel<-switch(test, "1vs"=bootlinear, "2vs3"=bootThresh)
 
 bootstraploop<-function(x, thVar=NULL){
 
@@ -292,7 +329,15 @@ if(!missing(thVar))
 	{stop("thVar currently badly implemented"); zcombin<-thVar}
 else 
 	zcombin<-xboot%*%combin
-zb <- embed(zcombin,m+1)[,seq_len(max(thDelay))+1]
+if(model=="MTAR"){
+	if(max(thDelay)<p)
+		zb<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
+	else if(max(thDelay)==p){
+		zb<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
+		zb<-rbind(0,as.matrix(zb))}
+}
+else
+	zb <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
 zb<-as.matrix(zb)
 
 #  print(cbind(z,zb))
@@ -305,11 +350,12 @@ gammasb<-unique(allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)])
 
 IDSb<-as.matrix(expand.grid(thDelay, gammasb))
 resultb <- apply(IDSb, 1, SSR_1thresh,Z=Zb, Y=t(Yboot),trans=zb)
-bestDelayb<-IDSb[which.min(resultb),1]
-bestThreshb<-IDSb[which.min(resultb),2]
+postBestb<-which(resultb==min(resultb, na.rm=TRUE))[1]
+bestDelayb<-IDSb[postBestb,1]
+bestThreshb<-IDSb[postBestb,2]
 
 Sigma_mod1threshb<-Sigma_1thresh(gam1=bestThreshb, d=bestDelayb,Z=Zb,Y=t(Yboot), trans=zb)
-print(bestThreshb)
+# print(bestThreshb)
 ###Two threshold Search (conditional and 1 iteration) on bootstrap data
 Moreb<-list(d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
 Thresh2b<-condiStep(allgammasb, bestThreshb, fun=SSR_2thresh, MoreArgs=Moreb)$newThresh
@@ -385,11 +431,14 @@ return(list(bestDelay=bestDelay, LRtest.val=LRs, Pvalueboot=PvalBoot, CriticalVa
 
 
 if(FALSE){ #usage example
-# environment(TVAR_LRtest)<-environment(star)
+environment(TVAR_LRtest)<-environment(star)
 data(zeroyld)
-data<-zeroyld
+data<-zeroyld[1:150,]
 
-TVAR_LRtest(data, m=2, mTh=1,thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs")
-
+TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
+###Todo
+#does not work TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
+#TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="2vs3", check=TRUE, model="MTAR")
 }
+
 

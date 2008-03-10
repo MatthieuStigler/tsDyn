@@ -1,7 +1,8 @@
-TVAR_simul<-function(data,B,Thresh, nthresh=1, type=c("boot", "simul", "check"), sigma,n=200, lag=1, trend=TRUE,  thDelay=1,  thVar=NULL, mTh=1, starting=NULL){
+TVAR_simul<-function(data,B,Thresh, nthresh=1, type=c("simul","boot", "check"), sigma,n=200, lag=1, trend=TRUE,  thDelay=1,  thVar=NULL, mTh=1, starting=NULL){
 if(!missing(data)&!missing(B))
 	stop("You have to provide either B or y, but not both")
 p<-lag
+type<-match.arg(type)
 
 if(!missing(B)){
 	if(type!="simul"){
@@ -9,8 +10,9 @@ if(!missing(B)){
 		warning("Type check or boot are only avalaible with pre specified data. The type simul was used")}
 	if(missing(sigma)){
 		warning("sigma is missing, the values taken are 0.25 for each variable")
-		sigma<-rep(0.25,k)}
+		sigma<-rep(0.25,nrow(B))}
 	nB<-nrow(B)
+	ndig<-4
 	esp<-p*nB
 	if(trend)
 		esp<-p*nB+1
@@ -23,12 +25,10 @@ if(!missing(B)){
 		else
 			stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables")
 }
-else
+else{
 	y<-as.matrix(data)
-if(!missing(B))
-	ndig<-4
-else
 	ndig<-getndp(y[,1])
+}
 T <- nrow(y) 		#Size of start sample
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
@@ -41,7 +41,7 @@ npar<-ncol(Z)
 if(max(thDelay)>p)
 	stop("Max of thDelay should be smaller or equal to the number of lags")
 
-type<-match.arg(type)
+
 
 ########################
 ### Threshold variable
@@ -51,10 +51,20 @@ temp<-TVAR_thresh(mTh=mTh,thDelay=thDelay,thVar=thVar,y=y, p=p) #Stored in misc.
 trans<-temp$trans
 combin<-temp$combin
 
-if(nthresh==1&missing(Thresh))
-	Thresh<-mean(trans)
-if(nthresh==2&missing(Thresh))
-	Thresh<-quantile(trans, probs=c(0.25, 0.75))
+if(nthresh==1){
+	if(missing(Thresh))
+		Thresh<-mean(trans)
+	if(length(Thresh)!=1){
+		warning("Please only one Thresh value if you choose nthresh=1. First one was chosen")
+		Thresh<-Thresh[1]}
+}
+if(nthresh==2){
+	if(missing(Thresh))
+		Thresh<-quantile(trans, probs=c(0.25, 0.75))
+	if(length(Thresh)!=2)
+		stop("please give two Thresh values if you choose nthresh=2")
+}
+
 Thresh<-round(Thresh,ndig)
 ##################
 ###Model
@@ -87,7 +97,7 @@ if(missing(sigma)&type=="simul")
 }
 
 ##############################
-###Bootstrap for the F test
+###Reconstitution boot/simul
 ##############################
 #initial values
 

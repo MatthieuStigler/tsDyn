@@ -1,15 +1,25 @@
 selectSETARmat<- function (x, m, d = 1, steps = d, thSteps = 7, mL = 1:m, mH = 1:m, 
-    th = quantile(x, prob = seq(0.15, 0.85, length = thSteps)), 
-    thDelay = seq_len(m)-1, criterion = c("pooled-AIC", "AIC", "SSR_OLS"), trim=0.15, ngrid="ALL", around, plot=TRUE) {
-
+    thDelay = seq_len(m)-1, criterion = c("pooled-AIC", "AIC", "SSR_OLS"), trim=0.15, ngrid="ALL", around, plot=TRUE,demean = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR")) {
+demean<-match.arg(demean)
 if (max(thDelay) >= m)
 	stop(paste("thDelay too high: should be < m (=", m, ")"))
 str <- nlar.struct(x, m, d, steps)
 xx <- getXX(str)
 yy <- getYY(str)
+model<-match.arg(model)
 
 ### Grid for threshold values
-allgammas <- sort(unique(x[- seq_len(m)]))
+if(model=="TAR"){
+	trans<-embed(x,m+1)}
+else{
+	if(max(thDelay)<m)
+		trans<-embed(diff(x),m)
+	else if(max(thDelay)==m){
+		trans<-embed(diff(x),m+1)
+		trans<-rbind(0,as.matrix(trans))}
+}
+
+allgammas <- sort(unique(trans[,1]))
 ng <- length(allgammas)
 if(ngrid=="ALL"){
 	gammas <- allgammas[round(trim*ng):round((1-trim)*ng)]
@@ -62,18 +72,34 @@ parsToModel <- function(parms) {
 	thVal <- parms[4]
 	m <- max(thDelayVal + 1, mLVal, mHVal)
 	return(setar(x, m = m, d = d, steps = steps, mL = mLVal, 
-		mH = mHVal, th = thVal, thDelay=thDelayVal))
+		mH = mHVal, th = thVal, thDelay=thDelayVal, demean=demean, common=common))
 }
 
 ### SSR function
+if(demean=="const"){
+	const<-rep(1,nrow(xx))
+	nconst<-"const"}
+else if(demean=="trend"){
+	const<-seq_len(nrow(xx))
+	nconst<-"trend"}
+else if(demean=="both"){
+	const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
+	nconst<-c("const", "trend")}
+else{
+	const<-NULL
+	nconst<-NULL}
+
 SSRestim <- function(parameters) {
 	Delay <- parameters[1]
 	gammai <- parameters[2] 
-        isL <- ifelse(xx[, Delay + 1]< gammai,1,0)	### isL: dummy variable
-        xxL <- cbind(1, xx[, mL]) * isL		### Lower matrix
-        xxH <- cbind(1, xx[, mH]) * (1 - isL)	### Upper matrix
-	xxB <- cbind(xxL, xxH)
-	crossprod(yy - xxB %*% chol2inv( chol( crossprod(xxB) ) ) %*% crossprod(xxB, yy) )
+        isL <- ifelse(trans[, Delay + 1]< gammai,1,0)	### isL: dummy variable
+	if(common==FALSE){
+		xxL <- cbind(const,xx[,seq_len(mL)])*isL
+		xxH <- cbind(const,xx[,seq_len(mH)])*(1-isL)
+		xxLH<-cbind(xxL,xxH)}
+	else
+		xxLH<-cbind(const,xx[,seq_len(mL)]*isL,xx[,seq_len(mH)]*(1-isL))
+	crossprod(yy - xxLH %*% chol2inv( chol( crossprod(xxLH) ) ) %*% crossprod(xxLH, yy) )
 }
 
 ###Grid for computation
@@ -125,7 +151,7 @@ environment(selectSETARmat)<-environment(selectNNET)
 sun<-(sqrt(sunspot.year+1)-1)*2		
 
 ###Full grid search with OLS
-selectSETARmat(sun, m=2, criterion="SSR_OLS", d=1, thDelay=0:1)
+selectSETARmat(sun, m=3, criterion="SSR_OLS", d=1, thDelay=0:2,model="MTAR")
 
 ###restricted search with AIC or AIC pooled around the max selected by OLS
 selectSETARmat(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)

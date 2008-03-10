@@ -21,7 +21,8 @@
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
-setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE){
+setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,demean = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR")){
+demean<-match.arg(demean)
 	if(missing(m))
 		m <- max(mL, mH, thDelay+1)
   if(missing(series))
@@ -40,6 +41,15 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 		if (trace) 
 			cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
 	}
+	if(length(mL)==1)
+		ML<-seq_len(mL)
+	else
+		ML<-mL
+	if(length(mH)==1)
+		MH<-seq_len(mH)
+	else
+		MH<-mH
+	###Set-up of transition variable
 	if(!missing(thDelay)) {
 		if(thDelay>=m) 
 			stop(paste("thDelay too high: should be < m (=",m,")"))
@@ -63,6 +73,10 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 			cat("Using default threshold variable: thDelay=0\n")
 		z <- xx[,1]
 	}
+	model<-match.arg(model)
+	if(model=="MTAR")
+		z<-c(0,diff(z))
+	###Threshold search
 	if (missing(th)) { #if 'th' not specified, try over a reasonable grid
 		th <- quantile(z, prob=c(0.15, 0.85))	#interval such that we have enough observations
 		if(trace)
@@ -90,19 +104,42 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 		return(res)
 	} else {	#else fit with the specified threshold
 		isL <- 0+(z <= th)		#regime-switching indicator variable
-		xxL <- cbind(1,xx[,seq_len(mL)])*isL
-		xxH <- cbind(1,xx[,seq_len(mH)])*(1-isL)
-		res <- lm.fit(cbind(xxL, xxH), yy)
+		if(demean=="const"){
+			const<-rep(1,nrow(xx))
+			nconst<-"const"}
+		else if(demean=="trend"){
+			const<-seq_len(nrow(xx))
+			nconst<-"trend"}
+		else if(demean=="both"){
+			const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
+			nconst<-c("const", "trend")}
+		else{
+			const<-NULL
+			nconst<-NULL}
+		if(common==FALSE){
+			xxL <- cbind(const,xx[,ML])*isL
+			xxH <- cbind(const,xx[,MH])*(1-isL)
+			xxLH<-cbind(xxL,xxH)}
+		else
+			xxLH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
+		res <- lm.fit(xxLH, yy)
 		res$coefficients <- c(res$coefficients, th)
-		names(res$coefficients) <- c(paste("phi1", 0:mL, sep="."), 
-			paste("phi2", 0:mH, sep="."), "th")
+		if(common==FALSE){
+			names(res$coefficients) <- c(paste(nconst,rep(1,length(nconst))),paste("phi1", ML, sep="."), paste(nconst,rep(2,length(nconst))),paste("phi2", MH, sep="."), "th")}
+		else{
+			names(res$coefficients)<-c(nconst,paste("phi1", ML, sep="."),paste("phi2",MH, sep="."), "th")}
 		res$k <- if(nested) (res$rank+1) else res$rank	#If nested, 1 more fitted parameter: th
 		res$fixedTh <- if(nested) FALSE else TRUE
 		res$mL <- mL
 		res$mH <- mH
+		res$ML <- ML
+		res$MH <- MH
 		res$externThVar <- externThVar
 		res$thVar <- z
-    res$lowRegProp <- mean(isL)
+		res$nconst<-nconst
+		res$common<-common
+    		res$lowRegProp <- mean(isL)
+		res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
 		if(!externThVar) {
 			if(missing(mTh)) {
 				mTh <- rep(0,m)
@@ -121,20 +158,27 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 
 print.setar <- function(x, ...) {
 	NextMethod(...)
-	cat("\nSETAR model (2 regimes)\n")
 	x.old <- x
 	x <- x$model.specific
 	order.L <- x$mL
+	order2.L <- length(x$ML)
 	order.H <- x$mH
-	lowCoef <- x.old$coef[1:(order.L+1)]
-	highCoef<- x.old$coef[(order.L+1)+1:(order.H+1)]
-	thCoef <- x.old$coef[order.L+order.H+3]
+	order2.H <- length(x$MH)
+	common<-x$common
+	nconst<-x$nconst
 	externThVar <- x$externThVar
+	cat("\nSETAR model (2 regimes)\n")
 	cat("Coefficients:\n")
-	cat("Low regime:\n")
-	print(lowCoef, ...)
-	cat("\nHigh regime:\n")
-	print(highCoef, ...)
+	if(common==FALSE){
+		lowCoef <- x.old$coef[1:(order2.L+length(nconst))]
+		highCoef<- x.old$coef[(order2.L+length(nconst)+1):(order2.L+2*length(nconst)+order2.H)]
+		cat("Low regime:\n")
+		print(lowCoef, ...)
+		cat("\nHigh regime:\n")
+		print(highCoef, ...)}
+	else{
+		print(x.old$coeff[-length(x.old$coeff)])}
+	thCoef <- tail(x.old$coef,n=1)
 	cat("\nThreshold")
 	cat("\nVariable: ")
         if(externThVar)
@@ -159,10 +203,14 @@ summary.setar <- function(object, ...) {
 	ans <- list()
 	mod <- object$model.specific
 	order.L <- mod$mL
+	order2.L <- length(mod$ML)
 	order.H <- mod$mH
-	ans$lowCoef <- object$coef[1:(order.L+1)]
-	ans$highCoef<- object$coef[(order.L+1)+1:(order.H+1)]
-	ans$thCoef <- object$coef[order.L+order.H+3]
+	order2.H <- length(mod$MH)
+	nconst<-mod$nconst
+	common<-mod$common
+	ans$lowCoef <- object$coef[1:(order2.L+length(nconst))]
+	ans$highCoef<- object$coef[(order2.L+length(nconst)+1):(order2.L+2*length(nconst)+order2.H)]
+	ans$thCoef <- object$coef[length(object$coef)]
 	ans$fixedTh <- mod$fixedTh
 	ans$externThVar <- mod$externThVar
 	ans$lowRegProp <- mod$lowRegProp

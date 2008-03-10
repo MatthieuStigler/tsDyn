@@ -105,11 +105,7 @@ if (cov==1){
 	m0<-rbind(cbind(zz0, am0),cbind( am0, zz0)) 
 		#m0=[zz0,zeros(length(zz0(:,1)),length(zz0(1,:)));zeros(length(zz0(:,1)),length(zz0(1,:))),zz0];
 	v<- m0%*%(t(xe)%*%xe)%*%m0		#v=m0*(xe*xe)*m0; taille attendue 2*para(cst +ECM+k*2
-	print(dim(v))
-	print(dim(sige%x%solve(t(z0)%*%z0)))
-print(lz0)
-print(dim(zz0))
-stop()
+
 	}
 #print(paste("dim v", dim(v)))
 #print(paste("dim sige", dim(sige)))
@@ -117,7 +113,7 @@ stop()
 if (cov==0){ v<-sige%x%solve(t(z0)%*%z0)}			#v=sige.*zz0; 
 
 
-se=sqrt(diag(v));
+se<-sqrt(diag(v));
 seprint<-matrix(se, nrow=2, byrow=TRUE)
 rownames(seprint)<-paste("Equation",colnames(dat))
 if(intercept==TRUE){colnames(seprint)<-c("ECM","Intercept",c(paste(rep(colnames(dat),k), -rep(1:k, each=nequ))))}
@@ -563,6 +559,7 @@ data<-zeroyld
 
 HanSeo_TVECM(data, lag=1, intercept=TRUE, UserSpecified_beta=0.98, cov=1, UserSpecified_gamma=-0.63, bn=30, gn=30, boot=0)
 
+HanSeo_TVECM(data, lag=1, intercept=TRUE, cov=1, bn=30, gn=300, boot=0)
 
 
 }

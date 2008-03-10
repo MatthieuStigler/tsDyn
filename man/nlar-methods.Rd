@@ -16,7 +16,7 @@
 Generic \sQuote{nlar} methods
 }
 \usage{
-\method{AIC}{nlar}(object, \dots)
+\method{AIC}{nlar}(object, k=2,\dots)
 \method{coef}{nlar}(object, \dots)
 \method{fitted}{nlar}(object, \dots)
 \method{MAPE}{nlar}(object, \dots)
@@ -36,6 +36,7 @@ Generic \sQuote{nlar} methods
   \item{simulate}{ if \code{TRUE}, new observations are simulated from underlying Data Generating Process }
   \item{ask}{ graphical option. See \code{\link{par}}}
   \item{digits}{See \code{\link{printCoefmat}} }
+  \item{k}{ numeric, the penalty per parameter to be used; the default k = 2 is the classical AIC}
   \item{\dots}{ further arguments to be passed to and from other methods }
 }
 \details{

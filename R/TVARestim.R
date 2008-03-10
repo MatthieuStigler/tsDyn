@@ -1,21 +1,31 @@
-OlsTVAR <- function(data, lag, type=c("level", "difference"),trend=TRUE, nthresh=1,trim=0.1,ngrid, gamma=NULL, thDelay=1, mTh=1, thVar,around, plot=TRUE, dummyToBothRegimes=TRUE){
+OlsTVAR <- function(data, lag, demean = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=TRUE, dummyToBothRegimes=TRUE){
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
-#if(type=="difference") {y<-diff(y)}
 T <- nrow(y) 		#Size of start sample
 p <- lag
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
-
+t<-T-p			#Size of end sample
 if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 if(max(thDelay)>p)
 	stop("Max of thDelay should be smaller or equal to the number of lags")
-if(dummyToBothRegimes==FALSE&nthresh!= 1) warning("The 'dummyToBothRegimes' argument is only relevant for one threshold models")
+if(dummyToBothRegimes==FALSE&nthresh!= 1) 
+	warning("The 'dummyToBothRegimes' argument is only relevant for one threshold models")
+model<-match.arg(model)
+demean<-match.arg(demean)
+
 Y <- y[(p+1):T,] #
 Z <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
-if(trend==TRUE)
-	Z <- cbind(1,Z)
+
+if(demean=="const")
+	Z<-cbind(1, Z)
+else if(demean=="trend")
+	Z<-cbind(seq_len(t), Z)
+else if(demean=="both")
+	Z<-cbind(rep(1,t),seq_len(t), Z)
+if(commonInter & demean!="const")
+	stop("commonInter argument only avalaible with demean = const")
 npar <- ncol(Z)			#Number of parameters
 
 ##################
@@ -24,18 +34,28 @@ npar <- ncol(Z)			#Number of parameters
  B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
 
 
-npar<-ncol(B)
+allpar<-ncol(B)*nrow(B)
 
 rownames(B)<-paste("Equation",colnames(data))
-if(trend==TRUE){colnames(B)<-c("Intercept",c(paste(rep(colnames(data),p), -rep(1:p, each=k))))}
-else {colnames(B)<-c(c(paste(rep(colnames(data),p), -rep(1:p, each=k)))) }
+LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
+
+if(demean=="const")
+	Bnames<-c("Intercept",LagNames)
+else if(demean=="trend")
+	Bnames<-c("Trend",LagNames)
+else if(demean=="both")
+	Bnames<-c("Intercept","Trend",LagNames)
+else 
+	Bnames<-c(LagNames)
+colnames(B)<-Bnames
 
 res<-Y-Z%*%t(B)
 
-Sigma<- matrix(1/T*crossprod(res),ncol=k,dimnames=list(colnames(data), colnames(data)))
-nlike<-log(det(Sigma))/(T-p-1)		#	nlike=(t/2)*log(det(sige));
-aic<-nlike+2*(npar)/(T-p-1)
-bic<-nlike+log(T-p-1)*(npar)/(T-p-1)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
+Sigma<- matrix(1/t*crossprod(res),ncol=k,dimnames=list(colnames(data), colnames(data)))
+nlike<-log(det(Sigma))		#	nlike=(t/2)*log(det(sige));
+aic<-t*nlike+2*(allpar)
+bic<-t*nlike+log(t)*(allpar)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
+info_Lin<-c(aic, bic)
 
 
 ########################
@@ -64,7 +84,15 @@ else {
 	else 
 		combin<-matrix(mTh,ncol=1, nrow=k)
 	zcombin <- y %*% combin
-	z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+	if(model=="MTAR"){
+		if(max(thDelay)<p)
+			z<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
+		else if(max(thDelay)==p){
+			z<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
+			z<-rbind(0,as.matrix(z))}
+	}
+	else
+		z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
 }
 
 trans<-as.matrix(z)
@@ -116,31 +144,59 @@ if(!missing(around)){
 #Model with dummy applied to only one regime
 loop1_onedummy <- function(gam1, d){
 	##Threshold dummies
-	regimeDown <- ifelse(trans[,d]<gam1, 1,0) * Z
+	dummyDown <- ifelse(trans[,d]<gam1, 1,0) * Z
+	ndown<-mean(dummyDown)
+	regimeDown<-dummyDown*Z
 	##SSR
-	Z1 <- t(cbind(regimeDown, Z))		# dim k(p+1) x t
-	B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
-	crossprod(c( Y - B1 %*% Z1))
+	if(min(ndown, 1-ndown)>=trim){
+		Z1 <- t(cbind(regimeDown, Z))		# dim k(p+1) x t
+		B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
+		res<-crossprod(c( Y - B1 %*% Z1))}
+	else
+		res<-NA
+	return(res)
 } #end of the function
+
 
 #Model with dummy applied to both regimes
 loop1_twodummy <- function(gam1, d){
 	##Threshold dummies
 	d1<-ifelse(trans[,d]<gam1, 1,0)
-	regimeDown <- d1 * Z
-	regimeUp<-(1-d1)*Z
+	ndown<-mean(d1)
 	##SSR
-	Z1 <- t(cbind(regimeDown, regimeUp))		# dim k(p+1) x t
-	B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
-	crossprod(c( Y - B1 %*% Z1))
+	if(min(ndown, 1-ndown)>=trim){
+		Z1 <- t(cbind(d1 * Z, (1-d1)*Z))		# dim k(p+1) x t
+		B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
+		res<-crossprod(c( Y - B1 %*% Z1))}
+	else
+		res<-NA
+	return(res)
 } #end of the function
 
+#Model with dummy applied to both regimes and a common intercept
+loop1_twodummy_oneIntercept <- function(gam1, d){
+	##Threshold dummies
+	d1<-ifelse(trans[,d]<gam1, 1,0)
+	ndown<-mean(d1)
+	if(min(ndown, 1-ndown)>=trim){
+		Z1 <- t(cbind(1,d1 * Z[,-1], (1-d1)*Z[,-1]))		# dim k(p+1) x t
+		B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
+		res<-crossprod(c( Y - B1 %*% Z1))}
+	else
+		res<-NA
+	return(res)
+} #end of the function
 
 onesearch <- function(thDelay,gammas){
 	grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
-	if(dummyToBothRegimes)
-		store <- mapply(loop1_twodummy,d=grid1[,1],gam1=grid1[,2])	#search for values of grid
-	else	store <- mapply(loop1_onedummy,d=grid1[,1],gam1=grid1[,2])
+	if(dummyToBothRegimes){
+		if(commonInter)
+			store<-mapply(loop1_twodummy_oneIntercept,d=grid1[,1],gam1=grid1[,2])
+		else
+			store <- mapply(loop1_twodummy,d=grid1[,1],gam1=grid1[,2])	#search for values of grid
+	}
+	else	
+		store <- mapply(loop1_onedummy,d=grid1[,1],gam1=grid1[,2])
 	posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
 
 	if(plot&is.null(gamma)){
@@ -178,6 +234,24 @@ loop2 <- function(gam1, gam2,d){
 	return(res)
 }
 
+loop2_oneIntercept <- function(gam1, gam2,d){
+	##Threshold dummies
+	dummydown <- ifelse(trans[,d]<gam1, 1, 0)
+	regimedown <- dummydown*Z[,-1]
+	ndown <- mean(dummydown)
+	dummyup <- ifelse(trans[,d]>=gam2, 1, 0)
+	regimeup <- dummyup*Z[,-1]
+	nup <- mean(dummyup)
+	##SSR from TVAR(3)
+	#print(c(ndown,1-nup-ndown,nup))
+	if(min(nup, ndown, 1-nup-ndown)>trim){
+		Z2 <- t(cbind(1,regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
+		res <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+	}
+	else
+		res <- NA
+	return(res)
+}
 ############################
 ###Search for one threshold
 ############################
@@ -238,7 +312,11 @@ list(threshRef=threshRef, newThresh=newThresh)
 secondBestThresh<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay,ninter=ninter, fun=loop2)$newThresh
 
 ###Iterative step
-condiStep(allgammas, threshRef=secondBestThresh, delayRef=bestDelay,ninter=ninter, fun=loop2)
+if(commonInter)
+	func<-loop2_oneIntercept
+else
+	func<-loop2
+condiStep(allgammas, threshRef=secondBestThresh, delayRef=bestDelay,ninter=ninter, fun=func)
 
 ###Alternative step: grid around the points from first step
 smallThresh <- min(bestThresh,secondBestThresh)
@@ -254,7 +332,7 @@ for(i in seq_len(length(gammasDown))){
 	gam1 <- gammasDown[i]
 	for(j in 1: length(gammasUp)){
 		gam2 <- gammasUp[j]
-		storeIter[i,j] <- loop2(gam1=gam1, gam2=gam2, d=bestDelay)
+		storeIter[i,j] <- func(gam1=gam1, gam2=gam2, d=bestDelay)
 	}
 }
 
@@ -317,53 +395,123 @@ bestThresh <- c(gamma1, gamma2)
 #############
 ###Best Model
 #############
+if(commonInter)
+	val<- 1
+else
+	val<- -(seq_len(ncol(Z)))
+
 if(nthresh==1){
 	dummydown <- ifelse(trans[,bestDelay]<bestThresh, 1, 0)
 	ndown <- mean(dummydown)
-	regimeDown <- dummydown*Z
+	regimeDown <- dummydown*Z[,-val]
 	if(dummyToBothRegimes) 
-		regimeUp<-(1-dummydown)*Z
+		regimeUp<-(1-dummydown)*Z[,-val]
 	else regimeUp<-Z
-	Zbest <- t(cbind(regimeDown,regimeUp))		# dim k(p+1) x t
+	if(commonInter)
+		Zbest<-t(cbind(1,regimeDown,regimeUp))
+	else
+		Zbest <- t(cbind(regimeDown,regimeUp))		# dim k(p+1) x t
 }
+
 if(nthresh==2|nthresh==3){
 	dummydown <- ifelse(trans[,bestDelay]<bestThresh[1], 1,0)
 	ndown <- mean(dummydown)
-	regimedown <- dummydown*Z
+	regimedown <- dummydown*Z[,-val]
 	dummyup <- ifelse(trans[,bestDelay]>=bestThresh[2], 1,0)
 	nup <- mean(dummyup)
-	regimeup <- dummyup*Z
-	Zbest <- t(cbind(regimedown,(1-dummydown-dummyup)*Z, regimeup))	# dim k(p+1) x t
+	regimeup <- dummyup*Z[,-val]
+	if(commonInter)
+		Zbest <- t(cbind(1,regimedown,(1-dummydown-dummyup)*Z[,-1], regimeup))	# dim k(p+1) x t
+	else
+		Zbest <- t(cbind(regimedown,(1-dummydown-dummyup)*Z, regimeup))	# dim k(p+1) x t
 }
 
 Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
+resbest <- t(Y - Bbest %*% Zbest)
+SSRbest <- as.numeric(crossprod(c(resbest)))
+nparbest<-nrow(Bbest)*ncol(Bbest)
+
+Sigmabest<-matrix(1/t*crossprod(resbest),ncol=k,dimnames=list(colnames(data), colnames(data)))
+SigmabestOls<-Sigmabest*(t/(t-ncol(Bbest)))
+
+VarCovB<-solve(tcrossprod(Zbest))%x%SigmabestOls
+StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
+
+Tvalue<-Bbest/StDevB
+Pval<-pt(abs(Tvalue), df=(ncol(Zbest)-nrow(Zbest)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Zbest)-nrow(Zbest)), lower.tail=TRUE)
+Pval<-round(Pval,4)
+
+
+### Info criteria
+nlikebest<-log(det(Sigmabest))			#nlike=(t/2)*log(det(sige));
+aicbest<-t*nlikebest+2*(nparbest)
+bicbest<-t*nlikebest+log(t)*(nparbest)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
+info_Thresh<-c(aicbest, bicbest)
+aicbest2<-t*nlikebest+2*(nparbest+nthresh)
+bicbest2<-t*nlikebest+log(t)*(nparbest+nthresh)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
+info_Thresh2<-c(aicbest2, bicbest2)
+
+nobsdown<-sum(dummydown)
+nobsup<-length(dummydown)-nobsdown
+
+SigmabestUnder<-matrix(1/nobsdown*crossprod(resbest*dummydown),ncol=k)
+SigmabestOver<-matrix(1/nobsup*crossprod(resbest*(1-dummydown)),ncol=k)
+
+
+nlikebest<-nobsdown*log(det(SigmabestUnder))+nobsup*log(det(SigmabestOver))
+pooled_aicbest<-nlikebest+2*(nparbest)
+pooled_bicbest<-nlikebest+(log(nobsup)+log(nobsdown))*(nparbest)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
+pooled_info_Thresh<-c(pooled_aicbest, pooled_bicbest)
+
+
+
+
+###naming and dividing B
 rownames(Bbest) <- paste("Equation", colnames(data))
 Bcolnames <- c("Trend", c(paste(rep(colnames(data),p),"t", -rep(1:p, each=k))))
-if(!trend)
-	Bnames<-c(c(paste(rep(colnames(data),p), "t",-rep(1:p, each=k))))
-resbest <- Y - Bbest %*% Zbest
-SSRbest <- as.numeric(crossprod(c(resbest)))
-
-if(nthresh==1)
-	colnames(Bbest) <- rep(Bcolnames,2)
-else
-	colnames(Bbest)<-rep(Bcolnames,3)
+sBnames<-Bnames[-which(Bnames=="Intercept")]
 
 if(nthresh==1){
-	Bdown <- Bbest[,c(1:npar)]
-	Bup <- Bbest[,-c(1:npar)]
-	Blist <- list(Bdown=Bdown, Bup=Bup)
+	if(commonInter){
+		colnames(Bbest)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
+		colnames(Pval)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
+		Blist<-Bbest
+		Plist<-Pval}
+	else{
+		colnames(Bbest) <- rep(Bnames,2)
+		colnames(Pval) <- rep(Bnames,2)
+		Bdown <- Bbest[,c(1:npar)]
+		Bup <- Bbest[,-c(1:npar)]
+		Pdown <- Pval[,c(1:npar)]
+		Pup <- Pval[,-c(1:npar)]
+		Blist <- list(Bdown=Bdown, Bup=Bup)
+		Plist <- list(Pdown=Pdown, Pup=Pup)}
 	nobs <- c(ndown=ndown, nup=1-ndown)
-} else {
-	Bdown <- Bbest[,c(1:npar)]
-	Bmiddle <- Bbest[,c(1:npar)+npar]
-	Bup <- Bbest[,c(1:npar)+2*npar]
-	colnames(Bmiddle) <- Bcolnames
-	Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)
+}
+else{
+	if(commonInter){
+		colnames(Bbest)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
+		colnames(Pval)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
+		Blist<-Bbest
+		Plist<-Pval}
+	else{
+		colnames(Bbest)<-rep(Bnames,3)
+		colnames(Pval)<-rep(Bnames,3)
+		Bdown <- Bbest[,c(1:npar)]
+		Bmiddle <- Bbest[,c(1:npar)+npar]
+		Bup <- Bbest[,c(1:npar)+2*npar]
+		Pdown <- Pval[,c(1:npar)]
+		Pmiddle <- Pval[,c(1:npar)+npar]
+		Pup <- Pval[,c(1:npar)+2*npar]			
+		colnames(Bmiddle) <- Bnames
+		colnames(Pmiddle) <- Bnames
+		Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)
+		Plist <- list(Pdown=Pdown, Pmiddle=Pmiddle,Pup=Pup)}
 	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 }
 
-list(Thresh=bestThresh, Parameters=Blist, SSR=SSRbest, nobs_regimes=nobs)
+
+list(resids=list(lin=res, Thresh=resbest), VAR=VarCovB, Thresh=bestThresh, Parameters=Blist, Pvalues=Plist,SSR=SSRbest, aic_bic=list(info_Lin=info_Lin,info_Thresh=info_Thresh,info_Thresh2=info_Thresh2), nobs_regimes=nobs)
 }	#end of the whole function
 
 if(FALSE) { #usage example
@@ -371,6 +519,7 @@ if(FALSE) { #usage example
 data(zeroyld)
 data<-zeroyld
 
-OlsTVAR(data, lag=2, nthresh=2, thDelay=1:2,trim=0.1, plot=TRUE)
+OlsTVAR(data[1:100,], lag=2, nthresh=2, thDelay=1:2,trim=0.1, plot=FALSE, commonInter=FALSE, demean="const")
 #lag2, 2 thresh, trim00.05: 561.46
 }
+
