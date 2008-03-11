@@ -5,10 +5,11 @@
 addRegime test
 }
 \usage{
-addRegime(object)
+addRegime(object, ...)
 }
 \arguments{
 \item{object}{ fitted model object with at least 2 regimes }
+\item{...}{arguments to and from other methods}
 }
 \value{
 A list containing the p-value of the F statistic and a boolean,

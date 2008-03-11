@@ -11,16 +11,16 @@ setar(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE
 }
 \usage{
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thDelay=0, th,
-trace=FALSE,demean = c( "const", "trend","none", "both"), 
-common=FALSE, model=c("TAR", "MTAR"))
+trace=FALSE,demean = c( "const", "trend","none", "both"),
+common=FALSE, model=c("TAR", "MTAR"), ML, MH)
 
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, mTh, th,
 trace=FALSE,demean = c( "const", "trend","none", "both"), 
-common=FALSE, model=c("TAR", "MTAR"))
+common=FALSE, model=c("TAR", "MTAR"), ML, MH)
 
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thVar, th,
 trace=FALSE,demean = c( "const", "trend","none", "both"), 
-common=FALSE, model=c("TAR", "MTAR"))
+common=FALSE, model=c("TAR", "MTAR"), ML, MH)
 }
 \value{
   An object of class \code{nlar}, subclass \code{setar}
@@ -97,7 +97,7 @@ summary(mod.setar)
 
 if(require(FinTS)) {
 	data(m.unrate)
-	setar(diff(m.unrate), ML=c(2,3,4,12), MH=c(2,4,12), th=0.1)
+	setar(diff(m.unrate), ML=c(2,3,4,12), MH=c(2,4,12), th=0.1, demean="none")
 }
 }
 \keyword{ ts }

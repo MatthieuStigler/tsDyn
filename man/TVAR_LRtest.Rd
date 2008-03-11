@@ -5,7 +5,7 @@
 \description{Multivariate extension of the linearity against threshold test from Hansen (1999) with bootstrap distribution 
 }
 \usage{
-TVAR_LRtest <- function (x, m=1, d = 1, steps = d, trend=TRUE, 
+TVAR_LRtest(x, m=1, d = 1, steps = d, trend=TRUE, 
 series, thDelay = 1:2,    mTh=1, thVar, nboot=10, plot=FALSE,
 trim=0.1, test=c("1vs", "2vs3"))
 }

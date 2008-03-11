@@ -5,7 +5,7 @@
 \description{Test of linearity against threshold of Hansen (1999) with bootstrap distribution
 }
 \usage{
-setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
+setarTest(x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
     mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"))
 }
 

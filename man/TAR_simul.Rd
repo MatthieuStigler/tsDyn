@@ -5,7 +5,7 @@
 Estimate or bootstraps a Threshold VAR
 }
 \usage{
-TAR_simul<-function(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL)
+TAR_simul(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL)
 }
 \value{
 a list with the simulated/bootstraped data and the parameter matrix used. 

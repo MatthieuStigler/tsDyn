@@ -5,7 +5,7 @@
 Estimate a Treshold Vector Error Correction model (VECM)
 }
 \usage{
-TVECM<-function(data,lag=1,trend=TRUE, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), rest=c("none", "equal", "signOp"), model=c("All", "only_ECT") )
+TVECM(data,lag=1,trend=TRUE, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), rest=c("none", "equal", "signOp"), model=c("All", "only_ECT") )
 }
 \value{
 Fitted model data

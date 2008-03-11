@@ -5,7 +5,7 @@
 Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
-TVAR_simul<-function(y,B=NULL,Thresh, nthresh=1, type=c("boot", "simul", "check"), 
+TVAR_simul(y,B=NULL,Thresh, nthresh=1, type=c("boot", "simul", "check"), 
 sigma,n=200, lag=1, trend=TRUE,  thDelay=1,  thVar=NULL, mTh=1, starting=NULL)
 }
 \value{
