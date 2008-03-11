@@ -20,9 +20,9 @@ lag.plot <- function(x, ...)
 \begin{titlepage}
 {\centering \huge Nonlinear autoregressive\\[0.5cm]
 time series models in R\\[0.5cm]
-using \tsDyn version 0.6\\}
+using \tsDyn version 0.7\\}
 \vfill\par
-{\centering last revised 22/02/2007 by Antonio, Fabio Di Narzo\\}
+{\centering last revised 11/03/2008 by Antonio, Fabio Di Narzo\\}
 \end{titlepage}
 
 \section{Introduction} \tsDyn is an R package for the estimation of
@@ -250,8 +250,9 @@ X_{t+s} =&
 \end{eqnarray*}
 with $G$ the logistic function, and $Z_t$ the threshold variable. For $Z_t$, $L$ and $H$ specification, the same convention as that of SETAR models is followed. In addition, for LSTAR models one has to specify some starting values for all the parameters to be estimated: $(\phi, \gamma, \text{th})$.
 
-Once again, estimation is done using CLS, but here an exact solution does not extist, so a numerical minimization algorithm has to be used.
-If not provided, starting values for $(\gamma, \text{th})$ are obtained by rough grid search.
+Estimation is done by analytically determining $\phi_1$ and $\phi_2$ (through linear regression)
+and then minimizing residuals sum of squares with respect to $\text{th}$ and $\gamma$. These two steps are repeated
+until convergence is achieved.
 
 \subsection{Neural Network models}
 A neural network model with linear output, $D$ \emph{hidden units} and activation function $g$, is represented as:
