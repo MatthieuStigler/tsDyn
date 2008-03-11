@@ -1,6 +1,11 @@
 -version 0.7-0
 -args demean, common, and posibility to select only some lags in setar (tnx to
 M. Stigler)
+-added k parameter to the AIC method
+-added 'zeroyld' dataset
+-standardized license naming in description
+-added functions star and ncstar
+-fixed typo in print.star
 
 -version 0.6-0 released
 -fixed Matrix dependency in DESCRIPTION
