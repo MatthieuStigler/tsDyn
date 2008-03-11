@@ -7,7 +7,7 @@
 Self Exciting Threshold AutoRegressive model.
 }
 \synopsis{
-setar(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,demean = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"))
+setar(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE, demean = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML, MH)
 }
 \usage{
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thDelay=0, th,
@@ -43,8 +43,12 @@ common=FALSE, model=c("TAR", "MTAR"))
 \item{x}{ time series }
 \item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 \item{series}{ time series name (optional) }
-\item{mL}{autoregressive order for 'low' regime (dafult: m). Must be <=m}
-\item{mH}{autoregressive order for 'high' regime (default: m). Must be <=m}
+\item{mL}{autoregressive order for 'low' regime (dafult: m). Must be <=m.
+ Alternatively, you can specify \code{ML}}
+\item{ML}{vector of lags for low-regime autoregressive model}
+\item{mH}{autoregressive order for 'high' regime (default: m). Must be <=m.
+	Alternatively, you can specify \code{MH}}
+\item{MH}{vector of lags for high-regime autoregressive model}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d)}
 \item{mTh}{coefficients for the lagged time series, to obtain the threshold variable}
 \item{thVar}{external threshold variable}
@@ -90,6 +94,11 @@ regression theory, and are to be considered asymptoticals.
 mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
 mod.setar
 summary(mod.setar)
+
+if(require(FinTS)) {
+	data(m.unrate)
+	setar(diff(m.unrate), ML=c(2,3,4,12), MH=c(2,4,12), th=0.1)
+}
 }
 \keyword{ ts }
 \references{

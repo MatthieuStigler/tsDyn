@@ -1,3 +1,7 @@
+-version 0.7-0
+-args demean, common, and posibility to select only some lags in setar (tnx to
+M. Stigler)
+
 -version 0.6-0 released
 -fixed Matrix dependency in DESCRIPTION
 -added minimal docs for newly created internal objects
