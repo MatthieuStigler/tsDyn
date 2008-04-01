@@ -326,7 +326,7 @@ startingValues.ncstar <- function(object, trace=TRUE, ...)
 
   # Maximum and minimum values for gamma
   maxGamma <- 40;
-  minGamma <- 10;
+  minGamma <- 1;
   rateGamma <- 2; ############################################!!!
   
   for(i in 1:1000) {
@@ -379,11 +379,13 @@ startingValues.ncstar <- function(object, trace=TRUE, ...)
                  ", th = ", th[noRegimes - 1],"\n");
   
   # Reorder the regimes according to the values of th
-  if (noRegimes > 2) {
+  if ((noRegimes > 2)  &&
+                    prod((1:(noRegimes - 1)) != sort(th, index.return=TRUE)$ix))  {
+
     if(trace) cat("  Reordering regimes...\n")
+    ordering <-  sort(th, index.return=TRUE)$ix
 
     th <- sort(th, index.return=TRUE)$x
-    ordering <-  sort(th, index.return=TRUE)$ix
     gamma <- gamma[ordering]
     omega <- omega[, ordering]
     phi1 <- phi1[ordering,]
