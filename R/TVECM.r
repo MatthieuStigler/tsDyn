@@ -513,8 +513,8 @@ allpar<-ncol(Bbest)*nrow(Bbest)
 
 # nparTot<-npar+1+nthresh			#addition of threshold and cointegrating vector
 
-
-resbest <- Y - Zbest%*% t(Bbest)
+fitted<-Zbest%*% t(Bbest)
+resbest <- Y - fitted
 SSRbest <- as.numeric(crossprod(c(resbest)))
 Sigmathresh<- matrix(1/t*crossprod(resbest), ncol=k)
 nlike_thresh<-log(det(Sigmathresh))		#	nlike=(t/2)*log(det(sige));
@@ -634,7 +634,9 @@ if(!model=="only_ECT"){
 	cat("\n P-values\n")
 	print(Pup)
 	}
-list(resids=list(res=res, resbest=resbest), VAR=VarCovB, Parameters=Blist, nobs_regime=nobs)
+z<-list(residuals=resbest, VAR=VarCovB, coefficients=Blist, k=k, t=t, nobs_regime=nobs, nthresh=nthresh, nparB=allpar, fitted.values=fitted)
+class(z)<-"nlVar"
+return(z)
 }
 
 
@@ -651,5 +653,12 @@ summary(lm(zeroyld[,1]~zeroyld[,2]))
 TVECM(data, nthresh=1,lag=1, bn=80, ngridG=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
 beta0<-rep(1.12,480)
 TVECM(data, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
+a<-TVECM(data, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT")
+class(a)
+print(a)
+logLik(a)
+AIC(a)
+deviance(a)
+
 }
 

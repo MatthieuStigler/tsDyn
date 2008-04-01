@@ -1,4 +1,4 @@
-OlsTVAR <- function(data, lag, demean = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=TRUE, dummyToBothRegimes=TRUE){
+TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=TRUE, dummyToBothRegimes=TRUE){
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
 T <- nrow(y) 		#Size of start sample
@@ -13,49 +13,20 @@ if(max(thDelay)>p)
 if(dummyToBothRegimes==FALSE&nthresh!= 1) 
 	warning("The 'dummyToBothRegimes' argument is only relevant for one threshold models")
 model<-match.arg(model)
-demean<-match.arg(demean)
+include<-match.arg(include)
 
 Y <- y[(p+1):T,] #
 Z <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 
-if(demean=="const")
+if(include=="const")
 	Z<-cbind(1, Z)
-else if(demean=="trend")
+else if(include=="trend")
 	Z<-cbind(seq_len(t), Z)
-else if(demean=="both")
+else if(include=="both")
 	Z<-cbind(rep(1,t),seq_len(t), Z)
-if(commonInter & demean!="const")
-	stop("commonInter argument only avalaible with demean = const")
+if(commonInter & include!="const")
+	stop("commonInter argument only avalaible with include = const")
 npar <- ncol(Z)			#Number of parameters
-
-##################
-###Linear model
-#################
- B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
-
-
-allpar<-ncol(B)*nrow(B)
-
-rownames(B)<-paste("Equation",colnames(data))
-LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
-
-if(demean=="const")
-	Bnames<-c("Intercept",LagNames)
-else if(demean=="trend")
-	Bnames<-c("Trend",LagNames)
-else if(demean=="both")
-	Bnames<-c("Intercept","Trend",LagNames)
-else 
-	Bnames<-c(LagNames)
-colnames(B)<-Bnames
-
-res<-Y-Z%*%t(B)
-
-Sigma<- matrix(1/t*crossprod(res),ncol=k,dimnames=list(colnames(data), colnames(data)))
-nlike<-log(det(Sigma))		#	nlike=(t/2)*log(det(sige));
-aic<-t*nlike+2*(allpar)
-bic<-t*nlike+log(t)*(allpar)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
-info_Lin<-c(aic, bic)
 
 
 ########################
@@ -427,7 +398,8 @@ if(nthresh==2|nthresh==3){
 }
 
 Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
-resbest <- t(Y - Bbest %*% Zbest)
+fitted<-Bbest %*% Zbest
+resbest <- t(Y - fitted)
 SSRbest <- as.numeric(crossprod(c(resbest)))
 nparbest<-nrow(Bbest)*ncol(Bbest)
 
@@ -442,15 +414,9 @@ Pval<-pt(abs(Tvalue), df=(ncol(Zbest)-nrow(Zbest)), lower.tail=FALSE)+pt(-abs(Tv
 Pval<-round(Pval,4)
 
 
-### Info criteria
-nlikebest<-log(det(Sigmabest))			#nlike=(t/2)*log(det(sige));
-aicbest<-t*nlikebest+2*(nparbest)
-bicbest<-t*nlikebest+log(t)*(nparbest)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
-info_Thresh<-c(aicbest, bicbest)
-aicbest2<-t*nlikebest+2*(nparbest+nthresh)
-bicbest2<-t*nlikebest+log(t)*(nparbest+nthresh)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
-info_Thresh2<-c(aicbest2, bicbest2)
 
+
+###Pooled AIC
 nobsdown<-sum(dummydown)
 nobsup<-length(dummydown)-nobsdown
 
@@ -469,6 +435,16 @@ pooled_info_Thresh<-c(pooled_aicbest, pooled_bicbest)
 ###naming and dividing B
 rownames(Bbest) <- paste("Equation", colnames(data))
 Bcolnames <- c("Trend", c(paste(rep(colnames(data),p),"t", -rep(1:p, each=k))))
+LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
+if(include=="const")
+	Bnames<-c("Intercept",LagNames)
+else if(include=="trend")
+	Bnames<-c("Trend",LagNames)
+else if(include=="both")
+	Bnames<-c("Intercept","Trend",LagNames)
+else 
+	Bnames<-c(LagNames)
+
 sBnames<-Bnames[-which(Bnames=="Intercept")]
 
 if(nthresh==1){
@@ -510,8 +486,13 @@ else{
 	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 }
 
-
-list(resids=list(lin=res, Thresh=resbest), VAR=VarCovB, Thresh=bestThresh, Parameters=Blist, Pvalues=Plist,SSR=SSRbest, aic_bic=list(info_Lin=info_Lin,info_Thresh=info_Thresh,info_Thresh2=info_Thresh2), nobs_regimes=nobs)
+specific<-list()
+specific$Thresh<-bestThresh
+specific$nthresh<-nthresh
+specific$rowB<-npar
+z<-list(coefficients=Blist, residuals=resbest, VAR=VarCovB,   Pvalues=Plist, nobs_regimes=nobs, k=k, t=t, nparB=nparbest, fitted.values=fitted, model.specific=specific)
+class(z)<-c("TVAR","nlVar")
+return(z)
 }	#end of the whole function
 
 if(FALSE) { #usage example
@@ -519,7 +500,30 @@ if(FALSE) { #usage example
 data(zeroyld)
 data<-zeroyld
 
-OlsTVAR(data[1:100,], lag=2, nthresh=2, thDelay=1:2,trim=0.1, plot=FALSE, commonInter=FALSE, demean="const")
+a<-TVAR(data[1:100,], lag=2, nthresh=2, thDelay=1:2,trim=0.1, plot=FALSE, commonInter=FALSE, include="const")
 #lag2, 2 thresh, trim00.05: 561.46
+class(a)
+print(a)
+logLik(a)
+AIC(a)
+deviance(a)
+summary(a)
 }
 
+print.TVAR<-function(x,...){
+	NextMethod(...)
+	cat("\n\nModel TVAR with ", x$model.specific$nthresh, " thresholds\n\n")
+	print(x$coefficients)
+	cat("\nThreshold value")
+	print(x$model.specific$Thresh)
+}
+
+summary.TVAR<-function(x, ...){
+	a<-matrix(unlist(x$coefficients), nrow=x$k)
+	b<-matrix(unlist(x$Pval),nrow=x$k)
+	BP<-matrix(NA, nrow=x$k, ncol=x$nparB)
+	BP<-paste(a,"(", b, ")")
+	BP<-matrix(BP, nrow=x$k)
+# 	attributes(BP)<-attributes(x$coefficients)
+	print(BP)
+}

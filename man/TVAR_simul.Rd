@@ -38,7 +38,7 @@ B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.025926
 sim<-TVAR_simul(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5), sigma=c(0.3,0.4))$serie
 
 #estimate the new serie
-OlsTVAR(sim, lag=1, dummyToBothRegimes=TRUE)
+TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 
 ##Bootstrap a TVAR with two threshold (three regimes)
 data(zeroyld)

@@ -10,7 +10,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
        setar, lstar, star, ncstar, availableModels, nlarDialog, 
        linear, isLinear, nnetTs, aar, star,
-	OlsTVAR, TVECM, setarTest, TVAR_LRtest, TAR_simul, TVAR_simul, TVECM_SeoTest)
+	TVAR, TVECM, setarTest, TVAR_LRtest, TAR_simul, TVAR_simul, TVECM_SeoTest)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)

@@ -46,7 +46,7 @@ data(zeroyld)
 
 data<-zeroyld
 
-OlsTVAR(data, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=TRUE)
+TVAR(data, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=TRUE)
 
 ##The one threshold (two regimes) gives a value of 10.698 for the threshold and 1 for the delay. Conditional on this values, the search for a second threshold (three regimes) gives 8.129. Starting from this values, a full grid search finds the same values and confims the first step estimation. 
 }
