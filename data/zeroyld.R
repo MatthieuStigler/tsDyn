@@ -107,4 +107,4 @@ zeroyld <- structure(list(short.run = c(2.183, 2.246, 2.308, 2.401, 2.558,
 8.746, 8.05, 7.633, 8.237, 8.352, 7.797, 7.613, 7.742, 7.998, 
 8.009, 8.224, 8.471, 8.094, 7.963, 7.641, 7.74, 7.663, 7.352, 
 7.269, 6.842, 6.531, 6.431)), .Names = c("short.run", "long.run"
-), class = "data.frame", row.names = c(NA, -482L))
+), class = "data.frame", row.names = c(NA, -482))
