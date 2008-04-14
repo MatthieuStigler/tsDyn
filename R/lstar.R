@@ -99,7 +99,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     # Maximum and minimum values for gamma
     maxGamma <- 40;
     minGamma <- 10;
-    rateGamma <- 5;
+    rateGamma <- 1;
 
     # Maximum and minimum values for c
     minTh <- quantile(as.ts(z), .1) # percentil 10 de z
@@ -166,7 +166,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     # First fix the linear parameters
     xx <- cbind(xxL, xxH * G(z, gamma, th))
     if(any(is.na(as.vector(xx)))) {
-      message('missing value during computations')
+      message('lstar: missing value during computations')
       return (Inf)
     }
     tmp <- lm.fit(xx, yy)$coefficients
@@ -181,8 +181,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
  
   #Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
-  res <- optim(p, SS, gradEhat, hessian = TRUE, control = control,
-               phi1 = phi1, phi2 = phi2)
+  res <- optim(p, SS, gradEhat, hessian = TRUE, method="BFGS",
+               control = control, phi1 = phi1, phi2 = phi2)
 
   if(trace)
     if(res$convergence!=0)

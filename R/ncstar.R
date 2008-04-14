@@ -324,23 +324,45 @@ startingValues.ncstar <- function(object, trace=TRUE, ...)
          
   bestCost <- Inf;
 
+<<<<<<< .mine
+  for(i in 1:1000) {  ######################    1 0 0 0
+=======
   # Maximum and minimum values for gamma
   maxGamma <- 40;
   minGamma <- 1;
   rateGamma <- 2; ############################################!!!
   
   for(i in 1:1000) {
+>>>>>>> .r139
 
+<<<<<<< .mine
+    if ((i %% 25 == 0) && trace) cat(".")
+=======
     if ((i %% 20 == 0) && trace) cat(".")
+>>>>>>> .r139
 
     newOmega <- c(runif(1, min=0, max=1),
                                 runif(NCOL(xx) - 1, min=-1, max=1))
     newOmega <- newOmega * (1 / norm(Matrix(newOmega), "f"))
     dim(newOmega) <- c(NCOL(xx), 1)
+<<<<<<< .mine
+    omega[, noRegimes - 1] <- newOmega
+=======
     omega[, noRegimes - 1] <- newOmega;
+>>>>>>> .r139
 
-    newTh <- median(xx %*% newOmega)
-    th[noRegimes - 1] <- newTh;
+#    if(i %% 2 == 0)  newTh <- -1
+#    else newTh <- 1
+    
+#    newTh <- median(xx %*% newOmega)
+
+    newTh <- rnorm(1, mean(xx %*% newOmega), sd(xx %*% newOmega))
+    th[noRegimes - 1] <- newTh
+    
+    # Maximum and minimum values for gamma
+    maxGamma <- 40; #abs(8 / ((max(xx %*% newOmega) - newTh)))
+    minGamma <- 1; #abs(1 / ((min(xx %*% newOmega) - newTh)));
+    rateGamma <- 2#(maxGamma-minGamma) / 20;     
     
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
 
@@ -379,10 +401,17 @@ startingValues.ncstar <- function(object, trace=TRUE, ...)
                  ", th = ", th[noRegimes - 1],"\n");
   
   # Reorder the regimes according to the values of th
+<<<<<<< .mine
+  if ((noRegimes > 2) &&
+                   prod((1:(noRegimes - 1)) != sort(th, index.return=TRUE)$ix)) {
+    if(trace) cat("  Reordering regimes...\n")
+
+=======
   if ((noRegimes > 2)  &&
                     prod((1:(noRegimes - 1)) != sort(th, index.return=TRUE)$ix))  {
 
     if(trace) cat("  Reordering regimes...\n")
+>>>>>>> .r139
     ordering <-  sort(th, index.return=TRUE)$ix
 
     th <- sort(th, index.return=TRUE)$x
@@ -505,9 +534,13 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     y.hat <- FF(phi1, phi2omega, xx)
     crossprod(yy - y.hat)
   }
-  
+
   res <- optim(object$model.specific$phi2omega, SS, gr = gradEhat,
+<<<<<<< .mine
+               method="CG", control = control)
+=======
                method="BFGS", control = control)
+>>>>>>> .r139
 
   newPhi2 <- res$par[1:((noRegimes-1) * 2)];
   dim(newPhi2) <- c(noRegimes - 1, 2)
@@ -522,9 +555,16 @@ estimateParams.ncstar <- function(object, trace=TRUE, control=list(), ...)
     if(gamma[i] <0)
       gamma[i] <- - gamma[i];
   
+<<<<<<< .mine
+  if (trace) cat("  Optimized values fixed for regime ", noRegimes,
+                 ": \n    gamma = ", gamma,
+                 "\n    th = ", th,
+                 "\n    omega = ", omega, "\n");
+=======
   if (trace) cat("  Optimized values fixed for regime ", noRegimes,
                  ": \n    gamma = ", gamma,
                  "\n    th = ", th,"\n");
+>>>>>>> .r139
 
   if(trace) 
     if(res$convergence != 0)
@@ -587,7 +627,14 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
   if(missing(series))   series <- deparse(substitute(x))
 
   # Normalize the series.
+<<<<<<< .mine
+#  if ((mean(x) >= 0.05) && (sd(x) >= 0.05) {
+#    if (trace) cat("Normalizing the series.\n")
+#    x <- (x - mean(x)) / sd(x);
+#  }
+=======
 #  x <- (x - mean(x)) / sd(x);
+>>>>>>> .r139
   
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 
@@ -672,7 +719,11 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       }            
     }
     
+<<<<<<< .mine
+    if(trace) cat("\n- Finished building an NCSTAR with ",
+=======
     if(trace) cat("\n- Finished building a MRSTAR with ",
+>>>>>>> .r139
                   object$model.specific$noRegimes, " regimes\n");
     return(object);
   }
