@@ -1,4 +1,4 @@
-## Copyright (C) 2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2006-2008  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -76,10 +76,10 @@ llar.step <- function(x, m, d=1, steps=d, series, eps=stop("you must specify a w
     stop("NA's not allowed")  
   onvoid <- match.arg(onvoid)
   r <- 1+r/100
-  lags <- c(0:(m-1)*(-d),steps)
-  xx <- embedd(x, lags=lags)
-  yy <- xx[,m+1]
-  xx <- xx[,1:m]
+  lags <- c(steps, 0:(m-1)*(-d))
+  xxFull <- embedd(x, lags=lags)
+  yy <- xxFull[,1]
+  xx <- xxFull[,seq_len(m)+1]
   xxL <- xx[nrow(xx),]
   dif <- sweep(xx, 2, xxL, "-")
   DL <- apply(dif,1,function(x) sum(x^2))
@@ -104,7 +104,7 @@ llar.step <- function(x, m, d=1, steps=d, series, eps=stop("you must specify a w
   xxSEL <- cbind(1,xx[SEL,])
   yySEL <- yy[SEL]
   lmod <- lm.fit(xxSEL, yySEL)
-  return(crossprod(c(1,xxL),lmod$coef))
+  return(crossprod(c(1,xxFull[nrow(xxFull), seq_len(m)]),lmod$coef))
 }
 
 llar.predict <- function(x, m, d=1, steps=d, series, n.ahead=1,
