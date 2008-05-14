@@ -7,10 +7,9 @@ importFrom(tseries, na.remove)
 export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        autopairs, autotriples, autotriples.rgl,
        delta, delta.test, delta.lin, delta.lin.test,
-       llar, llar.predict, llar.fitted, sigmoid, dsigmoid, d2sigmoid,
-       setar, lstar, star, ncstar, availableModels, nlarDialog, 
-       linear, isLinear, nnetTs, aar, star,
-	TVAR, TVECM, setarTest, TVAR_LRtest, TAR_simul, TVAR_simul, TVECM_SeoTest)
+       llar, llar.predict, llar.fitted, sigmoid, dsigmoid,
+       setar, lstar, star, ncstar, ncstar.predefined, availableModels,
+       nlarDialog, linear, isLinear, nnetTs, aar, star)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
