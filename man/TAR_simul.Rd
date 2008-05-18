@@ -11,8 +11,10 @@ TAR_simul(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, 
 a list with the simulated/bootstraped data and the parameter matrix used. 
 }
 \arguments{
-\item{y}{ univariate time series }
-\item{B}{vector of parameter to simulate}
+\item{data}{ univariate time series }
+\item{B}{vector of coefficients to simulate}
+\item{sigma}{variance of the errors}
+\item{n}{Number of observations to create when type="simul"}
 \item{Thresh}{The threshold value(s). Vector of length nthresh}
 \item{nthresh}{number of threshold (see details)}
 \item{lag}{Number of lags to include in each regime}

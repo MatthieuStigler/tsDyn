@@ -1,4 +1,4 @@
-TVECM<-function(data,lag=1,trend=TRUE, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), model=c("All", "only_ECT"), demean = c( "const", "trend","none", "both"),beta0=0 ) {
+TVECM<-function(data,lag=1, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), model=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),beta0=0,trace=TRUE ) {
 y<-as.matrix(data)
 T<-nrow(y)		#T: number of observations
 p<-lag 		#p: Number of lags
@@ -10,7 +10,7 @@ if(is.null(colnames(data))==TRUE)
 	colnames(data)<-paste("Var", c(1:k), sep="")
 ndig<-getndp(y)
 restr<-match.arg(restr)
-demean<-match.arg(demean)
+include<-match.arg(include)
 model<-match.arg(model)
 model<-switch(model, "All"="All", "only_ECT"="only_ECT")
 
@@ -19,11 +19,11 @@ DeltaY<-diff(y)[(p+1):(T-1),]
 Xminus1<-embed(y,p+2)[,(k+1):(k+k)]
 DeltaX<-embed(diff(y),p+1)[,-(1:k)]
 
-if(demean=="const")
+if(include=="const")
 	DeltaX<-cbind(rep(1,t), DeltaX)
-else if(demean=="trend")
+else if(include=="trend")
 	DeltaX<-cbind(seq_len(t), DeltaX)
-else if(demean=="both")
+else if(include=="both")
 	DeltaX<-cbind(rep(1,t),seq_len(t), DeltaX)
 
 
@@ -65,11 +65,11 @@ allpar<-ncol(B)*nrow(B)
 
 rownames(B)<-paste("Equation",colnames(data))
 LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
-if(demean=="const")
+if(include=="const")
 	colnames(B)<-c("ECT","Intercept",LagNames)
-else if(demean=="trend")
+else if(include=="trend")
 	colnames(B)<-c("ECT","Trend",LagNames)
-else if(demean=="both")
+else if(include=="both")
 	colnames(B)<-c("ECT","Intercept","Trend",LagNames)
 else 
 	colnames(B)<-c("ECT",LagNames)
@@ -88,44 +88,11 @@ colnames(Pval)<-colnames(B)
 nlike<-log(det(Sigma))		#	nlike=(t/2)*log(det(sige));
 aic<-t*nlike+2*(allpar)	
 bic<-t*nlike+log(t)*(allpar)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
-
-###Output for linear VECM
-cat("Size of full sample:", T)
-cat("\nSize of end sample:", T-p-1)
-cat("\nNumber of lags:", p)
-cat("\nNumber of variables:", k)
-cat("\nVariables:", c(colnames(data)))
-
-cat("\n############################ \n###Linear VECM estimates (by OLS)\n############################\n \n")
-cat("Cointegrating vector",c(1, -betaLT), "\n")
-cat("Standard error of the cointegrating value", betaLT_std, "\n")
-cat("Parameters \n")
-print(B)
-cat("P-Values\n")
-print(Pval)
-cat("\nNegative LL \t", nlike, "\n")
-cat("AIC \t\t", aic, "\n")
-cat("BIC \t\t", bic, "\n")
-
-
 #########################
 ###Set up of the grid
 #########################
 
-#Function to select values around a given point
-aroundGrid <- function(around,allvalues,ngrid,trim){
-	ng <- length(allvalues)
-	wh.around <- which.min(abs(allvalues-around))
-	if(length(which(allvalues==around))==0)
-		warning("\nThe value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead")
-	if(length(wh.around)>1){
-		warning("\nThere were", length(wh.around)," values corresponding to the around argument. The first one was taken")
-		wh.around<-wh.around[1]}
-	ar <- seq(from=wh.around-round(ngrid/2), to=(wh.around+round(ngrid/2)))		#Values around the point
-	ar2 <- ar[ar>=round(trim*ng)&ar<=round((1-trim)*ng)]			#Bounding with trim 
-	values <- allvalues[ar2]
-	return(values)
-}
+
 
 
 ###grid for gamma1
@@ -228,12 +195,14 @@ for (i in seq_len(length(gammas))){
 
 #m<-min(store, na.rm=TRUE)
 na<-sum(ifelse(is.na(store),1,0))
-if(na>0) cat("\n",na,"(", na/(nrow(store)*ncol(store)), ") points of the grid lead to regimes with percentage of observations < trim and were not computed\n")
-
+if(na>0) {
+	if(trace) {cat("\n",na,"(", percent(na/(nrow(store)*ncol(store)),3,by100=TRUE), ") points of the grid lead to regimes with percentage of observations < trim and were not compute")}
+}
 
 pos<-which(store==min(store, na.rm=TRUE), arr.ind=TRUE)		#Best gamma
 if(nrow(pos)>1) {
-	warning("There were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one  ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken") 	
+	if(trace){
+		cat("\nThere were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one  ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken") 	}
 	pos<-pos[1,]}
 
 
@@ -249,7 +218,7 @@ oneThreshTemp<-function(betai,gam) func_onethresh(betai=betai, gam=gam, DeltaX=D
 storemap<-mapply(oneThreshTemp, betai=grid[,1], gam=grid[,2])
 bests<-which(storemap==min(storemap, na.rm=TRUE))
 if(length(bests)>1) {
-	warning("There were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken") 	
+	if(trace){ cat("\nThere were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken")}
 	bests<-bests[1]}
 beta_grid<-grid[bests,1]
 bestGamma1<-grid[bests,2]
@@ -354,8 +323,8 @@ bestone <- oneSearch(betas, gammas)
 bestThresh <- bestone$gamma
 bestBeta <- bestone$beta
 func<-switch(model, "All"=two_Thresh, "only_ECT"=two_partial_Thresh)
-
-cat("\nBest threshold from first search", bestThresh)
+if(trace)
+	cat("\nBest threshold from first search", bestThresh)
 
 if(!is.null(gamma2$exact))
 	secondBestThresh<-gamma2$exact
@@ -365,7 +334,7 @@ if(is.null(gamma2$exact) & !is.numeric(gamma2$around)){
 
 wh.thresh <- which.min(abs(allgammas-bestThresh))
 ninter<-round(trim*nrow(Xminus1))
-print(restr)
+
 if(restr=="none"){
 	#search for a second threshold smaller than the first
 	if(wh.thresh>2*ninter){
@@ -397,15 +366,17 @@ else if(restr=="signOp"){
 store2 <- c(storeMinus, storePlus)
 
 positionSecond <- which(store2==min(store2, na.rm=TRUE))
-if(length(positionSecond)>1) warning("There were ",length(positionSecond), " thresholds values which minimize the SSR in the conditional step, the first one was taken") 
-
+if(length(positionSecond)>1) {
+	if(trace) cat("\nThere were ",length(positionSecond), " thresholds values which minimize the SSR in the conditional step, the first one was taken") 
+}
 positionSecond<-positionSecond[1]
 if(positionSecond<=length(storeMinus)){
 	secondBestThresh<-gammaMinus[positionSecond]}
 else {
 	secondBestThresh<-gammaPlus[positionSecond-length(storeMinus)]}
 
-cat("\nSecond best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE))
+if(trace)
+	cat("\nSecond best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE))
 }#end if ...many conditions
 
 
@@ -450,9 +421,11 @@ for(i in seq_len(length(gammasDown))){
 
 #Finding the best result
 positionIter <- which(storeIter==min(storeIter, na.rm=TRUE), arr.ind=TRUE)
-if(nrow(positionIter)>1) 
-	{warning("There were ",length(positionIter), " thresholds values which minimize the SSR in the iterative step, the first one was taken") 
+if(nrow(positionIter)>1) {
+	if(trace)
+	{	cat("\nThere were ",length(positionIter), " thresholds values which minimize the SSR in the iterative step, the first one was taken") 
 	positionIter<-positionIter[1,]}
+	}
 rIter <- positionIter[1]
 cIter <- positionIter[2]
 
@@ -461,7 +434,8 @@ bestThresh2Iter <- gammasUp[cIter]
 
 bestThresh <- c(bestThresh1Iter, bestThresh2Iter)
 
-cat("\nSecond step best thresholds", bestThresh, "\t\t\t SSR", min(storeIter, na.rm=TRUE), "\n")
+if(trace)
+	cat("\nSecond step best thresholds", bestThresh, "\t\t\t SSR", min(storeIter, na.rm=TRUE))
 }#end if nthresh=2
 
 
@@ -537,13 +511,13 @@ rownames(Pval) <- paste("Equation", colnames(data))
 DeltaXnames<-c(paste(rep(colnames(data),p), "t",-rep(1:p, each=k)))
 
 
-if(demean=="const") 
+if(include=="const") 
 	Bcolnames <- c("ECT","Const", DeltaXnames)
-else if(demean=="trend") 
+else if(include=="trend") 
 	Bcolnames <- c("ECT","Trend", DeltaXnames)
-else if(demean=="both") 
+else if(include=="both") 
 	Bcolnames <- c("ECT","Const","Trend", DeltaXnames)
-else if(demean=="none") 
+else if(include=="none") 
 	Bcolnames <- c("ECT",DeltaXnames)
 
 if(nthresh==1){
@@ -604,61 +578,192 @@ else if(nthresh==2){
 	}
 }
 
-##Print
-cat("\n############################ \n###Threshold VECM estimates \n############################\n \n")
-if(is.null(gamma1$exact)==TRUE){cat("Threshold estimate \t\t", bestThresh)}
-else {cat("User specified threshold \t\t", bestThresh)}
-if(is.null(beta$exact)==TRUE){cat("\nCointegrating vector Estimate: \t", c(1,-bestBeta))}
-else{cat("\nUser specified Cointegrating vector: \t", c(1,-bestBeta))}
-cat("\nNegative Log-Like: \t\t", nlike_thresh)
-cat("\nAIC \t\t\t\t", aic_thresh, "\nBIC \t\t\t\t", bic_thresh, "\nSSR \t\t\t\t", SSRbest)
 
-cat("\n###Under regime \n \n Percentage of observations \t",  ndown)
-cat("\n Parameters \n")
-print(Bdown)
-cat("\n P-values\n")
-print(Pdown)
 
-if(nthresh==2&model=="All"){
-	cat("\n##Middle regime \n \n Percentage of observations \t",  1-ndown-nup)
-	cat("\n Parameters \n")
-	print(Bmiddle)
-	cat("\n P-values\n")
-	print(Pmiddle)
-	}
+specific<-list()
+specific$Thresh<-bestThresh
+specific$nthresh<-nthresh
+specific$nreg<-nthresh+1
+specific$rowB<-npar
+specific$nobs<-nobs
+specific$oneMatrix<-ifelse(model=="only_ECT",TRUE, FALSE)
+specific$beta<-c(1, -betaLT)
+specific$threshEstim<-ifelse(is.null(gamma1), TRUE, FALSE)
+# specific$commonInter<-commonInter
 
-if(!model=="only_ECT"){
-	cat("\n###Over regime \n \n Percentage of observations \t",nup)
-	cat("\n Parameters \n")
-	print(Bup)
-	cat("\n P-values\n")
-	print(Pup)
-	}
-z<-list(residuals=resbest, VAR=VarCovB, coefficients=Blist, k=k, t=t, nobs_regime=nobs, nthresh=nthresh, nparB=allpar, fitted.values=fitted)
-class(z)<-"nlVar"
+
+
+z<-list(coefficients=Blist, residuals=resbest, VAR=VarCovB,   Pvalues=Plist, nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+
+
+class(z)<-c("TVECM","nlVar")
 return(z)
 }
 
 
 
 if(FALSE) {
+library(tsDyn)
 data(zeroyld)
-data<-zeroyld
+dat<-zeroyld
 
 environment(TVECM)<-environment(star)
 
 summary(lm(zeroyld[,1]~zeroyld[,2]-1))
 summary(lm(zeroyld[,1]~zeroyld[,2]))
 
-TVECM(data, nthresh=1,lag=1, bn=80, ngridG=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
+TVECM(dat, nthresh=1,lag=1, bn=80, ngridG=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
 beta0<-rep(1.12,480)
-TVECM(data, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
-a<-TVECM(data, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT")
-class(a)
-print(a)
-logLik(a)
-AIC(a)
-deviance(a)
+TVECM(dat, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
 
+
+tvecm<-TVECM(dat, nthresh=2,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="All")
+class(tvecm)
+tvecm
+print(tvecm)
+coef(tvecm)
+logLik(tvecm)
+AIC(tvecm)
+BIC(tvecm)
+deviance(tvecm)
+summary(tvecm)
+toLatex.TVECM(tvecm)
+###TODO
+#allow for three ECT terms when argument only_ECT
+#pmatch all=All
+#introduce trace argument
+#convert warning to cat for There were 2 thresholds values which minimize the SSR in the conditional step
 }
 
+print.TVECM<-function(x,...){
+# 	NextMethod(...)
+	cat("Model TVECM with ", x$model.specific$nthresh, " thresholds\n\n")
+	print(x$coefficients)
+	cat("\nThreshold value")
+	print(x$model.specific$Thresh)
+}
+
+summary.TVECM<-function(object,...){
+	x<-object
+	if(x$model.specific$oneMatrix) {
+		x$coefficients<-list(x$coefficients)
+		x$Pvalues<-list(x$Pvalues)}
+	ab<-list()
+	symp<-list()
+	stars<-list()
+	for(i in 1:length(x$Pvalues)){
+		symp[[i]] <- symnum(x$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
+		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$Pval[[i]]))
+		ab[[i]]<-matrix(paste(round(x$coefficients[[i]],4),"(", x$Pval[[i]],")",stars[[i]], sep=""), nrow=nrow(x$Pvalues[[1]]))
+		dimnames(ab[[i]])<-dimnames(x$coefficients[[1]])
+	}
+	attributes(ab)<-attributes(x$coefficients)
+
+ 	x$bigcoefficients<-ab
+	x$aic<-AIC.nlVar(x)
+	x$bic<-BIC.nlVar(x)
+	x$SSR<-deviance(x)
+	class(x)<-c("summary.TVECM", "TVECM")
+	return(x)
+	
+}
+
+print.summary.TVECM<-function(x,...){
+	cat("#############\n###Model TVECM\n#############")
+	cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
+	cat("\nNumber of variables:", x$k,"\tNumber of estimated parameters", x$npar)
+	cat("\nAIC",x$aic , "\tBIC", x$bic,"\tSSR", x$SSR,"\n\n")
+	print(noquote(x$bigcoefficients))	
+	cat("\nThreshold")
+	cat("\nValues:", x$model.specific$Thresh)
+	cat("\nPercentage of Observations in each regime", percent(x$model.specific$nobs,digits=3,by100=TRUE))
+	cat("\nCointegrating vector", x$model.specific$beta)
+}
+
+toLatex.TVECM<-function(x, ...,digits=4){
+	Th<-x$model.specific$Thresh
+	nthresh<-length(Th)
+	if(x$model.specific$oneMatrix){
+		x$coefficients<-list(x$coefficients)
+	}
+	if(inherits(x,"summary.TVECM")){
+		coef<-x$bigcoefficients
+		for(i in 1:length(coef)){
+			coef[[i]]<-gsub(")", ")^{",coef[[i]], extended=FALSE)
+			coef[[i]]<-matrix(paste(coef[[i]], "}"), ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
+		}
+	}
+	else{
+		coef<-as.list(x$coefficients)
+		coef<-rapply(coef,round, digits=digits, how="list")}
+	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
+	varNames<-rownames(coef[[1]])
+	res<-character()
+	res[1]<-"%This needs package amsmath. Write \\usepackage{amsmath}"
+	res[2]<-"\\begin{equation}"
+	res[3]<- "\\begin{pmatrix} %explained vector"
+	res[4]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
+	res[5]<- "\\end{pmatrix}="
+	res[6]<- "\\left\\{"
+ 	res[7]<-"\\begin{array}{rl}"
+
+	###Condition for the threshold
+	if(nthresh%in%c(1,2)){
+		cond<-paste(c("& \\text{if Th}<","& \\text{if Th}>"), Th)
+		ect<-c("^{<th}", "^{>th}")}
+	if(nthresh==2){
+		cond[3]<-cond[2]
+		cond[2]<-paste("& \\text{if }",Th[1], "< \\text{Th} <", Th[2])	
+		ect<-c("^{<th1}","^{>th2}")
+ 		}
+	###Adds the const/trend and lags
+	for(i in 1:ifelse(x$model.specific$oneMatrix, 1,nthresh+1)){
+		if(x$model.specific$oneMatrix){
+			regimei<-coef[[1]]
+			j<-i
+		}
+		else{
+			regimei<-coef[[i]]
+			j<-1}
+		###ECT
+		for(k in 1:ifelse(x$model.specific$oneMatrix,2,1)){
+			len<-length(res)
+			res[len+1]<-"\\begin{pmatrix} %ECT"
+			res[len+2]<-TeXVec(regimei[,k])
+			if(x$model.specific$oneMatrix)
+				res[len+3]<-paste("\\end{pmatrix}","ECT_{-1}",ect[k],"+",sep="")
+			else
+				res[len+3]<-paste("\\end{pmatrix}","ECT_{-1}","+",sep="")
+		}
+		###const/trend
+ 		res<-include(x, res, regimei, skip=j)
+		###lags
+		res<-LagTeX(res, x, regimei, skip=ninc+j+x$lag*x$k*(j-1))
+		if(!x$model.specific$oneMatrix)
+			res[length(res)+1]<- paste(cond[i], "\\\\")
+	}
+	res[length(res)+1]<-"\\end{array}"
+	res[length(res)+1]<-"\\right."
+	res[length(res)+1]<-"\\end{equation}"
+	res<-gsub("kik", "\\\\", res, fixed=TRUE)
+	res<-res[res!="blank"]
+	
+	return(structure(res, class="Latex"))
+}
+
+#Function to select values around a given point
+aroundGrid <- function(around,allvalues,ngrid,trim){
+	ng <- length(allvalues)
+	wh.around <- which.min(abs(allvalues-around))
+	if(length(which(allvalues==around))==0){
+		if(trace) cat("\nThe value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead")
+	}
+	if(length(wh.around)>1){
+		if(trace) {warning("\nThere were", length(wh.around)," values corresponding to the around argument. The first one was taken")}
+		wh.around<-wh.around[1]
+	}
+	ar <- seq(from=wh.around-round(ngrid/2), to=(wh.around+round(ngrid/2)))		#Values around the point
+	ar2 <- ar[ar>=round(trim*ng)&ar<=round((1-trim)*ng)]			#Bounding with trim 
+	values <- allvalues[ar2]
+	return(values)
+}

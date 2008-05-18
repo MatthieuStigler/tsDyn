@@ -340,8 +340,8 @@ print(se2print)
 #############
 ###Wald tests
 ##############
-bb<<-bb
-rb<<-rb
+# bb<<-bb
+# rb<<-rb
 if (k>0){
 	bw<-matrix(c(bb[-c(1,2),]), ncol=1)		#Vectorization of the lags parameters
 	vr<-matrix(c(c(3:rb),c((rb+3):(2*rb))), ncol=1)

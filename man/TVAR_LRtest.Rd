@@ -5,9 +5,7 @@
 \description{Multivariate extension of the linearity against threshold test from Hansen (1999) with bootstrap distribution 
 }
 \usage{
-TVAR_LRtest(x, m=1, d = 1, steps = d, trend=TRUE, 
-series, thDelay = 1:2,    mTh=1, thVar, nboot=10, plot=FALSE,
-trim=0.1, test=c("1vs", "2vs3"))
+TVAR_LRtest(data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR"))
 }
 
 \value{A list containing:
@@ -17,16 +15,19 @@ trim=0.1, test=c("1vs", "2vs3"))
 -The bootstrap Pvalues and critical values for the test selected
 }
 \arguments{
-\item{x}{ multivariate time series }
-\item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
-\item{series}{ time series name (optional) }
-\item{thDelay}{'time delay' for the threshold variable IN THE MULTIVARIATE IMPLEMENTATION (so 0:1 in univariate correspond to 1:2)}
+\item{data}{ multivariate time series }
+\item{lag}{Number of lags to include in each regime}
+\item{trend} {whether a trend should be added}
+\item{series}{name of the series}
+\item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases. }
 \item{mTh}{combination of variables with same lag order for the transition variable. Either a single value (indicating which variable to take) or a combination}
-\item{thVar}{external threshold variable}
-\item{nboot}{numer of bootstrap replications}
+\item{thVar}{external transition variable}
+\item{nboot}{Number of bootstrap replications}
+\item{plot} {Whether a plot showing the results of the grid search should be printed}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
-\item{plot}{Whether a plot with the bootstrap distribution and the Ftest should be shown}
-\item{test}{Type of test. See details}
+\item{test}{Type of usual and alternative hypothesis. See details}
+\item{check}{Possiblity to check the function by no sampling: the test value should be the sme as in the original data}
+\item{model} {Whether the threshold variable is taken in level (TAR) or difference (MTAR)}
 
 }
 \details{
@@ -58,7 +59,7 @@ The homoskedastik bootstrap distribution is based on resampling the residuals fr
 data(zeroyld)
 data<-zeroyld
 
-TVAR_LRtest(data, m=2, mTh=1,thDelay=1:2, nboot=3, plot=FALSE, trim=0.1, test="1vs")}
+TVAR_LRtest(data, lag=2, mTh=1,thDelay=1:2, nboot=3, plot=FALSE, trim=0.1, test="1vs")}
 \keyword{ ts }
 \references{
 Hansen (1999) Testing for linearity, Journal of Economic Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26)

@@ -107,6 +107,8 @@ residuals.nlar <- function(object, ...) {
   ans
 }
 
+deviance.nlar<-function(object,...) crossprod(object$residuals)
+
 #Mean Square Error for the specified object
 mse <- function (object, ...)  
   UseMethod("mse")
@@ -124,9 +126,19 @@ AIC.nlar <- function(object,k=2, ...){
   n * log( mse(object) ) + k * npar
 }
 
+BIC <- function(obj, ...,k) UseMethod("BIC")
+
+BIC.default<-function(object, ...,k)
+	NULL
+
+BIC.lm<-function(object, ...,k)
+	AIC(object,...,k=log(length(object$residuals)))
+
 #BIC for the fitted nlar model
-BIC.nlar <- function(object, ...)
+BIC.nlar <- function(object, ...,k)
 	AIC.nlar(object, k=log(object$str$n.used))
+
+
 
 #Mean Absolute Percent Error
 MAPE <- function(object, ...)

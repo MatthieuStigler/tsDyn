@@ -1,4 +1,4 @@
-TVAR_LRtest <- function (data, m=1, d = 1, steps = d, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
+TVAR_LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
 
 if (missing(series))  series <- deparse(substitute(data))
 y <- as.matrix(data) 
@@ -7,10 +7,11 @@ y<-round(y,ndig)
 Torigin <- nrow(y) 	#Size of original sample
 
 T <- nrow(y) 		#Size of start sample
-t <- T-m 		#Size of end sample
+t <- T-lag 		#Size of end sample
 k <- ncol(y) 		#Number of variables
-p<-m
-
+p<-lag
+m<-lag			#keep consistent with nlar
+d<-1			#seems to be useless for nlVar...
 model<-match.arg(model)
 if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", seq_len(k), sep="")

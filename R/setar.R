@@ -21,23 +21,38 @@
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
-setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,demean = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MH=seq_len(mH)){
-	demean<-match.arg(demean)
+setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15){
+	include<-match.arg(include)
+	model<-match.arg(model)
 	if(missing(m))
 		m <- max(ML, MH, thDelay+1)
+	if(!missing(th)){
+		if(length(th)==2)
+			nthresh<-2
+	}
   if(missing(series))
     series <- deparse(substitute(x))
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	xx <- getXX(str)
 	yy <- getYY(str)
 	externThVar <- FALSE
-	if(missing(ML)) {
-		if (missing(mL)) {
+	##Lags selection
+	if(missing(ML)) {		#ML: different lags
+		if (missing(mL)) {	#mL: suit of lags
 			mL <- m
 			if (trace) 
 				cat("Using maximum autoregressive order for low regime: mL =", m,"\n")
 		}
 		ML <- seq_len(mL)
+	}
+
+	if(missing(MM)) {
+		if (missing(mM)) {
+			mM <- m
+			if (trace&nthresh==2) 
+				cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
+		}
+		MM <- seq_len(mM)
 	}
 	if(missing(MH)) {
 		if (missing(mH)) {
@@ -47,12 +62,41 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 		}
 		MH <- seq_len(mH)
 	}
+
+	###includes const, trend
+	if(include=="const"){
+		const <- rep(1,nrow(xx))
+		inc<-"const"}
+	else if(include=="trend"){
+		const<-seq_len(nrow(xx))
+		inc<-"trend"}
+	else if(include=="both"){
+		const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
+		inc<-c("const","trend")} 
+	else {
+		const<-NULL
+		inc<-NULL
+	}
+	ninc<-length(inc)
+
 	###Set-up of transition variable
 	if(!missing(thDelay)) {
 		if(thDelay>=m) 
 			stop(paste("thDelay too high: should be < m (=",m,")"))
-		z <- xx[,thDelay+1]
-	} else if(!missing(mTh)) {
+		if(model=="TAR"){
+			z <- xx
+			z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE]
+			z4<-embed(x,m+1)[,-1]
+		}
+		else{
+			if(thDelay==m-1)
+				stop("th Delay too high, should be <m-1 (=",m,")(because of differencing)")
+ 		z<-embed(diff(x),m)[,thDelay+2]
+		#print(cbind(yy,xx,z))
+		#z<-z[if(m-thDelay-2>0)-seq_len(m-thDelay-2>0) else seq_len(nrow(z)),thDelay+2]
+		}
+	}
+ 	else if(!missing(mTh)) {
 		if(length(mTh) != m) 
 			stop("length of 'mTh' should be equal to 'm'")
 		z <- xx %*% mTh #threshold variable
@@ -69,68 +113,68 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 	} else {
 		if(trace) 
 			cat("Using default threshold variable: thDelay=0\n")
-		z <- xx[,1]
+		z <- xx
+		thDelay<-0
 	}
-	model<-match.arg(model)
-	if(model=="MTAR")
-		z<-c(0,diff(z))
+
+z<-as.matrix(z)
 	###Threshold search
 	if (missing(th)) { #if 'th' not specified, try over a reasonable grid
-		th <- quantile(z, prob=c(0.15, 0.85))	#interval such that we have enough observations
-		if(trace)
-			cat("Searching inside threshold range: ", th[1], ", ",th[2],"\n")
-		th <- seq(th[1], th[2], length=20)
-		mses <- numeric(length(th))
-		ress <- list()
-		for(i in seq_len(length(th))) {
-			if(externThVar)
-				ress[[i]] <- Recall(x=x, m=m, d=d, steps=steps, 
-					series=series, thVar=x, th=th[i], nested=TRUE, ML=ML, MH=MH)
-			else if(missing(thDelay)){
-				ress[[i]] <- Recall(x=x, m=m, d=d, steps=steps, 
-					series=series, mTh=mTh, th=th[i], nested=TRUE, ML=ML, MH=MH)
-			} else {
-				ress[[i]] <- Recall(x=x, m=m, d=d, steps=steps, 
-					series=series, thDelay=thDelay, th=th[i], nested=TRUE, ML=ML, MH=MH)
-			}
-			mses[i] <- var(ress[[i]]$residuals)
+		ngrid<-ifelse(nthresh==1,30,"ALL")
+		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, nested=FALSE,include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
+		if(nthresh==1) 
+			th<-c(search[1,"th"])
+		else
+			th<-c(search)
+		nested<-TRUE
+		if(trace) {
+			cat("Selected threshold: ", th,"\n")
 		}
-		if(trace) 
-			cat(" Selected threshold: ", th[which.min(mses)],"\n")
-		res <- ress[[which.min(mses)]]
-		res$model.specific$th <- th
-		return(res)
-	} else {	#else fit with the specified threshold
-		isL <- 0+(z <= th)		#regime-switching indicator variable
-		if(demean=="const"){
-			const <- rep(1,nrow(xx))
-			nconst <- "const"
+		#missing(th)<-FALSE
+	}
+
+	##specified threshold 
+	if(!missing(th)) {
+		#check number of observations
+		if(nthresh==1){
+			isL <- ifelse(z[, thDelay + 1]<=th, 1, 0)
+			isM<-NA
+			isH <- 1-isL}	
+		else{
+			isL <- ifelse(z[, thDelay + 1]<=th[1], 1, 0)
+			isH <- ifelse(z[, thDelay + 1]>th[2], 1, 0)
+			isM <- 1-isL-isH
 		}
-		else if(demean=="trend"){
-			const<-seq_len(nrow(xx))
-			nconst<-"trend"}
-		else if(demean=="both"){
-			const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
-			nconst<-c("const", "trend")
-		} else {
-			const<-NULL
-			nconst<-NULL
+		nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))
+
+		if(min(nobs)<trim){
+			if(trace)
+				cat("\nWith the threshold you gave, there a not ",trim,"observations in each regime")
 		}
-		if(common==FALSE){
-			xxL <- cbind(const,xx[,ML])*isL
-			xxH <- cbind(const,xx[,MH])*(1-isL)
-			xxLH<-cbind(xxL,xxH)
-		} else
-			xxLH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
+		if(min(nobs)==0)
+			stop("With the threshold you gave, there is a regime with no observations!")
+		#build the X matrix
+		if(nthresh==1){
+			xxLH<-thresh1(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)	
+			midCommon<-mid<-NA}
+		else if(nthresh==2){
+			xxLH<-thresh2(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)
+			midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep="."))
+			mid<-c(paste("phi3", MH, sep="."))
+		}	
+
+		##compute model
 		res <- lm.fit(xxLH, yy)
+
+		##Coefficients and names
 		res$coefficients <- c(res$coefficients, th)
 		if(common==FALSE){
-			names(res$coefficients) <- c(paste(nconst, rep(1,length(nconst))), paste("phi1", ML, sep="."), 
-				paste(nconst,rep(2,length(nconst))),paste("phi2", MH, sep="."), "th")
+			names(res$coefficients) <- na.omit(c(paste(inc, rep(1,ninc)), paste("phi1", ML, sep="."), paste(inc,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
 		} else{
-			names(res$coefficients) <- c(nconst,paste("phi1", ML, sep="."),paste("phi2",MH, sep="."), "th")
+			names(res$coefficients) <- na.omit(c(inc,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
 		}
-		res$k <- if(nested) (res$rank+1) else res$rank	#If nested, 1 more fitted parameter: th
+
+		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
 		res$fixedTh <- if(nested) FALSE else TRUE
 		res$mL <- max(ML)
 		res$mH <- max(MH)
@@ -138,9 +182,13 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 		res$MH <- MH
 		res$externThVar <- externThVar
 		res$thVar <- z
-		res$nconst<-nconst
+		res$nconst<-inc
 		res$common<-common
-		res$lowRegProp <- mean(isL)
+		res$nthresh<-nthresh
+		res$model<-model
+		res$RegProp <- c(mean(isL),mean(isH))
+		if(nthresh==2)
+			res$RegProp <- c(mean(isL),mean(isM),mean(isH))
 		res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
 		if(!externThVar) {
 			if(missing(mTh)) {
@@ -149,16 +197,12 @@ setar <- function(x, m, d=1, steps=d, series, mL, mH, thDelay=0, mTh, thVar, th,
 			}
 			res$mTh <- mTh
 		}
-		return(extend(nlar(str,
-			coef=res$coef,
-			fit=res$fitted.values,
-			res=res$residuals,
-			k=res$k,
-			model.specific=res), "setar"))
+		return(extend(nlar(str,	coef=res$coef,	fit=res$fitted.values,	res=res$residuals,
+			k=res$k,model.specific=res), "setar"))
 	}
 }
 
-getSetarXRegimeCoefs <- function(x, regime=c("1","2")) {
+getSetarXRegimeCoefs <- function(x, regime=c("1","2","3")) {
 	regime <- match.arg(regime)
 	x <- x$coef
 	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
@@ -177,40 +221,53 @@ print.setar <- function(x, ...) {
 	order2.H <- length(x$MH)
 	common <- x$common
 	nconst <- x$nconst
+	nthresh<-x$nthresh
 	externThVar <- x$externThVar
-	cat("\nSETAR model (2 regimes)\n")
+	cat("\nSETAR model (",nthresh+1,"regimes)\n")
 	cat("Coefficients:\n")
 	if(common==FALSE){
 		lowCoef <- getSetarXRegimeCoefs(x.old, "1")
-		highCoef<- getSetarXRegimeCoefs(x.old, "2")
+		highCoef<- getSetarXRegimeCoefs(x.old, ifelse(nthresh==1,"2","3"))
 		cat("Low regime:\n")
 		print(lowCoef, ...)
+		if(nthresh==2){
+			midCoef<- getSetarXRegimeCoefs(x.old, "2")
+			cat("\nMid regime:\n")
+			print(midCoef, ...)}
 		cat("\nHigh regime:\n")
 		print(highCoef, ...)
 	} else {
 		print(x.old$coeff[-length(x.old$coeff)], ...)
 	}
-	thCoef <- coef(x.old)["th"]
+	thCoef<-coef(x.old)[which(names(coef(x.old))=="th")]
 	cat("\nThreshold")
+	if(x$model=="MTAR"){
+		cat("\nMomentum Threshold (MTAR) Adjustment")
+		D<-"Diff"}
+	else
+		D<-NULL
 	cat("\nVariable: ")
         if(externThVar)
           cat("external")
         else {
           cat('Z(t) = ')
-          cat('+ (',format(x$mTh[1], digits=2), ') X(t) ', sep="")
+          cat('+ (',format(x$mTh[1], digits=2), paste(")",D," X(t)", sep=""), sep="")
           if(length(x$mTh)>1)
-            for(j in 1:(length(x$mTh) - 1)) {
-              cat('+ (', format(x$mTh[j+1], digits=2), ') X(t-', j, ')', sep="")
+            for(j in 1:(length(x$mTh) - nthresh)) {
+              cat('+ (', format(x$mTh[j+1], digits=2), paste(")",D,"X(t-", j, ")", sep=""), sep="")
             }
           cat('\n')
         }
 	cat("Value:", format(thCoef, digits=4))
 	if(x$fixedTh) cat(" (fixed)")
 	cat("\n")
-	cat("Proportion of points in low regime: ", format(x$lowRegProp*100, digits=3), "%\n", sep="")
+	cat("Proportion of points in ")
+	if(nthresh==1)
+		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)))
+	else
+		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)))
 	invisible(x)
 }
-
 summary.setar <- function(object, ...) {
 	ans <- list()
 	mod <- object$model.specific
@@ -328,53 +385,365 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 }
 
 #Exhaustive search over a grid of model parameters
-selectSETAR <- function (x, m, d=1, steps=d, thSteps = 7, mL = 1:m, mH = 1:m, 
-    th = quantile(x, prob = seq(0.15, 0.85, length = thSteps)), 
-    thDelay = 0:(m - 1), criterion = c("pooled-AIC","AIC")){
-	str <- nlar.struct(x,m,d,steps)
-	pooledAIC <- function(parms) {
-		thDelayVal <- parms[1] + 1
-		mLVal <- parms[3]
-		mHVal <- parms[4]
-		m <- max(thDelayVal, mLVal, mHVal)
-		lags <- c((0:(m - 1)) * (-d), steps)
-		xxyy <- embedd(x, lags = lags)
-		z <- xxyy[, thDelayVal]
-		isLow <- (z <= parms[2])
-		if ((sum(isLow) < mLVal) | (sum(!isLow) < mHVal)) 
-				return(NA)
-		xx <- xxyy[isLow, 1:mLVal]
-		y <- xxyy[isLow, m + 1]
-		AIC1 <- AIC(lm(y ~ xx))
-		xx <- xxyy[!isLow, 1:mHVal]
-		y <- xxyy[!isLow, m + 1]
-		AIC2 <- AIC(lm(y ~ xx))
-		return(AIC1 + AIC2)
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m)-1, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2) 
+
+{
+	include<-match.arg(include)
+	model<-match.arg(model)
+	if(missing(m))
+		m <- max(ML, MH, thDelay+1)
+  if(missing(series))
+    series <- deparse(substitute(x))
+	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+	xx <- getXX(str)
+	yy <- getYY(str)
+	externThVar <- FALSE
+	##Lags selection
+	if(missing(ML)) {		#ML: different lags
+		if (missing(mL)) {	#mL: suit of lags
+			mL <- m
+			if (trace) 
+				cat("Using maximum autoregressive order for low regime: mL =", m,"\n")
+		}
+		ML <- seq_len(mL)
 	}
-	parsToModel <- function(parms) {
-		thDelayVal <- parms[1]
-		thVal <- parms[2]
-		mLVal <- parms[3]
-		mHVal <- parms[4]
-		m <- max(thDelayVal+1, mLVal, mHVal)
-		return(setar(x, m=m, d=d, steps=steps, mL=mLVal, mH=mHVal, th=thVal))
+
+	if(missing(MM)) {
+		if (missing(mM)) {
+			mM <- m
+			if (trace&nthresh==2) 
+				cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
+		}
+		MM <- seq_len(mM)
 	}
-	x <- str$x
-	IDS <- as.matrix(expand.grid(thDelay, th, mL, mH))
-	criterion <- match.arg(criterion)
-	if(criterion=="pooled-AIC") {
-		computedCriterion <- apply(IDS, 1, pooledAIC)
+	if(missing(MH)) {
+		if (missing(mH)) {
+			mH <- m
+			if (trace) 
+				cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
+		}
+		MH <- seq_len(mH)
+	}
+
+	###includes const, trend
+	if(include=="const"){
+		const <- rep(1,nrow(xx))
+		inc<-"const"}
+	else if(include=="trend"){
+		const<-seq_len(nrow(xx))
+		inc<-"trend"}
+	else if(include=="both"){
+		const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
+		inc<-c("const","trend")} 
+	else {
+		const<-NULL
+		inc<-NULL
+	}
+	ninc<-length(include)
+
+	###Set-up of transition variable
+	if(!missing(thDelay)) {
+		if(max(thDelay)>=m) 
+			stop(paste("thDelay too high: should be < m (=",m,")"))
+		if(model=="TAR"){
+			z <- xx
+			z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE]
+			z4<-embed(x,m+1)[,-1]
+		}
+		else{
+			if(thDelay==m-1)
+				stop("th Delay too high, should be <m-1 (=",m,")(because of differencing)")
+ 		z<-embed(diff(x),m)[,thDelay+2]
+		#print(cbind(yy,xx,z))
+		#z<-z[if(m-thDelay-2>0)-seq_len(m-thDelay-2>0) else seq_len(nrow(z)),thDelay+2]
+		}
+	}
+ 	else if(!missing(mTh)) {
+		if(length(mTh) != m) 
+			stop("length of 'mTh' should be equal to 'm'")
+		z <- xx %*% mTh #threshold variable
+		dim(z) <- NULL
+	} else if(!missing(thVar)) {
+		if(length(thVar)>nrow(xx)) {
+			z <- thVar[seq_len(nrow(xx))]
+			if(trace) 
+				cat("Using only first", nrow(xx), "elements of thVar\n")
+		}
+		else 
+			z <- thVar
+		externThVar <- TRUE
 	} else {
-		critFun <- switch(criterion, AIC=AIC)
-		computedCriterion <- apply(IDS, 1, function(x) critFun(parsToModel(x)))
+		z <- xx
 	}
-	res <- cbind(IDS, computedCriterion)
-	colnames(res) <- c("thDelay", "th", "mL", "mH", criterion)
-	idSel <- sort(computedCriterion, index=TRUE)$ix
-	idSel <- idSel[1:min(10, length(idSel))]
-	res <- data.frame(res[idSel,], row.names=NULL)
+
+
+z<-as.matrix(z)
+
+##Grid
+allTh <- sort(unique(z[,1]))
+ng <- length(allTh)
+ninter<-round(trim*ng)
+nmax<-ng-2*ninter
+
+#gamma pre-specified
+if(!is.null(th$exact)){
+	th<-allTh[which.min(abs(allTh-th$exact))]
+	if(length(th)>1){
+		cat("Many values correspond to the one you gave. The first one was taken")
+		th<-th[1]}
+	ngrid<-1
+	}
+#interval to search between given by user
+else if(is.numeric(th$int)){
+	if(missing(ngrid))
+		ngrid<-20
+	intDown<-which.min(abs(allTh-th$int[1]))
+	intUp<-which.min(abs(allTh-th$int[2]))
+	if(length(intDown)>1|length(intUp)>1)
+		intDown<-intDown[1];intUp<-intUp[1];
+	if(trace)
+		cat("Searching within",min(ngrid,intUp-intDown), "values between",allTh[intDown], "and", allTh[intUp],"\n")
+	th<-allTh[seq(from=intDown, to=intUp, length.out=min(ngrid,intUp-intDown))]
+	}
+#value to search around	given by user
+else if(is.numeric(th$around)){
+	if(missing(ngrid))
+		ngrid<-20
+	if(trace)
+		cat("Searching within", ngrid, "values around", th$around,"\n")
+	th<-aroundGrid(th$around,allvalues=allTh,ngrid=ngrid,trim=trim)
+}
+
+#Default method: grid from lower to higher point
+else{
+	if(ngrid=="ALL")
+		ngrid<-nmax
+	else if(ngrid>nmax)
+		ngrid<-nmax
+	th<-allTh[round(seq(from=trim, to=1-trim, length.out=ngrid)*ng)]
+	if(trace)
+		cat("Searching on",ngrid, "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
+}
+th<-round(th, getndp(x))
+gammas<-th
+
+###Computation
+SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
+	XX<-thresh1(gam1,thDelay, xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
+		#res2<-deviance(lm(yy~XX-1))
+		#check if equal print(c(res,res2))
+	}
 	return(res)
 }
+
+
+SSR_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
+	XX<-thresh2(gam1,gam2,thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
+		#res2<-deviance(lm(yy~XX-1))
+		#print(c(res,res2))
+	}
+	return(res)
+}
+
+
+AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
+	XX<-thresh1(gam1,thDelay, xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		res<-length(yy)*log(res)+2*ncol(xx)
+		#res2<-AIC(lm(yy~XX-1))}
+	}
+	return(res)
+}
+
+AIC_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
+	XX<-thresh2(gam1,gam2,thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		res<-length(yy)*log(res)+2*ncol(xx)
+		#res2<-AIC(lm(yy~XX-1))
+		#print(c(res,res2))
+	}
+	return(res)
+}
+
+
+###Function pooled AIC
+pooledAIC <- function(parms) {	
+	thDelayVal <- parms[1] + 1
+	mLVal <- parms[2]
+	mHVal <- parms[3]
+
+	m <- max(thDelayVal, mLVal, mHVal)
+	lags <- c( (seq_len(m)-1) * (-d), steps)
+
+	xxyy <- embedd(x, lags = lags)
+
+	z <- xxyy[, thDelayVal]
+	isLow <- (z <= parms[4])
+
+	if ((sum(isLow) < mLVal) | (sum(!isLow) < mHVal)) 
+	    return(NA)
+
+	xx <- xxyy[isLow, seq_len(mLVal)]
+	y <- xxyy[isLow, m + 1]
+	AIC1 <- AIC(lm(y ~ xx))
+
+	xx <- xxyy[!isLow, seq_len(mHVal)]
+	y <- xxyy[!isLow, m + 1]
+	AIC2 <- AIC(lm(y ~ xx))
+	return(AIC1 + AIC2)
+}
+
+
+###Grid of combinations of all parameters
+    IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
+	colnames(IDS)<-c("thDelay", "mL", "mH", "th")
+    IDS2 <- as.matrix(expand.grid(thDelay, th))
+	colnames(IDS2)<-c("thDelay", "th")
+
+
+###Computation for 1 thresh
+criterion <- match.arg(criterion)
+IDS <- switch(criterion, "AIC" = IDS, "pooled-AIC" = IDS, "SSR" = IDS2)	###Selection of the grid
+
+if (criterion == "pooled-AIC") {
+    computedCriterion <- apply(IDS, 1, pooledAIC)} 
+else if(criterion=="AIC"){
+   computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,4], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,3], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,common=common,trim=trim))} 
+else if(criterion=="SSR"){
+    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,common=common,trim=trim))}
+
+###Results
+allres <- cbind(IDS, computedCriterion)
+colnames(allres) <- c(colnames(IDS), criterion)
+idSel <- sort(computedCriterion, index = TRUE)$ix
+idSel <- idSel[seq_len(min(ifelse(nthresh==1,10,5), length(idSel)))]
+res <- data.frame(allres[idSel, ], row.names = NULL)
+
+###Computation for 2 thresh
+if(nthresh==2){
+if(trace){
+	print(res)
+	cat("Number of combinations tested:", nrow(IDS),"\n")
+	cat("Result of the one threshold search: -Thresh: ",res[1,"th"],"\t-Delay: ",res[1,"thDelay"],"\n" )
+}
+More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,common=common, trim=trim)
+func<-switch(criterion, "AIC" = AIC_2thresh, "pooled-AIC" = IDS, "SSR" = SSR_2thresh)	
+
+last<-condiStep(th,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
+
+i<-1
+while(i<max.iter){
+	b<-condiStep(th,last$newThresh, delayRef=res[1,1],ninter=ninter, fun=func, trace=trace, More=More)
+	if(b$SSR<last$SSR){	#minimum still not reached
+		i<-i+1
+		last<-b}
+	else{			#minimum reached
+		i<-max.iter
+		last<-b}
+}
+
+bests<-matrix(c(min(c(last$threshRef, last$newThresh)),max(c(last$threshRef, last$newThresh))),nrow=1)
+colnames(bests)<-c("th1","th2")
+
+
+}
+###Graphical output
+if(plot==TRUE){
+	allcol <- seq_len(max(thDelay+1)*max(mL)*max(mH))
+	col <- switch(criterion, AIC=allcol, "pooled-AIC"=allcol,"SSR"=(thDelay+1) )
+	big <- apply(expand.grid(thDelay,mL, mH),1,function(a) paste("Th:", a[1],"mL:", a[2], "mH:", a[3]))
+	legend <- switch(criterion, "AIC"=big, "pooled-AIC"=big, "SSR"=paste("Threshold Delay", thDelay))
+
+	plot(allres[,"th"], allres[,ncol(allres)], col=col, xlab="Treshold Value",ylab=criterion, main="Results of the grid search")
+ 	legend("topleft", pch=1, legend=legend, col=col, bg=0)
+}
+
+##Result
+if(nthresh==1){
+	if(trace)
+		cat("\nNumber of combinations tested:", nrow(IDS),"\n")
+	return(res)
+	}
+else{
+	return(bests)}
+}
+
+if(FALSE) { #usage example
+library(tsDyn)
+environment(selectSETARmat)<-environment(selectNNET)
+#Transformation like in Hansen 1999
+sun<-(sqrt(sunspot.year+1)-1)*2		
+
+###Full grid search with OLS
+selectSETARmat(sun, m=3, criterion="SSR", d=1, thDelay=0:2,model="TAR", trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
+
+selectSETARmat(sun, m=3, criterion="AIC", d=1, thDelay=0:2,model="TAR", trim=0.25, max.iter=10, plot=FALSE, nthresh=1)
+
+###restricted search with AIC or AIC pooled around the max selected by OLS
+selectSETARmat(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)
+}
+
+
+
+thresh1 <- function(gam1, thDelay, xx,trans, ML, MH, MM,const,common,trim) {
+        isL <- ifelse(trans[, thDelay + 1]< gam1,1,0)	### isL: dummy variable
+	if(common==FALSE){
+		xxL <- cbind(const,xx[,ML])*isL
+		xxH <- cbind(const,xx[,MH])*(1-isL)
+		xxLH<-cbind(xxL,xxH)}
+	else
+		xxLH<-cbind(const,xx[,ML]*isL,xx[,mH]*(1-isL))
+	return(xxLH)
+}
+
+
+
+
+thresh2<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,common,trim){
+	trans<-as.matrix(trans)
+
+	##Threshold dummies
+	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
+# print(dummydown)
+	ndown <- mean(dummydown)
+	dummyup <- ifelse(trans[, thDelay + 1]>gam2, 1, 0)
+# print(dummyup)
+	nup <- mean(dummyup)
+	##Construction of the matrix
+#  print(c(gam1, gam2,ndown, (1-ndown-nup),nup))
+	if(common==FALSE){
+		xxL <- cbind(const,xx[,ML])*dummydown
+		xxM<-cbind(const, xx[,MM])*(1-dummydown-dummyup)
+		xxH <- cbind(const,xx[,MH])*(dummyup)
+		xxLMH<-cbind(xxL,xxM,xxH)
+	}
+	else
+		xxLMH<-cbind(const,xx[,ML]*dummydown,xx[,MM]*(1-dummydown-dummyup),xx[,MH]*(dummyup))
+	##computation of SSR
+	if(min(nup, ndown, 1-nup-ndown)>=trim){
+		res <- xxLMH	#SSR
+	}
+	else
+		res <- NA
+
+	return(res)
+}
+
+
 
 oneStep.setar <- function(object, newdata, itime, thVar, ...){
 	mL <- object$model$mL

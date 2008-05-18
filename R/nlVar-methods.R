@@ -1,23 +1,158 @@
-print.nlVar<-function(x){
-	if(x$model.specific$nthresh==0) 
+print.nlVar<-function(object,...){
+	if(object$model.specific$nthresh==0) 
 		cat("Linear VAR model\n")
 	else
 		cat("\n\nNon Linear Model\n")
 }
 
-logLik.nlVar<-function(x){
-	res<-x$residuals
-	k<-x$k
-	t<-x$t
+logLik.nlVar<-function(object,...){
+	res<-object$residuals
+	k<-object$k
+	t<-object$t
 	Sigmabest<-matrix(1/t*crossprod(res),ncol=k)
 	log(det(Sigmabest))
 }
 
-AIC.nlVar<-function(x, k=2){
-	t<-x$t
-	t*logLik.nlVar(x)+k*(x$nparB+x$model.specific$nthresh)
+AIC.nlVar<-function(object,..., k=2){
+	t<-object$t
+	t*logLik.nlVar(object)+k*(object$npar+object$model.specific$nthresh)
 }
 
-deviance.nlVar<-function(x){
-	as.numeric(crossprod(c(x$residuals)))
+
+
+BIC.nlVar<-function(object,..., k=log(object$t)){
+	t<-object$t
+	t*logLik.nlVar(object)+k*(object$nparB+object$model.specific$nthresh)
 }
+
+deviance.nlVar<-function(object,...){
+	as.numeric(crossprod(c(object$residuals)))
+}
+
+residuals.nlVar<-function(object,...){
+	object$residuals
+}
+
+fitted.nlVar<-function(object,...){
+	object$fitted
+}
+
+coef.nlVar<-function(object,...){
+	return(object$coefficients)
+}
+
+summary.nlVar2<-function(x, ...){
+	r<-4
+	t<-x$t
+	k<-x$k
+
+	Sigma<-matrix(1/t*crossprod(x$residuals),ncol=k)
+	VarCovB<-solve(crossprod(x$model.x))%x%Sigma
+	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
+
+	Tvalue<-x$coefficients/StDevB
+
+	Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
+	Pval<-round(Pval,4)
+	symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
+	stars<-matrix(symp, nrow=nrow(Pval))
+	ab<-matrix(paste(round(x$coefficients,r),"(", round(StDevB,r),")",stars,sep=""), nrow=nrow(Pval))
+	dimnames(ab)<-dimnames(x$coefficients)		
+
+print(ab)
+cat("\n",attributes(symp)$legend)
+# return(Sigma=Sigma, StDevB=StDevB, Pval=Pval)
+}
+
+
+summary.nlVar2<-function(x, ...){
+	r<-4
+	t<-x$t
+	k<-x$k
+
+	Sigma<-matrix(1/t*crossprod(x$residuals),ncol=k)
+	VarCovB<-solve(crossprod(x$model.x))%x%Sigma
+	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
+
+	Tvalue<-x$coefficients/StDevB
+
+	Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
+	Pval<-round(Pval,4)
+	symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
+	stars<-matrix(symp, nrow=nrow(Pval))
+	ab<-matrix(paste(round(x$coefficients,r),"(", round(StDevB,r),")",stars,sep=""), nrow=nrow(Pval))
+	dimnames(ab)<-dimnames(x$coefficients)		
+
+print(ab)
+cat("\n",attributes(symp)$legend)
+# return(Sigma=Sigma, StDevB=StDevB, Pval=Pval)
+}
+
+
+###Tolatex preliminary###
+#########################
+###Latex vector
+TeXVec<-function(vec){
+	d<-vec[1]
+	for(i in 1:(length(vec)	-1))
+		d<-paste(d,"kik",vec[i+1] )
+	d
+}
+
+###LateX elements of R matrix
+TeXMat<-function(mat, oneLine=FALSE){
+	mat<-matrix(mat, ncol=ifelse(inherits(mat, "matrix"), ncol(mat), length(mat)))
+	nr<-nrow(mat)
+	nc<-ncol(mat)	
+	d<-mat[,1]
+	if(!oneLine){
+		e<-nr
+		f<-1
+		for(i in 1:(nc-1))
+			d<-paste(d,"&",mat[,i+1] )
+	}
+	d[seq_len(nr-1)]<-paste(d[seq_len(nr-1)],"kik")
+	d[nr]<-paste(d[nr], "")
+	if(oneLine)
+		d<-charM(d)
+ 	matrix(d, nrow=ifelse(oneLine,1,nr), ncol=1)
+}
+
+###Function include
+include<-function(x, res, coef, skip=0){
+	n<-length(res)
+	res[(n+1):(n+5)]<-"blank"
+	if(x$include=="const"){
+		res[n+1]<-"\\begin{pmatrix}  %const"
+		res[n+2]<-TeXVec(coef[,1+skip])
+		res[n+3]<-"\\end{pmatrix}"}
+	if(x$include=="trend"){
+		res[n+1]<-"\\begin{pmatrix}  %trend"
+		res[n+2]<-TeXVec(coef[,1+skip])
+		res[n+3]<-"\\end{pmatrix}t %trend"}
+	if(x$include=="both"){
+		res[n+1]<-"\\begin{pmatrix}  %const"
+		res[n+2]<-TeXVec(coef[,1+skip])
+		res[n+3]<-"\\end{pmatrix}+\\begin{pmatrix} %trend"
+		res[n+4]<-TeXVec(coef[,2+skip])
+		res[n+5]<-"\\end{pmatrix}t"
+		}
+	return(res)
+}
+
+###Function lag
+LagTeX<-function(res, x, coef, skip){
+	for(j in 1:x$lag){
+		nres<-length(res)
+		res[nres+1]<-paste("+\\begin{pmatrix}", "%Lag", j)
+	 	for(i in 1:x$k){
+	 		res[nres+i+1]<-TeXMat(coef[,seq_len(x$k)+(j-1)*x$k+skip])[i]}
+		nres<-length(res)
+		res[nres+1]<-"\\end{pmatrix}"	
+ 		res[nres+2]<-"\\begin{pmatrix}"
+		res[nres+3]<-TeXVec(paste("X_{t-",j,"}^{",seq(1, x$k),"}", sep=""))
+		res[nres+4]<-"\\end{pmatrix}"
+	}
+res
+}
+

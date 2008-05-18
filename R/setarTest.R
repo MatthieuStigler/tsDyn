@@ -50,6 +50,7 @@ else
 allgammas<-sort(z[,b+1])
 ng<-length(allgammas)
 nmin<-round(trim*ng)
+ninter<-nmin					###TO CHANGE!
 gammas<-unique(allgammas[(nmin+1):(ng-nmin-1)])
 
 
@@ -63,9 +64,9 @@ xxh <- cbind(1, xx[, seq_len(mH)])
 ###Search function
 ##################
 TAR1t_SSR<-function(parameters,yy, xxl,xxh,z) {#
-	Delay<-parameters[1]
+	thDelay<-parameters[1]
 	gammai<-parameters[2]
-        isL <- ifelse(z[, Delay + 1]<= gammai,1,0)	### isL: dummy 
+        isL <- ifelse(z[, thDelay + 1]<= gammai,1,0)	### isL: dummy 
 	ndown<-mean(isL)	
 
 	if(min(ndown, 1-ndown)>=trim){
@@ -78,17 +79,15 @@ TAR1t_SSR<-function(parameters,yy, xxl,xxh,z) {#
 	return(res)
         }
 
-TAR2t_SSR <- function(gam1,gam2,Delay, yy, xx,z){
+TAR2t_SSR <- function(gam1,gam2,thDelay, yy, xx,z){
 	##Threshold dummies
-	dummydown <- ifelse(z[, Delay + 1]<=gam1, 1, 0)
+	dummydown <- ifelse(z[, thDelay + 1]<=gam1, 1, 0)
 	regimedown <- dummydown*xx
 	ndown <- mean(dummydown)
-	dummyup <- ifelse(z[, Delay + 1]>gam2, 1, 0)
+	dummyup <- ifelse(z[, thDelay + 1]>gam2, 1, 0)
 	regimeup <- dummyup*xx
 	nup <- mean(dummyup)
-#  print(min(nup, ndown, 1-nup-ndown)>trim)
 	##SSR from TAR(3)
-#  print(min(nup, ndown, 1-nup-ndown))
 	if(min(nup, ndown, 1-nup-ndown)>=trim){
 		XX <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)		# dim k(p+1) x t	
 		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSR
@@ -108,14 +107,16 @@ result <- apply(IDS, 1, TAR1t_SSR,yy=yy, xxl=xxl,xxh=xxh,z=z)#
 bestDelay<-IDS[which.min(result),1]
 bestThresh<-IDS[which.min(result),2]
 cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result), "\n")
-B1t<-TAR1t_B(Delay=bestDelay,gamma=bestThresh,yy=yy, xxl=xxl,xxh=xxh,z=z, m=m)
+B1t<-TAR1t_B(thDelay=bestDelay,gamma=bestThresh,yy=yy, xxl=xxl,xxh=xxh,z=z, m=m)
 
 ##################
 ###Two thresholds
 ##################
 
 ###Function for conditional search
-condiStep<-function(allgammas, threshRef, MoreArgs=NULL, target=NULL){
+
+
+condiStep2<-function(allgammas, threshRef, MoreArgs=NULL, target=NULL){
 
 wh.thresh <- which.min(abs(allgammas-threshRef))
 Thr2<-which.min(abs(allgammas-target))
@@ -151,11 +152,12 @@ list(newThresh=newThresh, SSR=min(store2, na.rm=TRUE))
 
 
 ###Applying the function for conditional search to original data
-More<-list(Delay=bestDelay, yy=yy, xx=xxlin,z=z)
-Thresh2<-condiStep(allgammas=sort(z[,bestDelay+1]), bestThresh, MoreArgs=More)$newThresh
-Thresh3<-condiStep(allgammas=sort(z[,bestDelay+1]), Thresh2, MoreArgs=More)
+More<-list(thDelay=bestDelay, yy=yy, xx=xxlin,z=z)
+# allgammas, threshRef, delayRef,ninter, fun, trace=TRUE
+Thresh2<-condiStep(allgammas=sort(z[,bestDelay+1]), threshRef=bestThresh, delayRef=bestDelay, ninter=ninter, fun=TAR2t_SSR, trace=TRUE )$newThresh
+Thresh3<-condiStep(allgammas=sort(z[,bestDelay+1]), threshRef=bestThresh, delayRef=bestDelay, ninter=ninter, fun=TAR2t_SSR, trace=TRUE )
 
-B2t<-TAR2t_B(gam1=min(Thresh3$newThresh,Thresh2),gam2=max(Thresh3$newThresh,Thresh2),Delay=bestDelay, yy=yy, xx=xxlin,z=z,m=m)
+B2t<-TAR2t_B(gam1=min(Thresh3$newThresh,Thresh2),gam2=max(Thresh3$newThresh,Thresh2),thDelay=bestDelay, yy=yy, xx=xxlin,z=z,m=m)
 print(list(thresh1=B1t, thresh2=B2t))
 
 ###Verification of stationarity of data
@@ -363,10 +365,14 @@ return(list(bestDelay=bestDelay,SSR=SSRs, test.val=Ftests, Pvalueboot=PvalBoot, 
 
 
 if(FALSE){ #usage example
+library(tsDyn)
 environment(setarTest)<-environment(setar)
-#Transformation like in Hansen 1999
+
+#Data used by Hansen
 sun<-(sqrt(sunspot.year+1)-1)*2
 
-setarTest(sun, m=11, thDelay=0:1, nboot=20, plot=TRUE, trim=0.1, test="2vs3")
+#Test 1vs2 and 1vs3
+setarTest(sun, m=11, thDelay=0:1, nboot=5, plot=TRUE, trim=0.1, test="1vs")
+
 }
 

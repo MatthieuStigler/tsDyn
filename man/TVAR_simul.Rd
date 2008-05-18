@@ -5,19 +5,23 @@
 Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
-TVAR_simul(y,B=NULL,Thresh, nthresh=1, type=c("boot", "simul", "check"), 
+TVAR_simul(data,B,Thresh, nthresh=1, type=c("simul","boot", "check"), 
 sigma,n=200, lag=1, trend=TRUE,  thDelay=1,  thVar=NULL, mTh=1, starting=NULL)
 }
+
+
 \value{
 a list with the simulated/bootstraped data and the parameter matrix used. 
 }
 \arguments{
-\item{y}{ multivariate time series }
-\item{B}{matrix of parameter to simulate}
+\item{data}{matrix of parameter to simulate}
+\item{B}{Matrix of coefficients to simulate}
 \item{Thresh}{The threshold value(s). Vector of length nthresh}
 \item{nthresh}{number of threshold (see details)}
-\item{lag}{Number of lags to include in each regime}
 \item{type}{Whether a bootstrap or simulation is to employ. See details}
+\item{sigma}{variance of the errors}
+\item{n}{Number of observations to create when type="simul"}
+\item{lag}{Number of lags to include in each regime}
 \item{trend}{If a trend should be included in the model}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases.  }
 \item{thVar}{external transition variable}

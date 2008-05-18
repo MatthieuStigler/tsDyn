@@ -6,7 +6,7 @@
 }
 \usage{
 setarTest(x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
-    mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"))
+    mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"),check=FALSE)
 }
 
 \value{A list containing:
@@ -30,7 +30,7 @@ setarTest(x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{plot}{Whether a plot with the bootstrap distribution and the Ftest should be shown}
 \item{test}{Type of test. See details}
-
+\item{check}{Possibility to check if the bootstrap is correct by not sampling the residuals. The result given should be the same as in the original data}
 }
 \details{
 Estimation of the first threshold parameter is made with CLS, a conditional search with one iteration is made for the second threshold. The Ftest comparing the residual sum of squares (SSR) of each model is computed.
@@ -63,7 +63,7 @@ The homoskedastik bootstrap distribution is based on resampling the residuals fr
 sun<-(sqrt(sunspot.year+1)-1)*2
 
 #Test 1vs2 and 1vs3
-setarTest(sun, m=11, thDelay=0:1, nboot=5, plot=TRUE, trim=0.1, test="1vs")
+#setarTest(sun, m=11, thDelay=0:1, nboot=5, plot=TRUE, trim=0.1, test="1vs")
 }
 \keyword{ ts }
 \references{
