@@ -449,7 +449,9 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
 #    phi1 <- phi1[ordering,]
     
   }
-  
+
+  object$fitted.values <- FF(phi1, c(gamma, th, omega), xx); # y.hat
+  object$residuals <- yy - object$fitted.values; # e.hat
   object$model.specific$phi2omega <- c(cbind(gamma, th), omega)
   object$model.specific$phi1 <- phi1;
   object$model.specific$coefficients <- c(phi1, c(cbind(gamma, th), omega));
@@ -699,14 +701,14 @@ estimateParams.ncstar <- function(object, trace=TRUE,
 #   sig
 ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
                    mTh, thDelay, thVar, sig=0.05, trace=TRUE, svIter = 1000,
-                   control=list(), ...)
+                   cluster= NULL, control=list(), ...)
 {
 
 
 
 
 
-#  debug(startingValues.ncstar)
+  debug(ncstar)
   
 
 
@@ -802,7 +804,17 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       object <- addRegime(object);
       
       if(trace) cat("- Fixing good starting values for regime ", nR);
-      object <- startingValues.ncstar(object, trace=trace, svIter = svIter);
+      cl <- makeCluster(cluster, type = "SOCK")
+      clusterSetupRNG(cl)
+      solutions <- clusterCall(cl, startingValues.ncstar, object, trace,
+                               svIter %/% length(cluster))
+      cost <- rep(Inf, length(solutions))
+      for (i in 1:length(solutions)) 
+        cost[i] <- sum(solutions[[i]]$residuals^2) / sqrt(n.used)
+      
+      object <- solutions[[which.min(cost)]]
+
+#      object <- startingValues.ncstar(object, trace=trace, svIter = svIter);
 
       if(trace) cat('- Estimating parameters of regime', nR, '...\n')
       object <- estimateParams(object, control=control, trace=trace);
