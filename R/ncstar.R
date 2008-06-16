@@ -33,7 +33,7 @@ GG <- function(z, gamma, th) {
   result
 }
 
-#Logistic transition  function
+#Logistic transition function
 # z: threshold variable(s)
 # gamma: smoothing parameter(s)
 # th: threshold parameter(s)

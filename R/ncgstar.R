@@ -33,7 +33,7 @@ GG <- function(z, gamma, th) {
 }
 
 #Fitted values, given parameters
-# phi1: matrix of  linear parameters
+# phi1: matrix of linear parameters
 # phi2omega: vector of tr. functions' parameters
 #                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
 FF <- function(xx, phi1, phi2) {
