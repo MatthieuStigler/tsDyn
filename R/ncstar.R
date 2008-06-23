@@ -49,11 +49,14 @@ GG1 <- function(z, th) {
   result
 }
 
+FF <- function(object, ...)
+  UseMethod("FF")
+
 #Fitted values, given parameters
 # phi1: matrix of linear parameters
 # phi2omega: vector of tr. functions' parameters
 #                                     (gamma_{1...p}, th{1...p}, omega_{1...p})
-FF <- function(phi1, phi2omega, xx) {
+FF.ncstar <- function(phi1, phi2omega, xx) {
   noRegimes <- NROW(phi1)
   x_t <- cbind(1,xx)
   
@@ -77,6 +80,72 @@ FF <- function(phi1, phi2omega, xx) {
 
   result <- apply(local, 1, sum)
   result
+}
+
+# LM linearity testing against 2 regime NCSTAR
+#
+#   Performs an 3rd order Taylor expansion LM test
+#
+#   object: a star object
+#   rob
+#   sig
+linearityTest.ncstar <- function(str, rob=FALSE, sig=0.05, trace=TRUE,...)
+{
+
+  n.used <- NROW(str$xx)  # The number of lagged samples
+
+  # Build the regressand vector
+  y_t <- str$yy
+  
+  # Regressors under the null
+  xH0 <- cbind(1, str$xx)
+
+  # Get the transition variable
+  xx <- str$xx
+
+  # Linear Model (null hypothesis)
+  linearModel <- lm(y_t ~ . , data=data.frame(xH0))
+  u_t <- linearModel$residuals;
+  SSE0 <- sum(u_t^2)
+
+  # Regressors under the alternative
+  xH1 <- cbind(xx^ 2, xx^3, xx^4)
+
+  # Standarize the regressors
+  Z <- cbind(xH0, xH1);
+  nZ <- NCOL(Z);
+  sdZ <- sd(Z)
+  dim(sdZ) <- c(1, nZ)
+  sdZ <- kronecker(matrix(1, n.used, 1), sdZ) # repeat sdZ n.used rows
+  Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
+
+  # Compute the rank of Z
+  s <- svd(Z);
+  tol <- max(dim(Z)) * s[1]$d * 2.2204e-16
+  rZ <- qr(Z, tol)$rank
+  if(rZ < NCOL(Z)) stop("Multicollinearity problem.\n")
+      
+  # Nonlinear model (alternative hypothesis)
+  nonlinearModel <- lm(u_t ~ ., data=data.frame(Z));
+  e_t <- nonlinearModel$residuals;
+  SSE1 <- sum(e_t^2)
+ 
+  # Compute the test statistic
+  nxH0 <- NCOL(xH0);
+  nxH1 <- NCOL(xH1);
+  
+  F = ((SSE0 - SSE1) / nxH1) / (SSE1 / (n.used - nxH1 - nxH0));
+    
+  # Look up the statistic in the table, get the p-value
+  pValue <- pf(F, nxH1, n.used - nxH0 - nxH1, lower.tail = FALSE);
+  
+  if (pValue >= sig) {
+    return(list(isLinear = TRUE,  pValue = pValue));
+  }
+  else {
+    return(list(isLinear = FALSE, pValue = pValue));
+  }
+
 }
 
 computeGradient <- function(object, ...)
@@ -813,10 +882,10 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       
       if(trace) cat("- Fixing good starting values for regime ", nR);
       if(length(cluster) == 0) {
-        object <- startingValues.ncstar(object, trace=trace, svIter = svIter);
+        object <- startingValues(object, trace=trace, svIter = svIter);
       } else {
         if(trace) cat("\n   + Doing distributed computations... ")
-        solutions <- clusterCall(cl, startingValues.ncstar, object, trace=trace,
+        solutions <- clusterCall(cl, startingValues, object, trace=trace,
                                  svIter = svIter %/% length(cluster))
         cost <- rep(Inf, length(solutions))
         if(trace) cat("\n   + Gathering results...\n")
