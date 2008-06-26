@@ -1,25 +1,22 @@
 datasize <- 1000; # Número de instancias del modelo que serán generadas
 T <- 500; # Tamaño de cada instancia
-svIter <- 100; # Número de iteraciones de la búsqueda de p. iniciales
+svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
 
 alg <- "GAD"
 #cluster <- NULL
 cluster <- c("localhost","localhost")
 library(snow)
-#setDefaultClusterOptions(outfile="/tmp/cluster.out")
-#cl <- makeCluster(cluster, "SOCK")
-#clusterEvalQ(cl, library(Matrix))
 
-plot <- FALSE
+plot <- TRUE
 
 # PARÁMETROS DEL MODELO ORIGINAL
 noRegimes <- 3 
 m <- 2 
-sigma <- 1; # Varianza del modelo
+sigma <- 0.5; # Varianza del modelo
 
-gamma <- c(8.49, 8.49) 
-th <- c(-1.0607, 1.0607)
-omega <- cbind(c(0.7071, -0.7071), c(0.7071,-0.7071))
+gamma <- c(3.13, 2.12) 
+th <- rbind(c(0.1016,0.5016),
+            c(0.7152, 0.1152))
 phi <- rbind(c(0.5, 0.8, -0.2),
              c(1.5, -0.6, -0.3),
              c(-0.5, -1.2, 0.7))
@@ -36,7 +33,7 @@ noRegimes_mean <- array(NA, datasize)
 
 first <- TRUE
 for(i in 1:datasize) {
-  cat("\n\n-------------------------------------------------------------\n",
+  cat("\n-------------------------------------------------------------\n",
       "DATASET NUMBER ", i, 
       "\n-------------------------------------------------------------\n")
 
@@ -50,10 +47,8 @@ for(i in 1:datasize) {
   f2 <- NA
 
   for(t in 3:(T+500)) {
-    f1[t] <- 1 / (1 + exp(- gamma[1] *
-                          (omega[1,1] * y[t-1] + omega[2,1] * y[t-2] - th[1])))
-    f2[t] <- 1 / (1 + exp(- gamma[2] *
-                          (omega[1,2] * y[t-1] + omega[2,2] * y[t-2] - th[2])))
+    f1[t] <- prod(exp(- gamma[1] * (y[(t-1):(t-2)] - th[1,])^2))
+    f2[t] <- prod(exp(- gamma[2] * (y[(t-1):(t-2)] - th[2,])^2))
  
     x <- c(1, y[(t-1):(t-2)]);
 
@@ -69,7 +64,7 @@ for(i in 1:datasize) {
   # ESTIMATE THE MODEL
   
   ncstarModels[i] <-
-    try(list(ncstar(y, m, noRegimes = noRegimes, alg = alg,
+    try(list(ncgstar.predefined(y, m, noRegimes = noRegimes, alg = alg,
                      cluster = cluster, svIter = svIter, trace = TRUE)));
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -95,7 +90,7 @@ for(i in 1:datasize) {
       dim(phi1_median) <- c(3,3)
       print(phi1_median)
       
-      cat("\n*** Median of the nonlinear parameters:\n")
+      cat("\n*** Median of the nonlinear parameters:\n     ")
       phi2_acc <- rbind(phi2_acc,
                    as.vector(ncstarModels[[i]]$model.specific$phi2))
       phi2_median <- apply(phi2_acc, 2, median) 
@@ -103,13 +98,10 @@ for(i in 1:datasize) {
 
       cat("gamma = ", phi2_median[1:(noRegimes - 1)])
 
-      th_median <- phi2_median[noRegimes:(2*(noRegimes - 1))]
-#      dim(th_median) <- c(m, noRegimes - 1)
-      cat("\nth = ", th_median)
-
-      omega_median <- phi2_median[(2 * (noRegimes - 1) + 1):length(phi2_median)]
-      dim(omega_median) <- c(m, noRegimes - 1)
-      cat("\nomega = ", omega_median)
+      th_median <- phi2_median[noRegimes:length(phi2_median)]
+      dim(th_median) <- c(m, noRegimes - 1)
+      cat("\nth = ")
+      print(th_median)
 
       if(plot) {
         par(mfrow=c(3, 2), pty = "m")
