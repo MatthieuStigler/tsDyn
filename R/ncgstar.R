@@ -367,7 +367,7 @@ startingValues.ncgstar <- function(object, trace=TRUE, svIter, ...)
   dim(th) <- c(noRegimes - 1, NCOL(xx))
   
   # Fix 'svIter' random starting values for th
-  newTh <- c(rnorm(svIter * q, mean=mean(xx[,1]), sd=sd(xx[,1])))
+  newTh <- rnorm(svIter * q, mean=mean(xx), sd=sd(xx))
   dim(newTh) <- c(svIter, q);
  
   maxGamma <- 40; # abs(8 / ((max(xx %*% newOmega) - newTh)))
@@ -380,7 +380,6 @@ startingValues.ncgstar <- function(object, trace=TRUE, svIter, ...)
     if ((i %% 25 == 0) && trace) cat(".")
 
     th[noRegimes - 1,] <- newTh[i,]
-#    th <- rbind(th, newTh[i,])
         
     for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
 
@@ -783,10 +782,10 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
       
       if(trace) cat("- Fixing good starting values for regime ", nR);
       if(length(cluster) == 0) {
-        object <- startingValues.ncgstar(object, trace=trace, svIter = svIter);
+        object <- startingValues(object, trace=trace, svIter = svIter);
       } else {
         if(trace) cat("\n   + Doing distributed computations... ")
-        solutions <- clusterCall(cl, startingValues.ncgstar, object, trace=trace,
+        solutions <- clusterCall(cl, startingValues, object, trace=trace,
                                  svIter = svIter %/% length(cluster))
         cost <- rep(Inf, length(solutions))
         if(trace) cat("\n   + Gathering results...\n")
@@ -798,19 +797,23 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
 
         if (trace) cat("\n  Starting values fixed for regime ", nR,
                        ":\n", object$model.specific$phi2, "\n");
+#                       ":\n\tgamma = ", object$model.specific$phi2omega[noRegimes - 1],
+#                       "\n\tth = ", object$model.specific$phi2omega[(noRegimes - 1) * 2],
+#                       "\n\tomega = ",
+#                       object$model.specific$phi2omega[((noRegimes - 1) * 2 + 1):((noRegimes - 1) * 2 + NCOL(xx))], "\n");
       }
 
       if(trace) cat('- Estimating parameters of regime', nR, ' (alg: ', alg, ')...\n')
-      object <- estimateParams.ncgstar(object, alg=alg, cluster=cluster,
+      object <- estimateParams(object, alg=alg, cluster=cluster,
                                control=control, trace=trace);
       
       if(trace) cat("\n- Testing for addition of regime ", nR + 1, ".\n");
       if(trace) cat("  Estimating gradient matrix...\n");
-      G <- computeGradient.ncgstar(object);
+      G <- computeGradient(object);
 
       sig <- sig / 2 # We halve the significance level
       if(trace) cat("  Computing the test statistic (sig = ", sig, ")...\n");
-      testResults <- testRegime.ncgstar(object, G = G,
+      testResults <- testRegime(object, G = G,
                                        rob = rob, sig = sig, trace=trace);
 
       increase <- testResults$remainingNonLinearity;

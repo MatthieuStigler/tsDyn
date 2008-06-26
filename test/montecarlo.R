@@ -14,7 +14,7 @@ noRegimes <- 3
 m <- 2 
 sigma <- 0.5; # Varianza del modelo
 
-gamma <- c(3.13, 2.12) 
+gamma <- c(3.13, 2.12)
 th <- rbind(c(-1.1016,1.1016),
             c(0.7152, 0.1152))
 phi <- rbind(c(0.5, 0.8, -0.2),

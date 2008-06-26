@@ -60,7 +60,7 @@ FF.ncstar <- function(phi1, phi2omega, xx) {
   noRegimes <- NROW(phi1)
   x_t <- cbind(1,xx)
   
-  phi2 <- phi2omega[1:((noRegimes-1) * 2)];
+  phi2 <- phi2omega[1:((noRegimes - 1) * 2)];
   dim(phi2) <- c(noRegimes - 1, 2)
   gamma <- phi2[,1]
   th <- phi2[,2]
@@ -381,11 +381,11 @@ addRegime.ncstar <- function(object)
     omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
     dim(omega) <- c(NCOL(xx), noRegimes - 1)
 
-    newOmega <- rep(0.0, NCOL(xx)) #c(runif(1), runif(NCOL(xx) - 1, min=-1,max=1))
+#    newOmega <- rep(0.0, NCOL(xx)) #c(runif(1), runif(NCOL(xx) - 1, min=-1,max=1))
 #    newOmega <- newOmega * (1 / norm(Matrix(newOmega), "f"))
-    dim(newOmega) <- c(NCOL(xx), 1)
+#    dim(newOmega) <- c(NCOL(xx), 1)
     
-    omega <- cbind(omega, newOmega); # Add one (random) vector
+    omega <- cbind(omega, rnorm(NCOL(xx))); # Add one (random) vector
 
     # phi1 (one vector for each regime)
     phi1 <-   object$model.specific$phi1
@@ -393,14 +393,14 @@ addRegime.ncstar <- function(object)
   }
 
   # Update the object
-  object$model.specific$noRegimes <- object$model.specific$noRegimes + 1;
-  object$noRegimes <- object$noRegimes + 1;
+  object$model.specific$noRegimes <- noRegimes + 1;
+  object$noRegimes <- noRegimes + 1;
   
   object$model.specific$phi1 <- phi1
   object$model.specific$phi2omega <- c(phi2, omega)
   
-  object$model.specific$coefficients <- c(phi1, c(phi2, omega));
-  object$coefficients <- c(phi1, c(phi2, omega));
+  object$model.specific$coefficients <- c(phi1, phi2, omega);
+  object$coefficients <- c(phi1, phi2, omega);
   object$model.specific$k <- length(object$coefficients)
   object$k <- length(object$coefficients);
   
@@ -478,7 +478,7 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
 #      newPhi1 <- t(newPhi1)
 
       local2 <- (x_t %*% newPhi1) * trfun;
- 
+      
       y.hat <- apply(local2, 1, sum)
       cost <- crossprod(yy - y.hat) / sqrt(n.used);
 
@@ -500,11 +500,6 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
   omega <- bestOmega
   phi1 <- t(bestPhi1)
   
-   if (trace) cat("\n  Starting values fixed for regime ", noRegimes,
-                 ":\n\tgamma = ", gamma[noRegimes - 1],
-                 "\n\tth = ", th[noRegimes - 1],
-                 "\n\tomega = ", omega[, noRegimes - 1], "\n");
-  
   # Reorder the regimes according to the values of th
   if ((noRegimes > 2) &&
       prod((1:(noRegimes - 1)) != sort(th, index.return=TRUE)$ix)) {
@@ -517,18 +512,24 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
     omega <- omega[, ordering]
 #    phi1 <- phi1[ordering,]
     
+   if (trace) cat("\n  Starting values fixed for regime ", noRegimes,
+                 ":\n\tgamma = ", gamma[noRegimes - 1],
+                 "\n\tth = ", th[noRegimes - 1],
+                 "\n\tomega = ", omega[, noRegimes - 1], "\n");
+  
     z <- xx %*% omega
     trfun <- cbind(1, GG(z, gamma, th))
       
-    # We fix the linear parameters here, before optimizing the nonlinear.
+    # We fix the linear parameters again.
     local1 <- apply(trfun, 2, "*", x_t)
     dim(local1) <- c(n.used, noRegimes * NCOL(x_t))
     phi1<- lm.fit(x = local1, y = yy)$coefficients
     dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
+    phi1 <- t(phi1)
 
   }
 
-  object$fitted.values <- FF(phi1, c(gamma, th, omega), xx); # y.hat
+  object$fitted.values <- FF.ncstar(phi1, c(gamma, th, omega), xx); # y.hat
   object$residuals <- yy - object$fitted.values; # e.hat
   object$model.specific$phi2omega <- c(gamma, th, omega)
   object$model.specific$phi1 <- phi1;
@@ -538,7 +539,7 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
   object$k <- length(object$coefficients)
   
   return(object);
-  
+
 }
 
 estimateParams <- function(object, ...)
@@ -692,24 +693,37 @@ estimateParams.ncstar <- function(object, trace=TRUE,
   par <- c(th * gamma, w1)
 
   if (alg == "LM") {
-    res <- nls.lm(par=par, fn=SS.lm, jac = gradEhat.lm,
-                  control=nls.lm.control(nprint=500, maxfev=1e+9, maxiter=4000));
+    res <- try(nls.lm(par=par, fn=SS.lm, jac = gradEhat.lm,
+                  control=nls.lm.control(nprint=0, maxfev=1e+9, maxiter=1024)));
   } else if (alg == "BFGS") {
-    res <- optim(par, fn=SS, gr = gradEhat, method="BFGS",
-                  control = list(trace=10, hessian = FALSE, maxit=1000));
+    res <- optim(par, fn=SS, gr = gradEhat, method = alg,
+                  control = list(trace=0, hessian = FALSE, maxit=1000));
   } else if (alg == "SANN") {
-    res <- optim(par, fn=SS, method="SANN",
-                  control = list(trace=10, maxit=20000, temp=200));
-  } else if (alg == "GAD") {
-    res <- genoud(fn = SS, starting.values=par, nvars=length(par),
-                  gr = gradEhat, cluster=cluster,
-                  control=list(hessian = FALSE, maxit=1000), print.level = 0)
-  } else if (alg == "GA") {
-    res <- genoud(fn = SS, starting.values=par, nvars=length(par),
-                  BFGS=FALSE, cluster=cluster,
-                  control=list(hessian = FALSE, maxit=1000), print.level = 0)
+    res <- optim(par, fn=SS, method = alg,
+                  control = list(trace=0, maxit=20000, temp=200,tmax=50));
+  } else if (is.null(cluster)) {
+    if (alg == "GAD") {
+      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
+                    gr = gradEhat, cluster=FALSE,
+                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+    } else if (alg == "GA") {
+      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
+                    BFGS=FALSE, cluster= FALSE,
+                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+    }
+  } else {
+    if (alg == "GAD") {
+      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
+                    gr = gradEhat, cluster=cluster,
+                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+    } else if (alg == "GA") {
+      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
+                    BFGS=FALSE, cluster=cluster,
+                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+    }
   }
-  
+
+
   b1 <- res$par[1:(noRegimes - 1)]
   w1 <- res$par[noRegimes:length(res$par)]
   dim(w1) <- c(q, noRegimes - 1)
@@ -755,12 +769,12 @@ estimateParams.ncstar <- function(object, trace=TRUE,
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 4.- Compute yhat and ehat
   
-  object$fitted.values <- FF(phi1, c(gamma, th, omega), xx); # y.hat
+  object$fitted.values <- FF.ncstar(phi1, c(gamma, th, omega), xx); # y.hat
   object$residuals <- yy - object$fitted.values; # e.hat
   object$coefficients <- c(phi1, c(gamma, th, omega))
   object$model.specific$phi1 <- phi1
   object$model.specific$phi2omega <- c(gamma, th, omega);
-  
+
   return(object)
   
 }
@@ -782,16 +796,6 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
                    cluster= NULL, control=list(), alg="LM", ...)
 {
 
-
-
-
-
-#  debug(ncstar)
-  
-
-
-  
-  
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 1. Build the nlar object and associated variables.
   if(missing(series))   series <- deparse(substitute(x))
@@ -803,6 +807,12 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
 #  }
   
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+
+  if(!is.null(cluster)) {
+    cl <- makeCluster(cluster, type="SOCK")
+#    clusterSetupRNG(cl)
+    clusterEvalQ(cl, library(Matrix))
+  }
 
   xx <- str$xx
   x_t <- cbind(1, xx)
@@ -845,6 +855,8 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
                           k=NCOL(x_t), noRegimes=1,
                           model.specific=list),
                      "ncstar")
+
+    if(!is.null(cluster)) stopCluster(cl)
     return(object);
   }
   else {
@@ -879,13 +891,15 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
       
       if(trace) cat("- Adding regime ", nR, ".\n");
       object <- addRegime(object);
+
+#      if(nR==4) debug(startingValues.ncstar)
       
       if(trace) cat("- Fixing good starting values for regime ", nR);
-      if(length(cluster) == 0) {
-        object <- startingValues(object, trace=trace, svIter = svIter);
+      if(is.null(cluster)) {
+        object <- startingValues.ncstar(object, trace=trace, svIter = svIter);
       } else {
         if(trace) cat("\n   + Doing distributed computations... ")
-        solutions <- clusterCall(cl, startingValues, object, trace=trace,
+        solutions <- clusterCall(cl, startingValues.ncstar, object, trace=trace,
                                  svIter = svIter %/% length(cluster))
         cost <- rep(Inf, length(solutions))
         if(trace) cat("\n   + Gathering results...\n")
@@ -896,24 +910,25 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
         object <- solutions[[which.min(cost)]]
 
         if (trace) cat("\n  Starting values fixed for regime ", nR,
-                       ":\n", object$model.specific$phi2omega, "\n");
-#                       ":\n\tgamma = ", object$model.specific$phi2omega[noRegimes - 1],
-#                       "\n\tth = ", object$model.specific$phi2omega[(noRegimes - 1) * 2],
-#                       "\n\tomega = ",
-#                       object$model.specific$phi2omega[((noRegimes - 1) * 2 + 1):((noRegimes - 1) * 2 + NCOL(xx))], "\n");
+#                       ":\n", object$model.specific$phi2omega, "\n");
+             ":\n\tgamma = ", object$model.specific$phi2omega[1:(nR - 1)],
+             "\n\tth = ", object$model.specific$phi2omega[nR:(2*(nR - 1))],
+             "\n\tomega = ",
+                object$model.specific$phi2omega
+                       [(2 * (nR - 1) + 1):length(object$model.specific$phi2omega)], "\n");
       }
 
-      if(trace) cat('- Estimating parameters of regime', nR, '...\n')
-      object <- estimateParams(object, control=control, trace=trace,
+      if(trace) cat('- Estimating parameters of regime', nR, ', (alg: ', alg, ')...\n')
+      object <- estimateParams.ncstar(object, control=control, trace=trace,
                                alg=alg, cluster=cluster);
       
       if(trace) cat("\n- Testing for addition of regime ", nR + 1, ".\n");
       if(trace) cat("  Estimating gradient matrix...\n");
-      G <- computeGradient(object);
+      G <- computeGradient.ncstar(object);
 
       sig <- sig / 2 # We halve the significance level
       if(trace) cat("  Computing the test statistic (sig = ", sig, ")...\n");
-      testResults <- testRegime(object, G = G,
+      testResults <- testRegime.ncstar(object, G = G,
                                        rob = rob, sig = sig, trace=trace);
 
       increase <- testResults$remainingNonLinearity;
@@ -929,6 +944,8 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     
     if(trace) cat("\n- Finished building an NCSTAR with ",
                   object$model.specific$noRegimes, " regimes\n");
+
+    if(!is.null(cluster)) stopCluster(cl)
     return(object);
   }
   
@@ -1010,6 +1027,8 @@ ncstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
                           k=NCOL(x_t), noRegimes=1,
                           model.specific=list),
                      "ncstar")
+
+    if(cluster!=NULL) stopCluster(cluster)
     return(object);
   }
   else {
@@ -1042,7 +1061,7 @@ ncstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
       
       if(trace) cat("- Adding regime ", nR, ".\n");
       object <- addRegime(object);
-      
+
       if(trace) cat("- Fixing good starting values for regime ", nR);
       if(length(cluster) == 0) {
         object <- startingValues.ncstar(object, trace=trace, svIter = svIter);
@@ -1066,13 +1085,15 @@ ncstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
 #                       object$model.specific$phi2omega[((noRegimes - 1) * 2 + 1):((noRegimes - 1) * 2 + NCOL(xx))], "\n");
       }
 
-      if(trace) cat('- Estimating parameters of regime', nR, '...\n')
+      if(trace) cat('- Estimating parameters of regime', nR, ', (alg: ', alg, ')...\n')
       object <- estimateParams(object, control=control, trace=trace,
                                alg=alg, cluster=cluster);
     }
     
     if(trace) cat("\n- Finished building an NCSTAR with ",
                   object$model.specific$noRegimes, " regimes\n");
+
+    if(cluster!=NULL) stopCluster(cluster)
     return(object);
   }
 
