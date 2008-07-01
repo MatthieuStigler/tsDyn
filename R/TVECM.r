@@ -678,7 +678,7 @@ print.summary.TVECM<-function(x,...){
 	cat("\nCointegrating vector", x$model.specific$beta)
 }
 
-toLatex.TVECM<-function(x, ...,digits=4){
+toLatex.TVECM<-function(x,digits=4,...){
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
 	if(x$model.specific$oneMatrix){
