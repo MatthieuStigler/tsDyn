@@ -179,3 +179,16 @@ percent<-function(x,digits=3,by100=FALSE){
 	a<-ifelse(by100,100,1)
 	paste(a*round(x,digits),"%",sep="")
 }
+
+myformat<-function(x,digits, toLatex=FALSE){
+	r<-x
+	littlex<-abs(x)<10^-(digits)
+	r[!littlex]<-formatC(x[!littlex],digits=digits, format="f")
+	r[littlex]<-format(x[littlex],digits=min(digits,2), scientific=TRUE)
+	if(toLatex)
+		r<-gsub("(e.*)","slashtext{\\1}",r)
+	if(class(x)=="numeric")
+		return(noquote(r))
+	if(class(x)=="matrix")
+		return(matrix(noquote(r), ncol=ncol(x), nrow=nrow(x)))
+}

@@ -95,10 +95,9 @@ res<-Y-fitted
 
 model.specific<-list()
 model.specific$nthresh<-0
-if(model=="TVECM"){
+if(model=="VECM"){
 	model.specific$betaLT<-betaLT
 	model.specific$betaLT_std<-betaLT_std}
-
 
 
 z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=model, model.specific=model.specific)
@@ -136,7 +135,7 @@ print.VAR<-function(x,...){
 	print(coef(x))
 }
 
-summary.VAR<-function(object, ...){
+summary.VAR<-function(object, digits=4,...){
 	x<-object
 	r<-4
 	t<-x$t
@@ -149,16 +148,16 @@ summary.VAR<-function(object, ...){
 	Tvalue<-x$coefficients/StDevB
 
 	Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
-	Pval<-round(Pval,4)
+	#Pval<-round(Pval,4)
 	symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","** ","*  ",".  ","    "))
 	stars<-matrix(symp, nrow=nrow(Pval))
-	ab<-matrix(paste(round(x$coefficients,r),"(", round(StDevB,r),")",stars,sep=""), nrow=nrow(Pval))
+	ab<-matrix(paste(myformat(x$coefficients,digits),"(", myformat(StDevB,digits),")",stars,sep=""), nrow=nrow(Pval))
 	dimnames(ab)<-dimnames(x$coefficients)		
 
 	x$bigcoefficients<-ab
 	x$Sigma<-Sigma
 	x$StDevB<-StDevB
-	x$ Pvalues<-Pval
+	x$Pvalues<-Pval
 	x$aic<-AIC.nlVar(x)
 	x$bic<-BIC.nlVar(x)
 	class(x)<-c("summary.VAR", "VAR")
@@ -184,28 +183,38 @@ toLatex.VAR<-function(object,..., digits=4){
 	x<-object
 	if(inherits(x,"summary.VAR")){
 		coef<-x$bigcoefficients
-		coef<-gsub(")", ")^{",summary(x)$bigcoefficients, extended=FALSE)
-		coef<-matrix(paste(coef, "}"), ncol=ncol(coef), nrow=nrow(coef))}
+		a<-as.numeric(sub("\\([[:print:]]*", "",coef)) #extract coef values
+		a<-myformat(a,digits,toLatex=TRUE)
+		b<-as.numeric(sub("\\).*", "",sub(".*\\(", "",coef))) #extract st dev
+		b<-myformat(b,digits,toLatex=TRUE) #put the scientific notation in \text latex fromat
+		if(getOption("show.signif.stars"))					d<-paste("^{",sub(".*\\)", "",coef),"}", sep="")#extract stars and add ^{}
+		else
+			d<-NULL
+		coef<-matrix(paste(a,"(",b,")",d, sep=""),ncol=ncol(coef), nrow=nrow(coef))
+		}
 	else{
-		coef<-round(x$coefficients, digits)}
+		coef<-myformat(x$coefficients, digits)}
 	varNames<-rownames(x$coefficients)
 	res<-character()
-	res[1]<-"%This needs package amsmath. Write \\usepackage{amsmath}"
-	res[2]<-"\\begin{equation}"
-	res[3]<- "\\begin{pmatrix} %explained vector"
-	res[4]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
-	res[5]<- "\\end{pmatrix}="
+	res[1]<-"%insert in the preamble and uncomment the line you want for usual /medium /small matrix"
+	res[2]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\begin{pmatrix}}{\\end{pmatrix}} %USUAL"
+	res[3]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\left(\\begin{smallmatrix}}{\\end{smallmatrix}\\right)} %SMALL"
+	res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
+	res[5]<-"\\begin{equation}"
+	res[6]<- "\\begin{smatrix} %explained vector"
+	res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
+	res[8]<- "\\end{smatrix}="
  	res<-include(x, res, coef)
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
 	if(x$model=="VECM"){
 		len<-length(res)
-		res[len+1]<-"+\\begin{pmatrix}  %ECT"
+		res[len+1]<-"+\\begin{smatrix}  %ECT"
 		res[len+2]<-TeXVec(coef[,ninc+1])
-		res[len+3]<-"\\end{pmatrix}ECT_{-1}"
+		res[len+3]<-"\\end{smatrix}ECT_{-1}"
 		ninc<-ninc+1}
 	res<-LagTeX(res, x, coef, ninc)
 	res[length(res)+1]<-"\\end{equation}"
-	res<-gsub("kik", "\\\\", res, fixed=TRUE)
+	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]
 	
 	return(structure(res, class="Latex"))

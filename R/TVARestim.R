@@ -349,13 +349,6 @@ nparbest<-nrow(Bbest)*ncol(Bbest)
 Sigmabest<-matrix(1/t*crossprod(resbest),ncol=k,dimnames=list(colnames(data), colnames(data)))
 SigmabestOls<-Sigmabest*(t/(t-ncol(Bbest)))
 
-VarCovB<-solve(tcrossprod(Zbest))%x%SigmabestOls
-StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
-
-Tvalue<-Bbest/StDevB
-Pval<-pt(abs(Tvalue), df=(ncol(Zbest)-nrow(Zbest)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Zbest)-nrow(Zbest)), lower.tail=TRUE)
-Pval<-round(Pval,4)
-
 
 
 
@@ -377,7 +370,6 @@ pooled_info_Thresh<-c(pooled_aicbest, pooled_bicbest)
 
 ###naming and dividing B
 rownames(Bbest) <- paste("Equation", colnames(data))
-Bcolnames <- c("Trend", c(paste(rep(colnames(data),p),"t", -rep(1:p, each=k))))
 LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
 if(include=="const")
 	Bnames<-c("Intercept",LagNames)
@@ -388,57 +380,25 @@ else if(include=="both")
 else 
 	Bnames<-c(LagNames)
 
-sBnames<-Bnames[-which(Bnames=="Intercept")]
+Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
 
-if(nthresh==1){
-	if(commonInter){
-		colnames(Bbest)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
-		colnames(Pval)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
-		Blist<-Bbest
-		Plist<-Pval}
-	else{
-		colnames(Bbest) <- rep(Bnames,2)
-		colnames(Pval) <- rep(Bnames,2)
-		Bdown <- Bbest[,c(1:npar)]
-		Bup <- Bbest[,-c(1:npar)]
-		Pdown <- Pval[,c(1:npar)]
-		Pup <- Pval[,-c(1:npar)]
-		Blist <- list(Bdown=Bdown, Bup=Bup)
-		Plist <- list(Pdown=Pdown, Pup=Pup)}
+if(nthresh==1)
 	nobs <- c(ndown=ndown, nup=1-ndown)
-}
-else{
-	if(commonInter){
-		colnames(Bbest)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
-		colnames(Pval)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
-		Blist<-Bbest
-		Plist<-Pval}
-	else{
-		colnames(Bbest)<-rep(Bnames,3)
-		colnames(Pval)<-rep(Bnames,3)
-		Bdown <- Bbest[,c(1:npar)]
-		Bmiddle <- Bbest[,c(1:npar)+npar]
-		Bup <- Bbest[,c(1:npar)+2*npar]
-		Pdown <- Pval[,c(1:npar)]
-		Pmiddle <- Pval[,c(1:npar)+npar]
-		Pup <- Pval[,c(1:npar)+2*npar]			
-		colnames(Bmiddle) <- Bnames
-		colnames(Pmiddle) <- Bnames
-		Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)
-		Plist <- list(Pdown=Pdown, Pmiddle=Pmiddle,Pup=Pup)}
+else if (nthresh==2)
 	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
-}
 
+#elements to return
 specific<-list()
 specific$Thresh<-bestThresh
 specific$nthresh<-nthresh
 specific$nreg<-nthresh+1
-specific$rowB<-npar
+specific$nrowB<-npar
 specific$nobs<-nobs
 specific$oneMatrix<-commonInter
 specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
+specific$Bnames<-Bnames
 
-z<-list(coefficients=Blist, residuals=resbest, VAR=VarCovB,   Pvalues=Plist, nobs_regimes=nobs, k=k, t=t, nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
 class(z)<-c("TVAR","nlVar")
 return(z)
 }	#end of the whole function
@@ -475,21 +435,39 @@ print.TVAR<-function(x,...){
 	print(x$model.specific$Thresh)
 }
 
-summary.TVAR<-function(object, ...){
+summary.TVAR<-function(object,...){
 	x<-object
+	xspe<-x$model.specific
+	x$sum<-list()
+	Z<-x$model.matrix
+	Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=x$k)
+	SigmabestOls<-Sigmabest*(x$t/(x$t-ncol(x$coeffmat)))
+	VarCovB<-solve(tcrossprod(Z))%x%SigmabestOls
+	StDevB<-matrix(diag(VarCovB)^0.5, nrow=x$k)
+	Tvalue<-x$coeffmat/StDevB
+	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
+	Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
+	Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
 	if(x$model.specific$oneMatrix) {
 		x$coefficients<-list(x$coefficients)
-		x$Pvalues<-list(x$Pvalues)}
+		x$sum$StDev<-list(StDevB)
+		x$sum$Pvalues<-list(Pval)
+		x$sum$VarCovB<-list(VarCovB)}
+	else{
+		x$sum$StDev<-StDevB
+		x$sum$Pvalues<-Pval
+		x$sum$VarCovB<-VarCovB}
 	ab<-list()
 	symp<-list()
 	stars<-list()
-	for(i in 1:length(x$Pvalues)){
-		symp[[i]] <- symnum(x$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
-		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$Pval[[i]]))
-		ab[[i]]<-matrix(paste(round(x$coefficients[[i]],4),"(", x$Pval[[i]],")",stars[[i]], sep=""), nrow=nrow(x$Pvalues[[1]]))
+	for(i in 1:length(x$sum$Pvalues)){
+		symp[[i]] <- symnum(x$sum$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
+		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$sum$Pvalues[[i]]))
+		ab[[i]]<-matrix(paste(x$coefficients[[i]],"(", x$sum$StDev[[i]],")",stars[[i]], sep=""), nrow=nrow(x$sum$StDev[[1]]))
 		dimnames(ab[[i]])<-dimnames(x$coefficients[[1]])
 	}
 	attributes(ab)<-attributes(x$coefficients)
+	x$stars<-symp
 	x$bigcoefficients<-ab
 	x$aic<-AIC.nlVar(x)
 	x$bic<-BIC.nlVar(x)
@@ -498,16 +476,29 @@ summary.TVAR<-function(object, ...){
 	return(x)
 }
 
-print.summary.TVAR<-function(x,...){
+print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars"),...){
+	coeftoprint<-list()
+	for(i in 1:length(x$bigcoefficients)){
+		a<-myformat(x$coefficients[[i]], digits)
+		b<-myformat(x$sum$StDev[[i]], digits)
+		if(getOption("show.signif.stars"))
+			stars<-x$stars			
+		else
+			stars<-NULL
+		coeftoprint[[i]]<-matrix(paste(a,"(", b,")",stars, sep=""), nrow=nrow(x$sum$StDev[[1]]))
+		dimnames(coeftoprint[[i]])<-dimnames(x$coefficients[[1]])
+	}
 	cat("Model TVAR with ", x$model.specific$nthresh, " thresholds\n")
 	cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
-	cat("\nNumber of variables:", x$k,"\tNumber of estimated parameters", x$npar)
+	cat("\nNumber of variables:", x$k,"\tNumber of estimated parameters:", x$npar,"+",x$model.specific$nthresh)
 	cat("\nAIC",x$aic , "\tBIC", x$bic, "\t SSR", x$SSR,"\n\n")
-	print(noquote(x$bigcoefficients))	
-	cat("\nThreshold value",x$model.specific$Thresh)
+	print(noquote(coeftoprint))
+	if (signif.stars) 
+	        cat("---\nSignif. codes: ", attr(x$stars, "legend"), "\n")
+	cat("\nThreshold value:",x$model.specific$Thresh)
 	if(!x$model.specific$threshEstim)
 		cat(" (user specified)")
-	cat("\nPercentage of Observations in each regime", x$model.specific$nobs)
+	cat("\nPercentage of Observations in each regime:", percent(x$model.specific$nobs,3,TRUE))
 }
 
 
@@ -519,22 +510,42 @@ toLatex.TVAR<-function(object,..., digits=4){
 	if(inherits(x,"summary.TVAR")){
 		coef<-x$bigcoefficients
 		for(i in 1:length(coef)){
-			coef[[i]]<-gsub(")", ")^{",coef[[i]], extended=FALSE)
-			coef[[i]]<-matrix(paste(coef[[i]], "}"), ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
-		}
-	}
+			a<-myformat(x$coefficients[[i]],digits, toLatex=TRUE)
+			b<-myformat(x$StDev[[i]],digits,toLatex=TRUE)
+			if(getOption("show.signif.stars"))
+				stars<-x$stars			
+			else
+				stars<-NULL
+			coef[[i]]<-matrix(paste(a,"(",b,")",stars, sep=""),ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
+		}#end for
+	}#end if
+			#a<-as.numeric(sub("\\([[:print:]]*", "",coef[[i]])) #extract coef values
+			#a<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(a,digits))) #put the scientific notation in \text latex fromat
+			#a<-myformat(a,digits,toLatex=TRUE)
+			#b<-as.numeric(sub("\\).*", "",sub(".*\\(", "",coef[[i]]))) #extract st dev
+			#b<-myformat(b,digits,toLatex=TRUE)
+			#b<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(b,digits))) #put the scientific notation in \text latex fromat
+			#if(getOption("show.signif.stars"))
+			#		d<-paste("^{",sub(".*\\)", "",coef[[i]]),"}", sep="")#extract stars and add ^{}
+			#else
+			#		d<-NULL
+			#coef[[i]]<-matrix(paste(a,"(",b,")",d, sep=""),ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
 	else{
 		coef<-as.list(x$coefficients)
 		coef<-rapply(coef,round, digits=digits, how="list")}
 	varNames<-rownames(coef[[1]])
 	res<-character()
-	res[1]<-"%This needs package amsmath. Write \\usepackage{amsmath}"
-	res[2]<-"\\begin{equation}"
-	res[3]<- "\\begin{pmatrix} %explained vector"
-	res[4]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
-	res[5]<- "\\end{pmatrix}="
-	res[6]<- "\\left\\{"
- 	res[7]<-"\\begin{array}{rl}"
+	res[1]<-"%insert in the preamble and uncomment the line you want for usual /medium /small matrix"
+	res[2]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\begin{pmatrix}}{\\end{pmatrix}} %USUAL"
+	res[3]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\left(\\begin{smallmatrix}}{\\end{smallmatrix}\\right)} %SMALL"
+	res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
+	res[5]<-"\\begin{equation}"
+	res[6]<- "\\begin{smatrix} %explained vector"
+	res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
+	res[8]<- "\\end{smatrix}="
+	#if(!x$model.specific$oneMatrix)
+		res[length(res)+1]<- "\\left\\{"
+ 	res[length(res)+1]<-"\\begin{array}{ll}"
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
 	###Condition for the threshold
@@ -558,13 +569,42 @@ toLatex.TVAR<-function(object,..., digits=4){
 		res[length(res)+1]<- paste(cond[i], "\\\\")
 	}
 	res[length(res)+1]<-"\\end{array}"
-	res[length(res)+1]<-"\\right."
+	#if(!x$model.specific$oneMatrix)
+		res[length(res)+1]<-"\\right."
 	res[length(res)+1]<-"\\end{equation}"
-	res<-gsub("kik", "\\\\", res, fixed=TRUE)
+	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]
-	
 	return(structure(res, class="Latex"))
 
+}
+
+
+nameB<-function(mat,commonInter, Bnames, nthresh, npar){
+	sBnames<-Bnames[-which(Bnames=="Intercept")]
+	if(nthresh==1){
+		if(commonInter){
+			colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
+			Blist<-mat}
+		else{
+			colnames(mat) <- rep(Bnames,2)
+			Bdown <- mat[,c(1:npar)]
+			Bup <- mat[,-c(1:npar)]
+			Blist <- list(Bdown=Bdown, Bup=Bup)}
+	}
+	else{
+		if(commonInter){
+			colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
+			Blist<-mat}
+		else{
+			colnames(mat)<-rep(Bnames,3)
+			Bdown <- mat[,c(1:npar)]
+			Bmiddle <- mat[,c(1:npar)+npar]
+			Bup <- mat[,c(1:npar)+2*npar]		
+			colnames(Bmiddle) <- Bnames
+			colnames(Bmiddle) <- Bnames
+			Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)}
+	}
+	return(Blist)
 }
 
 onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){

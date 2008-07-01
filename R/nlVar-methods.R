@@ -95,7 +95,7 @@ cat("\n",attributes(symp)$legend)
 TeXVec<-function(vec){
 	d<-vec[1]
 	for(i in 1:(length(vec)	-1))
-		d<-paste(d,"kik",vec[i+1] )
+		d<-paste(d,"slashslash",vec[i+1] )
 	d
 }
 
@@ -111,7 +111,7 @@ TeXMat<-function(mat, oneLine=FALSE){
 		for(i in 1:(nc-1))
 			d<-paste(d,"&",mat[,i+1] )
 	}
-	d[seq_len(nr-1)]<-paste(d[seq_len(nr-1)],"kik")
+	d[seq_len(nr-1)]<-paste(d[seq_len(nr-1)],"slashslash")
 	d[nr]<-paste(d[nr], "")
 	if(oneLine)
 		d<-charM(d)
@@ -119,39 +119,39 @@ TeXMat<-function(mat, oneLine=FALSE){
 }
 
 ###Function include
-include<-function(x, res, coef, skip=0){
+include<-function(x, res, coef, skip=0, mat="smatrix"){
 	n<-length(res)
 	res[(n+1):(n+5)]<-"blank"
 	if(x$include=="const"){
-		res[n+1]<-"\\begin{pmatrix}  %const"
+		res[n+1]<-paste("\\begin{",mat, "}     %const", sep="")
 		res[n+2]<-TeXVec(coef[,1+skip])
-		res[n+3]<-"\\end{pmatrix}"}
+		res[n+3]<-paste("\\end{",mat,"}", sep="")}
 	if(x$include=="trend"){
-		res[n+1]<-"\\begin{pmatrix}  %trend"
+		res[n+1]<-paste("\\begin{",mat,"}     %trend", sep="")
 		res[n+2]<-TeXVec(coef[,1+skip])
-		res[n+3]<-"\\end{pmatrix}t %trend"}
+		res[n+3]<-paste("\\end{",mat,"}     %trend", sep="")}
 	if(x$include=="both"){
-		res[n+1]<-"\\begin{pmatrix}  %const"
+		res[n+1]<-paste("\\begin{",mat, "}     %const", sep="")
 		res[n+2]<-TeXVec(coef[,1+skip])
-		res[n+3]<-"\\end{pmatrix}+\\begin{pmatrix} %trend"
+		res[n+3]<-paste("\\end{",mat,"}+\\begin{",mat,"}     %trend", sep="")
 		res[n+4]<-TeXVec(coef[,2+skip])
-		res[n+5]<-"\\end{pmatrix}t"
+		res[n+5]<-paste("\\end{",mat, "}t", sep="")
 		}
 	return(res)
 }
 
 ###Function lag
-LagTeX<-function(res, x, coef, skip){
+LagTeX<-function(res, x, coef, skip,mat="smatrix"){
 	for(j in 1:x$lag){
 		nres<-length(res)
-		res[nres+1]<-paste("+\\begin{pmatrix}", "%Lag", j)
+		res[nres+1]<-paste("+\\begin{",mat,"}      %Lag", j,sep="")
 	 	for(i in 1:x$k){
 	 		res[nres+i+1]<-TeXMat(coef[,seq_len(x$k)+(j-1)*x$k+skip])[i]}
 		nres<-length(res)
-		res[nres+1]<-"\\end{pmatrix}"	
- 		res[nres+2]<-"\\begin{pmatrix}"
+		res[nres+1]<-paste("\\end{",mat,"}",sep="")
+ 		res[nres+2]<-paste("\\begin{",mat,"}", sep="")
 		res[nres+3]<-TeXVec(paste("X_{t-",j,"}^{",seq(1, x$k),"}", sep=""))
-		res[nres+4]<-"\\end{pmatrix}"
+		res[nres+4]<-paste("\\end{",mat,"}", sep="")
 	}
 res
 }

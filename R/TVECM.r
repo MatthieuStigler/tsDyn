@@ -81,7 +81,6 @@ StDev<-matrix(diag(VarCov)^0.5, nrow=k)
 
 Tvalue<-B/StDev
 Pval<-pt(abs(Tvalue), df=(t-ncol(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(t-ncol(Z)), lower.tail=TRUE)
-Pval<-round(Pval,4)
 colnames(Pval)<-colnames(B)
 
 
@@ -196,7 +195,7 @@ for (i in seq_len(length(gammas))){
 #m<-min(store, na.rm=TRUE)
 na<-sum(ifelse(is.na(store),1,0))
 if(na>0) {
-	if(trace) {cat("\n",na,"(", percent(na/(nrow(store)*ncol(store)),3,by100=TRUE), ") points of the grid lead to regimes with percentage of observations < trim and were not compute")}
+	if(trace) {cat("\n",na,"(", percent(na/(nrow(store)*ncol(store)),3,by100=TRUE), ") points of the grid lead to regimes with percentage of observations < trim and were not computed\n")}
 }
 
 pos<-which(store==min(store, na.rm=TRUE), arr.ind=TRUE)		#Best gamma
@@ -500,7 +499,6 @@ StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
 
 Tvalue<-Bbest/StDevB
 Pval<-pt(abs(Tvalue), df=(t-ncol(Zbest)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(t-ncol(Zbest)), lower.tail=TRUE)
-Pval<-round(Pval,4)
 
 
 ###naming the parameter matrix
@@ -643,7 +641,7 @@ print.TVECM<-function(x,...){
 	print(x$model.specific$Thresh)
 }
 
-summary.TVECM<-function(object,...){
+summary.TVECM<-function(object,digits=4,...){
 	x<-object
 	if(x$model.specific$oneMatrix) {
 		x$coefficients<-list(x$coefficients)
@@ -654,7 +652,7 @@ summary.TVECM<-function(object,...){
 	for(i in 1:length(x$Pvalues)){
 		symp[[i]] <- symnum(x$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
 		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$Pval[[i]]))
-		ab[[i]]<-matrix(paste(round(x$coefficients[[i]],4),"(", x$Pval[[i]],")",stars[[i]], sep=""), nrow=nrow(x$Pvalues[[1]]))
+		ab[[i]]<-matrix(paste(myformat(x$coefficients[[i]],digits),"(", myformat(x$Pval[[i]],digits),")",stars[[i]], sep=""), nrow=nrow(x$Pvalues[[1]]))
 		dimnames(ab[[i]])<-dimnames(x$coefficients[[1]])
 	}
 	attributes(ab)<-attributes(x$coefficients)
@@ -689,8 +687,19 @@ toLatex.TVECM<-function(x, ...,digits=4){
 	if(inherits(x,"summary.TVECM")){
 		coef<-x$bigcoefficients
 		for(i in 1:length(coef)){
-			coef[[i]]<-gsub(")", ")^{",coef[[i]], extended=FALSE)
-			coef[[i]]<-matrix(paste(coef[[i]], "}"), ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
+			a<-as.numeric(sub("\\([[:print:]]*", "",coef[[i]])) #extract coef values
+			#a<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(a,digits))) #put the scientific notation in \text latex fromat
+			a<-myformat(a,digits,toLatex=TRUE)
+			b<-as.numeric(sub("\\).*", "",sub(".*\\(", "",coef[[i]]))) #extract st dev
+			b<-myformat(b,digits,toLatex=TRUE)
+			#b<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(b,digits))) #put the scientific notation in \text latex fromat
+			if(getOption("show.signif.stars"))
+					d<-paste("^{",sub(".*\\)", "",coef[[i]]),"}", sep="")#extract stars and add ^{}
+			else
+					d<-NULL
+			coef[[i]]<-matrix(paste(a,"(",b,")",d, sep=""),ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
+			#coef[[i]]<-gsub(")", ")^{",coef[[i]], extended=FALSE)
+			#coef[[i]]<-matrix(paste(coef[[i]], "}"), ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
 		}
 	}
 	else{
@@ -699,13 +708,17 @@ toLatex.TVECM<-function(x, ...,digits=4){
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
 	varNames<-rownames(coef[[1]])
 	res<-character()
-	res[1]<-"%This needs package amsmath. Write \\usepackage{amsmath}"
-	res[2]<-"\\begin{equation}"
-	res[3]<- "\\begin{pmatrix} %explained vector"
-	res[4]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
-	res[5]<- "\\end{pmatrix}="
-	res[6]<- "\\left\\{"
- 	res[7]<-"\\begin{array}{rl}"
+	res[1]<-"%insert in the preamble and uncomment the line you want for usual /medium /small matrix"
+	res[2]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\begin{pmatrix}}{\\end{pmatrix}} %USUAL"
+	res[3]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\left(\\begin{smallmatrix}}{\\end{smallmatrix}\\right)} %SMALL"
+	res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
+	res[5]<-"\\begin{equation}"
+	res[6]<- "\\begin{smatrix} %explained vector"
+	res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
+	res[8]<- "\\end{smatrix}="
+	if(!x$model.specific$oneMatrix)
+		res[length(res)+1]<- "\\left\\{"
+ 	res[length(res)+1]<-"\\begin{array}{ll}"
 
 	###Condition for the threshold
 	if(nthresh%in%c(1,2)){
@@ -728,12 +741,12 @@ toLatex.TVECM<-function(x, ...,digits=4){
 		###ECT
 		for(k in 1:ifelse(x$model.specific$oneMatrix,2,1)){
 			len<-length(res)
-			res[len+1]<-"\\begin{pmatrix} %ECT"
+			res[len+1]<-"\\begin{smatrix} %ECT"
 			res[len+2]<-TeXVec(regimei[,k])
 			if(x$model.specific$oneMatrix)
-				res[len+3]<-paste("\\end{pmatrix}","ECT_{-1}",ect[k],"+",sep="")
+				res[len+3]<-paste("\\end{smatrix}","ECT_{-1}",ect[k],"+",sep="")
 			else
-				res[len+3]<-paste("\\end{pmatrix}","ECT_{-1}","+",sep="")
+				res[len+3]<-paste("\\end{smatrix}","ECT_{-1}","+",sep="")
 		}
 		###const/trend
  		res<-include(x, res, regimei, skip=j)
@@ -743,9 +756,10 @@ toLatex.TVECM<-function(x, ...,digits=4){
 			res[length(res)+1]<- paste(cond[i], "\\\\")
 	}
 	res[length(res)+1]<-"\\end{array}"
-	res[length(res)+1]<-"\\right."
+	if(!x$model.specific$oneMatrix)
+		res[length(res)+1]<-"\\right."
 	res[length(res)+1]<-"\\end{equation}"
-	res<-gsub("kik", "\\\\", res, fixed=TRUE)
+	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]
 	
 	return(structure(res, class="Latex"))
