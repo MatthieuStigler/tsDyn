@@ -13,8 +13,6 @@
 require(tsDyn)
 require(tseriesChaos)
 options(prompt=" ", encoding="LATIN-9")
-lag.plot <- function(x, ...) 
-	stats::lag.plot(x, labels=FALSE, ...)
 \end{Scode}
 
 \begin{titlepage}
