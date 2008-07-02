@@ -121,7 +121,7 @@ z<-as.matrix(z)
 	###Threshold search
 	if (missing(th)) { #if 'th' not specified, try over a reasonable grid
 		ngrid<-ifelse(nthresh==1,30,"ALL")
-		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, nested=FALSE,include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
+		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
 		if(nthresh==1) 
 			th<-c(search[1,"th"])
 		else
