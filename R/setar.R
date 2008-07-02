@@ -263,9 +263,9 @@ print.setar <- function(x, ...) {
 	cat("\n")
 	cat("Proportion of points in ")
 	if(nthresh==1)
-		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)))
+		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
 	else
-		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)))
+		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
 	invisible(x)
 }
 summary.setar <- function(object, ...) {
@@ -320,7 +320,7 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
         }        
 	cat("\nValue:", format(x$thCoef[1], digits=4))
 	if(x$fixedTh) cat(" (fixed)")
-  cat("\nProportion of points in low regime: ", format(x$lowRegProp*100, digits=3), "%\n", sep="")
+	cat('\n')
 	invisible(x)
 }
 
