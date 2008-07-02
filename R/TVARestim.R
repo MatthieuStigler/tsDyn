@@ -432,7 +432,7 @@ print.TVAR<-function(x,...){
 	cat("Model TVAR with ", x$model.specific$nthresh, " thresholds\n\n")
 	print(x$coefficients)
 	cat("\nThreshold value")
-	print(x$model.specific$Thresh)
+	print(paste(x$model.specific$Thresh, collapse=" "))
 }
 
 summary.TVAR<-function(object,...){
