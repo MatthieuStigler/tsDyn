@@ -1,9 +1,6 @@
-cat("Antonio, Fabio Di Narzo and Josè Luis Aznarte (2007). tsDyn: Time series analysis based on dynamical systems theory. R package version 0.7.
-A BibTeX entry for LaTeX users is
-
-  @Manual{,
-    title = {tsDyn: Time series analysis based on dynamical systems theory},
-    author = {{Antonio, Fabio Di Narzo, Jos\\`{e} Luis Aznarte}},
-    year = {2007},
-    note = {R package version 0.6},
-  }")
+citEntry(entry="Manual",
+	title = "tsDyn: Time series analysis based on dynamical systems theory",
+	author = "Antonio, Fabio Di Narzo",
+	year = 2007,
+	note = "R package version 0.7",
+	textVersion = "Antonio, Fabio Di Narzo and Josè Luis Aznarte (2007). tsDyn: Time series analysis based on dynamical systems theory")
