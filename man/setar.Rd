@@ -7,7 +7,7 @@
 Self Exciting Threshold AutoRegressive model.
 }
 \synopsis{
-setar(x, m, d=1, steps=d, series, mL, mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE, include = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MM=seq_len(mM), MH=seq_len(mH),nthresh=1,trim=0.15)
+setar(x, m, d=1, steps=d, series, mL, mM, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE, include = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MM=seq_len(mM), MH=seq_len(mH),nthresh=1,trim=0.15)
 }
 \usage{
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thDelay=0, th,
@@ -43,7 +43,7 @@ common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MH=seq_len(mH),nthresh=1,t
 \item{x}{ time series }
 \item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 \item{series}{ time series name (optional) }
-\item{mL, mH,mM}{autoregressive order for \sQuote{low} (mL) \sQuote{middle} (mM, only useful if nthresh=2) and \sQuote{high} (mH)regime (default values: m). Must be <=m. Alternatively, you can specify \code{ML}}
+\item{mL,mH}{autoregressive order for \sQuote{low} (mL) \sQuote{middle} (mM, only useful if nthresh=2) and \sQuote{high} (mH)regime (default values: m). Must be <=m. Alternatively, you can specify \code{ML}}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d)}
 \item{mTh}{coefficients for the lagged time series, to obtain the threshold variable}
 \item{thVar}{external threshold variable}
@@ -51,7 +51,7 @@ common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MH=seq_len(mH),nthresh=1,t
 \item{trace}{should additional infos be printed? (logical)}
 \item{include} {Type of deterministic regressors to include}
 \item{common}{Whether the deterministic regressors are regime specific (common=FALSE) or not.}
-\item{ML,MM,MH}{vector of lags for  order for \sQuote{low} (ML) \sQuote{middle} (MM, only useful if nthresh=2) and \sQuote{high} (MH)regime. Max must be <=m}
+\item{ML,MH}{vector of lags for  order for \sQuote{low} (ML) \sQuote{middle} (MM, only useful if nthresh=2) and \sQuote{high} (MH)regime. Max must be <=m}
 \item{model}{Currently not implemented}
 \item{nthresh}{Number of threshold of the model}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime. Default to 0.15}
