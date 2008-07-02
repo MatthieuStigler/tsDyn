@@ -27,7 +27,7 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m)-1, mTh, th
 \item{criterion}{ Model selection criterion}
 \item{thSteps}{Not used}
 \item{ngrid}{Number of threshold values to search for within regimes with sufficient number of observations (specified with \code{trim}). Default to "ALL"}
-\item{plot}{Śhould a plot showing the criterion values be printed? (logical)}
+\item{plot}{Should a plot showing the criterion values be printed? (logical)}
 \item{max.iter}{Number of iterations for the alogorithm}
 }
 \details{
