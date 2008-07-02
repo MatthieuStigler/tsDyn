@@ -679,6 +679,7 @@ print.summary.TVECM<-function(x,...){
 }
 
 toLatex.TVECM<-function(object, digits=4, ...){
+	x <- object
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
 	if(x$model.specific$oneMatrix){
