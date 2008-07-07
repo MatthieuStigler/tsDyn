@@ -518,71 +518,21 @@ else if(include=="both")
 else if(include=="none") 
 	Bcolnames <- c("ECT",DeltaXnames)
 
-if(nthresh==1){
-	if(model=="All")
-		colnames(Bbest) <- rep(Bcolnames,2)
-	if(model=="only_ECT")
-		colnames(Bbest)<-c("ECT-","ECT+", Bcolnames[-which(Bcolnames=="ECT")])
-}
-else{
-	if(model=="All")
-		colnames(Bbest)<-rep(Bcolnames,3)
-	if(model=="only_ECT")
-		colnames(Bbest)<-c("ECT-","ECT+", Bcolnames[-which(Bcolnames=="ECT")])
-}
-colnames(Pval)<-colnames(Bbest)
+
 ###partitionning the matrix following the regimes
 
-if(nthresh==1){
-	if(model=="All"){
-		Bdown <- Bbest[,c(1:npar)]
-		Bup <- Bbest[,-c(1:npar)]
-		Pdown <- Pval[,c(1:npar)]
-		Pup <- Pval[,-c(1:npar)]
-		Blist <- list(Bdown=Bdown, Bup=Bup)
-		Plist <- list(Pdown=Pdown, Pup=Pup)
-		nobs <- c(ndown=ndown,nup=nup)
-	}
-	if(model=="only_ECT"){
-		Bdown<-Bbest
-		Blist<-Bbest
-		Plist<-Pval
-		Pdown<-Pval
- 		Bup<-NA
-		nobs <- c(ndown=ndown, nup=nup)
-	}
-}
-else if(nthresh==2){
-	if(model=="All"){
-		Bdown <- Bbest[,c(1:npar)]
-		Bmiddle <- Bbest[,c(1:npar)+npar]
-		Bup <- Bbest[,c(1:npar)+2*npar]
-		colnames(Bmiddle) <- Bcolnames
-		Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)
-		Pdown <- Pval[,c(1:npar)]
-		Pmiddle <- Pval[,c(1:npar)+npar]
-		Pup <- Pval[,c(1:npar)+2*npar]		
-		Plist <- list(Pdown=Pdown, Pmiddle=Pmiddle,Pup=Pup)	
-		colnames(Pmiddle) <- Bcolnames
-		nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
-	}
-	if(model=="only_ECT"){
-		Blist<-Bbest
-		Plist<-Pval
-		Bdown<-Bbest
-		Pdown<-Pval
-		Bup<-NA
-		nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
-	}
-}
+if(nthresh==1)
+	nobs <- c(ndown=ndown, nup=nup)
+else if(nthresh==2)
+	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 
-
+Blist<-nameB(Bbest,commonInter=ifelse(model=="All",FALSE,TRUE), Bnames=Bcolnames,nthresh=nthresh,npar=npar, model="TVECM", TVECMmodel=model)
 
 specific<-list()
 specific$Thresh<-bestThresh
 specific$nthresh<-nthresh
 specific$nreg<-nthresh+1
-specific$rowB<-npar
+specific$nrowB<-npar
 specific$nobs<-nobs
 specific$oneMatrix<-ifelse(model=="only_ECT",TRUE, FALSE)
 specific$beta<-c(1, -betaLT)
@@ -591,7 +541,7 @@ specific$threshEstim<-ifelse(is.null(gamma1), TRUE, FALSE)
 
 
 
-z<-list(coefficients=Blist, residuals=resbest, VAR=VarCovB,   Pvalues=Plist, nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+z<-list(coefficients=Blist, residuals=resbest, model.matrix=t(Zbest), VAR=VarCovB, coeffmat=Bbest,nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
 
 
 class(z)<-c("TVECM","nlVar")
@@ -643,16 +593,28 @@ print.TVECM<-function(x,...){
 
 summary.TVECM<-function(object,digits=4,...){
 	x<-object
-	if(x$model.specific$oneMatrix) {
-		x$coefficients<-list(x$coefficients)
-		x$Pvalues<-list(x$Pvalues)}
+	Z<-x$model.matrix
+	xspe<-x$model.specific
+	###Stdev, VarCov
+	Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=x$k)
+	SigmabestOls<-Sigmabest*(x$t/(x$t-ncol(x$coeffmat)))
+	VarCovB<-solve(tcrossprod(Z))%x%SigmabestOls
+	StDevB<-matrix(diag(VarCovB)^0.5, nrow=x$k)
+	Tvalue<-x$coeffmat/StDevB
+	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
+	Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
+	Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
+	x$coefficients<-as.list(x$coefficients)
+	x$StDev<-as.list(StDevB)
+	x$Pvalues<-as.list(Pval)
+	x$VarCov<-as.list(VarCovB)
 	ab<-list()
 	symp<-list()
 	stars<-list()
 	for(i in 1:length(x$Pvalues)){
 		symp[[i]] <- symnum(x$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
 		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$Pval[[i]]))
-		ab[[i]]<-matrix(paste(myformat(x$coefficients[[i]],digits),"(", myformat(x$Pval[[i]],digits),")",stars[[i]], sep=""), nrow=nrow(x$Pvalues[[1]]))
+		ab[[i]]<-matrix(paste(myformat(x$coefficients[[i]],digits),"(", myformat(x$Pvalues[[i]],digits),")",stars[[i]], sep=""), nrow=nrow(x$Pvalues[[1]]))
 		dimnames(ab[[i]])<-dimnames(x$coefficients[[1]])
 	}
 	attributes(ab)<-attributes(x$coefficients)
@@ -666,6 +628,8 @@ summary.TVECM<-function(object,digits=4,...){
 	
 }
 
+
+
 print.summary.TVECM<-function(x,...){
 	cat("#############\n###Model TVECM\n#############")
 	cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
@@ -678,36 +642,30 @@ print.summary.TVECM<-function(x,...){
 	cat("\nCointegrating vector", x$model.specific$beta)
 }
 
-toLatex.TVECM<-function(object, digits=4, ...){
-	x <- object
+toLatex.TVECM<-function(x, ...,digits=4,parenthese=c("StDev","Pvalue")){
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
-	if(x$model.specific$oneMatrix){
-		x$coefficients<-list(x$coefficients)
-	}
+	x$coefficients<-as.list(x$coefficients)
+	parenthese<-match.arg(parenthese)
 	if(inherits(x,"summary.TVECM")){
-		coef<-x$bigcoefficients
-		for(i in 1:length(coef)){
-			a<-as.numeric(sub("\\([[:print:]]*", "",coef[[i]])) #extract coef values
-			#a<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(a,digits))) #put the scientific notation in \text latex fromat
-			a<-myformat(a,digits,toLatex=TRUE)
-			b<-as.numeric(sub("\\).*", "",sub(".*\\(", "",coef[[i]]))) #extract st dev
-			b<-myformat(b,digits,toLatex=TRUE)
-			#b<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(b,digits))) #put the scientific notation in \text latex fromat
+		coeftoprint <-list()
+		for(i in 1:length(x$coefficients)){
+			a<-myformat(x$coefficients[[i]],digits, toLatex=TRUE)
+			if(parenthese=="StDev")
+				b<-myformat(x$StDev[[i]],digits,toLatex=TRUE)
+			else if(parenthese=="Pvalue")
+				b<-myformat(x$Pvalues[[i]],digits,toLatex=TRUE)
 			if(getOption("show.signif.stars"))
-					d<-paste("^{",sub(".*\\)", "",coef[[i]]),"}", sep="")#extract stars and add ^{}
+				stars<-paste("^{",x$stars[[i]],"}", sep="")
 			else
-					d<-NULL
-			coef[[i]]<-matrix(paste(a,"(",b,")",d, sep=""),ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
-			#coef[[i]]<-gsub(")", ")^{",coef[[i]], extended=FALSE)
-			#coef[[i]]<-matrix(paste(coef[[i]], "}"), ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
-		}
+				stars<-NULL
+			coeftoprint[[i]]<-matrix(paste(a,"(",b,")",stars, sep=""),ncol=ncol(a), nrow=nrow(a))
+		}#end for
 	}
 	else{
-		coef<-as.list(x$coefficients)
-		coef<-rapply(coef,round, digits=digits, how="list")}
+		coeftoprint <-rapply(x$coefficients,myformat, digits=digits, toLatex=TRUE,how="list")}
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
-	varNames<-rownames(coef[[1]])
+	varNames<-rownames(coeftoprint[[1]])
 	res<-character()
 	res[1]<-"%insert in the preamble and uncomment the line you want for usual /medium /small matrix"
 	res[2]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\begin{pmatrix}}{\\end{pmatrix}} %USUAL"
@@ -733,11 +691,11 @@ toLatex.TVECM<-function(object, digits=4, ...){
 	###Adds the const/trend and lags
 	for(i in 1:ifelse(x$model.specific$oneMatrix, 1,nthresh+1)){
 		if(x$model.specific$oneMatrix){
-			regimei<-coef[[1]]
+			regimei<-coeftoprint[[1]]
 			j<-i
 		}
 		else{
-			regimei<-coef[[i]]
+			regimei<-coeftoprint[[i]]
 			j<-1}
 		###ECT
 		for(k in 1:ifelse(x$model.specific$oneMatrix,2,1)){

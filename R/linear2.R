@@ -156,8 +156,10 @@ summary.VAR<-function(object, digits=4,...){
 
 	x$bigcoefficients<-ab
 	x$Sigma<-Sigma
-	x$StDevB<-StDevB
+	x$StDev<-StDevB
 	x$Pvalues<-Pval
+	x$stars<-stars
+	x$starslegend<-symp
 	x$aic<-AIC.nlVar(x)
 	x$bic<-BIC.nlVar(x)
 	class(x)<-c("summary.VAR", "VAR")
@@ -179,21 +181,24 @@ print.summary.VAR<-function(x,...){
 }
 
 
-toLatex.VAR<-function(object,..., digits=4){
+toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	x<-object
+	parenthese<-match.arg(parenthese)
 	if(inherits(x,"summary.VAR")){
-		coef<-x$bigcoefficients
-		a<-as.numeric(sub("\\([[:print:]]*", "",coef)) #extract coef values
-		a<-myformat(a,digits,toLatex=TRUE)
-		b<-as.numeric(sub("\\).*", "",sub(".*\\(", "",coef))) #extract st dev
-		b<-myformat(b,digits,toLatex=TRUE) #put the scientific notation in \text latex fromat
-		if(getOption("show.signif.stars"))					d<-paste("^{",sub(".*\\)", "",coef),"}", sep="")#extract stars and add ^{}
+		a<-myformat(x$coefficients,digits, toLatex=TRUE)
+		if(parenthese=="StDev")
+			b<-myformat(x$StDev,digits,toLatex=TRUE)
+		else if(parenthese=="Pvalue")
+			b<-myformat(x$Pvalues,digits,toLatex=TRUE)
+		if(getOption("show.signif.stars"))
+			stars<-paste("^{",x$stars,"}", sep="")
 		else
-			d<-NULL
-		coef<-matrix(paste(a,"(",b,")",d, sep=""),ncol=ncol(coef), nrow=nrow(coef))
-		}
+			stars<-NULL
+		coeftoprint<-matrix(paste(a,"(",b,")",stars, sep=""),ncol=ncol(a), nrow=nrow(a))
+	}#end if x is of class summary
+
 	else{
-		coef<-myformat(x$coefficients, digits)}
+		coeftoprint <-myformat(x$coefficients, digits, toLatex=TRUE)}
 	varNames<-rownames(x$coefficients)
 	res<-character()
 	res[1]<-"%insert in the preamble and uncomment the line you want for usual /medium /small matrix"
@@ -204,15 +209,15 @@ toLatex.VAR<-function(object,..., digits=4){
 	res[6]<- "\\begin{smatrix} %explained vector"
 	res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
 	res[8]<- "\\end{smatrix}="
- 	res<-include(x, res, coef)
+ 	res<-include(x, res, coeftoprint)
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
 	if(x$model=="VECM"){
 		len<-length(res)
 		res[len+1]<-"+\\begin{smatrix}  %ECT"
-		res[len+2]<-TeXVec(coef[,ninc+1])
+		res[len+2]<-TeXVec(coeftoprint[,ninc+1])
 		res[len+3]<-"\\end{smatrix}ECT_{-1}"
 		ninc<-ninc+1}
-	res<-LagTeX(res, x, coef, ninc)
+	res<-LagTeX(res, x, coeftoprint, ninc)
 	res[length(res)+1]<-"\\end{equation}"
 	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]

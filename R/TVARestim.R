@@ -398,7 +398,7 @@ specific$oneMatrix<-commonInter
 specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
 specific$Bnames<-Bnames
 
-z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
 class(z)<-c("TVAR","nlVar")
 return(z)
 }	#end of the whole function
@@ -438,8 +438,8 @@ print.TVAR<-function(x,...){
 summary.TVAR<-function(object,...){
 	x<-object
 	xspe<-x$model.specific
-	x$sum<-list()
 	Z<-x$model.matrix
+	###Stdev, VarCov
 	Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=x$k)
 	SigmabestOls<-Sigmabest*(x$t/(x$t-ncol(x$coeffmat)))
 	VarCovB<-solve(tcrossprod(Z))%x%SigmabestOls
@@ -448,26 +448,22 @@ summary.TVAR<-function(object,...){
 	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
 	Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
 	Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
-	if(x$model.specific$oneMatrix) {
-		x$coefficients<-list(x$coefficients)
-		x$sum$StDev<-list(StDevB)
-		x$sum$Pvalues<-list(Pval)
-		x$sum$VarCovB<-list(VarCovB)}
-	else{
-		x$sum$StDev<-StDevB
-		x$sum$Pvalues<-Pval
-		x$sum$VarCovB<-VarCovB}
+	x$coefficients<-as.list(x$coefficients)
+	x$StDev<-as.list(StDevB)
+	x$Pvalues<-as.list(Pval)
+	x$VarCov<-as.list(VarCovB)
 	ab<-list()
 	symp<-list()
 	stars<-list()
-	for(i in 1:length(x$sum$Pvalues)){
-		symp[[i]] <- symnum(x$sum$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
-		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$sum$Pvalues[[i]]))
-		ab[[i]]<-matrix(paste(x$coefficients[[i]],"(", x$sum$StDev[[i]],")",stars[[i]], sep=""), nrow=nrow(x$sum$StDev[[1]]))
+	for(i in 1:length(x$Pvalues)){
+		symp[[i]] <- symnum(x$Pvalues[[i]], corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
+		stars[[i]]<-matrix(symp[[i]], nrow=nrow(x$Pvalues[[i]]))
+		ab[[i]]<-matrix(paste(x$coefficients[[i]],"(", x$StDev[[i]],")",stars[[i]], sep=""), nrow=nrow(x$StDev[[i]]))
 		dimnames(ab[[i]])<-dimnames(x$coefficients[[1]])
 	}
 	attributes(ab)<-attributes(x$coefficients)
-	x$stars<-symp
+	x$stars<-stars
+	x$starslegend<-symp[[1]]
 	x$bigcoefficients<-ab
 	x$aic<-AIC.nlVar(x)
 	x$bic<-BIC.nlVar(x)
@@ -476,16 +472,16 @@ summary.TVAR<-function(object,...){
 	return(x)
 }
 
-print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars"),...){
+print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars")){
 	coeftoprint<-list()
 	for(i in 1:length(x$bigcoefficients)){
 		a<-myformat(x$coefficients[[i]], digits)
-		b<-myformat(x$sum$StDev[[i]], digits)
+		b<-myformat(x$StDev[[i]], digits)
 		if(getOption("show.signif.stars"))
-			stars<-x$stars			
+			stars<-x$stars[[i]]	
 		else
 			stars<-NULL
-		coeftoprint[[i]]<-matrix(paste(a,"(", b,")",stars, sep=""), nrow=nrow(x$sum$StDev[[1]]))
+		coeftoprint[[i]]<-matrix(paste(a,"(", b,")",stars, sep=""), nrow=nrow(x$StDev[[1]]))
 		dimnames(coeftoprint[[i]])<-dimnames(x$coefficients[[1]])
 	}
 	cat("Model TVAR with ", x$model.specific$nthresh, " thresholds\n")
@@ -494,7 +490,7 @@ print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.
 	cat("\nAIC",x$aic , "\tBIC", x$bic, "\t SSR", x$SSR,"\n\n")
 	print(noquote(coeftoprint))
 	if (signif.stars) 
-	        cat("---\nSignif. codes: ", attr(x$stars, "legend"), "\n")
+	        cat("---\nSignif. codes: ", attr(x$starslegend, "legend"), "\n")
 	cat("\nThreshold value:",x$model.specific$Thresh)
 	if(!x$model.specific$threshEstim)
 		cat(" (user specified)")
@@ -503,37 +499,29 @@ print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.
 
 
 
-toLatex.TVAR<-function(object,..., digits=4){
+toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	x<-object
-	if(x$model.specific$oneMatrix){
-		x$coefficients<-list(x$coefficients)}
+	parenthese<-match.arg(parenthese)
+	x$coefficients<-as.list(x$coefficients)
 	if(inherits(x,"summary.TVAR")){
-		coef<-x$bigcoefficients
-		for(i in 1:length(coef)){
+		coeftoprint <-list()
+		for(i in 1:length(x$coefficients)){
 			a<-myformat(x$coefficients[[i]],digits, toLatex=TRUE)
-			b<-myformat(x$StDev[[i]],digits,toLatex=TRUE)
+			if(parenthese=="StDev")
+				b<-myformat(x$StDev[[i]],digits,toLatex=TRUE)
+			else if(parenthese=="Pvalue")
+				b<-myformat(x$Pvalues[[i]],digits,toLatex=TRUE)
 			if(getOption("show.signif.stars"))
-				stars<-x$stars			
+				stars<-paste("^{",x$stars[[i]],"}", sep="")
 			else
 				stars<-NULL
-			coef[[i]]<-matrix(paste(a,"(",b,")",stars, sep=""),ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
+			coeftoprint[[i]]<-matrix(paste(a,"(",b,")",stars, sep=""),ncol=ncol(a), nrow=nrow(a))
 		}#end for
 	}#end if
-			#a<-as.numeric(sub("\\([[:print:]]*", "",coef[[i]])) #extract coef values
-			#a<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(a,digits))) #put the scientific notation in \text latex fromat
-			#a<-myformat(a,digits,toLatex=TRUE)
-			#b<-as.numeric(sub("\\).*", "",sub(".*\\(", "",coef[[i]]))) #extract st dev
-			#b<-myformat(b,digits,toLatex=TRUE)
-			#b<-sub("(e.*)", "kuktext{\\1}",as.character(myformat(b,digits))) #put the scientific notation in \text latex fromat
-			#if(getOption("show.signif.stars"))
-			#		d<-paste("^{",sub(".*\\)", "",coef[[i]]),"}", sep="")#extract stars and add ^{}
-			#else
-			#		d<-NULL
-			#coef[[i]]<-matrix(paste(a,"(",b,")",d, sep=""),ncol=ncol(coef[[i]]), nrow=nrow(coef[[i]]))
+
 	else{
-		coef<-as.list(x$coefficients)
-		coef<-rapply(coef,round, digits=digits, how="list")}
-	varNames<-rownames(coef[[1]])
+		coeftoprint <-rapply(x$coefficients,myformat, digits=digits,toLatex=TRUE, how="list")}
+	varNames<-rownames(coeftoprint[[1]])
 	res<-character()
 	res[1]<-"%insert in the preamble and uncomment the line you want for usual /medium /small matrix"
 	res[2]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\begin{pmatrix}}{\\end{pmatrix}} %USUAL"
@@ -544,7 +532,7 @@ toLatex.TVAR<-function(object,..., digits=4){
 	res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
 	res[8]<- "\\end{smatrix}="
 	#if(!x$model.specific$oneMatrix)
-		res[length(res)+1]<- "\\left\\{"
+	res[length(res)+1]<- "\\left\\{"
  	res[length(res)+1]<-"\\begin{array}{ll}"
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
@@ -553,15 +541,15 @@ toLatex.TVAR<-function(object,..., digits=4){
 		cond<-paste(c("& \\text{if Th}<","& \\text{if Th}>"), Th)}
 	if(nthresh==2){
 		cond[3]<-cond[2]
-		cond[2]<-paste("& \\text{if }",Th[1], "< \\text{Th} <", Th[2])	
+		cond[2]<-paste("& \\text{if }",Th[1], "< \\text{Th} <", Th[2])
  		}
 	###Adds the const/trend and lags
 	for(i in 1:(nthresh+1)){
 		if(x$model.specific$oneMatrix){
-			regimei<-coef[[1]]
+			regimei<-coeftoprint[[1]]
 			j<-i}
 		else{
-			regimei<-coef[[i]]
+			regimei<-coeftoprint[[i]]
 			j<-1}
  		res<-include(x, res, regimei)
 		ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
@@ -569,8 +557,7 @@ toLatex.TVAR<-function(object,..., digits=4){
 		res[length(res)+1]<- paste(cond[i], "\\\\")
 	}
 	res[length(res)+1]<-"\\end{array}"
-	#if(!x$model.specific$oneMatrix)
-		res[length(res)+1]<-"\\right."
+	res[length(res)+1]<-"\\right."
 	res[length(res)+1]<-"\\end{equation}"
 	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]
@@ -579,11 +566,18 @@ toLatex.TVAR<-function(object,..., digits=4){
 }
 
 
-nameB<-function(mat,commonInter, Bnames, nthresh, npar){
-	sBnames<-Bnames[-which(Bnames=="Intercept")]
+nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All"){
+	model<-match.arg(model)
+	if(model=="TVAR")
+		sBnames<-Bnames[-which(Bnames=="Intercept")]
+	else if(model=="TVECM")
+		sBnames<-Bnames[-which(Bnames=="ECT")]
 	if(nthresh==1){
 		if(commonInter){
-			colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
+			if(model=="TVAR")
+				colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
+			else if(model=="TVECM")
+				colnames(mat)<-c("ECT-","ECT+", sBnames)
 			Blist<-mat}
 		else{
 			colnames(mat) <- rep(Bnames,2)
@@ -593,14 +587,16 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar){
 	}
 	else{
 		if(commonInter){
-			colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
+			if(model=="TVAR")
+				colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
+			else if(model=="TVECM")
+				colnames(Bbest)<-c("ECT-","ECT+", Bcolnames[-which(Bcolnames=="ECT")])
 			Blist<-mat}
 		else{
 			colnames(mat)<-rep(Bnames,3)
 			Bdown <- mat[,c(1:npar)]
 			Bmiddle <- mat[,c(1:npar)+npar]
 			Bup <- mat[,c(1:npar)+2*npar]		
-			colnames(Bmiddle) <- Bnames
 			colnames(Bmiddle) <- Bnames
 			Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)}
 	}
