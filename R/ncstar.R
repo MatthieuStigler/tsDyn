@@ -1017,9 +1017,9 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     if(trace) cat("\n- Finished building an NCSTAR with ",
                   object$model.specific$noRegimes, " regimes\n");
 
-    res.testIID <- NA #array(NA, 12)
-    for(r in 1:12)
-      res.testIID[r] <- testIID.ncstar(object, G, r)
+#    res.testIID <- NA #array(NA, 12)
+#    for(r in 1:12)
+#      res.testIID[r] <- testIID.ncstar(object, G, r)
 
 #    res.testvar <- testVar.ncstar
 #    res.testparConst <- testParConst.ncstar
