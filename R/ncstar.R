@@ -338,6 +338,75 @@ testRegime.ncstar <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   }
 }
 
+testIID.ncstar <- function(object, G, r, rob=FALSE, sig=0.05, trace = TRUE, ...)
+{
+
+  e <-  object$residuals;
+  n <- NCOL(G);
+  T <- length(e);
+  t0 <- r+1;
+  G <- G[t0:T,]
+  selectr <- 1:r
+
+  v <- array(NA, c(T - t0 + 1, r))
+  for (t in t0:T) 
+	v[t-t0+1,] = e[t - selectr];
+
+  e <- e[t0:T]
+
+  # Compute the rank of G' * G
+  G2 <- t(G) %*% G;
+  s <- svd(G2);
+  tol <- max(dim(G2)) * s[1]$d * 2.2204e-16
+  rG <- qr(G2, tol)$rank
+
+  if(rG < n) {
+    PCtmp <- princomp(G);
+    PC <- PCtmp$loadings;
+    lambda <- cumsum(PCtmp$sdev^2 / sum(PCtmp$sdev^2));
+    indmin <- min(which(lambda > 0.99999));
+    GPCA <- t(PC %*% t(G));
+    GPCA <- GPCA[, 1:indmin];
+    b <- lm.fit(x = GPCA, y = e)$coefficients
+#    b <- lm(e ~ . -1, data = data.frame(GPCA))$coefficients
+    u <-  e - GPCA %*% b;
+    xH0 <- GPCA;
+  } else {
+    b <- lm.fit(x = G, y = e)$coefficients;
+#    b <- lm(e ~ . -1, data=data.frame(G))$coefficients;
+    u <- e - G %*% b;
+    xH0 <- G;
+  }
+
+  SSE0 <- sum(u^2) / T;
+
+  if (rG < n) {
+    xH1 = cbind(v, GPCA);
+    n = NCOL(GPCA);
+  } else {
+    xH1 = cbind(v, G);
+  }
+
+ # Nonlinear model (Alternative hypothesis)
+  c <- lm.fit(x = xH1, y = u)$coefficients
+#  c <- lm(u ~ . - 1, data=data.frame(Z))$coefficients
+  dim(c) <- c(NCOL(xH1), 1);
+  e <- u - xH1 %*% c #e=u-X*c;
+  SSE <- sum(e^2);
+
+  # Compute the third order statistic
+  F = ((SSE0 - SSE) / r) / (SSE / (T - n - r));
+
+  pValue <- pf(F, r, T - nxH0 - r, lower.tail = FALSE);
+
+  if (pValue >= sig) {
+    return(list(isIID = FALSE, pValue = pValue));
+  }
+  else {
+    return(list(isIID = TRUE, pValue = pValue));
+  }
+}
+
 addRegime <- function(object, ...)
   UseMethod("addRegime")
 
@@ -500,34 +569,11 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
   omega <- bestOmega
   phi1 <- t(bestPhi1)
   
-  # Reorder the regimes according to the values of th
-  if ((noRegimes > 2) &&
-      prod((1:(noRegimes - 1)) != sort(th, index.return=TRUE)$ix)) {
-    if(trace) cat("  Reordering regimes...\n")
-  
-    ordering <-  sort(th, index.return=TRUE)$ix
-    
-    th <- sort(th, index.return=TRUE)$x
-    gamma <- gamma[ordering]
-    omega <- omega[, ordering]
-#    phi1 <- phi1[ordering,]
-    
-   if (trace) cat("\n  Starting values fixed for regime ", noRegimes,
+  if (trace) cat("\n  Starting values fixed for regime ", noRegimes,
                  ":\n\tgamma = ", gamma[noRegimes - 1],
                  "\n\tth = ", th[noRegimes - 1],
                  "\n\tomega = ", omega[, noRegimes - 1], "\n");
   
-    z <- xx %*% omega
-    trfun <- cbind(1, GG(z, gamma, th))
-      
-    # We fix the linear parameters again.
-    local1 <- apply(trfun, 2, "*", x_t)
-    dim(local1) <- c(n.used, noRegimes * NCOL(x_t))
-    phi1<- lm.fit(x = local1, y = yy)$coefficients
-    dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
-    phi1 <- t(phi1)
-
-  }
 
   object$fitted.values <- FF.ncstar(phi1, c(gamma, th, omega), xx); # y.hat
   object$residuals <- yy - object$fitted.values; # e.hat
@@ -583,7 +629,7 @@ estimateParams.ncstar <- function(object, trace=TRUE,
     dfX <- dsigmoid(trfun);
     gb1 <- array(NA, c(n.used, noRegimes - 1)) 
     for (i in 1:(noRegimes - 1)) 
-      gb1[,i] <- - (x_t %*% phi1[i+1,]) * dfX[i,];
+      gb1[,i] <- - (x_t %*% phi1[i+1,]) * dfX[,i];
     gw1 <- array(NA, c(n.used, (noRegimes - 1) * q)) 
     for (i in 1:(noRegimes - 1)) 
       gw1[, (i*q - q+1):(i*q)] <- repmat((x_t %*% phi1[i+1,]) * dfX[,i], 1, q) * xx;
@@ -640,7 +686,7 @@ estimateParams.ncstar <- function(object, trace=TRUE,
     dfX <- dsigmoid(trfun);
     gb1 <- array(NA, c(n.used, noRegimes - 1)) 
     for (i in 1:(noRegimes - 1)) 
-      gb1[,i] <- - (x_t %*% phi1[i+1,]) * dfX[i,];
+      gb1[,i] <- - (x_t %*% phi1[i+1,]) * dfX[,i];
     gw1 <- array(NA, c(n.used, (noRegimes - 1) * q)) 
     for (i in 1:(noRegimes - 1)) 
       gw1[, (i*q - q+1):(i*q)] <- repmat((x_t %*% phi1[i+1,]) * dfX[,i], 1, q) * xx;
@@ -685,6 +731,32 @@ estimateParams.ncstar <- function(object, trace=TRUE,
   omega <- object$model.specific$phi2omega[(((noRegimes - 1) * 2) + 1):
                                            length(object$model.specific$phi2omega)]
   dim(omega) <- c(q, noRegimes - 1)
+
+  # Reorder the regimes according to the values of th
+  if ((noRegimes > 2) &&
+      !prod((1:(noRegimes - 1)) == sort(th, index.return=TRUE)$ix)) {
+    if(trace) cat("  Reordering regimes... ")
+  
+    ordering <-  sort(th, index.return=TRUE)$ix
+    
+    th <- sort(th, index.return=TRUE)$x
+    gamma <- gamma[ordering]
+    omega <- omega[, ordering]
+#    phi1 <- phi1[ordering,]
+    
+    if(trace) cat(" OK.\n")
+
+    z <- xx %*% omega
+    trfun <- cbind(1, GG(z, gamma, th))
+      
+    # We fix the linear parameters again.
+    local1 <- apply(trfun, 2, "*", x_t)
+    dim(local1) <- c(n.used, noRegimes * NCOL(x_t))
+    phi1<- lm.fit(x = local1, y = yy)$coefficients
+    dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
+    phi1 <- t(phi1)
+
+  }
 
   w1 <- array(NA, c(q, noRegimes - 1))
   for (i in 1:NCOL(omega))
@@ -945,6 +1017,17 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     if(trace) cat("\n- Finished building an NCSTAR with ",
                   object$model.specific$noRegimes, " regimes\n");
 
+    res.testIID <- NA #array(NA, 12)
+    for(r in 1:12)
+      res.testIID[r] <- testIID.ncstar(object, G, r)
+
+#    res.testvar <- testVar.ncstar
+#    res.testparConst <- testParConst.ncstar
+
+#    object$model.specific$testIID <- res.testIID;
+#    object$model.specific$testVar <- res.testVar;
+#    object$model.specific$testParConst <- res.testParConst;    
+    
     if(!is.null(cluster)) stopCluster(cl)
     return(object);
   }
