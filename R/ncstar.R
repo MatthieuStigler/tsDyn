@@ -397,7 +397,7 @@ testIID.ncstar <- function(object, G, r, rob=FALSE, sig=0.05, trace = TRUE, ...)
   # Compute the third order statistic
   F = ((SSE0 - SSE) / r) / (SSE / (T - n - r));
 
-  pValue <- pf(F, r, T - nxH0 - r, lower.tail = FALSE);
+  pValue <- pf(F, r, T - n - r, lower.tail = FALSE);
 
   if (pValue >= sig) {
     return(list(isIID = FALSE, pValue = pValue));
