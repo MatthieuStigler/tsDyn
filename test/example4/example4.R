@@ -1,6 +1,6 @@
 datasize <- 1000; # Número de instancias del modelo que serán generadas
 T <- 500; # Tamaño de cada instancia
-svIter <- 100; # Número de iteraciones de la búsqueda de p. iniciales
+svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
 
 alg <- "BFGS"
 #cluster <- NULL

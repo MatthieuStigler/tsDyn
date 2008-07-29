@@ -2,12 +2,12 @@ datasize <- 1000; # Número de instancias del modelo que serán generadas
 T <- 500; # Tamaño de cada instancia
 svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
 
-alg <- "BFGS"
+alg <- "GAD"
 #cluster <- NULL
 cluster <- c("localhost","localhost")
 library(snow)
 
-plot <- TRUE
+plot <- FALSE
 
 # PARÁMETROS DEL MODELO ORIGINAL
 noRegimes <- 5
@@ -159,3 +159,5 @@ for(i in 1:datasize) {
 
   }
 }
+
+save.image(file="example6GAD.Rdata")
