@@ -1035,8 +1035,9 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, tests = FALSE,
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 
   if(!is.null(cluster)) {
+    setDefaultClusterOptions(master="localhost", port=10187)
     cl <- makeCluster(cluster, type="SOCK")
-#    clusterSetupRNG(cl)
+    clusterSetupRNG(cl)
     clusterEvalQ(cl, library(Matrix))
   }
 
