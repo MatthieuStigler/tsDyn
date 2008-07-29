@@ -1017,7 +1017,7 @@ estimateParams.ncstar <- function(object, trace=TRUE,
 #   series
 #   rob
 #   sig
-ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
+ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, tests = FALSE,
                    mTh, thDelay, thVar, sig=0.95, trace=TRUE, svIter = 1000,
                    cluster= NULL, control=list(), alg="LM", ...)
 {
@@ -1171,33 +1171,35 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
     # 4. Diagnostic checking
     
-    if(trace) cat("== Testing for linear independence of the residuals:\n")
+    if(tests) {
+      if(trace) cat("== Testing for linear independence of the residuals:\n")
 
-    isIID <- array(NA, 12)
-    pValue <- array(NA, 12)
-    for(r in 1:12) {
-      test1 <- testIID.ncstar(object, G, r, rob=rob, sig=sig, trace = trace)
-      isIID[r] <- test1$isIID
-      pValue[r] <- test1$pValue
+      isIID <- array(NA, 12)
+      pValue <- array(NA, 12)
+      for(r in 1:12) {
+        test1 <- testIID.ncstar(object, G, r, rob=rob, sig=sig, trace = trace)
+        isIID[r] <- test1$isIID
+        pValue[r] <- test1$pValue
+      }
+      object$model.specific$testIID <- data.frame(isIID, pValue)
+      if(trace) print(data.frame(isIID, pValue))
+      
+      if(trace) cat("== Testing for constant variance of the residuals:\n")
+      test2 <- testConstVar.ncstar(object, G, rob=rob, sig=sig, trace = trace)
+      object$model.specific$testConstVar <- test2; 
+      
+      if(test2$isConstVar) 
+        cat("      Constant variance detected, pValue = ", test2$pValue, "\n")
+      else cat("     Smoothly changing variance detected, pvalue = ", test2$pValue, "\n")
+      
+      if(trace) cat("== Testing for parameter constancy:\n")
+      test3 <- testParConst.ncstar(object, G, rob=rob, sig=sig, trace = trace)
+      object$model.specific$testParConst <- test3;
+      
+      if(test3$isConstVar) 
+        cat("      Constant parameters detected, pValue = ", test3$pValue, "\n")
+      else cat("     Smoothly changing parameters detected, pvalue = ", test3$pValue, "\n")
     }
-    object$model.specific$testIID <- data.frame(isIID, pValue)
-    if(trace) print(data.frame(isIID, pValue))
-
-    if(trace) cat("== Testing for constant variance of the residuals:\n")
-    test2 <- testConstVar.ncstar(object, G, rob=rob, sig=sig, trace = trace)
-    object$model.specific$testConstVar <- test2; 
-    
-    if(test2$isConstVar) 
-      cat("      Constant variance detected, pValue = ", test2$pValue, "\n")
-    else cat("     Smoothly changing variance detected, pvalue = ", test2$pValue, "\n")
-    
-    if(trace) cat("== Testing for parameter constancy:\n")
-    test3 <- testParConst.ncstar(object, G, rob=rob, sig=sig, trace = trace)
-    object$model.specific$testParConst <- test3;
-    
-    if(test3$isConstVar) 
-      cat("      Constant parameters detected, pValue = ", test3$pValue, "\n")
-    else cat("     Smoothly changing parameters detected, pvalue = ", test3$pValue, "\n")
     
     if(trace) cat("\n- Finished building an NCSTAR with ",
                   object$model.specific$noRegimes, " regimes\n");
