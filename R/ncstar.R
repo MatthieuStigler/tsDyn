@@ -1211,6 +1211,103 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, tests = FALSE,
   
 }
 
+ncstar.predefined <- function(x, m=2, d = 1, steps = d,
+                              noRegimes, phi1, phi2omega, series, tests = FALSE,
+                   mTh, thDelay, thVar, sig=0.95, trace=TRUE, svIter = 1000,
+                   cluster= NULL, control=list(), alg="LM", ...)
+{
+
+  if(!is.null(cluster)) {
+    setDefaultClusterOptions(master="localhost", port=10187)
+    cl <- makeCluster(cluster, type="SOCK")
+    clusterSetupRNG(cl)
+    clusterEvalQ(cl, library(Matrix))
+  }
+
+  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  # 1. Build the nlar object and associated variables.
+  if(missing(series))   series <- deparse(substitute(x))
+
+  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+
+  xx <- str$xx
+  x_t <- cbind(1, xx)
+  yy <- str$yy
+
+  externThVar <- FALSE
+  n.used <- NROW(xx)
+
+  if(missing(noRegimes)) {
+    if(!missing(phi1)) {
+      noRegimes <- NROW(phi1)
+    }
+    else{
+     cat("Number of regimes not provided.");
+     exit(1);
+   }
+  }
+    
+   # Create the ncstar object
+  list = list(noRegimes=noRegimes, m = m, fitted = NA,  
+    residuals = NA,
+    coefficients = c(phi1, phi2omega),
+    k = length(c(phi1, phi2omega)),
+    convergence=NA, counts=NA, hessian=NA, message=NA,
+    value=NA, par=NA,
+    phi2omega = phi2omega, phi1= phi1) 
+  object <- extend(nlar(str, coefficients = c(phi1, phi2omega),
+                        fitted = NA,
+                        residuals = NA,
+                        k =length(c(phi1, phi2omega)),  noRegimes=noRegimes,
+                        model.specific=list),
+                   "ncstar")
+
+  if(trace) cat('- Estimating parameters for all ', noRegimes, ' regimes, (alg: ', alg, ')...\n')
+  object <- estimateParams.ncstar(object, control=control, trace=trace,
+                                  alg=alg, cluster=cluster);    
+    
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # 4. Diagnostic checking
+    
+  if(tests) {
+    if(trace) cat("== Testing for linear independence of the residuals:\n")
+
+    isIID <- array(NA, 12)
+    pValue <- array(NA, 12)
+    for(r in 1:12) {
+      test1 <- testIID.ncstar(object, G, r, rob=rob, sig=sig, trace = trace)
+      isIID[r] <- test1$isIID
+      pValue[r] <- test1$pValue
+    }
+    object$model.specific$testIID <- data.frame(isIID, pValue)
+    if(trace) print(data.frame(isIID, pValue))
+    
+    if(trace) cat("== Testing for constant variance of the residuals:\n")
+    test2 <- testConstVar.ncstar(object, G, rob=rob, sig=sig, trace = trace)
+    object$model.specific$testConstVar <- test2; 
+    
+    if(test2$isConstVar) 
+      cat("      Constant variance detected, pValue = ", test2$pValue, "\n")
+    else cat("     Smoothly changing variance detected, pvalue = ", test2$pValue, "\n")
+    
+    if(trace) cat("== Testing for parameter constancy:\n")
+    test3 <- testParConst.ncstar(object, G, rob=rob, sig=sig, trace = trace)
+    object$model.specific$testParConst <- test3;
+    
+    if(test3$isConstVar) 
+      cat("      Constant parameters detected, pValue = ", test3$pValue, "\n")
+    else cat("     Smoothly changing parameters detected, pvalue = ", test3$pValue, "\n")
+  }
+  
+  if(trace) cat("\n- Finished building an NCSTAR with ",
+                object$model.specific$noRegimes, " regimes\n");
+  
+  if(!is.null(cluster)) stopCluster(cl)
+  return(object);
+}
+
+
+
 oneStep.star <- function(object, newdata, itime, thVar, ...)
 {
 
