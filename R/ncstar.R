@@ -1307,7 +1307,6 @@ ncstar.predefined <- function(x, m=2, d = 1, steps = d,
 }
 
 
-
 oneStep.star <- function(object, newdata, itime, thVar, ...)
 {
 
