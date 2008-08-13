@@ -666,7 +666,8 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
   newTh <- array(NA, svIter)
   for(i in 1:svIter) {
     newOmega[,i] <- newOmega[,i] / norm(Matrix(newOmega[,i]), "f")
-    newTh[i] <- rnorm(1, mean(xx %*% newOmega[,i]), sd(xx %*% newOmega[,i]))
+#    newTh[i] <- rnorm(1, mean(xx %*% newOmega[,i]), sd(xx %*% newOmega[,i]))
+    newTh[i] <- median(xx %*% newOmega[,i])
   }
   
   maxGamma <- 40; # abs(8 / ((max(xx %*% newOmega) - newTh)))
@@ -1261,6 +1262,14 @@ ncstar.predefined <- function(x, m=2, d = 1, steps = d,
                         k =length(c(phi1, phi2omega)),  noRegimes=noRegimes,
                         model.specific=list),
                    "ncstar")
+
+#      cat("\nStarting values for linear parameters:\n    ")
+#      print(phi1_median)
+      
+#      cat("\nStarting values for nonlinear parameters:\n")
+#      cat("gamma = ", phi2_median[1:(noRegimes - 1)])
+#      cat("; th = ", phi2_median[noRegimes:(2*(noRegimes - 1))])
+#      cat("\nomega=", phi2_median[(2 * (noRegimes - 1) + 1):length(phi2_median)])
 
   if(trace) cat('- Estimating parameters for all ', noRegimes, ' regimes, (alg: ', alg, ')...\n')
   object <- estimateParams.ncstar(object, control=control, trace=trace,
