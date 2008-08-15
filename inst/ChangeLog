@@ -1,5 +1,5 @@
 -version 0.7-0
--args demean, common, and posibility to select only some lags in setar (tnx to
+-args demean, common, and possibility to select only some lags in setar (tnx to
 M. Stigler)
 -added k parameter to the AIC method
 -added 'zeroyld' dataset
