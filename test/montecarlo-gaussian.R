@@ -2,12 +2,12 @@ datasize <- 1000; # Número de instancias del modelo que serán generadas
 T <- 500; # Tamaño de cada instancia
 svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
 
-alg <- "GAD"
+alg <- "BFGS"
 #cluster <- NULL
-cluster <- c("localhost","localhost")
+cluster <- c("dicits", "dicits", "dicits", "dicits")
 library(snow)
 
-plot <- TRUE
+plot <- FALSE
 
 # PARÁMETROS DEL MODELO ORIGINAL
 noRegimes <- 3 
@@ -15,8 +15,8 @@ m <- 2
 sigma <- 0.5; # Varianza del modelo
 
 gamma <- c(3.13, 2.12) 
-th <- rbind(c(0.1016,0.5016),
-            c(0.7152, 0.1152))
+th <- rbind(c(-0.5016, 0.5016),
+            c(0.5152, -0.5152))
 phi <- rbind(c(0.5, 0.8, -0.2),
              c(1.5, -0.6, -0.3),
              c(-0.5, -1.2, 0.7))
@@ -64,7 +64,7 @@ for(i in 1:datasize) {
   # ESTIMATE THE MODEL
   
   ncstarModels[i] <-
-    try(list(ncgstar.predefined(y, m, noRegimes = noRegimes, alg = alg,
+    try(list(ncgstar(y, m, alg = alg,
                      cluster = cluster, svIter = svIter, trace = TRUE)));
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

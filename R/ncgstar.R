@@ -701,6 +701,13 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
 #    x <- (x - mean(x)) / sd(x);
 #  }
   
+  if(!is.null(cluster)) {
+    setDefaultClusterOptions(master="localhost", port=10187)
+    cl <- makeCluster(cluster, type="SOCK")
+    clusterSetupRNG(cl)
+    clusterEvalQ(cl, library(Matrix))
+  }
+
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
   cl <- makeCluster(cluster, "SOCK")
   
@@ -781,11 +788,11 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
       object <- addRegime(object);
       
       if(trace) cat("- Fixing good starting values for regime ", nR);
-      if(length(cluster) == 0) {
-        object <- startingValues(object, trace=trace, svIter = svIter);
+      if(is.null(cluster)) {
+        object <- startingValues.ncgstar(object, trace=trace, svIter = svIter);
       } else {
         if(trace) cat("\n   + Doing distributed computations... ")
-        solutions <- clusterCall(cl, startingValues, object, trace=trace,
+        solutions <- clusterCall(cl, startingValues.ncstar, object, trace=trace,
                                  svIter = svIter %/% length(cluster))
         cost <- rep(Inf, length(solutions))
         if(trace) cat("\n   + Gathering results...\n")

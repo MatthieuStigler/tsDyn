@@ -666,8 +666,8 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
   newTh <- array(NA, svIter)
   for(i in 1:svIter) {
     newOmega[,i] <- newOmega[,i] / norm(Matrix(newOmega[,i]), "f")
-#    newTh[i] <- rnorm(1, mean(xx %*% newOmega[,i]), sd(xx %*% newOmega[,i]))
-    newTh[i] <- median(xx %*% newOmega[,i])
+    newTh[i] <- rnorm(1, mean(xx %*% newOmega[,i]), sd(xx %*% newOmega[,i]))
+#    newTh[i] <- median(xx %*% newOmega[,i])
   }
   
   maxGamma <- 40; # abs(8 / ((max(xx %*% newOmega) - newTh)))
@@ -932,21 +932,21 @@ estimateParams.ncstar <- function(object, trace=TRUE,
     if (alg == "GAD") {
       res <- genoud(fn = SS, starting.values=par, nvars=length(par),
                     gr = gradEhat, cluster=FALSE,
-                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+                    control=list(maxit=1000), print.level = 0)
     } else if (alg == "GA") {
       res <- genoud(fn = SS, starting.values=par, nvars=length(par),
                     BFGS=FALSE, cluster= FALSE,
-                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+                    control=list(maxit=1000), print.level = 0)
     }
   } else {
     if (alg == "GAD") {
       res <- genoud(fn = SS, starting.values=par, nvars=length(par),
                     gr = gradEhat, cluster=cluster,
-                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+                    control=list(maxit=1000), print.level = 0)
     } else if (alg == "GA") {
       res <- genoud(fn = SS, starting.values=par, nvars=length(par),
                     BFGS=FALSE, cluster=cluster,
-                    control=list(hessian = FALSE, maxit=1000), print.level = 0)
+                    control=list(maxit=999), print.level = 0)
     }
   }
 
