@@ -282,13 +282,13 @@ testRegime.ncgstar <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...
   
   F = ((SSE0 - SSE) / nxH1) / (SSE / (T - nxH0 - nxH1));
 
-  pValue <- pf(F, nxH1, T - nxH0 - nxH1, lower.tail = FALSE);
+  pValue <- pf(F, nxH1, T - nxH0 - nxH1, lower.tail = TRUE);
 
   if (pValue >= sig) {
-    return(list(remainingNonLinearity = FALSE, pValue = pValue));
+    return(list(remainingNonLinearity = TRUE, pValue = pValue));
   }
   else {
-    return(list(remainingNonLinearity = TRUE, pValue = pValue));
+    return(list(remainingNonLinearity = FALSE, pValue = pValue));
   }
 }
 
@@ -367,15 +367,21 @@ startingValues.ncgstar <- function(object, trace=TRUE, svIter, ...)
   dim(th) <- c(noRegimes - 1, NCOL(xx))
   
   # Fix 'svIter' random starting values for th
-  newTh <- rnorm(svIter * q, mean=mean(xx), sd=sd(xx))
-  dim(newTh) <- c(svIter, q);
- 
+#  newTh <- rnorm(svIter * q, mean=mean(xx), sd=sd(xx))
+#  dim(newTh) <- c(svIter, q);
+
+  rango <- range(xx)
+  div <- seq(rango[1], rango[2], length.out = svIter^(1/q))
+  newTh <- as.matrix( do.call( expand.grid, rep( list(div), q ) ) )
+
+  max.iter <- NROW(newTh)
+  
   maxGamma <- 40; # abs(8 / ((max(xx %*% newOmega) - newTh)))
   minGamma <- 1; # abs(1 / ((min(xx %*% newOmega) - newTh)));
   rateGamma <- 2; # (maxGamma - minGamma) / 20;     
   bestCost <- Inf;
 
-  for(i in 1:svIter) { 
+  for(i in 1:max.iter) { 
 
     if ((i %% 25 == 0) && trace) cat(".")
 
@@ -818,10 +824,10 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
       if(trace) cat("  Estimating gradient matrix...\n");
       G <- computeGradient(object);
 
-      sig <- sig / 2 # We halve the significance level
-      if(trace) cat("  Computing the test statistic (sig = ", sig, ")...\n");
+#      sig <- sig / 2 # We halve the significance level
+      if(trace) cat("  Computing the test statistic (sig = ", 1 - 0.05 / nR, ")...\n");
       testResults <- testRegime(object, G = G,
-                                       rob = rob, sig = sig, trace=trace);
+                                       rob = rob, sig = 1 - 0.05 / nR, trace=trace);
 
       increase <- testResults$remainingNonLinearity;
       if(increase) {

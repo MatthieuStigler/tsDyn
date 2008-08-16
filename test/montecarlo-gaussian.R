@@ -1,15 +1,15 @@
 datasize <- 1000; # Número de instancias del modelo que serán generadas
 T <- 500; # Tamaño de cada instancia
-svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
+svIter <- 100; # Número de iteraciones de la búsqueda de p. iniciales
 
 alg <- "BFGS"
-#cluster <- NULL
-cluster <- c("dicits", "dicits", "dicits", "dicits")
+cluster <- NULL
+#cluster <- c("dicits", "dicits", "dicits", "dicits")
 library(snow)
 
 plot <- FALSE
 
-# PARÁMETROS DEL MODELO ORIGINAL
+# PARAMETROS DEL MODELO ORIGINAL
 noRegimes <- 3 
 m <- 2 
 sigma <- 0.5; # Varianza del modelo
