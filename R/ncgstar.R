@@ -798,7 +798,7 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
         object <- startingValues.ncgstar(object, trace=trace, svIter = svIter);
       } else {
         if(trace) cat("\n   + Doing distributed computations... ")
-        solutions <- clusterCall(cl, startingValues.ncstar, object, trace=trace,
+        solutions <- clusterCall(cl, startingValues.ncgstar, object, trace=trace,
                                  svIter = svIter %/% length(cluster))
         cost <- rep(Inf, length(solutions))
         if(trace) cat("\n   + Gathering results...\n")
