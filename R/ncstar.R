@@ -1316,38 +1316,35 @@ ncstar.predefined <- function(x, m=2, d = 1, steps = d,
 }
 
 
-oneStep.star <- function(object, newdata, itime, thVar, ...)
+oneStep.ncstar <- function(object, newdata, itime, thVar, ...)
 {
 
   noRegimes <- object$model.specific$noRegimes;
+  xx <- object$str$xx
 
   phi1 <- object$model.specific$phi1;
-  phi2 <- object$model.specific$phi2;
+  phi2omega <- object$model.specific$phi2;
 
-  if(object$model.specific$externThVar) {
-    z <- thVar[itime]
-  } else {
-    z <- newdata %*% object$model$mTh;
-    dim(z) <- NULL;
-  }
+  phi2 <- phi2omega[1:((noRegimes - 1) * 2)];
+  dim(phi2) <- c(noRegimes - 1, 2)
+  gamma <- phi2[,1]
+  th <- phi2[,2]
+  omega <- phi2omega[(((noRegimes - 1) * 2) + 1):length(phi2omega)]
+  dim(omega) <- c(NCOL(xx), noRegimes - 1)
 
-  if(nrow(newdata) > 1) {
-    accum <- array(0, c(noRegimes, nrow(newdata)))
-    accum[1,] <- (cbind(1,newdata) %*% phi1[1,]);
-    for (i in 2:noRegimes) 
-      accum[i,] <-
-        (cbind(1,newdata) %*% phi1[i,]) * G(z, phi2[i - 1,1], phi2[i - 1,2])
+#  if(nrow(newdata) > 1) {
+    trfun <- cbind(1, GG(newdata %*% omega, gamma, th))
+    local <- (cbind(1, newdata) %*% t(phi1)) * trfun;
+    result <- apply(local, 1, sum)
+#  }
+#  else {
+#    accum <- c(1, newdata) %*% phi1[1,];
+#    for (i in 2:noRegimes) 
+#      accum <- accum + 
+#        (c(1, newdata) %*% phi1[i,]) * G(z, phi2[i - 1,1], phi2[i - 1,2])
     
-    result <- apply(accum, 2, sum)
-  }
-  else {
-    accum <- c(1, newdata) %*% phi1[1,];
-    for (i in 2:noRegimes) 
-      accum <- accum + 
-        (c(1, newdata) %*% phi1[i,]) * G(z, phi2[i - 1,1], phi2[i - 1,2])
-    
-    result <- accum
-  }
+#    result <- accum
+#  }
 
   result
   

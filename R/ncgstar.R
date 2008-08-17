@@ -993,38 +993,22 @@ ncgstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
 
 }
 
-oneStep.star <- function(object, newdata, itime, thVar, ...)
+oneStep.ncgstar <- function(object, newdata, itime, thVar, ...)
 {
-
-  noRegimes <- object$model.specific$noRegimes;
 
   phi1 <- object$model.specific$phi1;
   phi2 <- object$model.specific$phi2;
 
-  if(object$model.specific$externThVar) {
-    z <- thVar[itime]
-  } else {
-    z <- newdata %*% object$model$mTh;
-    dim(z) <- NULL;
-  }
+  noRegimes <- NROW(phi1)
+  x_t <- cbind(1,xx)
 
-  if(nrow(newdata) > 1) {
-    accum <- array(0, c(noRegimes, nrow(newdata)))
-    accum[1,] <- (cbind(1,newdata) %*% phi1[1,]);
-    for (i in 2:noRegimes) 
-      accum[i,] <-
-        (cbind(1,newdata) %*% phi1[i,]) * G(z, phi2[i - 1,1], phi2[i - 1,2])
-    
-    result <- apply(accum, 2, sum)
-  }
-  else {
-    accum <- c(1, newdata) %*% phi1[1,];
-    for (i in 2:noRegimes) 
-      accum <- accum + 
-        (c(1, newdata) %*% phi1[i,]) * G(z, phi2[i - 1,1], phi2[i - 1,2])
-    
-    result <- accum
-  }
+  gamma <- phi2[1:noRegimes - 1]
+  th <- phi2[noRegimes:length(phi2)]
+  dim(th) <- c(noRegimes - 1, NCOL(newdata))
+
+  trfun <- cbind(1, GG(newdata, gamma, th))
+  local <- (cbind(1,newdata) %*% t(phi1)) * trfun;
+  result <- apply(local, 1, sum)
 
   result
   
