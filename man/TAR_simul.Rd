@@ -2,7 +2,7 @@
 \alias{TAR_simul}
 \title{Simulation and bootstrap of Treshold Autoregressive model}
 \description{
-Estimate or bootstraps a Threshold VAR
+Simulate or bootstrap a Threshold VAR
 }
 \usage{
 TAR_simul(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL)

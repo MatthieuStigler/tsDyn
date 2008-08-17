@@ -192,3 +192,10 @@ myformat<-function(x,digits, toLatex=FALSE){
 	if(class(x)=="matrix")
 		return(matrix(noquote(r), ncol=ncol(x), nrow=nrow(x)))
 }
+###Assign to class list is class matrix
+asListIfMat<-function(x){
+  if(class(x)=="matrix")
+      return(list(x))
+    else
+      return(x)
+}

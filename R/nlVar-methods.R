@@ -105,19 +105,16 @@ TeXMat<-function(mat, oneLine=FALSE){
 	nr<-nrow(mat)
 	nc<-ncol(mat)	
 	d<-mat[,1]
-	if(!oneLine){
-		e<-nr
-		f<-1
-		for(i in 1:(nc-1))
-			d<-paste(d,"&",mat[,i+1] )
-	}
+	for(i in 1:(nc-1))
+	  d<-paste(d,"&",mat[,i+1])
 	d[seq_len(nr-1)]<-paste(d[seq_len(nr-1)],"slashslash")
 	d[nr]<-paste(d[nr], "")
-	if(oneLine)
-		d<-charM(d)
  	matrix(d, nrow=ifelse(oneLine,1,nr), ncol=1)
 }
-
+if(FALSE){
+  a<-matrix(c(1,2,3,4,5,6), ncol=2)
+  TeXMat(a)
+}
 ###Function include
 include<-function(x, res, coef, skip=0, mat="smatrix"){
 	n<-length(res)
@@ -142,6 +139,10 @@ include<-function(x, res, coef, skip=0, mat="smatrix"){
 
 ###Function lag
 LagTeX<-function(res, x, coef, skip,mat="smatrix"){
+	if(inherits(x,c("VECM","TVECM")))
+	    delta<-"slashDelta "
+	else
+	    delta<-NULL
 	for(j in 1:x$lag){
 		nres<-length(res)
 		res[nres+1]<-paste("+\\begin{",mat,"}      %Lag", j,sep="")
@@ -150,7 +151,7 @@ LagTeX<-function(res, x, coef, skip,mat="smatrix"){
 		nres<-length(res)
 		res[nres+1]<-paste("\\end{",mat,"}",sep="")
  		res[nres+2]<-paste("\\begin{",mat,"}", sep="")
-		res[nres+3]<-TeXVec(paste("X_{t-",j,"}^{",seq(1, x$k),"}", sep=""))
+		res[nres+3]<-TeXVec(paste(delta,"X_{t-",j,"}^{",seq(1, x$k),"}", sep=""))
 		res[nres+4]<-paste("\\end{",mat,"}", sep="")
 	}
 res

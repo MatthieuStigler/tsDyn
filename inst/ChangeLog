@@ -1,7 +1,10 @@
 -version 0.7-0
--args demean, common, and possibility to select only some lags in setar (tnx to
+-added args demean, common, model, trim and possibility to select only some lags in setar and selectSETAR (tnx to
 M. Stigler)
--added k parameter to the AIC method
+-added possibilty to have two thresolds and hence three regimes in setar and selectSETAR (arg nthresh)
+-added criterion "SSR" (sum of squares residual) and argument max.iter in selectSETAR
+-extended arg th in selectSETAR to search inside an intervall or around a point or on the whole grid
+-added k parameter to the AIC method and fixed a bug
 -added 'zeroyld' dataset
 -standardized license naming in description
 -added functions star and ncstar

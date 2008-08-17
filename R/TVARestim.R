@@ -448,10 +448,10 @@ summary.TVAR<-function(object,...){
 	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
 	Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
 	Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
-	x$coefficients<-as.list(x$coefficients)
-	x$StDev<-as.list(StDevB)
-	x$Pvalues<-as.list(Pval)
-	x$VarCov<-as.list(VarCovB)
+	x$coefficients<-asListIfMat(x$coefficients)
+	x$StDev<-asListIfMat(StDevB)
+	x$Pvalues<-asListIfMat(Pval)
+	x$VarCov<-asListIfMat(VarCovB)
 	ab<-list()
 	symp<-list()
 	stars<-list()
@@ -502,7 +502,7 @@ print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.
 toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	x<-object
 	parenthese<-match.arg(parenthese)
-	x$coefficients<-as.list(x$coefficients)
+	x$coefficients<-asListIfMat(x$coefficients)
 	if(inherits(x,"summary.TVAR")){
 		coeftoprint <-list()
 		for(i in 1:length(x$coefficients)){

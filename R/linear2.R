@@ -1,4 +1,5 @@
-linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, coINT=FALSE){
+linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, coINT=FALSE, LRinclude=c("none", "const", "trend","both"), beta0=0)
+{
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
 T <- nrow(y) 		#Size of start sample
@@ -30,27 +31,54 @@ if(model=="VECM"|I=="diff"){
 
 ##Long-run relationship OLS estimation
 if(model=="VECM"){
+	#beta has to be estimated
 	if(is.null(beta) ){
-		if(coINT)
-			coint<-lm(y[,1]~ y[,-1])
-		else
-			coint<-lm(y[,1]~ y[,-1]-1)
-	}
+	  if(class(LRinclude)=="character"){
+	    LRinclude<-match.arg(LRinclude)
+	    if(LRinclude=="none")
+	      LRplus<-rep(0,T)
+	    else if(LRinclude=="const")
+	      LRplus<- rep(1,T)
+	    else if(LRinclude=="trend")
+	      LRplus<- seq_len(T)
+	    else if(LRinclude=="both")
+	      LRplus<-cbind(rep(1,T),seq_len(T))
+	  }
+	   else if(class(LRinclude)%in%c("matrix", "numeric"))
+	    LRplus<-LRinclude
 	else
-		coint<-c(1, -beta)
-
-# beta0<-(beta0%*%coint$coef[-1])[-c(1:p,T),]}
-
-	betaLT<-coint$coef
+	   stop("Argument LRinclude badly given")
+	if(class(LRinclude)=="character") {
+	  if(LRinclude=="none"){
+	    LRplusplus<-matrix(0, nrow=T, ncol=1)
+	    coint<-lm(y[,1] ~  y[,-1]-1)}
+	  else{
+	    coint<-lm(y[,1] ~  y[,-1]-1+ LRplus)
+	    LRplusplus<-as.matrix(LRplus)%*%coint$coef[-1]}}
+	else{
+	  coint<-lm(y[,1] ~  y[,-1]-1+ LRplus)
+	  LRplusplus<-as.matrix(LRplus)%*%coint$coef[-1]}
+	
+	betaLT<-coint$coef[[1]]
 	betaLT_std <- sqrt(diag(summary(coint)$sigma*summary(coint)$cov))
-
+	}
+	#beta is given by user
+	else{
+	  coint<-c(1, -beta)
+	  betaLT<-beta
+	}
 
 # ECT<-y%*%c(1,-betaLT)
 # ECT<-round(ECT,ndig)
 #ECTminus1<-ECT[-c(1:p,T)]
 
-	ECTminus1<-round(Xminus1%*%c(1,-betaLT),ndig)
+	#ECTminus1<-Xminus1%*%c(1,-betaLT)
+	ECTminus1<-residuals(coint)[-c(seq_len(p), T)]
 	Z<-cbind(ECTminus1,Z)
+
+#check if other way works
+#print(cbind(residuals(coint)[-c(seq_len(p),T)], (y%*%c(1,-betaLT)-(LRplusplus))[-c(seq_len(p),T),]))
+#print(all.equal(residuals(coint)[-c(seq_len(p),T)], (y%*%c(1,-betaLT)-(LRplusplus))[-c(seq_len(p),T),]))
 }
 
 ###Regressors matrix
@@ -86,8 +114,8 @@ else if(include=="trend")
 	Bnames<-c("Trend",ECT, LagNames)
 else if(include=="both")
 	Bnames<-c("Intercept","Trend",ECT, LagNames)
-else 
-	Bnames<-c(LagNames)
+else
+	Bnames<-c(ECT,LagNames)
 
 colnames(B)<-Bnames
 fitted<-Z%*%t(B)
@@ -101,7 +129,10 @@ if(model=="VECM"){
 
 
 z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=model, model.specific=model.specific)
-class(z)<-c("VAR","nlVar")
+if(model=="VAR")
+  class(z)<-c("VAR","nlVar")
+if(model=="VECM")
+  class(z)<-c("VAR","VECM", "nlVar")
 return(z)
 }
 
@@ -162,6 +193,7 @@ summary.VAR<-function(object, digits=4,...){
 	x$starslegend<-symp
 	x$aic<-AIC.nlVar(x)
 	x$bic<-BIC.nlVar(x)
+	x$SSR<-deviance.nlVar(x)
 	class(x)<-c("summary.VAR", "VAR")
 	return(x)
 }
@@ -172,7 +204,7 @@ print.summary.VAR<-function(x,...){
 	cat("#############\n###Model", x$model,"\n#############")
 	cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
 	cat("\nNumber of variables:", x$k,"\tNumber of estimated slope parameters", x$npar)
-	cat("\nAIC",x$aic , "\tBIC", x$bic)
+	cat("\nAIC",x$aic , "\tBIC", x$bic, "\tSSR", x$SSR)
 	if(x$model=="VECM")
 		cat("\nCointegrating vector:", x$model.specific$betaLT)
 	cat("\n\n")
@@ -191,6 +223,7 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 		else if(parenthese=="Pvalue")
 			b<-myformat(x$Pvalues,digits,toLatex=TRUE)
 		if(getOption("show.signif.stars"))
+
 			stars<-paste("^{",x$stars,"}", sep="")
 		else
 			stars<-NULL
@@ -207,7 +240,10 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
 	res[5]<-"\\begin{equation}"
 	res[6]<- "\\begin{smatrix} %explained vector"
-	res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
+	if(inherits(x, "VECM"))
+	  res[7]<-TeXVec(paste("slashDelta X_{t}^{",seq(1, x$k),"}", sep=""))
+	else
+	  res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
 	res[8]<- "\\end{smatrix}="
  	res<-include(x, res, coeftoprint)
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
