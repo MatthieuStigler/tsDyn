@@ -576,7 +576,7 @@ addRegime.ncstar <- function(object)
 
     # omega is random but has norm equal to 1
     omega <- c(runif(1), runif(NCOL(xx) - 1, min=-1,max=1))
-    omega <- omega * (1 / norm(Matrix(omega), "f"))
+    omega <- omega * (1 / norma(omega))
     dim(omega) <- c(NCOL(xx), 1)
 
     gamma <- 0
@@ -665,7 +665,7 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
  
   newTh <- array(NA, svIter)
   for(i in 1:svIter) {
-    newOmega[,i] <- newOmega[,i] / norm(Matrix(newOmega[,i]), "f")
+    newOmega[,i] <- newOmega[,i] / norma(newOmega[,i])
     newTh[i] <- rnorm(1, mean(xx %*% newOmega[,i]), sd(xx %*% newOmega[,i]))
 #    newTh[i] <- median(xx %*% newOmega[,i])
   }
@@ -681,7 +681,7 @@ startingValues.ncstar <- function(object, trace=TRUE, svIter, ...)
 
 #    newOmega <- c(runif(1, min=0, max=1),
 #                                runif(NCOL(xx) - 1, min=-1, max=1))
-#    newOmega <- newOmega * (1 / norm(Matrix(newOmega), "f"))
+#    newOmega <- newOmega * (1 / norma(newOmega))
 #    dim(newOmega) <- c(NCOL(xx), 1)
 #    newTh <- rnorm(1, mean(xx %*% newOmega), sd(xx %*% newOmega))
 
@@ -821,6 +821,40 @@ estimateParams.ncstar <- function(object, trace=TRUE,
 
   }
 
+  #Sum of squares function
+  #p: vector of parameters
+  SS.ga <- function(par) {
+    b1 <- par[1:(noRegimes-1)];
+    w1 <- par[noRegimes:length(par)]
+    dim(w1) <- c(q, noRegimes - 1)
+
+    # We check the restrictions
+    for (i in 1:(noRegimes - 1)) 
+      if( abs(norma(w1[,i]) - 1) < 0.05 )
+        return(Inf)
+    
+    if( noRegimes > 2) {
+      sorting <- sort(b1, index.return = TRUE)
+      if (!prod((1:(noRegimes - 1)) == sorting$ix))
+        return(Inf)
+    }
+
+    # We fix the linear parameters because they're not known here
+    trfun <- cbind(1, GG1(xx %*% w1, b1))
+    tmp <- apply(trfun, 2, "*", x_t)
+    dim(tmp) <- c(n.used, noRegimes * p)
+    phi1 <- lm.fit(x = tmp, y = yy)$coefficients
+    dim(phi1) <- c(p, noRegimes)
+#    phi1 <- t(phi1)
+
+    # Return the sum of squares
+    local <- (x_t %*% phi1) * trfun;
+    y.hat <- apply(local, 1, sum)
+    
+    return(crossprod(yy - y.hat))
+
+  }
+
   # Function to compute the gradient 
   #
   # Returns the gradient with respect to the error
@@ -919,6 +953,18 @@ estimateParams.ncstar <- function(object, trace=TRUE,
   
   par <- c(th * gamma, w1)
 
+#  domainsGamma <- t(matrix(rep(c(0,100), noRegimes - 1), c(2,noRegimes - 1)))
+#  domainsTh <- t(matrix(rep(c(min(xx) - sd(xx[,1]), max(xx) + sd(xx[,1])),
+#                            noRegimes - 1), c(2, noRegimes - 1)))
+#  domainsOmega <- t(matrix(rep(c(-1,1), noRegimes - 1), c(2, noRegimes - 1)))
+
+  domainsb1 <- t(matrix(rep(c(100 * (min(xx) - sd(xx[,1])),
+                              100 * (max(xx) + sd(xx[,1]))), noRegimes - 1),
+                        c(2, noRegimes - 1)))
+  domainsw1 <- t(matrix(rep(c(-100, 100), q * (noRegimes - 1)),
+                        c(2,q * (noRegimes - 1))))
+  domainsGA <- rbind(domainsb1, domainsw1)
+
   if (alg == "LM") {
     res <- try(nls.lm(par=par, fn=SS.lm, jac = gradEhat.lm,
                   control=nls.lm.control(nprint=100, maxfev=1e+9, maxiter=1024)));
@@ -930,23 +976,27 @@ estimateParams.ncstar <- function(object, trace=TRUE,
                   control = list(trace=0, maxit=20000, temp=200,tmax=50));
   } else if (is.null(cluster)) {
     if (alg == "GAD") {
-      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
-                    gr = gradEhat, cluster=FALSE,
-                    control=list(maxit=1000), print.level = 0)
+      res <- genoud(fn = SS.ga, starting.values=par, nvars=length(par),
+                    gr = gradEhat, cluster=FALSE, control=list(maxit=1000),
+                    print.level = 0, pop.size=2000, max.generations=200,
+                    wait.generations=50, Domains = domainsGA)
     } else if (alg == "GA") {
-      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
-                    BFGS=FALSE, cluster= FALSE,
-                    control=list(maxit=1000), print.level = 0)
+      res <- genoud(fn = SS.ga, starting.values=par, nvars=length(par),
+                    BFGS=FALSE, cluster= FALSE, control=list(maxit=1000),
+                    print.level = 0, pop.size=2000, max.generations=200,
+                    wait.generations=50, Domains = domainsGA)
     }
   } else {
     if (alg == "GAD") {
-      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
-                    gr = gradEhat, cluster=cluster,
-                    control=list(maxit=1000), print.level = 0)
+      res <- genoud(fn = SS.ga, starting.values=par, nvars=length(par),
+                    gr = gradEhat, cluster=cluster, control=list(maxit=1000),
+                    print.level = 0, pop.size=2000, max.generations=200,
+                    wait.generations=50, Domains = domainsGA)
     } else if (alg == "GA") {
-      res <- genoud(fn = SS, starting.values=par, nvars=length(par),
-                    BFGS=FALSE, cluster=cluster,
-                    control=list(maxit=999), print.level = 0)
+      res <- genoud(fn = SS.ga, starting.values=par, nvars=length(par),
+                    BFGS=FALSE, cluster=cluster, control=list(maxit=999),
+                    print.level = 0, pop.size=2000, max.generations=200,
+                    wait.generations=50, Domains = domainsGA)
     }
   }
 
@@ -961,7 +1011,7 @@ estimateParams.ncstar <- function(object, trace=TRUE,
       b1[i] <- -1 * b1[i];
     }
 
-    gamma[i] <- norm(Matrix(w1[,i]), "f")
+    gamma[i] <- norma(w1[,i])
     omega[, i] <- w1[,i] / gamma[i]; 
     th[i] <- b1[i] / gamma[i];
 
@@ -1154,9 +1204,11 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, tests = FALSE,
       if(trace) cat("  Estimating gradient matrix...\n");
       G <- computeGradient.ncstar(object);
 
-      if(trace) cat("  Computing the test statistic (sig = ", 1 - 0.05 / nR, ")...\n");
+      if(trace) cat("  Computing the test statistic (sig = ", 0.95, #1 - 0.05 / nR,
+                    ")...\n");
       testResults <- testRegime.ncstar(object, G = G,
-                                       rob = rob, sig = 1 - 0.05 / nR, trace=trace);
+                                       rob = rob, sig = 0.95, #1 - 0.05 / nR,
+                                       trace=trace);
 
       increase <- testResults$remainingNonLinearity;
       if(increase) {

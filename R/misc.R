@@ -52,6 +52,8 @@ dsigmoid <- function(x) x * (1 - x)
 
 repmat <- function(a, b, c) kronecker(matrix(1,b,c), a)
 
+norma <- function(v) sqrt(sum(v^2))
+
 ###Function to create the threshold in TVAR
 TVAR_thresh<-function(mTh,thDelay,thVar=NULL,y, p){
 T <- nrow(y) 
@@ -192,6 +194,7 @@ myformat<-function(x,digits, toLatex=FALSE){
 	if(class(x)=="matrix")
 		return(matrix(noquote(r), ncol=ncol(x), nrow=nrow(x)))
 }
+
 ###Assign to class list is class matrix
 asListIfMat<-function(x){
   if(class(x)=="matrix")
