@@ -2,7 +2,7 @@ datasize <- 1000; # Número de instancias del modelo que serán generadas
 T <- 500; # Tamaño de cada instancia
 svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
 
-alg <- "GA"
+alg <- "BFGS"
 #cluster <- NULL
 cluster <- c("node0","node0", "node0", "node0", "node1","node1", "node1", "node1", "node2","node2", "node2", "node2", "node3","node3", "node3", "node3", "node5","node5", "node5", "node5", "node6","node6", "node6", "node6", "node7","node7", "node7", "node7")
 #cluster <- c("dicits", "dicits", "dicits", "dicits")
@@ -28,9 +28,9 @@ phi <- rbind(c(0.5, 0.8, -0.2),
 library(tsDyn)
 ncstarModels <- array(list(), 2000)
 noRegimes_mean <- array(NA, datasize)
-#phi1_acc <- array(NA, noRegimes * (m + 1))
-#phi2_acc <- array(NA, (m+1) * (noRegimes - 1))
-#phi2_acc_median <- array(NA, (m+1) * (noRegimes - 1))
+phi1_acc <- array(NA, noRegimes * (m + 1))
+phi2_acc <- array(NA, (m+1) * (noRegimes - 1))
+phi2_acc_median <- array(NA, (m+1) * (noRegimes - 1))
 
 first <- TRUE
 for(i in 1:datasize) {

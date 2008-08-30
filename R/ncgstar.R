@@ -22,7 +22,7 @@
 # z: threshold variable(s)
 # gamma: smoothing parameter(s)
 # th: threshold parameters, one vector for each regime
-GG <- function(z, gamma, th) {
+GG.gaussian <- function(z, gamma, th) {
   regimes <- length(gamma)
   n.used <- NROW(z)
   result <- array(NA, c(n.used, regimes))
@@ -47,7 +47,7 @@ FF.ncgstar <- function(xx, phi1, phi2) {
   th <- phi2[noRegimes:length(phi2)]
   dim(th) <- c(noRegimes - 1, NCOL(xx))
 
-  trfun <- cbind(1, GG(xx, gamma, th))
+  trfun <- cbind(1, GG.gaussian(xx, gamma, th))
   local <- (x_t %*% t(phi1)) * trfun;
   result <- apply(local, 1, sum)
   result
@@ -150,7 +150,7 @@ computeGradient.ncgstar <- function(object, ...)
   # linear parameters
   phi1 <- object$model.specific$phi1;
 
-  fX <- GG(xx, gamma, th);
+  fX <- GG.gaussian(xx, gamma, th);
 #  dfX <- GGd(xx, gamma, th);
 
   tsum <- array(NA, c(n.used, noRegimes - 1, q))
@@ -391,7 +391,7 @@ startingValues.ncgstar <- function(object, trace=TRUE, svIter, ...)
 
       gamma[noRegimes - 1] <- newGamma;
 
-      trfun <- cbind(1, GG(xx, gamma, th))
+      trfun <- cbind(1, GG.gaussian(xx, gamma, th))
       
       # We fix the linear parameters here, before optimizing the nonlinear.
       local1 <- apply(trfun, 2, "*", x_t)
@@ -478,7 +478,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     dim(th) <- c(noRegimes - 1, q)
     
     # We fix the linear parameters because they're not known here
-    trfun <- GG(xx, gamma, th)
+    trfun <- GG.gaussian(xx, gamma, th)
     tmp <- apply(cbind(1, trfun), 2, "*", x_t)
     dim(tmp) <- c(n.used, noRegimes * p)
     phi1 <- lm.fit(x = tmp, y = yy)$coefficients
@@ -486,7 +486,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     phi1 <- t(phi1)
 
     # Compute the gradients
-    fX <- GG(xx, gamma, th);
+    fX <- GG.gaussian(xx, gamma, th);
 
     tsum <- array(NA, c(n.used, noRegimes - 1, q))
     for (i in 1:(noRegimes-1)) 
@@ -523,7 +523,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     dim(th) <- c(noRegimes - 1, q)
     
     # We fix the linear parameters because they're not known here
-    trfun <- cbind(1, GG(xx, gamma,th))
+    trfun <- cbind(1, GG.gaussian(xx, gamma,th))
     tmp <- apply(trfun, 2, "*", x_t)
     dim(tmp) <- c(n.used, noRegimes * p)
     phi1 <- lm.fit(x = tmp, y = yy)$coefficients
@@ -547,7 +547,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     dim(th) <- c(noRegimes - 1, q)
     
     # We fix the linear parameters because they're not known here
-    trfun <- GG(xx, gamma, th)
+    trfun <- GG.gaussian(xx, gamma, th)
     tmp <- apply(cbind(1, trfun), 2, "*", x_t)
     dim(tmp) <- c(n.used, noRegimes * p)
     phi1 <- lm.fit(x = tmp, y = yy)$coefficients
@@ -555,7 +555,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     phi1 <- t(phi1)
 
     # Compute the gradients
-    fX <- GG(xx, gamma, th);
+    fX <- GG.gaussian(xx, gamma, th);
     tsum <- array(NA, c(n.used, noRegimes - 1, q))
     tsum2 <- array(NA, c(n.used, noRegimes - 1))
     for (i in 1:(noRegimes-1)) 
@@ -587,7 +587,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     dim(th) <- c(noRegimes - 1, q)
     
     # We fix the linear parameters because they're not known here
-    trfun <- cbind(1, GG(xx, gamma,th))
+    trfun <- cbind(1, GG.gaussian(xx, gamma,th))
     tmp <- apply(trfun, 2, "*", x_t)
     dim(tmp) <- c(n.used, noRegimes * p)
     phi1 <- lm.fit(x = tmp, y = yy)$coefficients
@@ -653,7 +653,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 3.- Estimate linear parameters again
-  trfun <- GG(xx, gamma, th)
+  trfun <- GG.gaussian(xx, gamma, th)
   tmp <- apply(cbind(1, trfun), 2, "*", x_t)
   dim(tmp) <- c(n.used, noRegimes * p)
   phi1 <- lm.fit(x = tmp, y = yy)$coefficients
@@ -1006,7 +1006,7 @@ oneStep.ncgstar <- function(object, newdata, itime, thVar, ...)
   th <- phi2[noRegimes:length(phi2)]
   dim(th) <- c(noRegimes - 1, NCOL(newdata))
 
-  trfun <- cbind(1, GG(newdata, gamma, th))
+  trfun <- cbind(1, GG.gaussian(newdata, gamma, th))
   local <- (cbind(1,newdata) %*% t(phi1)) * trfun;
   result <- apply(local, 1, sum)
 
