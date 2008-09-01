@@ -28,7 +28,7 @@ GG.gaussian <- function(z, gamma, th) {
   result <- array(NA, c(n.used, regimes))
 
   for(i in 1:regimes)
-      result[,i] <- apply(exp( - gamma * (t(apply(z, 1, "-", th[i,])))^2), 1, prod)
+      result[,i] <- apply(exp( - gamma[i] * t(t(z) - th[i,])^2), 1, prod)
   result
 }
 
@@ -171,7 +171,7 @@ computeGradient.ncgstar <- function(object, ...)
   gth <- array(0, c(n.used, (noRegimes-1), q));
   for (i in 1:(noRegimes - 1))
     for (j in 1:q)
-      gth[, i, j] <- 2 * gamma * tsum[,i,j] * fX[,i]
+      gth[, i, j] <- 2 * gamma[i] * tsum[,i,j] * fX[,i]
   dim(gth) <- c(n.used, (noRegimes - 1) * q)
   
   return(cbind(gPhi1, ggamma, gth))
