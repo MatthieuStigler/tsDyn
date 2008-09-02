@@ -503,7 +503,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     gth <- array(NA, c(n.used, (noRegimes-1), q));
     for (i in 1:(noRegimes - 1))
       for (j in 1:q)
-        gth[, i, j] <- 2 * gamma * tsum[,i,j] * fX[,i]
+        gth[, i, j] <- 2 * gamma[i] * tsum[,i,j] * fX[,i]
     dim(gth) <- c(n.used, (noRegimes - 1) * q)
       
     J = - cbind(ggamma, gth) / sqrt(n.used)
@@ -570,7 +570,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
     gth <- array(0, c(n.used, (noRegimes-1), q));
     for (i in 1:(noRegimes - 1))
       for (j in 1:q)
-        gth[, i, j] <- 2 * gamma * tsum[,i,j] * fX[,i]
+        gth[, i, j] <- 2 * gamma[i] * tsum[,i,j] * fX[,i]
     dim(gth) <- c(n.used, (noRegimes - 1) * q)
       
     J = - cbind(ggamma, gth) / sqrt(n.used)
@@ -869,19 +869,19 @@ ncgstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
                               sig=0.05, trace=TRUE, svIter = 1000, control=list(), ...)
 {
 
+  if(!is.null(cluster)) {
+    setDefaultClusterOptions(master="localhost", port=10187)
+    cl <- makeCluster(cluster, type="SOCK")
+    clusterSetupRNG(cl)
+    clusterEvalQ(cl, library(Matrix))
+  }
+
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
   # 1. Build the nlar object and associated variables.
   if(missing(series))   series <- deparse(substitute(x))
 
-  # Normalize the series.
-#  if ((mean(x) >= 0.05) && (sd(x) >= 0.05) {
-#    if (trace) cat("Normalizing the series.\n")
-#    x <- (x - mean(x)) / sd(x);
-#  }
-  
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-  cl <- makeCluster(cluster, "SOCK")
-  
+
   xx <- str$xx
   x_t <- cbind(1, xx)
   yy <- str$yy
@@ -890,106 +890,80 @@ ncgstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
   n.used <- NROW(xx)
 
   if(missing(noRegimes)) {
-     error("Missing parameter 'noRegimes'.");
-   }
-    
-  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-  # 2. Linearity testing
-  if (trace) cat("Testing linearity...   ")
-  testResults <- linearityTest.ncgstar(str, rob=rob, sig=sig, trace = trace)
-  pValue <- testResults$pValue;
-  increase <- ! testResults$isLinear;
-
-  if(trace) cat("p-Value = ", pValue,"\n")
-  if(!increase) {
-    if(trace) cat("The series is linear.\n")
-    # Build the linear model
-    linearModel <- lm.fit(x = x_t, y = yy);
-#    linearModel <- lm(yy ~ .  - 1, data = data.frame(x_t));
-
-    phi1= linearModel$coefficients
-    dim(phi1) = c(1, NCOL(x_t)) # one row, one regime
-    
-    # Create the ncstar object
-    list = list(noRegimes=1, m = m, fitted = linearModel$fitted.values,  
-                     residuals = linearModel$residuals,
-                     coefficients = linearModel$coefficients,
-                     k = length(linearModel$coefficients),
-                     convergence=NA, counts=NA, hessian=NA, message=NA,
-                     value=NA, par=NA,
-                     phi2 = NA, phi1= phi1) 
-    object <- extend(nlar(str, coefficients = linearModel$coefficients,
-                          fitted = linearModel$fitted.values,
-                          residuals = linearModel$residuals,
-                          k=NCOL(x_t), noRegimes=1,
-                          model.specific=list),
-                     "ncgstar")
-    return(object);
-  }
-  else {
-    # Build the linear model
-    linearModel <- lm(yy ~ .  - 1, data = data.frame(x_t));
-
-    phi1= linearModel$coefficients
-    dim(phi1) = c(1, NCOL(x_t)) # one row, one regime
-    
-    # Create the ncstar object
-    list = list(noRegimes=1, m = m, fitted = linearModel$fitted.values,  
-                     residuals = linearModel$residuals,
-                     coefficients = linearModel$coefficients,
-                     k = length(linearModel$coefficients),
-                     convergence=NA, counts=NA, hessian=NA, message=NA,
-                     value=NA, par=NA,
-                     phi2 = NA, phi1= phi1) 
-    object <- extend(nlar(str, coefficients = linearModel$coefficients,
-                          fitted = linearModel$fitted.values,
-                          residuals = linearModel$residuals,
-                          k=NCOL(x_t), noRegimes=1,
-                          model.specific=list),
-                     "ncgstar")
-
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    # 3. Add-regime loop
-    while (object$model.specific$noRegimes < noRegimes) {
-      
-      nR <- object$model.specific$noRegimes + 1
-      
-      if(trace) cat("- Adding regime ", nR, ".\n");
-      object <- addRegime.ncgstar(object);
-      
-      if(trace) cat("- Fixing good starting values for regime ", nR);
-      if(length(cluster) == 0) {
-        object <- startingValues.ncgstar(object, trace=trace, svIter = svIter);
-      } else {
-        if(trace) cat("\n   + Doing distributed computations... ")
-        solutions <- clusterCall(cl, startingValues.ncgstar, object, trace=trace,
-                                 svIter = svIter %/% length(cluster))
-        cost <- rep(Inf, length(solutions))
-        if(trace) cat("\n   + Gathering results...\n")
-        for (i in 1:length(solutions)) {
-          cost[i] <- sum(solutions[[i]]$residuals^2) / sqrt(n.used)
-        }
-        
-        object <- solutions[[which.min(cost)]]
-
-        if (trace) cat("\n  Starting values fixed for regime ", nR,
-                       ":\n", object$model.specific$phi2, "\n");
-#                       ":\n\tgamma = ", object$model.specific$phi2omega[noRegimes - 1],
-#                       "\n\tth = ", object$model.specific$phi2omega[(noRegimes - 1) * 2],
-#                       "\n\tomega = ",
-#                       object$model.specific$phi2omega[((noRegimes - 1) * 2 + 1):((noRegimes - 1) * 2 + NCOL(xx))], "\n");
-      }
-
+    if(!missing(phi1)) {
+      noRegimes <- NROW(phi1)
     }
-
-    if(trace) cat('- Estimating parameters of regime', nR, '...\n')
-    object <- estimateParams.ncgstar(object, control=control, trace=trace,
-                             alg=alg, cluster=cluster);
-    
-    if(trace) cat("\n- Finished building an NCGSTAR with ",
-                  object$model.specific$noRegimes, " regimes\n");
-    return(object);
+    else{
+     cat("Number of regimes not provided.");
+     exit(1);
+   }
   }
+    
+   # Create the ncgstar object
+  list = list(noRegimes=noRegimes, m = m, fitted = NA,  
+    residuals = NA,
+    coefficients = c(phi1, phi2),
+    k = length(c(phi1, phi2)),
+    convergence=NA, counts=NA, hessian=NA, message=NA,
+    value=NA, par=NA,
+    phi2 = phi2, phi1= phi1) 
+  object <- extend(nlar(str, coefficients = c(phi1, phi2),
+                        fitted = NA,
+                        residuals = NA,
+                        k =length(c(phi1, phi2)),  noRegimes=noRegimes,
+                        model.specific=list),
+                   "ncgstar")
+
+#      cat("\nStarting values for linear parameters:\n    ")
+#      print(phi1_median)
+      
+#      cat("\nStarting values for nonlinear parameters:\n")
+#      cat("gamma = ", phi2_median[1:(noRegimes - 1)])
+#      cat("; th = ", phi2_median[noRegimes:(2*(noRegimes - 1))])
+#      cat("\nomega=", phi2_median[(2 * (noRegimes - 1) + 1):length(phi2_median)])
+
+  if(trace) cat('- Estimating parameters for all ', noRegimes, ' regimes, (alg: ', alg, ')...\n')
+  object <- estimateParams.ncstar(object, control=control, trace=trace,
+                                  alg=alg, cluster=cluster);    
+    
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    # 4. Diagnostic checking
+    
+  if(tests) {
+    if(trace) cat("== Testing for linear independence of the residuals:\n")
+
+    isIID <- array(NA, 12)
+    pValue <- array(NA, 12)
+    for(r in 1:12) {
+      test1 <- testIID.ncgstar(object, G, r, rob=rob, sig=sig, trace = trace)
+      isIID[r] <- test1$isIID
+      pValue[r] <- test1$pValue
+    }
+    object$model.specific$testIID <- data.frame(isIID, pValue)
+    if(trace) print(data.frame(isIID, pValue))
+    
+    if(trace) cat("== Testing for constant variance of the residuals:\n")
+    test2 <- testConstVar.ncgstar(object, G, rob=rob, sig=sig, trace = trace)
+    object$model.specific$testConstVar <- test2; 
+    
+    if(test2$isConstVar) 
+      cat("      Constant variance detected, pValue = ", test2$pValue, "\n")
+    else cat("     Smoothly changing variance detected, pvalue = ", test2$pValue, "\n")
+    
+    if(trace) cat("== Testing for parameter constancy:\n")
+    test3 <- testParConst.ncgstar(object, G, rob=rob, sig=sig, trace = trace)
+    object$model.specific$testParConst <- test3;
+    
+    if(test3$isConstVar) 
+      cat("      Constant parameters detected, pValue = ", test3$pValue, "\n")
+    else cat("     Smoothly changing parameters detected, pvalue = ", test3$pValue, "\n")
+  }
+  
+  if(trace) cat("\n- Finished building an NCGSTAR with ",
+                object$model.specific$noRegimes, " regimes\n");
+  
+  if(!is.null(cluster)) stopCluster(cl)
+  return(object);
 
 }
 
