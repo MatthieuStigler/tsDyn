@@ -28,7 +28,7 @@ GG.gaussian <- function(z, gamma, th) {
   result <- array(NA, c(n.used, regimes))
 
   for(i in 1:regimes)
-      result[,i] <- apply(exp( - gamma[i] * t(t(z) - th[i,])^2), 1, prod)
+      result[,i] <- apply(exp( - gamma[i] *  t(t(z) - th[i,])^2), 1, prod)
   result
 }
 
@@ -404,9 +404,17 @@ startingValues.ncgstar <- function(object, trace=TRUE, svIter, ...)
  
       y.hat <- apply(local2, 1, sum)
       cost <- crossprod(yy - y.hat) / sqrt(n.used);
+#      cat("cost for iter ",i,": ",cost,"\n")
+#      cat("Phi1:\n")
+#      print(t(newPhi1))
+#      cat("gamma:\n")
+#      print(gamma)
+#      cat("th:\n")
+#      print(th)
 
       if(! is.na(cost)) {
         if(cost < bestCost) {
+#          cat("Updating bestCost, iter ",i,"\n")
           bestCost <- cost;
 
           bestGamma <- gamma
@@ -472,7 +480,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
   # Function to compute the gradient 
   #
   # Returns the gradient with respect to the error
-  gradEhat <- function(par) {
+  gradEhat.ncgstar <- function(par) {
     gamma <- par[1:noRegimes - 1]
     th <- par[noRegimes:length(phi2)]
     dim(th) <- c(noRegimes - 1, q)
@@ -517,9 +525,9 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   #Sum of squares function
   #p: vector of parameters
-  SS <- function(par) {
+  SS.ncgstar <- function(par) {
     gamma <- par[1:noRegimes - 1]
-    th <- par[noRegimes:length(phi2)]
+    th <- par[noRegimes:length(par)]
     dim(th) <- c(noRegimes - 1, q)
     
     # We fix the linear parameters because they're not known here
@@ -604,6 +612,11 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   phi2 <- object$model.specific$phi2;
 
+  domainsGamma <- t(matrix(rep(c(0,100), noRegimes - 1), c(2,noRegimes - 1)))
+  domainsTh <- t(matrix(rep(c(min(xx) - sd(xx[,1]), max(xx) + sd(xx[,1])),
+                            q * (noRegimes - 1)), c(2, q * (noRegimes - 1))))
+  domainsGA <- rbind(domainsGamma, domainsTh)
+
   if (alg == "LM") {
     
     res <- nls.lm(phi2, fn=SS.lm, jac = gradEhat.lm,
@@ -611,7 +624,7 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   } else if (alg == "BFGS") {
 
-    res <- optim(phi2, fn=SS, gr = gradEhat,
+    res <- optim(phi2, fn=SS, gr = gradEhat.ncgstar,
                  method="BFGS",
                   control = list(trace=0, hessian = FALSE, maxit=1000));
 
@@ -622,15 +635,18 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   } else if (alg == "GAD") {
 
-    res <- genoud(fn = SS, starting.values=phi2, nvars=length(phi2),
-                  gr = gradEhat, cluster=cluster,
-                  control=list(hessian = FALSE, maxit=1000), print.level = 1)
+    res <- genoud(fn = SS.ncgstar, starting.values=phi2, nvars=length(phi2),
+                  gr = gradEhat.ncgstar, cluster=cluster,
+                  control=list(maxit=1000), print.level = 1,
+                  pop.size=1000, max.generations=200,
+                  wait.generations=50, Domains = domainsGA)
 
   } else if (alg == "GA") {
 
-    res <- genoud(fn = SS, starting.values=phi2, nvars=length(phi2),
-                  BFGS=FALSE, cluster=cluster,
-                  control=list(hessian = FALSE, maxit=1000), print.level = 1)
+    res <- genoud(fn = SS.ncgstar, starting.values=phi2, nvars=length(phi2),
+                  BFGS=FALSE, cluster=cluster, print.level = 1,
+                  pop.size=1000, max.generations=200,
+                  wait.generations=50, Domains = domainsGA)
 
   }
   
@@ -791,7 +807,7 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
       nR <- object$model.specific$noRegimes + 1
       
       if(trace) cat("- Adding regime ", nR, ".\n");
-      object <- addRegime(object);
+      object <- addRegime.ncgstar(object);
       
       if(trace) cat("- Fixing good starting values for regime ", nR);
       if(is.null(cluster)) {
@@ -822,7 +838,7 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
       
       if(trace) cat("\n- Testing for addition of regime ", nR + 1, ".\n");
       if(trace) cat("  Estimating gradient matrix...\n");
-      G <- computeGradient(object);
+      G <- computeGradient.ncgstar(object);
 
 #      sig <- sig / 2 # We halve the significance level
       if(trace) cat("  Computing the test statistic (sig = ", 1 - 0.05 / nR, ")...\n");
@@ -865,7 +881,7 @@ ncgstar <- function(x, m=2, noRegimes, d = 1, steps = d, series,
 #
 ncgstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
                               mTh, thDelay, thVar, phi1, phi2,
-                              alg="BFGS", cluster= NULL, 
+                              alg="BFGS", cluster= NULL, tests=F,
                               sig=0.05, trace=TRUE, svIter = 1000, control=list(), ...)
 {
 
@@ -923,7 +939,7 @@ ncgstar.predefined <- function(x, m=2, noRegimes, d = 1, steps = d, series,
 #      cat("\nomega=", phi2_median[(2 * (noRegimes - 1) + 1):length(phi2_median)])
 
   if(trace) cat('- Estimating parameters for all ', noRegimes, ' regimes, (alg: ', alg, ')...\n')
-  object <- estimateParams.ncstar(object, control=control, trace=trace,
+  object <- estimateParams.ncgstar(object, control=control, trace=trace,
                                   alg=alg, cluster=cluster);    
     
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
