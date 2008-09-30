@@ -4,8 +4,8 @@ svIter <- 1000; # Número de iteraciones de la búsqueda de p. iniciales
 
 alg <- "BFGS"
 #cluster <- NULL
-cluster <- c("node0","node0", "node0", "node0", "node1","node1", "node1", "node1", "node2","node2", "node2", "node2", "node3","node3", "node3", "node3", "node5","node5", "node5", "node5", "node6","node6", "node6", "node6", "node7","node7", "node7", "node7")
-#cluster <- c("dicits", "dicits", "dicits", "dicits")
+#cluster <- c("brain","brain")
+cluster <- c("brain", "brain", "neuron1", "neuron1", "neuron2", "neuron2","neuron3", "neuron3","neuron4", "neuron4","neuron5", "neuron5","neuron6", "neuron6","neuron7", "neuron7")
 library(snow)
 
 plot <- FALSE

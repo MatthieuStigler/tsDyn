@@ -433,18 +433,6 @@ startingValues.ncgstar <- function(object, trace=TRUE, svIter, ...)
                  ":\n\tgamma = ", gamma[noRegimes - 1],
                  "\n\tth = ", th[noRegimes - 1,], "\n");
   
-  # Reorder the regimes according to the values of th
-  if (noRegimes > 2) {
-    if(trace) cat("  Reordering regimes...\n")
-
-    ordering <-  apply(th, 2, order)[,1]
-    
-    th <- th[ordering,]
-    gamma <- gamma[ordering]
-    phi1 <- phi1[ordering,]
-   
-  }
-  
   object$model.specific$phi2 <- c(gamma, th)
   object$model.specific$phi1 <- phi1;
   object$model.specific$coefficients <- c(phi1, gamma, th);
@@ -610,6 +598,17 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   }
 
+  # Reorder the regimes according to the values of th
+  if (noRegimes > 2) {
+    if(trace) cat("  Reordering regimes...\n")
+
+    ordering <-  apply(th, 2, order)[,1]
+    
+    th <- th[ordering,]
+    gamma <- gamma[ordering]
+    phi1 <- phi1[ordering,]
+  }
+
   phi2 <- object$model.specific$phi2;
 
   domainsGamma <- t(matrix(rep(c(0,100), noRegimes - 1), c(2,noRegimes - 1)))
@@ -624,13 +623,13 @@ estimateParams.ncgstar <- function(object, trace=TRUE,
 
   } else if (alg == "BFGS") {
 
-    res <- optim(phi2, fn=SS, gr = gradEhat.ncgstar,
+    res <- optim(phi2, fn=SS.ncgstar, gr = gradEhat.ncgstar,
                  method="BFGS",
-                  control = list(trace=0, hessian = FALSE, maxit=1000));
+                  control = list(trace=0, maxit=1000));
 
   } else if (alg == "SANN") {
 
-    res <- optim(phi2, fn=SS, method="SANN",
+    res <- optim(phi2, fn=SS.ncgstar, method="SANN",
                   control = list(trace=10, maxit=20000, temp=200));
 
   } else if (alg == "GAD") {

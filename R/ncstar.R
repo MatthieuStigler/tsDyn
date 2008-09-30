@@ -1278,7 +1278,7 @@ ncstar.predefined <- function(x, m=2, d = 1, steps = d,
     setDefaultClusterOptions(master="localhost", port=10187)
     cl <- makeCluster(cluster, type="SOCK")
     clusterSetupRNG(cl)
-    clusterEvalQ(cl, library(Matrix))
+#    clusterEvalQ(cl, library(Matrix))
   }
 
   # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -1304,7 +1304,7 @@ ncstar.predefined <- function(x, m=2, d = 1, steps = d,
    }
   }
     
-   # Create the ncstar object
+  # Create the ncstar object
   list = list(noRegimes=noRegimes, m = m, fitted = NA,  
     residuals = NA,
     coefficients = c(phi1, phi2omega),
