@@ -398,7 +398,7 @@ specific$oneMatrix<-commonInter
 specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
 specific$Bnames<-Bnames
 
-z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific, thVar=trans[,bestDelay])
 class(z)<-c("TVAR","nlVar")
 return(z)
 }	#end of the whole function
@@ -451,6 +451,7 @@ summary.TVAR<-function(object,...){
 	x$coefficients<-asListIfMat(x$coefficients)
 	x$StDev<-asListIfMat(StDevB)
 	x$Pvalues<-asListIfMat(Pval)
+	x$Tvalues<-Tvalue
 	x$VarCov<-asListIfMat(VarCovB)
 	ab<-list()
 	symp<-list()
@@ -472,7 +473,7 @@ summary.TVAR<-function(object,...){
 	return(x)
 }
 
-print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars")){
+print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars"),...){
 	coeftoprint<-list()
 	for(i in 1:length(x$bigcoefficients)){
 		a<-myformat(x$coefficients[[i]], digits)
@@ -497,6 +498,9 @@ print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.
 	cat("\nPercentage of Observations in each regime:", percent(x$model.specific$nobs,3,TRUE))
 }
 
+plot.TVAR<-function(x,...){
+ plot(x$thVar)
+}
 
 
 toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){

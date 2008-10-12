@@ -126,7 +126,8 @@ AIC.nlar <- function(object,k=2, ...){
   n * log( mse(object) ) + k * npar
 }
 
-BIC <- function(obj, ...,k) UseMethod("BIC")
+
+BIC <- function(object, ...,k) UseMethod("BIC")
 
 BIC.default<-function(object, ...,k)
 	NULL

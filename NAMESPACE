@@ -12,7 +12,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
 	setar, lstar, star, availableModels,
        nlarDialog, linear, isLinear, nnetTs, aar,
 	star, ncstar, ncgstar, ncstar.predefined,ncgstar.predefined,
-       TVAR, TVECM,TVAR_LRtest, TAR_simul, TVAR_simul, TVECM_SeoTest, linear2,
+       TVAR, TVECM,TVAR_LRtest, TAR_simul, TVAR_simul, TVECM_SeoTest, linear2, setarTest,
 	BIC)
 S3method(extend, list)
 S3method(isLinear, lstar)

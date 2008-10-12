@@ -647,7 +647,7 @@ print.summary.TVECM<-function(x,...){
 	cat("\nCointegrating vector", x$model.specific$beta)
 }
 
-toLatex.TVECM<-function(x, ...,digits=4,parenthese=c("StDev","Pvalue")){
+toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
 	x$coefficients<-asListIfMat(x$coefficients)

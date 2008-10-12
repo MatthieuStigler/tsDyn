@@ -229,8 +229,11 @@ Sigma_mod2thresh<-Sigma_2thresh(gam1=smallThresh,gam2=bigThresh,d=bestDelay, Z=Z
 LRtest12<-as.numeric(t*(log(det(Sigma))-log(det(Sigma_mod1thresh))))
 LRtest13<-as.numeric(t*(log(det(Sigma))-log(det(Sigma_mod2thresh))))
 LRtest23<-as.numeric(t*(log(det(Sigma_mod1thresh))-log(det(Sigma_mod2thresh))))
-LRs<-matrix(c(LRtest12, LRtest13, LRtest23),ncol=3, dimnames=list("LRtest", c("1vs2", "1vs3", "2vs3")))
-
+LRs<-matrix(c(LRtest12, LRtest13, LRtest23),ncol=3, dimnames=list("Test", c("1vs2", "1vs3", "2vs3")))
+if(test=="1vs")
+  LRs<-LRs[,-3]
+else
+  LRs<-LRs[,3]
 ##############################
 ###Bootstrap for the F test
 ##############################
@@ -390,8 +393,9 @@ PvalBoot23<-mean(ifelse(LRtestboot23>LRtest23,1,0))
 CriticalValBoot23<-quantile(LRtestboot23, probs=c(0.9, 0.95, 0.975,0.99))
 
 if(test=="1vs"){
-	CriticalValBoot<-list(Test1vs2=CriticalValBoot12, Test1vs3=CriticalValBoot13)
-	PvalBoot<-list(Test1vs2=PvalBoot12,Test1vs3=PvalBoot13)
+	CriticalValBoot<-rbind(CriticalValBoot12,CriticalValBoot13)
+	PvalBoot<-c(PvalBoot12,PvalBoot13)
+	names(PvalBoot)<-c("1vs2", "1vs3")
 	}
 else{
 	CriticalValBoot<-CriticalValBoot23
@@ -400,6 +404,7 @@ else{
 
 
 ###Grahical output
+#needs: LRtestboot12, LRtest12, m, k
 if(plot==TRUE&nboot>0){
 	if(test=="1vs"){
 	layout(c(1,2))
@@ -425,18 +430,41 @@ if(plot==TRUE&nboot>0){
 
 #nlar=extend(nlar(str, coef = res$coef, fit = res$fitted.values, res = res$residuals, k = res$k,
 #list( model.specific = res),"setar")
-return(list(bestDelay=bestDelay, LRtest.val=LRs, Pvalueboot=PvalBoot, CriticalValBoot=CriticalValBoot))
+res<-list(bestDelay=bestDelay, LRtest.val=LRs, Pvalueboot=PvalBoot, CriticalValBoot=CriticalValBoot, type="test")
+class(res)<-"TVARtest"
+return(res)
 }#End of thw whole function
 
+print.TVARtest<-function(x,...){
+  cat("Test of linear AR against TAR(1) and TAR(2)\n\nLR test:\n")
+  LR<-rbind(x$LRtest.val,x$Pvalueboot)
+  rownames(LR)<-c("Test", "P-Val")
+  print(LR)
+}
 
+summary.TVARtest<-function(x,...){
+  class(x)<-"summary.TVARtest"
+  return(x)}
 
-
+print.summary.TVARtest<-function(x,...){
+  cat("Test of linear AR against TAR(1) and TAR(2)\n\nLR test:\n")
+  LR<-rbind(x$LRtest.val,x$Pvalueboot)
+  rownames(LR)<-c("Test", "P-Val")
+  print(LR)
+  cat("\n Bootstrap critical values for test 1 vs 2 regimes\n")
+  print(x$CriticalValBoot[1,])
+  cat("\n Bootstrap critical values for test 1 vs 3 regimes\n")
+  print(x$CriticalValBoot[2,])
+}
 if(FALSE){ #usage example
 environment(TVAR_LRtest)<-environment(star)
 data(zeroyld)
 data<-zeroyld[1:150,]
 
-TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
+test<-TVAR_LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=FALSE, trim=0.1, test="1vs", model="TAR")
+class(test)
+print(test)
+summary(test)
 ###Todo
 #does not work TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
 #TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="2vs3", check=TRUE, model="MTAR")

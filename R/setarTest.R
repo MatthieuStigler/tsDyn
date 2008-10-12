@@ -1,5 +1,16 @@
 setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
     mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE) {
+# 3: check if the linear model has roots inside unit circle
+# 4: set up of the threshold transition variable
+# 5: simple regressor matrix (if different lag)
+# 6:Functions to compute SSR of 1thresh and 2 thresh
+# 7: Search the best threshold
+# 8: Search the second best threshold
+# 9: Verification of stationarity in each regime of orginal serie
+# 10: SSR of TAR(+) and (2),compute F stat and print
+# 11: Reconstruction of series from linear model for Ftest 1vs2 and 1vs3
+
+#setarTest 1: preliminaries checkings
     if (missing(m)) m <- max(mL, mH, max(thDelay) + 1)
     if (missing(series))  series <- deparse(substitute(x))
 	ndig<-getndp(x)
@@ -12,18 +23,20 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
     if (missing(mL)) { mL <- m    }
     if (missing(mH)) { mH <- m    }
 
-###Linear model
+#setarTest 2: computation of the linear model
 xxlin<-cbind(1,xx)
 linear <- lm.fit(xxlin, yy)
 SSR<-as.numeric(crossprod(linear$residuals))
 B<-linear$coeff
 
+###setarTest 3: check if the linear model has roots inside unit circle
 is<-is.InUnitCircle(B, trend=TRUE, m=m, nthresh=0)
 if(is$warn==TRUE){
 	warning("The AR coefficients of the linear model lie inside the unit circle,\n thus the serie can be non-stationnary and the bootstrap distribution biased")
 	cat("\nUnit roots\n")
 	print(is$root)}
-###Threshold transition variable
+
+###setarTest 4: set up of the threshold transition variable
 
 
     if (!missing(mTh)) { stop("Currenly not implemented")
@@ -53,15 +66,13 @@ nmin<-round(trim*ng)
 ninter<-nmin					###TO CHANGE!
 gammas<-unique(allgammas[(nmin+1):(ng-nmin-1)])
 
-
-### Threshold model
-
+###setarTest 5: simple regressor matrix (if different lag)
 xxl <- cbind(1, xx[, seq_len(mL)])
 xxh <- cbind(1, xx[, seq_len(mH)])
 
 
-###################
-###Search function
+##################
+###setarTest 6:Functions to compute SSR of 1thresh and 2 thresh
 ##################
 TAR1t_SSR<-function(parameters,yy, xxl,xxh,z) {#
 	thDelay<-parameters[1]
@@ -98,7 +109,7 @@ TAR2t_SSR <- function(gam1,gam2,thDelay, yy, xx,z){
 }
 
 ##################
-###One threshold
+###setarTest 7: Search the best threshold
 ##################
 
 IDS<-as.matrix(expand.grid(thDelay, gammas))
@@ -110,10 +121,10 @@ cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result), "\n")
 B1t<-TAR1t_B(thDelay=bestDelay,gamma=bestThresh,yy=yy, xxl=xxl,xxh=xxh,z=z, m=m)
 
 ##################
-###Two thresholds
+###setarTest 8: Search the second best threshold
 ##################
 
-###Function for conditional search
+###Function for conditional search (deprecated?)
 
 
 condiStep2<-function(allgammas, threshRef, MoreArgs=NULL, target=NULL){
@@ -160,7 +171,7 @@ Thresh3<-condiStep(allgammas=sort(z[,bestDelay+1]), threshRef=bestThresh, delayR
 B2t<-TAR2t_B(gam1=min(Thresh3$newThresh,Thresh2),gam2=max(Thresh3$newThresh,Thresh2),thDelay=bestDelay, yy=yy, xx=xxlin,z=z,m=m)
 print(list(thresh1=B1t, thresh2=B2t))
 
-###Verification of stationarity of data
+###setarTest 9: Verification of stationarity in each regime of orginal serie
 is1t<-is.InUnitCircle(unlist(B1t), trend=TRUE, m=m, nthresh=1)
 if(is1t$warn==TRUE){
 	cat("Characteristic roots of 1 threshold model\n")
@@ -174,6 +185,8 @@ if(is2t$warn==TRUE){
 	warning("The AR coefficients of one regime of 2 thresholds model lie inside the unit circle,\n thus the serie can be non-stationnary")
 }
 
+
+###setarTest 10: SSR of TAR(+) and (2),compute F stat and print
 SSR1thresh<-min(result, na.rm=TRUE)
 SSR2thresh<-Thresh3$SSR
 SSRs<-matrix(c(SSR, SSR1thresh, SSR2thresh), ncol=3, dimnames=list("SSR", c("AR", "TAR(1)", "TAR(2)")))
@@ -194,7 +207,7 @@ Ftests<-matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1v
 ###Bootstrap for the F test
 ##############################
 
-### Reconstruction of series from linear model for Ftest 1vs2 and 1vs3
+###setarTest 11: Reconstruction of series from linear model for Ftest 1vs2 and 1vs3
 #initial data	
 xboot<-vector("numeric", length=length(x))		#Delta Y term
 xboot[1:m]<-x[1:m]
@@ -216,7 +229,7 @@ return(xboot)
 ### Reconstruction of series from 1 thresh model for Ftest 2vs3
 #initial data
 isL <- ifelse(z[, bestDelay + 1]<= bestThresh,1,0)	### isL: dummy 
-xxthresh <- cbind(xxl * isL,xxh * (1 - isL))	### Lower matrix
+xxthresh <- cbind(xxl * isL,xxh * (1 - isL))		### Lower matrix
 
 B1thresh<-chol2inv(chol(crossprod(xxthresh)))%*%crossprod(xxthresh,yy)
 res1thresh<-yy - xxthresh %*%B1thresh
@@ -327,28 +340,20 @@ else{
 if(plot==TRUE&nboot>0){
 	if(test=="1vs"){
 	layout(c(1,2))
-	#Boundary kernel following Statistical computing with R, Rizzo
-	#xx<-c(Ftestboot12,-Ftestboot12)
-	#g<-density(xx, bw=bw.nrd0(x))
-	#a<-seq(0,2*max(Ftestboot12),.01)
-	#ghat<-approx(g$x, g$y, xout=a)
-	#fhat<-2*ghat$y #density estimate along a
-	#plot(a, fhat, type="l", xlim=c(0,max(Ftest12+1,max(Ftestboot12))),xlab="SSR value")
-	
 	#Usual kernel
-	plot(density(Ftestboot12), xlab="Ftest12", xlim=c(0,max(Ftest12+1,max(Ftestboot12))),ylim=c(0,max(density(Ftestboot12)$y,dchisq(0:Ftest12, df=1+m))), main="Test linear AR vs 1 threshold TAR")
+	plot(density(Ftestboot12, from=0), xlab="Ftest12", xlim=c(0,max(Ftest12+1,max(Ftestboot12))),ylim=c(0,max(density(Ftestboot12)$y,dchisq(0:Ftest12, df=1+m))), main="Test linear AR vs 1 threshold TAR")
 	abline(v=Ftest12, lty=2, col=2)
 	curve(dchisq(x, df=1+m, ncp=0), from=0, n=Ftest12+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 
 
-	plot(density(Ftestboot13), xlab="Ftest13", xlim=c(0,max(Ftest13+1,max(Ftestboot13))),ylim=c(0,max(density(Ftestboot13)$y,dchisq(0:Ftest12, df=2*(1+m)))),main="Test linear AR vs 2 thresholds TAR")
+	plot(density(Ftestboot13, from=0), xlab="Ftest13", xlim=c(0,max(Ftest13+1,max(Ftestboot13))),ylim=c(0,max(density(Ftestboot13)$y,dchisq(0:Ftest12, df=2*(1+m)))),main="Test linear AR vs 2 thresholds TAR")
 	abline(v=Ftest13, lty=2, col=2)
 	curve(dchisq(x, df=2*(1+m), ncp=0), from=0, n=Ftest13+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 	}
 	else {
-	plot(density(Ftestboot23), xlab="Ftest23", xlim=c(0,max(Ftest23+1,Ftestboot23)), ylim=c(0,max(density(Ftestboot23)$y)), main="Test 1 threshold TAR vs 2 thresholds TAR")
+	plot(density(Ftestboot23, from=0), xlab="Ftest23", xlim=c(0,max(Ftest23+1,Ftestboot23)), ylim=c(0,max(density(Ftestboot23)$y)), main="Test 1 threshold TAR vs 2 thresholds TAR")
 	abline(v=Ftest23, lty=2, col=2)
 	curve(dchisq(x, df=1+m, ncp=0), from=0, n=Ftest23+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))

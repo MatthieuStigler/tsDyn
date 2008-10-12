@@ -6,7 +6,7 @@
 ## any later version.
 ##
 ## This program is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
+## WITHOUT ANY WARRANTY;without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
@@ -17,11 +17,23 @@
 
 #SETAR model contructor	(sequential conditional LS)
 #	th: threshold. If not specified, a grid of reasonable values is tried
+#	m: general autoregressive order (mL=mH)
 #	mL: autoregressive order below the threshold ('Low')
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
 setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15){
+# 1: preliminaries
+# 2:  Build the regressors matrix and Y vector
+# 3: Set-up of transition variable
+# 4: Search of the treshold if th not specified by user
+# 5: Build the threshold dummies and then the matrix of regressors
+# 6: compute the model, extract and name the vec of coeff
+# 7: return the infos
+
+
+
+###SETAR 1: preliminaries
 	include<-match.arg(include)
 	model<-match.arg(model)
 	if(missing(m))
@@ -30,6 +42,403 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 		if(length(th)==2)
 			nthresh<-2
 	}
+  if(missing(series))
+    series <- deparse(substitute(x))
+### SETAR 2:  Build the regressors matrix and Y vector
+        str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+	xx <- getXX(str)
+	yy <- getYY(str)
+	externThVar <- FALSE
+	##Lags selection
+	if(missing(ML)) {		#ML: different lags
+		if (missing(mL)) {	#mL: suit of lags
+			mL <- m
+			if (trace) 
+				cat("Using maximum autoregressive order for low regime: mL =", m,"\n")
+		}
+		ML <- seq_len(mL)
+	}
+
+	if(missing(MM)) {
+		if (missing(mM)) {
+			mM <- m
+			if (trace&nthresh==2) 
+				cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
+		}
+		MM <- seq_len(mM)
+	}
+	if(missing(MH)) {
+		if (missing(mH)) {
+			mH <- m
+			if (trace) 
+				cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
+		}
+		MH <- seq_len(mH)
+	}
+
+	###includes const, trend
+	if(include=="const"){
+		const <- rep(1,nrow(xx))
+		inc<-"const"}
+	else if(include=="trend"){
+		const<-seq_len(nrow(xx))
+		inc<-"trend"}
+	else if(include=="both"){
+		const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
+		inc<-c("const","trend")} 
+	else {
+		const<-NULL
+		inc<-NULL
+	}
+	ninc<-length(inc)
+
+### SETAR 3: Set-up of transition variable
+#two models: TAR or MTAR (z is differenced)
+#three possibilitiees for thVar:
+#thDelay: scalar: prespecified lag, or vector: of lags to search for. Z is a matrix
+#mTh: combination of lags. Z is one vector-matrix
+#thVar: external variable Zis one vector-matrix.
+# Default: thDelay=0
+	if(!missing(thDelay)) {
+		if(max(thDelay)>=m) 
+			stop(paste("thDelay too high: should be < m (=",m,")"))
+		if(model=="TAR"){
+			z <- xx		#xx <- getXX(str) 
+			z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE]
+			z4<-embed(x,m+1)[,-1]
+		}
+		else{
+			if(thDelay==m-1)
+				stop("th Delay too high, should be <m-1 (=",m,")(because of differencing)")
+			z<-embed(diff(x),m)[,thDelay+2]
+		#print(cbind(yy,xx,z))
+		#z<-z[if(m-thDelay-2>0)-seq_len(m-thDelay-2>0) else seq_len(nrow(z)),thDelay+2]
+		}
+	}
+ 	else if(!missing(mTh)) {
+		if(length(mTh) != m) 
+			stop("length of 'mTh' should be equal to 'm'")
+		z <- xx %*% mTh #threshold variable
+		dim(z) <- NULL
+	} else if(!missing(thVar)) {
+		if(length(thVar)>nrow(xx)) {
+			z <- thVar[seq_len(nrow(xx))]
+			if(trace) 
+				cat("Using only first", nrow(xx), "elements of thVar\n")
+		}
+		else 
+			z <- thVar
+		externThVar <- TRUE
+	} else {
+		if(trace) 
+			cat("Using default threshold variable: thDelay=0\n")
+		z <- xx
+		thDelay<-0
+	}
+
+z<-as.matrix(z)
+
+### SETAR 4: Search of the treshold if th not specified by user
+#if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
+#call the function selectSETAR
+	if (missing(th)) { 
+		ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
+		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
+		thDelay<-search[1,1]
+		th<-search[1,2]
+		nested<-TRUE
+		if(trace) {
+			cat("Selected threshold: ", th,"\n")
+			cat("Selected delay: ", thDelay,"\n")
+		}
+		#missing(th)<-FALSE
+	}
+### SETAR 5: Build the threshold dummies and then the matrix of regressors
+	#if(!missing(th)) {
+		#check number of observations)
+		if(nthresh==1){
+			isL <- ifelse(z[, thDelay + 1]<=th, 1, 0)
+			isM<-NA
+			isH <- 1-isL}	
+		else{
+			isL <- ifelse(z[, thDelay + 1]<=th[1], 1, 0)
+			isH <- ifelse(z[, thDelay + 1]>th[2], 1, 0)
+			isM <- 1-isL-isH
+		}
+
+		nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
+		if(min(nobs)<trim){
+			if(trace)
+				cat("\nWith the threshold you gave, there a not ",trim,"observations in each regime")
+		}
+		if(min(nobs)==0)
+			stop("With the threshold you gave, there is a regime with no observations!")
+		#build the X matrix
+		if(nthresh==1){
+			xxLH<-thresh1(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)	
+			midCommon<-mid<-NA}
+		else if(nthresh==2){
+			xxLH<-thresh2(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)
+			midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep="."))
+			mid<-c(paste("phi3", MH, sep="."))
+		}
+
+### SETAR 6: compute the model, extract and name the vec of coeff
+		res <- lm.fit(xxLH, yy)
+#Coefficients and names
+		res$coefficients <- c(res$coefficients, th)
+		if(common==FALSE){
+			names(res$coefficients) <- na.omit(c(paste(inc, rep(1,ninc)), paste("phi1", ML, sep="."), paste(inc,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
+		} else{
+			names(res$coefficients) <- na.omit(c(inc,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
+		}
+
+### SETAR 7: return the infos
+		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
+		res$thDelay
+		res$fixedTh <- if(nested) FALSE else TRUE
+		res$mL <- max(ML)
+		res$mH <- max(MH)
+		res$ML <- ML
+		res$MH <- MH
+		res$externThVar <- externThVar
+		res$thVar <- z[, thDelay + 1]
+		res$nconst<-inc
+		res$common<-common
+		res$nthresh<-nthresh
+		res$model<-model
+		res$RegProp <- c(mean(isL),mean(isH))
+		if(nthresh==2)
+			res$RegProp <- c(mean(isL),mean(isM),mean(isH))
+		res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
+		if(!externThVar) {
+			if(missing(mTh)) {
+				mTh <- rep(0,m)
+				mTh[thDelay+1] <- 1
+			}
+			res$mTh <- mTh
+		}
+		return(extend(nlar(str,	coef=res$coef,	fit=res$fitted.values,	res=res$residuals,
+			k=res$k,model.specific=res), "setar"))
+	#}
+}
+
+getSetarXRegimeCoefs <- function(x, regime=c("1","2","3")) {
+	regime <- match.arg(regime)
+	x <- x$coef
+	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
+	x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
+	x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
+	return(c(x1, x2, x3))
+}
+
+getTh<-function(x){
+	x[grep("th",names(x))]}
+
+print.setar <- function(x, ...) {
+	NextMethod(...)
+	x.old <- x
+	x <- x$model.specific
+	order.L <- x$mL
+	order2.L <- length(x$ML)
+	order.H <- x$mH
+	order2.H <- length(x$MH)
+	common <- x$common
+	nconst <- x$nconst
+	nthresh<-x$nthresh
+	externThVar <- x$externThVar
+	cat("\nSETAR model (",nthresh+1,"regimes)\n")
+	cat("Coefficients:\n")
+	if(common==FALSE){
+		lowCoef <- getSetarXRegimeCoefs(x.old, "1")
+		highCoef<- getSetarXRegimeCoefs(x.old, ifelse(nthresh==1,"2","3"))
+		cat("Low regime:\n")
+		print(lowCoef, ...)
+		if(nthresh==2){
+			midCoef<- getSetarXRegimeCoefs(x.old, "2")
+			cat("\nMid regime:\n")
+			print(midCoef, ...)}
+		cat("\nHigh regime:\n")
+		print(highCoef, ...)
+	} else {
+		print(x.old$coeff[-length(x.old$coeff)], ...)
+	}
+	thCoef<-getTh(coef(x.old))
+	cat("\nThreshold:")
+	if(x$model=="MTAR"){
+		cat("\nMomentum Threshold (MTAR) Adjustment")
+		D<-"Δ"}
+	else
+		D<-NULL
+	cat("\n-Variable: ")
+        if(externThVar)
+          cat("external")
+        else {
+          cat('Z(t) = ')
+          cat('+ (',format(x$mTh[1], digits=2), paste(")",D," X(t)", sep=""), sep="")
+          if(length(x$mTh)>1)
+            for(j in 1:(length(x$mTh) - nthresh)) {
+              cat('+ (', format(x$mTh[j+1], digits=2), paste(")",D,"X(t-", j, ")", sep=""), sep="")
+            }
+          cat('\n')
+        }
+	cat("-Value:", format(thCoef, digits=4))
+	if(x$fixedTh) cat(" (fixed)")
+	cat("\n")
+	cat("Proportion of points in ")
+	if(nthresh==1)
+		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
+	else
+		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
+	invisible(x)
+}
+
+summary.setar <- function(object, ...) {
+	ans <- list()
+	mod <- object$model.specific
+	order.L <- mod$mL
+	order2.L <- length(mod$ML)
+	order.H <- mod$mH
+	order2.H <- length(mod$MH)
+	nthresh<-mod$nthresh		#numer of thresholds
+	nconst<-mod$nconst		
+	common<-mod$common
+	ans$lowCoef <- getSetarXRegimeCoefs(object, "1")
+	ans$highCoef<- getSetarXRegimeCoefs(object, "2")
+	ans$thCoef <- coef(object)["th"]
+	ans$fixedTh <- mod$fixedTh
+	ans$externThVar <- mod$externThVar
+	ans$lowRegProp <- mod$lowRegProp
+	n <- getNUsed(object$str)
+	coef <- object$coef[seq_len(length(object$coef)-nthresh)] #all coeffients except of the threshold
+ 	p <- length(coef)			#Number of slope coefficients
+	resvar <- mse(object) * n / (n-p)
+	Qr <- mod$qr
+	p1 <- 1:p
+	est <- coef[Qr$pivot[p1]]
+	R <- chol2inv(Qr$qr[p1, p1, drop = FALSE]) #compute (X'X)^(-1) from the (R part) of the QR decomposition of X.
+	se <- sqrt(diag(R) * resvar) #standard errors
+	tval <- est/se			# t values
+	coef <- cbind(est, se, tval, 2*pt(abs(tval), n-p, lower.tail = FALSE))
+	dimnames(coef) <- list(names(est), c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
+	ans$coef <- coef
+	ans$mTh <- mod$mTh
+	extend(summary.nlar(object), "summary.setar", listV=ans)
+}
+
+print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
+	signif.stars = getOption("show.signif.stars"), ...) {
+	NextMethod(digits=digits, signif.stars=signif.stars, ...)
+	cat("\nCoefficient(s):\n\n")
+	printCoefmat(x$coef, digits = digits, signif.stars = signif.stars, ...)		
+	cat("\nThreshold")
+	cat("\nVariable: ")
+        if(x$externThVar)
+          cat("external")
+        else {
+          cat('Z(t) = ')
+          cat('+ (',format(x$mTh[1], digits=2), ') X(t) ', sep="")
+          if(length(x$mTh)>1)
+            for(j in 1:(length(x$mTh) - 1)) {
+              cat('+ (', format(x$mTh[j+1], digits=2), ') X(t-', j, ')', sep="")
+            }
+          cat('\n')
+        }        
+	cat("\nValue:", format(x$thCoef[1], digits=4))
+	if(x$fixedTh) cat(" (fixed)")
+	cat('\n')
+	invisible(x)
+}
+
+plot.setar <- function(x, ask=interactive(), legend=TRUE, regSwStart, regSwStop, ...) {
+	op <- par(no.readonly=TRUE)
+	par(ask=ask)
+	NextMethod(ask=ask, ...)
+	str <- x$str
+	xx <- getXX(str)
+	yy <- getYY(str)
+	nms <- colnames(xx)
+	m <- str$m
+	d <- str$d
+	lags <- c((0:(m-1))*(-d), str$steps)
+	xxyy <- getXXYY(str)
+	x.old <- x
+	x <- c(x, x$model.specific)
+	series <- str$x
+	z <- x$thVar
+	th <- getTh(coef(x)) #x$coefficients["th"]
+	nthresh<-x.old$model.specific$nthresh
+	regime<-ifelse(z<=th[1],1,2)
+	if(nthresh==2)
+	  regime[regime==2]<-ifelse(z[regime==2]<th[2], 2,3)
+	regime.id<-regime
+	#regime <- factor(z <= th, levels=c(TRUE, FALSE), labels=c("low","high"))
+	#regime.id <- as.numeric(regime) #1/2 vector indicating the regime
+	if(length(regime)<=300) {
+		pch <- c(20,23)[regime.id]
+		  cex <- 1
+	}
+	else {
+		pch <- '.'
+		cex <- 4
+	}
+#ACF and PACF plots
+	for(j in 1:m) {
+		plot(xxyy[,j], xxyy[,m+1], xlab=paste("lag", -lags[j]), ylab=paste("lag", -lags[m+1]),
+			col=regime.id, pch=pch, cex=cex, ...)
+		lines.default(xxyy[,j], x.old$fitted, lty=2)
+		if(legend)
+			legend("topleft", legend=c("low","high"), pch=pch[c(1,1)], col=1:2, merge=FALSE, title="regime")
+	}
+#Regime switching plot
+	sta <- 1
+	sto <- length(regime.id)
+	if(!missing(regSwStart))
+		sta <- regSwStart
+	if(!missing(regSwStop))
+		sto <- regSwStop
+	t <- sta:sto
+	regime.id <- regime.id[t]
+	series <- series[t+(m*d)]
+	ylim <- range(series)
+	l <- ylim[1] * 0.9
+	h <- ylim[2] * 1.1
+	ylim[1] <- ylim[1] * 0.8
+	ylim[2] <- ylim[2] * 1.2
+	x0 <- t
+	x1 <- t+1
+	y0 <- series[t]
+	y1 <- series[t+1]
+	par(mar=c(0,4,4,0))	#number of lines of margin to be specified on the 4 sides of the plot
+	plot(t, series, type="p", ax=FALSE, ylab="time series values", main="Regime switching plot")
+	if(legend)
+	    legend("topright", legend=c("low",if(nthresh==2) "middle","high"), pch=pch[c(1,1)], col=1:(nthresh+1), merge=FALSE, title="regime")
+	abline(h=th)
+	axis(2)		#adds an axis on the left
+	segments(x0,y0,x1,y1,col=regime.id)	#adds segments between the points with color depending on regime
+	par(op)
+	invisible(x)
+}
+
+###Exhaustive search over a grid of model parameters
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m)-1, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2) 
+#This internal function called by setar() makes a grid search over the values given by setar or user
+#1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
+#2: establish the transition variable z (just copy paste of function setar() )
+#3. set-up the grid following argument th or by default ngrid=="ALL" on all values
+#4: Sets up functions to compute the SSR or AIC on model with 1 or 2 thresh, or Pooled AIC
+#5: establish a grid with addition of thDelay (crit SSR) or thDelay, Ml and Mh  (crit AIC and pooledAIC)
+#6: apply the function in 3 to grid in 4
+#7: sorts the results to show the best values
+#8: Computation for 2 thresh using condiStep (see TVARestim.r)
+#9: plot of the results of the grid search
+#10: return results
+{
+### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
+	include<-match.arg(include)
+	model<-match.arg(model)
+	if(missing(m))
+		m <- max(ML, MH, thDelay+1)
   if(missing(series))
     series <- deparse(substitute(x))
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
@@ -79,369 +488,13 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 	}
 	ninc<-length(inc)
 
-	###Set-up of transition variable
-	if(!missing(thDelay)) {
-		if(thDelay>=m) 
-			stop(paste("thDelay too high: should be < m (=",m,")"))
-		if(model=="TAR"){
-			z <- xx
-			z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE]
-			z4<-embed(x,m+1)[,-1]
-		}
-		else{
-			if(thDelay==m-1)
-				stop("th Delay too high, should be <m-1 (=",m,")(because of differencing)")
- 		z<-embed(diff(x),m)[,thDelay+2]
-		#print(cbind(yy,xx,z))
-		#z<-z[if(m-thDelay-2>0)-seq_len(m-thDelay-2>0) else seq_len(nrow(z)),thDelay+2]
-		}
-	}
- 	else if(!missing(mTh)) {
-		if(length(mTh) != m) 
-			stop("length of 'mTh' should be equal to 'm'")
-		z <- xx %*% mTh #threshold variable
-		dim(z) <- NULL
-	} else if(!missing(thVar)) {
-		if(length(thVar)>nrow(xx)) {
-			z <- thVar[seq_len(nrow(xx))]
-			if(trace) 
-				cat("Using only first", nrow(xx), "elements of thVar\n")
-		}
-		else 
-			z <- thVar
-		externThVar <- TRUE
-	} else {
-		if(trace) 
-			cat("Using default threshold variable: thDelay=0\n")
-		z <- xx
-		thDelay<-0
-	}
-
-z<-as.matrix(z)
-	###Threshold search
-	if (missing(th)) { #if 'th' not specified, try over a reasonable grid
-		ngrid<-ifelse(nthresh==1,30,"ALL")
-		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
-		if(nthresh==1) 
-			th<-c(search[1,"th"])
-		else
-			th<-c(search)
-		nested<-TRUE
-		if(trace) {
-			cat("Selected threshold: ", th,"\n")
-		}
-		#missing(th)<-FALSE
-	}
-
-	##specified threshold 
-	if(!missing(th)) {
-		#check number of observations
-		if(nthresh==1){
-			isL <- ifelse(z[, thDelay + 1]<=th, 1, 0)
-			isM<-NA
-			isH <- 1-isL}	
-		else{
-			isL <- ifelse(z[, thDelay + 1]<=th[1], 1, 0)
-			isH <- ifelse(z[, thDelay + 1]>th[2], 1, 0)
-			isM <- 1-isL-isH
-		}
-		nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))
-
-		if(min(nobs)<trim){
-			if(trace)
-				cat("\nWith the threshold you gave, there a not ",trim,"observations in each regime")
-		}
-		if(min(nobs)==0)
-			stop("With the threshold you gave, there is a regime with no observations!")
-		#build the X matrix
-		if(nthresh==1){
-			xxLH<-thresh1(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)	
-			midCommon<-mid<-NA}
-		else if(nthresh==2){
-			xxLH<-thresh2(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)
-			midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep="."))
-			mid<-c(paste("phi3", MH, sep="."))
-		}	
-
-		##compute model
-		res <- lm.fit(xxLH, yy)
-
-		##Coefficients and names
-		res$coefficients <- c(res$coefficients, th)
-		if(common==FALSE){
-			names(res$coefficients) <- na.omit(c(paste(inc, rep(1,ninc)), paste("phi1", ML, sep="."), paste(inc,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
-		} else{
-			names(res$coefficients) <- na.omit(c(inc,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
-		}
-
-		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
-		res$fixedTh <- if(nested) FALSE else TRUE
-		res$mL <- max(ML)
-		res$mH <- max(MH)
-		res$ML <- ML
-		res$MH <- MH
-		res$externThVar <- externThVar
-		res$thVar <- z
-		res$nconst<-inc
-		res$common<-common
-		res$nthresh<-nthresh
-		res$model<-model
-		res$RegProp <- c(mean(isL),mean(isH))
-		if(nthresh==2)
-			res$RegProp <- c(mean(isL),mean(isM),mean(isH))
-		res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
-		if(!externThVar) {
-			if(missing(mTh)) {
-				mTh <- rep(0,m)
-				mTh[thDelay+1] <- 1
-			}
-			res$mTh <- mTh
-		}
-		return(extend(nlar(str,	coef=res$coef,	fit=res$fitted.values,	res=res$residuals,
-			k=res$k,model.specific=res), "setar"))
-	}
-}
-
-getSetarXRegimeCoefs <- function(x, regime=c("1","2","3")) {
-	regime <- match.arg(regime)
-	x <- x$coef
-	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
-	x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
-	x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
-	return(c(x1, x2, x3))
-}
-
-print.setar <- function(x, ...) {
-	NextMethod(...)
-	x.old <- x
-	x <- x$model.specific
-	order.L <- x$mL
-	order2.L <- length(x$ML)
-	order.H <- x$mH
-	order2.H <- length(x$MH)
-	common <- x$common
-	nconst <- x$nconst
-	nthresh<-x$nthresh
-	externThVar <- x$externThVar
-	cat("\nSETAR model (",nthresh+1,"regimes)\n")
-	cat("Coefficients:\n")
-	if(common==FALSE){
-		lowCoef <- getSetarXRegimeCoefs(x.old, "1")
-		highCoef<- getSetarXRegimeCoefs(x.old, ifelse(nthresh==1,"2","3"))
-		cat("Low regime:\n")
-		print(lowCoef, ...)
-		if(nthresh==2){
-			midCoef<- getSetarXRegimeCoefs(x.old, "2")
-			cat("\nMid regime:\n")
-			print(midCoef, ...)}
-		cat("\nHigh regime:\n")
-		print(highCoef, ...)
-	} else {
-		print(x.old$coeff[-length(x.old$coeff)], ...)
-	}
-	thCoef<-coef(x.old)[which(names(coef(x.old))=="th")]
-	cat("\nThreshold")
-	if(x$model=="MTAR"){
-		cat("\nMomentum Threshold (MTAR) Adjustment")
-		D<-"Diff"}
-	else
-		D<-NULL
-	cat("\nVariable: ")
-        if(externThVar)
-          cat("external")
-        else {
-          cat('Z(t) = ')
-          cat('+ (',format(x$mTh[1], digits=2), paste(")",D," X(t)", sep=""), sep="")
-          if(length(x$mTh)>1)
-            for(j in 1:(length(x$mTh) - nthresh)) {
-              cat('+ (', format(x$mTh[j+1], digits=2), paste(")",D,"X(t-", j, ")", sep=""), sep="")
-            }
-          cat('\n')
-        }
-	cat("Value:", format(thCoef, digits=4))
-	if(x$fixedTh) cat(" (fixed)")
-	cat("\n")
-	cat("Proportion of points in ")
-	if(nthresh==1)
-		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
-	else
-		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
-	invisible(x)
-}
-summary.setar <- function(object, ...) {
-	ans <- list()
-	mod <- object$model.specific
-	order.L <- mod$mL
-	order2.L <- length(mod$ML)
-	order.H <- mod$mH
-	order2.H <- length(mod$MH)
-	nconst<-mod$nconst
-	common<-mod$common
-	ans$lowCoef <- getSetarXRegimeCoefs(object, "1")
-	ans$highCoef<- getSetarXRegimeCoefs(object, "2")
-	ans$thCoef <- coef(object)["th"]
-	ans$fixedTh <- mod$fixedTh
-	ans$externThVar <- mod$externThVar
-	ans$lowRegProp <- mod$lowRegProp
-	n <- getNUsed(object$str)
-	coef <- object$coef[-length(object$coef)]
-	p <- length(coef)
-	resvar <- mse(object) * n / (n-p)
-	Qr <- mod$qr
-	p1 <- 1:p
-	est <- coef[Qr$pivot[p1]]
-	R <- chol2inv(Qr$qr[p1, p1, drop = FALSE])
-	se <- sqrt(diag(R) * resvar)
-	tval <- est/se
-	coef <- cbind(est, se, tval, 2*pt(abs(tval), n-p, lower.tail = FALSE))
-	dimnames(coef) <- list(names(est), c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
-	ans$coef <- coef
-	ans$mTh <- mod$mTh
-	extend(summary.nlar(object), "summary.setar", listV=ans)
-}
-
-print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
-	signif.stars = getOption("show.signif.stars"), ...) {
-	NextMethod(digits=digits, signif.stars=signif.stars, ...)
-	cat("\nCoefficient(s):\n\n")
-	printCoefmat(x$coef, digits = digits, signif.stars = signif.stars, ...)		
-	cat("\nThreshold")
-	cat("\nVariable: ")
-        if(x$externThVar)
-          cat("external")
-        else {
-          cat('Z(t) = ')
-          cat('+ (',format(x$mTh[1], digits=2), ') X(t) ', sep="")
-          if(length(x$mTh)>1)
-            for(j in 1:(length(x$mTh) - 1)) {
-              cat('+ (', format(x$mTh[j+1], digits=2), ') X(t-', j, ')', sep="")
-            }
-          cat('\n')
-        }        
-	cat("\nValue:", format(x$thCoef[1], digits=4))
-	if(x$fixedTh) cat(" (fixed)")
-	cat('\n')
-	invisible(x)
-}
-
-plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop, ...) {
-	op <- par(no.readonly=TRUE)
-	par(ask=ask)
-	NextMethod(ask=ask, ...)
-	str <- x$str
-	xx <- getXX(str)
-	yy <- getYY(str)
-	nms <- colnames(xx)
-	m <- str$m
-	d <- str$d
-	lags <- c((0:(m-1))*(-d), str$steps)
-	xxyy <- getXXYY(str)
-	x.old <- x
-	x <- c(x, x$model.specific)
-	series <- str$x
-	z <- x$thVar
-	th <- x$coefficients["th"]
-	regime <- factor(z <= th, levels=c(TRUE, FALSE), labels=c("low","high"))
-	regime.id <- as.numeric(regime)
-	if(length(regime)<=300) {
-		pch <- c(20,23)[regime.id]
-		cex <- 1
-	}
-	else {
-		pch <- '.'
-		cex <- 4
-	}
-	for(j in 1:m) {
-		plot(xxyy[,j], xxyy[,m+1], xlab=paste("lag", -lags[j]), ylab=paste("lag", -lags[m+1]),
-			col=regime.id, pch=pch, cex=cex, ...)
-		lines.default(xxyy[,j], x.old$fitted, lty=2)
-		if(legend)
-			legend("topleft", legend=c("low","high"), pch=pch[c(1,1)], col=1:2, merge=FALSE, title="regime")
-	}
-	sta <- 1
-	sto <- length(regime.id)
-	if(!missing(regSwStart))
-		sta <- regSwStart
-	if(!missing(regSwStop))
-		sto <- regSwStop
-	t <- sta:sto
-	regime.id <- regime.id[t]
-	series <- series[t+(m*d)]
-	ylim <- range(series)
-	l <- ylim[1] * 0.9
-	h <- ylim[2] * 1.1
-	ylim[1] <- ylim[1] * 0.8
-	ylim[2] <- ylim[2] * 1.2
-	x0 <- t
-	x1 <- t+1
-	y0 <- series[t]
-	y1 <- series[t+1]
-	par(mar=c(0,4,4,0))
-	plot(t, series, type="n", ax=FALSE, ylab="time series values", main="Regime switching plot")
-	axis(2)
-	segments(x0,y0,x1,y1,col=regime.id)
-	par(op)
-	invisible(x)
-}
-
-#Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m)-1, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2) 
-
-{
-	include<-match.arg(include)
-	model<-match.arg(model)
-	if(missing(m))
-		m <- max(ML, MH, thDelay+1)
-  if(missing(series))
-    series <- deparse(substitute(x))
-	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	xx <- getXX(str)
-	yy <- getYY(str)
-	externThVar <- FALSE
-	##Lags selection
-	if(missing(ML)) {		#ML: different lags
-		if (missing(mL)) {	#mL: suit of lags
-			mL <- m
-			if (trace) 
-				cat("Using maximum autoregressive order for low regime: mL =", m,"\n")
-		}
-		ML <- seq_len(mL)
-	}
-
-	if(missing(MM)) {
-		if (missing(mM)) {
-			mM <- m
-			if (trace&nthresh==2) 
-				cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
-		}
-		MM <- seq_len(mM)
-	}
-	if(missing(MH)) {
-		if (missing(mH)) {
-			mH <- m
-			if (trace) 
-				cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
-		}
-		MH <- seq_len(mH)
-	}
-
-	###includes const, trend
-	if(include=="const"){
-		const <- rep(1,nrow(xx))
-		inc<-"const"}
-	else if(include=="trend"){
-		const<-seq_len(nrow(xx))
-		inc<-"trend"}
-	else if(include=="both"){
-		const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
-		inc<-c("const","trend")} 
-	else {
-		const<-NULL
-		inc<-NULL
-	}
-	ninc<-length(include)
-
-	###Set-up of transition variable
+### selectSETAR 2: Set-up of transition variable
+#two models: TAR or MTAR (z is differenced)
+#three possibilitiees for thVar:
+#thDelay: scalar: prespecified lag, or vector: of lags to search for. Z is a matrix
+#mTh: combination of lags. Z is one vector-matrix
+#thVar: external variable Zis one vector-matrix.
+# Default: thDelay=0
 	if(!missing(thDelay)) {
 		if(max(thDelay)>=m) 
 			stop(paste("thDelay too high: should be < m (=",m,")"))
@@ -479,7 +532,12 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m
 
 z<-as.matrix(z)
 
-##Grid
+### selectSETAR 3: set-up of the grid
+#Possibilities:
+#gamma pre-specified
+#interval to search inside given by user
+#value to search around	given by user
+#Default method: grid from lower to higher point
 allTh <- sort(unique(z[,1]))
 ng <- length(allTh)
 ninter<-round(trim*ng)
@@ -493,7 +551,7 @@ if(!is.null(th$exact)){
 		th<-th[1]}
 	ngrid<-1
 	}
-#interval to search between given by user
+#interval to search inside given by user
 else if(is.numeric(th$int)){
 	if(missing(ngrid))
 		ngrid<-20
@@ -527,7 +585,7 @@ else{
 th<-round(th, getndp(x))
 gammas<-th
 
-###Computation
+### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
 SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
 	XX<-thresh1(gam1,thDelay, xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim)
 	if(any(is.na(XX))){
@@ -580,7 +638,7 @@ AIC_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=
 }
 
 
-###Function pooled AIC
+### selectSETAR 4b:Function pooled AIC 
 pooledAIC <- function(parms) {	
 	thDelayVal <- parms[1] + 1
 	mLVal <- parms[2]
@@ -608,14 +666,14 @@ pooledAIC <- function(parms) {
 }
 
 
-###Grid of combinations of all parameters
-    IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
-	colnames(IDS)<-c("thDelay", "mL", "mH", "th")
-    IDS2 <- as.matrix(expand.grid(thDelay, th))
-	colnames(IDS2)<-c("thDelay", "th")
+###selectSETAR 5: Grid of combinations of all parameters 
+IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
+colnames(IDS)<-c("thDelay", "mL", "mH", "th")
+IDS2 <- as.matrix(expand.grid(thDelay, th))
+colnames(IDS2)<-c("thDelay", "th")
 
 
-###Computation for 1 thresh
+###selectSETAR 6: Computation for 1 thresh
 criterion <- match.arg(criterion)
 IDS <- switch(criterion, "AIC" = IDS, "pooled-AIC" = IDS, "SSR" = IDS2)	###Selection of the grid
 
@@ -626,18 +684,21 @@ else if(criterion=="AIC"){
 else if(criterion=="SSR"){
     computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,common=common,trim=trim))}
 
-###Results
+###selectSETAR 7: sorts the results to show the best values
 allres <- cbind(IDS, computedCriterion)
 colnames(allres) <- c(colnames(IDS), criterion)
 idSel <- sort(computedCriterion, index = TRUE)$ix
 idSel <- idSel[seq_len(min(ifelse(nthresh==1,10,5), length(idSel)))]
 res <- data.frame(allres[idSel, ], row.names = NULL)
+bests<-c(res[1,1],res[1,2])
+names(bests)<-c("tDelay", "th")
 
-###Computation for 2 thresh
+###selectSETAR 8: Computation for 2 thresh 
+#use function condistep (see TVARestim.r) to estimate the second given the first
+#iterate thealgortihm: once the second is estimate, reestimate the first, and alternatively until convergence
 if(nthresh==2){
 if(trace){
 	print(res)
-	cat("Number of combinations tested:", nrow(IDS),"\n")
 	cat("Result of the one threshold search: -Thresh: ",res[1,"th"],"\t-Delay: ",res[1,"thDelay"],"\n" )
 }
 More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,common=common, trim=trim)
@@ -645,7 +706,7 @@ func<-switch(criterion, "AIC" = AIC_2thresh, "pooled-AIC" = IDS, "SSR" = SSR_2th
 
 last<-condiStep(th,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
 
-i<-1
+i<-1	#initialise the following loop
 while(i<max.iter){
 	b<-condiStep(th,last$newThresh, delayRef=res[1,1],ninter=ninter, fun=func, trace=trace, More=More)
 	if(b$SSR<last$SSR){	#minimum still not reached
@@ -656,12 +717,12 @@ while(i<max.iter){
 		last<-b}
 }
 
-bests<-matrix(c(min(c(last$threshRef, last$newThresh)),max(c(last$threshRef, last$newThresh))),nrow=1)
-colnames(bests)<-c("th1","th2")
+bests<-matrix(c(res[1,"thDelay"], min(c(last$threshRef, last$newThresh)),max(c(last$threshRef, last$newThresh))),nrow=1)
+colnames(bests)<-c("tDelay", "th1","th2")
 
 
 }
-###Graphical output
+###selectSETAR 9: plot of the results of the grid search
 if(plot==TRUE){
 	allcol <- seq_len(max(thDelay+1)*max(mL)*max(mH))
 	col <- switch(criterion, AIC=allcol, "pooled-AIC"=allcol,"SSR"=(thDelay+1) )
@@ -672,16 +733,15 @@ if(plot==TRUE){
  	legend("topleft", pch=1, legend=legend, col=col, bg=0)
 }
 
-##Result
-if(nthresh==1){
-	if(trace)
-		cat("\nNumber of combinations tested:", nrow(IDS),"\n")
-	return(res)
-	}
-else{
-	return(bests)}
+###selectSETAR 10: return results
+if(trace)
+	cat("\nNumber of combinations tested:", nrow(IDS),"\n")
+return(res)	
+
 }
 
+
+###Try it
 if(FALSE) { #usage example
 library(tsDyn)
 environment(selectSETARmat)<-environment(selectNNET)
