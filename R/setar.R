@@ -35,6 +35,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 
 ###SETAR 1: preliminaries
 	include<-match.arg(include)
+
 	model<-match.arg(model)
 	if(missing(m))
 		m <- max(ML, MH, thDelay+1)
@@ -62,7 +63,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 	if(missing(MM)) {
 		if (missing(mM)) {
 			mM <- m
-			if (trace&nthresh==2) 
+		    if (trace&nthresh==2) 
 				cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
 		}
 		MM <- seq_len(mM)
@@ -77,6 +78,8 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 	}
 
 	###includes const, trend
+  if(include=="none" && any(c(ML,MM,MH)==0))
+    stop("you cannot have a regime without constant and lagged variable")
 	if(include=="const"){
 		const <- rep(1,nrow(xx))
 		inc<-"const"}
@@ -144,8 +147,8 @@ z<-as.matrix(z)
 	if (missing(th)) { 
 		ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
 		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
-		thDelay<-search[1,1]
-		th<-search[1,2]
+		thDelay<-search$bests[1]
+		th<-search$bests[2:(nthresh+1)]
 		nested<-TRUE
 		if(trace) {
 			cat("Selected threshold: ", th,"\n")
@@ -175,27 +178,48 @@ z<-as.matrix(z)
 			stop("With the threshold you gave, there is a regime with no observations!")
 		#build the X matrix
 		if(nthresh==1){
-			xxLH<-thresh1(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)	
+		  if(common)
+		    xxLH<-buildXth1Common(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH,const)	
+		  else
+		    xxLH<-buildXth1NoCommon(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH,const)	
 			midCommon<-mid<-NA}
 		else if(nthresh==2){
-			xxLH<-thresh2(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim=trim)
-			midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep="."))
-			mid<-c(paste("phi3", MH, sep="."))
+		  if(common)
+		    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
+		  else
+		    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
+			#midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep=".")) no more used: 
+			#mid<-c(paste("phi3", MH, sep=".")) #no more used
 		}
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
 		res <- lm.fit(xxLH, yy)
 #Coefficients and names
 		res$coefficients <- c(res$coefficients, th)
-		if(common==FALSE){
+
+		if(FALSE){
 			names(res$coefficients) <- na.omit(c(paste(inc, rep(1,ninc)), paste("phi1", ML, sep="."), paste(inc,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
-		} else{
+		} 
+if(FALSE){
 			names(res$coefficients) <- na.omit(c(inc,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
 		}
 
+if(!common){
+  if(nthresh==1)
+    co<-c(getIncNames(inc,ML), getArNames(ML), getIncNames(inc,MH), getArNames(MH),"th")
+  else
+    co<-c(getIncNames(inc,ML), getArNames(ML), getIncNames(inc,MM), getArNames(MM), getIncNames(inc,MH), getArNames(MH),"th1","th2")
+}
+else{
+  if(nthresh==1)
+    co<-c(inc, getArNames(ML), getArNames(MH),"th")
+  else 
+    co<-c(inc, getArNames(ML), getArNames(MM), getArNames(MH),"th1","th2")
+}
+  names(res$coefficients) <- na.omit(co)
 ### SETAR 7: return the infos
 		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
-		res$thDelay
+		res$thDelay<-thDelay
 		res$fixedTh <- if(nested) FALSE else TRUE
 		res$mL <- max(ML)
 		res$mH <- max(MH)
@@ -204,10 +228,12 @@ z<-as.matrix(z)
 		res$externThVar <- externThVar
 		res$thVar <- z[, thDelay + 1]
 		res$nconst<-inc
-		res$common<-common
-		res$nthresh<-nthresh
+		res$common<-common  	#wheter arg common was given by user
+		res$nthresh<-nthresh 	#n of threshold
 		res$model<-model
 		res$RegProp <- c(mean(isL),mean(isH))
+		res$usedThVar<-z[,thDelay+1]
+		res$trim<-trim
 		if(nthresh==2)
 			res$RegProp <- c(mean(isL),mean(isM),mean(isH))
 		res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
@@ -223,7 +249,7 @@ z<-as.matrix(z)
 	#}
 }
 
-getSetarXRegimeCoefs <- function(x, regime=c("1","2","3")) {
+getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
 	regime <- match.arg(regime)
 	x <- x$coef
 	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
@@ -235,6 +261,24 @@ getSetarXRegimeCoefs <- function(x, regime=c("1","2","3")) {
 getTh<-function(x){
 	x[grep("th",names(x))]}
 
+#gets a vector with names of the arg inc
+getIncNames<-function(inc,ML){
+  ninc<-length(inc)
+    letter<-deparse(substitute(ML))
+    letter<-sub("M","",letter)
+    paste(inc, rep(letter,ninc))
+}
+
+#get a vector with names of the coefficients
+getArNames<-function(ML){
+  if(any(ML==0))
+    return(NA)
+  else{
+    letter<-deparse(substitute(ML))
+    letter<-sub("M","",letter)
+    paste(paste("phi",letter, sep=""),".", ML, sep="")
+  }
+}
 print.setar <- function(x, ...) {
 	NextMethod(...)
 	x.old <- x
@@ -250,12 +294,12 @@ print.setar <- function(x, ...) {
 	cat("\nSETAR model (",nthresh+1,"regimes)\n")
 	cat("Coefficients:\n")
 	if(common==FALSE){
-		lowCoef <- getSetarXRegimeCoefs(x.old, "1")
-		highCoef<- getSetarXRegimeCoefs(x.old, ifelse(nthresh==1,"2","3"))
+		lowCoef <- getSetarXRegimeCoefs(x.old, "L")
+		highCoef<- getSetarXRegimeCoefs(x.old, "H")
 		cat("Low regime:\n")
 		print(lowCoef, ...)
 		if(nthresh==2){
-			midCoef<- getSetarXRegimeCoefs(x.old, "2")
+			midCoef<- getSetarXRegimeCoefs(x.old, "M")
 			cat("\nMid regime:\n")
 			print(midCoef, ...)}
 		cat("\nHigh regime:\n")
@@ -303,8 +347,8 @@ summary.setar <- function(object, ...) {
 	nthresh<-mod$nthresh		#numer of thresholds
 	nconst<-mod$nconst		
 	common<-mod$common
-	ans$lowCoef <- getSetarXRegimeCoefs(object, "1")
-	ans$highCoef<- getSetarXRegimeCoefs(object, "2")
+	ans$lowCoef <- getSetarXRegimeCoefs(object, "L")
+	ans$highCoef<- getSetarXRegimeCoefs(object, "H")
 	ans$thCoef <- coef(object)["th"]
 	ans$fixedTh <- mod$fixedTh
 	ans$externThVar <- mod$externThVar
@@ -416,6 +460,11 @@ plot.setar <- function(x, ask=interactive(), legend=TRUE, regSwStart, regSwStop,
 	abline(h=th)
 	axis(2)		#adds an axis on the left
 	segments(x0,y0,x1,y1,col=regime.id)	#adds segments between the points with color depending on regime
+	#plot for the transition variable
+	par(mar=c(5,4,4,2))
+	layout(matrix(1:2, ncol=1))
+	plot1(th, nthresh,usedThVar=x$model.specific$usedThVar)
+	plot2(th, nthresh,usedThVar=x$model.specific$usedThVar, trim=x$model.specific$trim)
 	par(op)
 	invisible(x)
 }
@@ -586,8 +635,8 @@ th<-round(th, getndp(x))
 gammas<-th
 
 ### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
-SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
-	XX<-thresh1(gam1,thDelay, xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim)
+SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,fun=buildXth1Common){
+	XX<-fun(gam1,thDelay, xx,trans=z, ML=ML, MH=MH,const)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
@@ -599,8 +648,9 @@ SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,co
 }
 
 
-SSR_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
-	XX<-thresh2(gam1,gam2,thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim)
+
+SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2Common,trim=trim){
+	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
@@ -610,10 +660,11 @@ SSR_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=
 	}
 	return(res)
 }
-
-
-AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
-	XX<-thresh1(gam1,thDelay, xx,trans=z, ML=ML, MH=MH, MM=MM,const,common,trim)
+SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2Common,trim=trim){
+  SSR_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2NoCommon,trim=trim)
+}
+AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common ){
+	XX<-fun(gam1,thDelay, xx,trans=z, ML=ML, MH=MH, const)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
@@ -624,8 +675,8 @@ AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,con
 	return(res)
 }
 
-AIC_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim){
-	XX<-thresh2(gam1,gam2,thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,common=common,trim=trim)
+AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
+	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
@@ -637,7 +688,9 @@ AIC_2thresh<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=
 	return(res)
 }
 
-
+AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
+  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon)
+}
 ### selectSETAR 4b:Function pooled AIC 
 pooledAIC <- function(parms) {	
 	thDelayVal <- parms[1] + 1
@@ -680,9 +733,17 @@ IDS <- switch(criterion, "AIC" = IDS, "pooled-AIC" = IDS, "SSR" = IDS2)	###Selec
 if (criterion == "pooled-AIC") {
     computedCriterion <- apply(IDS, 1, pooledAIC)} 
 else if(criterion=="AIC"){
-   computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,4], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,3], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,common=common,trim=trim))} 
+  if(common)
+    computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,4], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,3], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common))
+  else
+    computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,4], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,3], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon))
+} 
 else if(criterion=="SSR"){
-    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,common=common,trim=trim))}
+  if(common)
+    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,fun=buildXth1Common))
+  else
+    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,fun=buildXth1NoCommon))
+}
 
 ###selectSETAR 7: sorts the results to show the best values
 allres <- cbind(IDS, computedCriterion)
@@ -690,23 +751,28 @@ colnames(allres) <- c(colnames(IDS), criterion)
 idSel <- sort(computedCriterion, index = TRUE)$ix
 idSel <- idSel[seq_len(min(ifelse(nthresh==1,10,5), length(idSel)))]
 res <- data.frame(allres[idSel, ], row.names = NULL)
-bests<-c(res[1,1],res[1,2])
+bests<-c(res[1,"thDelay"],res[1,"th"])
 names(bests)<-c("tDelay", "th")
 
 ###selectSETAR 8: Computation for 2 thresh 
-#use function condistep (see TVARestim.r) to estimate the second given the first
-#iterate thealgortihm: once the second is estimate, reestimate the first, and alternatively until convergence
+#use function condistep (see TVARestim.r) to estimate the second th given the first
+#iterate the algortihm: once the second is estimate, reestimate the first, and alternatively until convergence
 if(nthresh==2){
-if(trace){
-	print(res)
+  if(trace){
 	cat("Result of the one threshold search: -Thresh: ",res[1,"th"],"\t-Delay: ",res[1,"thDelay"],"\n" )
-}
-More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,common=common, trim=trim)
-func<-switch(criterion, "AIC" = AIC_2thresh, "pooled-AIC" = IDS, "SSR" = SSR_2thresh)	
-
+  }
+  More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,trim=trim)
+  if(criterion=="pooled-AIC")
+    warning("\ncriterion pooled AIC currently not implemented for nthresh=2, use rather SSR\n")
+  if(common)
+    func<-switch(criterion, "AIC" = AIC_2threshCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshCommon)	
+  else
+    func<-switch(criterion, "AIC" = AIC_2threshNoCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshNoCommon)
+#first conditional search
 last<-condiStep(th,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
 
-i<-1	#initialise the following loop
+#iterative loop for conditional search
+i<-1	#initialise the loop
 while(i<max.iter){
 	b<-condiStep(th,last$newThresh, delayRef=res[1,1],ninter=ninter, fun=func, trace=trace, More=More)
 	if(b$SSR<last$SSR){	#minimum still not reached
@@ -736,7 +802,7 @@ if(plot==TRUE){
 ###selectSETAR 10: return results
 if(trace)
 	cat("\nNumber of combinations tested:", nrow(IDS),"\n")
-return(res)	
+return(list(res=res, bests=bests))
 
 }
 
@@ -758,22 +824,23 @@ selectSETARmat(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)
 }
 
 
-
-thresh1 <- function(gam1, thDelay, xx,trans, ML, MH, MM,const,common,trim) {
+###Build the xx matrix with 1 thresh and common=TRUE
+buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const) {
+  isL <- ifelse(trans[, thDelay + 1]< gam1,1,0)	### isL: dummy variable
+  LH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
+}
+###Build the xx matrix with 1 thresh and common=FALSE
+buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const) {
         isL <- ifelse(trans[, thDelay + 1]< gam1,1,0)	### isL: dummy variable
-	if(common==FALSE){
-		xxL <- cbind(const,xx[,ML])*isL
-		xxH <- cbind(const,xx[,MH])*(1-isL)
-		xxLH<-cbind(xxL,xxH)}
-	else
-		xxLH<-cbind(const,xx[,ML]*isL,xx[,mH]*(1-isL))
+	xxL <- cbind(const,xx[,ML])*isL
+	xxH <- cbind(const,xx[,MH])*(1-isL)
+	xxLH<-cbind(xxL,xxH)
 	return(xxLH)
 }
 
 
-
-
-thresh2<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,common,trim){
+###Build the xx matrix with 2 thresh and common=TRUE
+buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 	trans<-as.matrix(trans)
 
 	##Threshold dummies
@@ -785,15 +852,8 @@ thresh2<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,common,trim){
 	nup <- mean(dummyup)
 	##Construction of the matrix
 #  print(c(gam1, gam2,ndown, (1-ndown-nup),nup))
-	if(common==FALSE){
-		xxL <- cbind(const,xx[,ML])*dummydown
-		xxM<-cbind(const, xx[,MM])*(1-dummydown-dummyup)
-		xxH <- cbind(const,xx[,MH])*(dummyup)
-		xxLMH<-cbind(xxL,xxM,xxH)
-	}
-	else
-		xxLMH<-cbind(const,xx[,ML]*dummydown,xx[,MM]*(1-dummydown-dummyup),xx[,MH]*(dummyup))
-	##computation of SSR
+	xxLMH<-cbind(const,xx[,ML]*dummydown,xx[,MM]*(1-dummydown-dummyup),xx[,MH]*(dummyup))
+##return result
 	if(min(nup, ndown, 1-nup-ndown)>=trim){
 		res <- xxLMH	#SSR
 	}
@@ -803,7 +863,33 @@ thresh2<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,common,trim){
 	return(res)
 }
 
+###Build the xx matrix with 2 thresh and common=FALSE
+buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
+	trans<-as.matrix(trans)
 
+	##Threshold dummies
+	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
+# print(dummydown)
+	ndown <- mean(dummydown)
+	dummyup <- ifelse(trans[, thDelay + 1]>gam2, 1, 0)
+# print(dummyup)
+	nup <- mean(dummyup)
+	##Construction of the matrix
+#  print(c(gam1, gam2,ndown, (1-ndown-nup),nup))
+	xxL <- cbind(const,xx[,ML])*dummydown
+	xxM<-cbind(const, xx[,MM])*(1-dummydown-dummyup)
+	xxH <- cbind(const,xx[,MH])*(dummyup)
+	xxLMH<-cbind(xxL,xxM,xxH)
+
+	##return result
+	if(min(nup, ndown, 1-nup-ndown)>=trim){
+		res <- xxLMH	#SSR
+	}
+	else
+		res <- NA
+
+	return(res)
+}
 
 oneStep.setar <- function(object, newdata, itime, thVar, ...){
 	mL <- object$model$mL

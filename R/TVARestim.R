@@ -213,27 +213,23 @@ if(dummyToBothRegimes){
 else	
 	func <- loop1_onedummy
 
-if(nthresh==1){
+
 bestone <- onesearch(thDelay,gammas, fun=func, trace=trace, gamma=gamma, plot=plot)
 bestThresh <- bestone$bestThresh
 bestDelay <- bestone$bestDelay
-}
+allThSSR<-bestone$allres
+
 
 ############################
 ###Search for two threshold
 ############################
 
-###Conditional search
+
 if(nthresh==2){
-
-###Conditionnal step
-bestone <- onesearch(thDelay, gammas, fun=func, trace=trace, gamma=gamma, plot=plot)
-bestThresh <- bestone$bestThresh
-bestDelay <- bestone$bestDelay
-
-if(commonInter)
+  ###Conditionnal step
+  if(commonInter)
 	func2<-loop2_oneIntercept
-else
+  else
 	func2<-loop2
 # secondBestThresh<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)$newThresh
 # step2FirstBest<-condiStep(allgammas, threshRef=secondBestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)
@@ -389,6 +385,8 @@ else if (nthresh==2)
 
 #elements to return
 specific<-list()
+specific$allgammas<-allgammas
+specific$gammas<-gammas
 specific$Thresh<-bestThresh
 specific$nthresh<-nthresh
 specific$nreg<-nthresh+1
@@ -396,10 +394,18 @@ specific$nrowB<-npar
 specific$nobs<-nobs
 specific$oneMatrix<-commonInter
 specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
+specific$allThSSR<-allThSSR#SSR values for all the th computed
 specific$Bnames<-Bnames
 
-z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific, thVar=trans[,bestDelay])
+z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific, usedThVar=trans[,bestDelay], trim=trim)
 class(z)<-c("TVAR","nlVar")
+if(plot){
+  layout(matrix(1:ifelse(z$model.specific$threshEstim,3,2), ncol=1))
+  plot1(bestThresh, nthresh,usedThVar=z$usedThVar)
+  plot2(bestThresh, nthresh,usedThVar=z$usedThVar, trim=z$trim)
+  if(z$model.specific$threshEstim)
+    plot3(bestThresh, nthresh,allTh=z$model.specific$allThSSR)
+}
 return(z)
 }	#end of the whole function
 
@@ -498,9 +504,66 @@ print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.
 	cat("\nPercentage of Observations in each regime:", percent(x$model.specific$nobs,3,TRUE))
 }
 
-plot.TVAR<-function(x,...){
- plot(x$thVar)
+
+
+
+plot1<-function(th,nthresh,usedThVar){
+plot.ts(usedThVar, ylab="")
+  title("Threshold variable used")
+  abline(h=th, col=2:(nthresh+1))
+  legend("topleft", lty=1, bg="white", col=2:(nthresh+1), legend=c(paste("th", 1:nthresh)))
 }
+
+plot2<-function(th,nthresh, usedThVar,trim){
+nga <- length(usedThVar)
+  orderedThVar<-sort(usedThVar)
+  lt<-rep(".",nga)
+  lt[(trim*nga):((1-trim)*nga)]<-1
+  #plot(seq_len(nga), allgammas, pch=lt, xlab="Sorted values", ylab="")
+  if(nthresh==1)
+    numTh<-which(orderedThVar==th)
+  else{
+    numTh1<-which(orderedThVar==th[1])
+    numTh2<-which(orderedThVar==th[2])
+    numTh<-c(numTh1, numTh2)}
+  ts.plot(orderedThVar, xlab="", ylab="")
+  title("Ordered threshold variable")
+  abline(v=c(trim*nga,(1-trim)*nga), col=4)
+  points(numTh, th, col=c(2:(nthresh+1)),cex=2)
+  leg<-c(paste("trim=", trim),paste("th", 1:nthresh))
+  legend("topleft", lty=1, col=c(4,2:(nthresh+1)), legend=leg, bg="white")
+}
+
+plot3<-function(th,nthresh, allTh){
+    allDelay<-unique(allTh[,1])
+    col <- rep(allDelay,length.out=nrow(allTh))
+    if(nthresh==1)
+      posBestTh<-which(allTh[,2]==th)
+    else{
+      posBestTh1<-which(allTh[,2]==th[1])
+      posBestTh2<-which(allTh[,2]==th[2])
+      posBestTh<-c(posBestTh1,posBestTh2)}
+    plot(allTh[,2], allTh[,3], col=col,xlab="Treshold Value",ylab="SSR")
+    title("Results of the grid search")
+    points(th,allTh[posBestTh,3], col=c(2:(nthresh+1)), cex=2)
+    leg<-c(paste("Threshold Delay", allDelay),(paste("th", 1:nthresh)))
+    legend("topleft", pch=1, legend=leg, col=c(allDelay,c(2:(nthresh+1))), bg="white")
+}
+
+
+plot.TVAR<-function(x,ask=interactive(), ...){
+  th<-x$model.specific$Thresh
+  nthresh<-x$model.specific$nthresh
+  op <- par(no.readonly=TRUE)
+  #par(ask=ask)
+  layout(matrix(1:ifelse(x$model.specific$threshEstim,3,2), ncol=1))
+  plot1(th, nthresh,usedThVar=x$usedThVar)
+  plot2(th, nthresh,usedThVar=x$usedThVar, trim=x$trim)
+  if(x$model.specific$threshEstim)
+    plot3(th, nthresh,allTh=x$model.specific$allThSSR)
+  par(op)
+}
+
 
 
 toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
@@ -612,17 +675,12 @@ onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){
 	store<-mapply(fun,thDelay=grid1[,1],gam1=grid1[,2])
 	posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
 
-	if(plot&is.null(gamma)){
-		result1 <- cbind(grid1,store)
-		col <- rep(thDelay,length.out=nrow(result1))
-		plot(result1[,2], result1[,3], col=col,xlab="Treshold Value",ylab="SSR", main="Results of the grid search")
-		legend("topleft", pch=1, legend=paste("Threshold Delay", thDelay), col=thDelay)
-	}
 	if(trace)
 		cat("Best unique threshold", grid1[posBestThresh,2],"\n")
 	if(length(thDelay)>1&trace)
 		cat("Best Delay", grid1[posBestThresh,1],"\n")
-	list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1])
+	res<-list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1], allres=cbind(grid1,store))
+        return(res)
 }#end of function one search
 
 condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More=NULL){
@@ -660,6 +718,8 @@ condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More
 	list(threshRef=threshRef, newThresh=newThresh, SSR=SSR)
 }
 
+
+###Function for nthresh=2, Alternative step: grid around the points from first step
 grid<-function(gammasUp, gammasDown, bestDelay, fun, trace=TRUE, method=c("for", "apply", "mapply")){
 	store <- matrix(NA,ncol=length(gammasUp), nrow=length(gammasDown))
 	method<-match.arg(method)

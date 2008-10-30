@@ -200,10 +200,10 @@ if(trace) {cat("\n",na,"(", percent(na/(nrow(store)*ncol(store)),3,by100=TRUE), 
 
 pos<-which(store==min(store, na.rm=TRUE), arr.ind=TRUE) #Best gamma
 if(nrow(pos)>1) {
-if(trace){
-cat("\n\tThere were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken") }
-pos<-pos[1,]}
-
+  if(trace){
+    cat("\n\tThere were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken") }
+  pos<-pos[1,]
+}
 
 
 bestGamma1<-gammas[pos[1]]
@@ -211,19 +211,17 @@ beta_grid<-betas[pos[2]]
 
 } #end methodMapply false
 ###Method with mapply
-
-if(methodMapply==TRUE){
-grid<-expand.grid(betas,gammas)
-oneThreshTemp<-function(betai,gam) func_onethresh(betai=betai, gam=gam, DeltaX=DeltaX,Xminus1=Xminus1, Y=Y)
-storemap<-mapply(oneThreshTemp, betai=grid[,1], gam=grid[,2])
-bests<-which(storemap==min(storemap, na.rm=TRUE))
-if(length(bests)>1) {
-if(trace){ cat("\n\tThere were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken")}
-bests<-bests[1]}
-beta_grid<-grid[bests,1]
-bestGamma1<-grid[bests,2]
-}
-
+  if(methodMapply==TRUE){
+    grid<-expand.grid(betas,gammas)
+    oneThreshTemp<-function(betai,gam) func_onethresh(betai=betai, gam=gam, DeltaX=DeltaX,Xminus1=Xminus1, Y=Y)
+    storemap<-mapply(oneThreshTemp, betai=grid[,1], gam=grid[,2])
+    bests<-which(storemap==min(storemap, na.rm=TRUE))
+    if(length(bests)>1) {
+      if(trace){ cat("\n\tThere were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken")}
+      bests<-bests[1]}
+    beta_grid<-grid[bests,1]
+    bestGamma1<-grid[bests,2]
+    }
 
 
 gammaMLE<-0.02321329
