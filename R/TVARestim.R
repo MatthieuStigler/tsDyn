@@ -521,10 +521,10 @@ nga <- length(usedThVar)
   lt[(trim*nga):((1-trim)*nga)]<-1
   #plot(seq_len(nga), allgammas, pch=lt, xlab="Sorted values", ylab="")
   if(nthresh==1)
-    numTh<-which(orderedThVar==th)
+    numTh<-which.min(abs(orderedThVar-th))
   else{
-    numTh1<-which(orderedThVar==th[1])
-    numTh2<-which(orderedThVar==th[2])
+    numTh1<-which.min(abs(orderedThVar-th[1]))
+    numTh2<-which.min(abs(orderedThVar-th[2]))
     numTh<-c(numTh1, numTh2)}
   ts.plot(orderedThVar, xlab="", ylab="")
   title("Ordered threshold variable")

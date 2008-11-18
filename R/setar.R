@@ -631,7 +631,7 @@ else{
 	if(trace)
 		cat("Searching on",ngrid, "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
 }
-th<-round(th, getndp(x))
+# th<-round(th, getndp(x)) bad idea, rather use format in print and summary
 gammas<-th
 
 ### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
