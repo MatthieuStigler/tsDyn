@@ -646,6 +646,7 @@ print.summary.TVECM<-function(x,...){
 }
 
 toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
+	x<-object
 	Th<-x$model.specific$Thresh
 	nthresh<-length(Th)
 	x$coefficients<-asListIfMat(x$coefficients)
