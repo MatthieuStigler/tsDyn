@@ -349,7 +349,7 @@ summary.setar <- function(object, ...) {
 	common<-mod$common
 	ans$lowCoef <- getSetarXRegimeCoefs(object, "L")
 	ans$highCoef<- getSetarXRegimeCoefs(object, "H")
-	ans$thCoef <- coef(object)["th"]
+	ans$thCoef <- getTh(coef(object))
 	ans$fixedTh <- mod$fixedTh
 	ans$externThVar <- mod$externThVar
 	ans$lowRegProp <- mod$lowRegProp
@@ -388,7 +388,7 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
             }
           cat('\n')
         }        
-	cat("\nValue:", format(x$thCoef[1], digits=4))
+	cat("\nValue:", format(x$thCoef, digits=4))
 	if(x$fixedTh) cat(" (fixed)")
 	cat('\n')
 	invisible(x)
@@ -426,11 +426,13 @@ plot.setar <- function(x, ask=interactive(), legend=TRUE, regSwStart, regSwStop,
 		pch <- '.'
 		cex <- 4
 	}
-#ACF and PACF plots
+#Phase plot
 	for(j in 1:m) {
 		plot(xxyy[,j], xxyy[,m+1], xlab=paste("lag", -lags[j]), ylab=paste("lag", -lags[m+1]),
 			col=regime.id, pch=pch, cex=cex, ...)
 		lines.default(xxyy[,j], x.old$fitted, lty=2)
+                if(nthresh==2)
+                  title("Curently not implemented for nthresh=2!")
 		if(legend)
 			legend("topleft", legend=c("low","high"), pch=pch[c(1,1)], col=1:2, merge=FALSE, title="regime")
 	}
