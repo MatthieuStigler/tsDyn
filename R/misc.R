@@ -142,6 +142,7 @@ TAR2t_B <- function(gam1,gam2,thDelay, yy, xx,z,m){
 	list(Bdown=Bdown, Bmiddle=Bmiddle, Bup=Bup, nobs=nobs)
 }
 
+
 ###Check if the AR coefficients in each regime lie inside the unit circle
 is.InUnitCircle<-function(B,trend,m, nthresh){
 if(trend)
