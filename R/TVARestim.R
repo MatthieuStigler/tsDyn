@@ -534,9 +534,10 @@ nga <- length(usedThVar)
   legend("topleft", lty=1, col=c(4,2:(nthresh+1)), legend=leg, bg="white")
 }
 
+#Plot for the grid search
 plot3<-function(th,nthresh, allTh){
     allDelay<-unique(allTh[,1])
-    col <- rep(allDelay,length.out=nrow(allTh))
+    col <- rep(allDelay,length.out=nrow(allTh))+1
     if(nthresh==1)
       posBestTh<-which(allTh[,2]==th)
     else{
@@ -547,7 +548,7 @@ plot3<-function(th,nthresh, allTh){
     title("Results of the grid search")
     points(th,allTh[posBestTh,3], col=c(2:(nthresh+1)), cex=2)
     leg<-c(paste("Threshold Delay", allDelay),(paste("th", 1:nthresh)))
-    legend("topleft", pch=1, legend=leg, col=c(allDelay,c(2:(nthresh+1))), bg="white")
+    legend("topleft", pch=1, legend=leg, col=c(allDelay+1,c(2:(nthresh+1))), bg="white")
 }
 
 
@@ -706,7 +707,6 @@ condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More
 
 	#results
 	store2 <- c(storeMinus, storePlus)
-
 	positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
 	if(positionSecond<=length(storeMinus))
 		newThresh<-gammaMinus[positionSecond]

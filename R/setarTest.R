@@ -30,7 +30,7 @@ SSR<-as.numeric(crossprod(linear$residuals))
 B<-linear$coeff
 
 ###setarTest 3: check if the linear model has roots inside unit circle
-is<-is.InUnitCircle(B, trend=TRUE, m=m, nthresh=0)
+is<-is.InUnitCircle(B, ninc=1, m=m, nthresh=0)
 if(is$warn==TRUE){
 	warning("The AR coefficients of the linear model lie inside the unit circle,\n thus the serie can be non-stationnary and the bootstrap distribution biased")
 	cat("\nUnit roots\n")
@@ -172,13 +172,13 @@ B2t<-TAR2t_B(gam1=min(Thresh3$newThresh,Thresh2),gam2=max(Thresh3$newThresh,Thre
 print(list(thresh1=B1t, thresh2=B2t))
 
 ###setarTest 9: Verification of stationarity in each regime of orginal serie
-is1t<-is.InUnitCircle(unlist(B1t), trend=TRUE, m=m, nthresh=1)
+is1t<-is.InUnitCircle(unlist(B1t), ninc=1, m=m, nthresh=1)
 if(is1t$warn==TRUE){
 	cat("Characteristic roots of 1 threshold model\n")
  	print(is1t$root)
 	warning("The AR coefficients of one regime of 1 threshold model lie inside the unit circle,\n thus the serie can be non-stationnary and the bootstrap distribution biased")
 }
-is2t<-is.InUnitCircle(unlist(B2t), trend=TRUE, m=m, nthresh=2)
+is2t<-is.InUnitCircle(unlist(B2t), ninc=1, m=m, nthresh=2)
 if(is2t$warn==TRUE){
 	cat("Characteristic roots of 2 thresholds model\n")
  	print(is2t$root)

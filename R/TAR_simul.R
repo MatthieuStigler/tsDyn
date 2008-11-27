@@ -102,11 +102,11 @@ if(missing(sigma))
 }
 
 ###Verification of stability
-is<-is.InUnitCircle(B, trend=trend, m=m, nthresh=nthresh)
-if(is$warn==TRUE){
-	warning("The AR coefficients of one regime lie inside the unit circle, thus the serie can be non-stationnary")
-	cat("\nUnit roots\n")
-	print(is$root)}
+# is<-is.InUnitCircle(B,ninc=1, m=m, nthresh=nthresh)
+# if(is$warn==TRUE){
+# 	warning("The AR coefficients of one regime lie inside the unit circle, thus the serie can be non-stationnary")
+# 	cat("\nUnit roots\n")
+# 	print(is$root)}
 ##############################
 ###Bootstrap
 ##############################

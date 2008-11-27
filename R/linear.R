@@ -1,4 +1,4 @@
-## Copyright (C) 2005/2006  Antonio, Fabio Di Narzo
+##Copyright (C) 2005/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -17,13 +17,21 @@
 
 #linear model fitter (via OLS)
 #str: call to nlar.struct
-linear <- function(x, m, d=1, steps=d, series) {
+linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none", "both")) {
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	xx <- getXX(str)
 	yy <- getYY(str)
-	xx <- cbind(1,xx)
-	colnames(xx) <- c("(intercept)", paste("phi",1:(ncol(xx)-1), sep="."))
+	#build intercept or trend, 
+	constMatrix<-buildConstants(include=include, n=nrow(xx))
+	inc<-constMatrix$inc #matrix of none, const, trend, noth
+	const<-constMatrix$const #vector of names
+	ninc<-constMatrix$ninc #number of terms (0,1, or 2)
+	xx <- cbind(const,xx)
+	colnames(xx) <- c(inc, paste("phi",1:(ncol(xx)-ninc), sep="."))
 	res <- lm.fit(xx, yy)
+	#check if unit root lie outside unit circle
+	is<-isRoot(coef(res), regime=".", lags=seq_len(m))
+	
 	return(extend(nlar(str, coefficients=res$coefficients, fitted.values=res$fitted.values,
 		residuals=res$residuals, k=res$rank, model.specific=res), 
 		"linear"))
@@ -64,6 +72,8 @@ print.summary.linear <- function(x, digits=max(3, getOption("digits") - 2),
 }
 
 oneStep.linear <- function(object, newdata, ...) {
+	if((names(coef(a))[1]!="const" |names(coef(a))[2]=="trend"))
+	  stop("Currently, only arg const is implemented for predict method")
 	cbind(1,newdata) %*% object$coefficients
 }
 

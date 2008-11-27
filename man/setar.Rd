@@ -88,7 +88,7 @@ regression theory, and are to be considered asymptoticals.
 }
 \author{ Antonio, Fabio Di Narzo }
 \examples{
-#fit a SETAR model, with threshold as suggested in Tong(1990)
+#fit a SETAR model, with threshold as suggested in Tong(1990, p 377)
 mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
 mod.setar
 summary(mod.setar)

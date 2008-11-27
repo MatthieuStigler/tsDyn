@@ -144,43 +144,70 @@ TAR2t_B <- function(gam1,gam2,thDelay, yy, xx,z,m){
 
 
 ###Check if the AR coefficients in each regime lie inside the unit circle
-is.InUnitCircle<-function(B,trend,m, nthresh){
-if(trend)
-	a<-1
-else
-	a<-0
-B<-as.vector(B)
+is.InUnitCircle<-function(B,ninc,m, nthresh){
 
-para<-B[a+seq_len(m)]
-charPol<-c(1, -para)
-
-val1<-polyroot(charPol)
-root<-Mod(val1)
-
-if(nthresh==1|nthresh==2){
-	para2<-B[a+seq_len(m)+m+a]
-	charPol2<-c(1, -para2)
-	val2<-polyroot(charPol2)
-	root<-matrix(c(root,Mod(val2)), nrow=1)
-	colnames(root)<-c(paste("reg", rep(1,m)),paste("reg", rep(2,m)))
-	if(nthresh==2){
-		para3<-B[a+seq_len(m)+2*(m+a)]
-		charPol3<-c(1, -para3)
-		val3<-polyroot(charPol3)
-		root<-matrix(c(root, Mod(val3)), nrow=1)
-		colnames(root)<-c(paste("reg", rep(1,m)),paste("reg", rep(2,m)),paste("reg", rep(3,m)))
-	}
+  a<-ninc
+  B<-as.vector(B)
+  
+  para<-B[a+seq_len(m)]
+  charPol<-c(1, -para)
+  
+  val1<-polyroot(charPol)
+  root<-Mod(val1)
+  
+  for(i in 1:(nthresh+1))
+  #extract coef
+  #build poly
+  #extract roots
+  #name it
+  
+  if(nthresh==1|nthresh==2){
+	  para2<-B[a+seq_len(m)+m+a]
+	  charPol2<-c(1, -para2)
+	  val2<-polyroot(charPol2)
+	  root<-matrix(c(root,Mod(val2)), nrow=1)
+	  colnames(root)<-c(paste("reg", rep(1,m)),paste("reg", rep(2,m)))
+	  if(nthresh==2){
+		  para3<-B[a+seq_len(m)+2*(m+a)]
+		  charPol3<-c(1, -para3)
+		  val3<-polyroot(charPol3)
+		  root<-matrix(c(root, Mod(val3)), nrow=1)
+		  colnames(root)<-c(paste("reg", rep(1,m)),paste("reg", rep(2,m)),paste("reg", rep(3,m)))
+	  }
+  }
+  
+  if(any(root<=1))
+	  list(warn=TRUE, root=root)
+  else
+	  list(warn=FALSE, root=root)
 }
-
-if(any(root<=1))
-	list(warn=TRUE, root=root)
-else
-	list(warn=FALSE, root=root)
+  
+isRoot<-function(coef, regime=c("L", "M", "H", "."), lags){
+  regime<-match.arg(regime)
+  coefName<-paste("phi", regime, sep="")
+  phi<-coef[grep(coefName,names(coef))]
+  vec<-rep(0, max(lags))
+  vec[lags]<-phi
+  charPol<-c(1, -vec)
+  val<-polyroot(charPol)
+  root<-Mod(val)
+  if(any(root<=1)){
+    regimeName<-switch(regime, "L"="low", "M"="medium", "H"="high", "."="")
+    message<-paste("Possible unit root in the", regimeName, " regime. Roots are:", paste(round(root,4), collapse=" "))
+    warn<-TRUE
+    warning(message, call.=FALSE)
+  }
+   else{
+    message<-NA
+    warn<-FALSE
+   }
+   return(list(warn=FALSE, root=root, message=message))
 }
-
+  
+  
 percent<-function(x,digits=3,by100=FALSE){
-	a<-ifelse(by100,100,1)
-	paste(a*round(x,digits),"%",sep="")
+	  a<-ifelse(by100,100,1)
+	  paste(a*round(x,digits),"%",sep="")
 }
 
 myformat<-function(x,digits, toLatex=FALSE){

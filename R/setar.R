@@ -38,7 +38,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 
 	model<-match.arg(model)
 	if(missing(m))
-		m <- max(ML, MH, thDelay+1)
+		m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
 	if(!missing(th)){
 		if(length(th)==2)
 			nthresh<-2
@@ -77,23 +77,13 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 		MH <- seq_len(mH)
 	}
 
-	###includes const, trend
+###includes const, trend
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
-	if(include=="const"){
-		const <- rep(1,nrow(xx))
-		inc<-"const"}
-	else if(include=="trend"){
-		const<-seq_len(nrow(xx))
-		inc<-"trend"}
-	else if(include=="both"){
-		const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
-		inc<-c("const","trend")} 
-	else {
-		const<-NULL
-		inc<-NULL
-	}
-	ninc<-length(inc)
+  constMatrix<-buildConstants(include=include, n=nrow(xx))
+  inc<-constMatrix$inc #matrix of none, const, trend, noth
+  const<-constMatrix$const #vector of names
+  ninc<-constMatrix$ninc #number of terms (0,1, or 2)
 
 ### SETAR 3: Set-up of transition variable
 #two models: TAR or MTAR (z is differenced)
@@ -193,9 +183,9 @@ z<-as.matrix(z)
 		}
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
-		res <- lm.fit(xxLH, yy)
+	res <- lm.fit(xxLH, yy)
 #Coefficients and names
-		res$coefficients <- c(res$coefficients, th)
+	res$coefficients <- c(res$coefficients, th)
 
 		if(FALSE){
 			names(res$coefficients) <- na.omit(c(paste(inc, rep(1,ninc)), paste("phi1", ML, sep="."), paste(inc,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
@@ -217,6 +207,19 @@ else{
     co<-c(inc, getArNames(ML), getArNames(MM), getArNames(MH),"th1","th2")
 }
   names(res$coefficients) <- na.omit(co)
+  
+###check for unit roots
+
+   isRootH<-isRoot(res$coefficients, regime="H", lags=MH)
+   isRootL<-isRoot(res$coefficients, regime="L", lags=ML)
+   if(nthresh==2)
+     isRootM<-isRoot(res$coefficients, regime="M", lags=MM)
+#    for(i in c(isRootH, isRootL, ifelse(ntresh==2, isRootM, NULL))){
+#     if(i$warn){
+#       warning(i$message)
+#       print(paste("\nUnit roots", i$root, "\n", sep=""))
+#     }
+#    }
 ### SETAR 7: return the infos
 		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
 		res$thDelay<-thDelay
@@ -465,14 +468,14 @@ plot.setar <- function(x, ask=interactive(), legend=TRUE, regSwStart, regSwStop,
 	#plot for the transition variable
 	par(mar=c(5,4,4,2))
 	layout(matrix(1:2, ncol=1))
-	plot1(th, nthresh,usedThVar=x$model.specific$usedThVar)
-	plot2(th, nthresh,usedThVar=x$model.specific$usedThVar, trim=x$model.specific$trim)
+	plot1(th, nthresh,usedThVar=x$model.specific$usedThVar) #shows transition variable, stored in TVARestim.R
+	plot2(th, nthresh,usedThVar=x$model.specific$usedThVar, trim=x$model.specific$trim) #ordered transition variabl
 	par(op)
 	invisible(x)
 }
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m)-1, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -486,17 +489,18 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=seq_len(m
 #10: return results
 {
 ### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
-	include<-match.arg(include)
-	model<-match.arg(model)
-	if(missing(m))
-		m <- max(ML, MH, thDelay+1)
+  include<-match.arg(include)
+  model<-match.arg(model)
+  if(missing(m))
+    m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(missing(series))
-    series <- deparse(substitute(x))
-	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	xx <- getXX(str)
-	yy <- getYY(str)
-	externThVar <- FALSE
-	##Lags selection
+      series <- deparse(substitute(x))
+  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+  xx <- getXX(str)
+  yy <- getYY(str)
+  externThVar <- FALSE
+  
+##Lags selection
 	if(missing(ML)) {		#ML: different lags
 		if (missing(mL)) {	#mL: suit of lags
 			mL <- m
@@ -716,6 +720,7 @@ if(nthresh==2){
   else
     func<-switch(criterion, "AIC" = AIC_2threshNoCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshNoCommon)
 #first conditional search
+
 last<-condiStep(th,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
 
 #iterative loop for conditional search
@@ -737,9 +742,9 @@ colnames(bests)<-c("tDelay", "th1","th2")
 }
 ###selectSETAR 9: plot of the results of the grid search
 if(plot==TRUE){
-	allcol <- seq_len(max(thDelay+1)*max(mL)*max(mH))
+	allcol <- seq_len(max(thDelay+1)*max(ML)*max(MH))
 	col <- switch(criterion, AIC=allcol, "pooled-AIC"=allcol,"SSR"=(thDelay+1) )
-	big <- apply(expand.grid(thDelay,mL, mH),1,function(a) paste("Th:", a[1],"mL:", a[2], "mH:", a[3]))
+	big <- apply(expand.grid(thDelay,ML, MH),1,function(a) paste("Th:", a[1],"mL:", a[2], "mH:", a[3]))
 	legend <- switch(criterion, "AIC"=big, "pooled-AIC"=big, "SSR"=paste("Threshold Delay", thDelay))
 
 	plot(allres[,"th"], allres[,ncol(allres)], col=col, xlab="Treshold Value",ylab=criterion, main="Results of the grid search")
@@ -749,10 +754,16 @@ if(plot==TRUE){
 ###selectSETAR 10: return results
 if(trace)
 	cat("\nNumber of combinations tested:", nrow(IDS),"\n")
-return(list(res=res, bests=bests))
-
+ret<-list(res=res, bests=bests, th=getTh(bests), nthresh=nthresh, allTh=allres, criterion=criterion)
+class(ret)<-"selectSETAR"
+return(ret)
 }
 
+plot.selectSETAR<-function(x,...){
+  if(x$criterion!="SSR")
+    stop("Currently only implemented for criterion SSR")
+  plot3(th=x$th,nthresh=x$nthresh,allTh= x$allTh)
+}
 
 ###Try it
 if(FALSE) { #usage example

@@ -3,6 +3,7 @@ buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const) {
   isL <- ifelse(trans[, thDelay + 1]< gam1,1,0)	### isL: dummy variable
   LH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
 }
+
 ###Build the xx matrix with 1 thresh and common=FALSE
 buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const) {
         isL <- ifelse(trans[, thDelay + 1]< gam1,1,0)	### isL: dummy variable
@@ -126,4 +127,25 @@ AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=M
 
 AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
   AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon)
+}
+
+
+buildConstants<-function(include=c("const", "trend","none", "both"), n){
+  include<-match.arg(include)
+  if(include=="const"){
+	  const <- rep(1,n)
+	  inc<-"const"}
+  else if(include=="trend"){
+	  const<-seq_len(n)
+	  inc<-"trend"}
+  else if(include=="both"){
+	  const<-cbind(rep(1,n),seq_len(n))
+	  inc<-c("const","trend")} 
+  else {
+	  const<-NULL
+	  inc<-NULL
+  }
+  ninc<-length(inc)
+  res<-list(const=const, inc=inc, ninc=ninc)
+  return(res)
 }
