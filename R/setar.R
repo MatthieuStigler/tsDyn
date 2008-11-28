@@ -80,7 +80,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 ###includes const, trend
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
-  constMatrix<-buildConstants(include=include, n=nrow(xx))
+  constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
   inc<-constMatrix$inc #matrix of none, const, trend, noth
   const<-constMatrix$const #vector of names
   ninc<-constMatrix$ninc #number of terms (0,1, or 2)
@@ -527,21 +527,13 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
 		MH <- seq_len(mH)
 	}
 
-	###includes const, trend
-	if(include=="const"){
-		const <- rep(1,nrow(xx))
-		inc<-"const"}
-	else if(include=="trend"){
-		const<-seq_len(nrow(xx))
-		inc<-"trend"}
-	else if(include=="both"){
-		const<-cbind(rep(1,nrow(xx)),seq_len(nrow(xx)))
-		inc<-c("const","trend")} 
-	else {
-		const<-NULL
-		inc<-NULL
-	}
-	ninc<-length(inc)
+###includes const, trend
+  if(include=="none" && any(c(ML,MM,MH)==0))
+    stop("you cannot have a regime without constant and lagged variable")
+  constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
+  inc<-constMatrix$inc #matrix of none, const, trend, noth
+  const<-constMatrix$const #vector of names
+  ninc<-constMatrix$ninc #number of terms (0,1, or 2)
 
 ### selectSETAR 2: Set-up of transition variable
 #two models: TAR or MTAR (z is differenced)
@@ -593,10 +585,10 @@ z<-as.matrix(z)
 #interval to search inside given by user
 #value to search around	given by user
 #Default method: grid from lower to higher point
-allTh <- sort(unique(z[,1]))
-ng <- length(allTh)
-ninter<-round(trim*ng)
-nmax<-ng-2*ninter
+  allTh <- sort(unique(z[,1]))
+  ng <- length(allTh)
+  ninter<-round(trim*ng)
+  nmax<-ng-2*ninter
 
 #gamma pre-specified
 if(!is.null(th$exact)){
@@ -671,10 +663,10 @@ pooledAIC <- function(parms) {
 
 
 ###selectSETAR 5: Grid of combinations of all parameters 
-IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
-colnames(IDS)<-c("thDelay", "mL", "mH", "th")
-IDS2 <- as.matrix(expand.grid(thDelay, th))
-colnames(IDS2)<-c("thDelay", "th")
+  IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
+  colnames(IDS)<-c("thDelay", "mL", "mH", "th")
+  IDS2 <- as.matrix(expand.grid(thDelay, th))
+  colnames(IDS2)<-c("thDelay", "th")
 
 
 ###selectSETAR 6: Computation for 1 thresh
@@ -697,14 +689,14 @@ else if(criterion=="SSR"){
 }
 
 ###selectSETAR 7: sorts the results to show the best values
-allres <- cbind(IDS, computedCriterion)
-colnames(allres) <- c(colnames(IDS), criterion)
-idSel <- sort(computedCriterion, index = TRUE)$ix
-idSel <- idSel[seq_len(min(ifelse(nthresh==1,10,5), length(idSel)))]
-res <- data.frame(allres[idSel, ], row.names = NULL)
-bests<-c(res[1,"thDelay"],res[1,"th"])
-names(bests)<-c("tDelay", "th")
-
+  allres <- cbind(IDS, computedCriterion)
+  colnames(allres) <- c(colnames(IDS), criterion)
+  idSel <- sort(computedCriterion, index = TRUE)$ix
+  idSel <- idSel[seq_len(min(ifelse(nthresh==1,10,5), length(idSel)))]
+  res <- data.frame(allres[idSel, ], row.names = NULL, check.names=FALSE)
+  bests<-c(res[1,"thDelay"],res[1,"th"],res[1,criterion])
+  names(bests)<-c("tDelay", "th",criterion)
+  firstBests<-bests
 ###selectSETAR 8: Computation for 2 thresh 
 #use function condistep (see TVARestim.r) to estimate the second th given the first
 #iterate the algortihm: once the second is estimate, reestimate the first, and alternatively until convergence
@@ -714,7 +706,7 @@ if(nthresh==2){
   }
   More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,trim=trim)
   if(criterion=="pooled-AIC")
-    warning("\ncriterion pooled AIC currently not implemented for nthresh=2, use rather SSR\n")
+    stop("\ncriterion pooled AIC currently not implemented for nthresh=2, use rather SSR\n")
   if(common)
     func<-switch(criterion, "AIC" = AIC_2threshCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshCommon)	
   else
@@ -735,8 +727,8 @@ while(i<max.iter){
 		last<-b}
 }
 
-bests<-matrix(c(res[1,"thDelay"], min(c(last$threshRef, last$newThresh)),max(c(last$threshRef, last$newThresh))),nrow=1)
-colnames(bests)<-c("tDelay", "th1","th2")
+bests<-c(res[1,"thDelay"], min(c(last$threshRef, last$newThresh)),max(c(last$threshRef, last$newThresh)), last$SSR)
+names(bests)<-c("tDelay", "th1","th2", criterion)
 
 
 }
@@ -754,10 +746,21 @@ if(plot==TRUE){
 ###selectSETAR 10: return results
 if(trace)
 	cat("\nNumber of combinations tested:", nrow(IDS),"\n")
-ret<-list(res=res, bests=bests, th=getTh(bests), nthresh=nthresh, allTh=allres, criterion=criterion)
+ret<-list(res=res, bests=bests, th=getTh(bests), nthresh=nthresh, allTh=allres, criterion=criterion,firstBests=firstBests)
 class(ret)<-"selectSETAR"
 return(ret)
 }
+
+print.selectSETAR<-function(x,...){
+  cat("Results of the grid search for 1 threshold\n")
+  print(x$res)
+  if(x$nthresh==2){
+    cat("\nBest results for 2 thresholds\n")
+    print(x$bests)
+  }
+}
+
+
 
 plot.selectSETAR<-function(x,...){
   if(x$criterion!="SSR")
