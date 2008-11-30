@@ -714,7 +714,7 @@ condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More
 		newThresh<-gammaPlus[positionSecond-length(storeMinus)]
 	SSR<-min(store2, na.rm=TRUE)
 	if(trace)
-		cat("Second best: ",newThresh, " (conditionnal on ",threshRef, " ) \t SSR:", SSR, "\n")
+		cat("Second best: ",newThresh, " (conditionnal on th=",threshRef, "and Delay=", delayRef," ) \t SSR:", SSR, "\n")
 	list(threshRef=threshRef, newThresh=newThresh, SSR=SSR)
 }
 

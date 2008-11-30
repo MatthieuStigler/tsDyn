@@ -41,7 +41,6 @@ buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 ###Build the xx matrix with 2 thresh and common=FALSE
 buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 	trans<-as.matrix(trans)
-
 	##Threshold dummies
 	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
 # print(dummydown)

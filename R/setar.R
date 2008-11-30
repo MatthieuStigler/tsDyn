@@ -134,7 +134,7 @@ z<-as.matrix(z)
 ### SETAR 4: Search of the treshold if th not specified by user
 #if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
 #call the function selectSETAR
-	if (missing(th)) { 
+	if (missing(th)|length(thDelay)>1) { 
 		ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
 		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
 		thDelay<-search$bests[1]
@@ -146,38 +146,39 @@ z<-as.matrix(z)
 		}
 		#missing(th)<-FALSE
 	}
+	if(missing(thVar)&missing(mTh))
+	  z<-xx[,thDelay+1, drop=FALSE]
 ### SETAR 5: Build the threshold dummies and then the matrix of regressors
 	#if(!missing(th)) {
 		#check number of observations)
 		if(nthresh==1){
-			isL <- ifelse(z[, thDelay + 1]<=th, 1, 0)
+			isL <- ifelse(z<=th, 1, 0)
 			isM<-NA
 			isH <- 1-isL}	
 		else{
-			isL <- ifelse(z[, thDelay + 1]<=th[1], 1, 0)
-			isH <- ifelse(z[, thDelay + 1]>th[2], 1, 0)
+			isL <- ifelse(z<=th[1], 1, 0)
+			isH <- ifelse(z>th[2], 1, 0)
 			isM <- 1-isL-isH
 		}
 
 		nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
 		if(min(nobs)<trim){
-			if(trace)
-				cat("\nWith the threshold you gave, there a not ",trim,"observations in each regime")
+			stop("\nWith the threshold you gave, there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
 		}
 		if(min(nobs)==0)
-			stop("With the threshold you gave, there is a regime with no observations!")
+			stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
 		#build the X matrix
 		if(nthresh==1){
 		  if(common)
-		    xxLH<-buildXth1Common(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH,const)	
+		    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=z, ML=ML, MH=MH,const)	
 		  else
-		    xxLH<-buildXth1NoCommon(gam1=th, thDelay, xx=xx,trans=z, ML=ML, MH=MH,const)	
+		    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=z, ML=ML, MH=MH,const)	
 			midCommon<-mid<-NA}
 		else if(nthresh==2){
 		  if(common)
-		    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
+		    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
 		  else
-		    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
+		    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
 			#midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep=".")) no more used: 
 			#mid<-c(paste("phi3", MH, sep=".")) #no more used
 		}
@@ -229,13 +230,12 @@ else{
 		res$ML <- ML
 		res$MH <- MH
 		res$externThVar <- externThVar
-		res$thVar <- z[, thDelay + 1]
+		res$thVar <- z
 		res$nconst<-inc
 		res$common<-common  	#wheter arg common was given by user
 		res$nthresh<-nthresh 	#n of threshold
 		res$model<-model
 		res$RegProp <- c(mean(isL),mean(isH))
-		res$usedThVar<-z[,thDelay+1]
 		res$trim<-trim
 		if(nthresh==2)
 			res$RegProp <- c(mean(isL),mean(isM),mean(isH))
@@ -397,7 +397,7 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 	invisible(x)
 }
 
-plot.setar <- function(x, ask=interactive(), legend=TRUE, regSwStart, regSwStop, ...) {
+plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop, ...) {
 	op <- par(no.readonly=TRUE)
 	par(ask=ask)
 	NextMethod(ask=ask, ...)
@@ -468,8 +468,8 @@ plot.setar <- function(x, ask=interactive(), legend=TRUE, regSwStart, regSwStop,
 	#plot for the transition variable
 	par(mar=c(5,4,4,2))
 	layout(matrix(1:2, ncol=1))
-	plot1(th, nthresh,usedThVar=x$model.specific$usedThVar) #shows transition variable, stored in TVARestim.R
-	plot2(th, nthresh,usedThVar=x$model.specific$usedThVar, trim=x$model.specific$trim) #ordered transition variabl
+	plot1(th, nthresh,usedThVar=x$model.specific$thVar) #shows transition variable, stored in TVARestim.R
+	plot2(th, nthresh,usedThVar=x$model.specific$thVar, trim=x$model.specific$trim) #ordered transition variabl
 	par(op)
 	invisible(x)
 }
@@ -662,16 +662,25 @@ pooledAIC <- function(parms) {
 }
 
 
-###selectSETAR 5: Grid of combinations of all parameters 
-  IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
-  colnames(IDS)<-c("thDelay", "mL", "mH", "th")
-  IDS2 <- as.matrix(expand.grid(thDelay, th))
-  colnames(IDS2)<-c("thDelay", "th")
+###selectSETAR 5: Grid of combinations of all parameters
+  criterion <- match.arg(criterion)
+  if(criterion=="SSR"){
+    ncombin<-length(thDelay)*length(th)
+    if(trace)
+      cat("Searching on", ncombin, " combinations of threshold and thDelay\n")
+    IDS <- as.matrix(expand.grid(thDelay, th))
+    colnames(IDS)<-c("thDelay", "th")
+  }
+  else{
+    ncombin<-length(thDelay)*length(th)*length(ML)*length(MH)
+    if(trace)
+      cat("Searching on ", ncombin, " combinations of threshold, thDelay, ML and MM\n")
+    IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
+    colnames(IDS)<-c("thDelay", "mL", "mH", "th")
+  }
 
 
 ###selectSETAR 6: Computation for 1 thresh
-criterion <- match.arg(criterion)
-IDS <- switch(criterion, "AIC" = IDS, "pooled-AIC" = IDS, "SSR" = IDS2)	###Selection of the grid
 
 if (criterion == "pooled-AIC") {
     computedCriterion <- apply(IDS, 1, pooledAIC)} 
@@ -693,7 +702,7 @@ else if(criterion=="SSR"){
   colnames(allres) <- c(colnames(IDS), criterion)
   idSel <- sort(computedCriterion, index = TRUE)$ix
   idSel <- idSel[seq_len(min(ifelse(nthresh==1,10,5), length(idSel)))]
-  res <- data.frame(allres[idSel, ], row.names = NULL, check.names=FALSE)
+  res <- data.frame(allres[idSel, , drop=FALSE], row.names = NULL, check.names=FALSE)
   bests<-c(res[1,"thDelay"],res[1,"th"],res[1,criterion])
   names(bests)<-c("tDelay", "th",criterion)
   firstBests<-bests
@@ -702,7 +711,7 @@ else if(criterion=="SSR"){
 #iterate the algortihm: once the second is estimate, reestimate the first, and alternatively until convergence
 if(nthresh==2){
   if(trace){
-	cat("Result of the one threshold search: -Thresh: ",res[1,"th"],"\t-Delay: ",res[1,"thDelay"],"\n" )
+	cat("Result of the one threshold search:\n -Thresh: ",res[1,"th"],"\t-Delay: ",res[1,"thDelay"],"\t-",criterion, res[1,criterion], "\n" )
   }
   More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,trim=trim)
   if(criterion=="pooled-AIC")
@@ -713,12 +722,12 @@ if(nthresh==2){
     func<-switch(criterion, "AIC" = AIC_2threshNoCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshNoCommon)
 #first conditional search
 
-last<-condiStep(th,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
+last<-condiStep(allTh,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
 
 #iterative loop for conditional search
 i<-1	#initialise the loop
 while(i<max.iter){
-	b<-condiStep(th,last$newThresh, delayRef=res[1,1],ninter=ninter, fun=func, trace=trace, More=More)
+	b<-condiStep(allTh,last$newThresh, delayRef=res[1,1],ninter=ninter, fun=func, trace=trace, More=More)
 	if(b$SSR<last$SSR){	#minimum still not reached
 		i<-i+1
 		last<-b}

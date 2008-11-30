@@ -9,7 +9,7 @@
 AR(m) model
 }
 \usage{
-	linear(x, m, d=1, steps=d, series)
+	linear(x, m, d=1, steps=d, series, include = c( "const", "trend","none", "both"))
 }
 \value{
 	A \code{\link{nlar}} object, \code{linear} subclass.
@@ -18,6 +18,7 @@ AR(m) model
 	\item{x}{ time series }
 	\item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 	\item{series}{ time series name (optional) }
+	\item{include} {Type of deterministic regressors to include}
 }
 \details{
 AR(m) model:
