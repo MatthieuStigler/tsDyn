@@ -1,4 +1,4 @@
-setar.sim<-function(data,B, setarObject, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=0, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL){
+setar.sim<-function(data,B, setarObject, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=0, Thresh, type=c("boot", "simul", "check"), starting=NULL){
 
 if(!missing(data)&!missing(B))
 	stop("You have to provide either B or data, but not both")
@@ -7,149 +7,25 @@ m<-lag
 type<-match.arg(type)
 
 if(!missing(B)){
-	if(type!="simul"){
-		type<-"simul"
-		warning("Type check or boot are only avalaible with pre-specified data. The type simul was used")}
-	if(missing(sigma)){
-		warning("sigma is missing, the value taken is 0.25 ")
-		sigma<-0.25}
-	esp<-p
-	if(trend)
-		esp<-p+1
-	if(esp*(nthresh+1)!=length(B))
-		stop("Matrix B bad specified")
-	y<-vector("numeric", length=n)
-	if(!is.null(starting))
-		if(length(starting)==p)
-			y[seq_len(p)]<-starting
-		else
-			stop("Bad specification of starting values. Should have so many values as the number of lags")
-}
-if(!missing(data))
-  y<-data
-
-  str <- nlar.struct(x = y, m = m, d = 1, steps = 1, series = deparse(substitute(x)))
-  xx <- str$xx
-  yy <- str$yy
-
-if(!missing(setarObject)){
-  y<-setarObject$str$x
-  xx <- getXX(setarObject$str)
-  yy <- getYY(setarObject$str)
-  Thresh<-getTh(coef(setarObject))
-  nthresh<-setarObject$model.specific$nthresh
-  incNames<-setarObject$model.specific$incNames
-  thDelay<-setarObject$model.specific$thDelay
-  m<-max(c(setarObject$model.specific$ML, setarObject$model.specific$MH))
-  p<-m
-  if(incNames%in%c("none", "trend"))
-    stop("Arg include = none or trend currently not implemented")
-  if(incNames=="trend")
-    trend<-TRUE
-  B<-coef(setarObject)
-  res<-na.omit(residuals(setarObject))
-  BUp<-getSetarXRegimeCoefs(setarObject, regime="H", returnFirstSlopeCoef=FALSE)
-  BDown<-getSetarXRegimeCoefs(setarObject, regime="L", returnFirstSlopeCoef=FALSE)
-  if(nthresh==2)
-    BMiddle<-getSetarXRegimeCoefs(setarObject, regime="M", returnFirstSlopeCoef=FALSE)
-  sigma<-NULL #should be removed after
-}
-
-if(type=="simul")
-	ndig<-4
-else
-	ndig<-getndp(y)
-if(ndig>.Options$digits){
-	ndig<-.Options$digits
-	y<-round(y,ndig)
-}
-npar<-ncol(xx)
-if(trend)
-	npar<-ncol(xx)+1
-
-
-
-###Threshold transition variable
-print(missing(thDelay))
-    if (!missing(thDelay)) {  
-      if (max(thDelay) >= m)             stop(paste("thDelay too high: should be < m (=",  m, ")"))
-        z <- xx[, seq_len(max(thDelay)+1)]
-    }
-    else if (!missing(mTh)) { stop("mTh argument currenly not implemented")
-	    if (length(mTh) != m) stop("length of 'mTh' should be equal to 'm'")
-        z <- xx %*% mTh
-        dim(z) <- NULL
-    }
-    else if (!missing(thVar)) { stop("thVar argument currenly not implemented")
-        if (length(thVar) > nrow(x)) {thVar <- thVar[seq_len(nrow(x))]}
-	if (length(thVar) < nrow(x)) {stop("The threshold variable should not be smaller than the serie") }
-	z<-nlar.struct(x = thVar, m = m, d = 1, steps = 1, series = deparse(substitute(z)))[, thDelay + 1]
-    }
-    else {z <- xx[, thDelay]
-    }
-trans<-z
-
-
-if(nthresh==1&missing(Thresh))
-	Thresh<-mean(trans)
-if(nthresh==2&missing(Thresh))
-	Thresh<-quantile(trans, probs=c(0.25, 0.75))
-if(nthresh!=0)
-	Thresh<-round(Thresh, ndig)
-##################
-###Model
-#################
-if(!missing(data)){
-  if(trend==TRUE)
-	  xx <- cbind(1,xx)
-  
-  if(nthresh==1){
-	  isL <- ifelse(round(trans,ndig)<= Thresh,1,0)	### isL: dummy 
-	  xx <- cbind(xx * isL,xx * (1 - isL))	### Lower matrix
+  if(type!="simul"){
+    type<-"simul"
+    warning("Type check or boot are only avalaible with pre-specified data. The type simul was used")}
+  if(missing(sigma)){
+    warning("sigma is missing, the value taken is 0.25 ")
+    sigma<-0.25}
+    esp<-p
+  if(trend)
+    esp<-p+1
+  if(esp*(nthresh+1)!=length(B))
+    stop("Matrix B bad specified")
+  y<-vector("numeric", length=n)
+  if(!is.null(starting)){
+    if(length(starting)==p)
+    y[seq_len(p)]<-starting
+    else
+    stop("Bad specification of starting values. Should have so many values as the number of lags")
   }
-  
-  if(nthresh==2){
-	  dummydown <- ifelse(round(trans,ndig)<=Thresh[1], 1, 0)
-	  regimedown <- dummydown*xx
-	  dummyup <- ifelse(round(trans,ndig)>Thresh[2], 1, 0)
-	  regimeup <- dummyup*xx
-	  xx <- cbind(regimedown, (1-dummydown-dummyup)*xx, regimeup)
-  }
-  
-  
-  model<-lm(yy~xx-1)
-  B<-model$coeff
-  Sigma<-summary(model)$sigma
-  res<-model$residuals
-  
-  if(missing(sigma))
-	  sigma<-Sigma
-}
-
-###Verification of stability
-# is<-is.InUnitCircle(B,ninc=1, m=m, nthresh=nthresh)
-# if(is$warn==TRUE){
-# 	warning("The AR coefficients of one regime lie inside the unit circle, thus the serie can be non-stationnary")
-# 	cat("\nUnit roots\n")
-# 	print(is$root)}
-##############################
-###Bootstrap
-##############################
-thDelay<-thDelay+1
-#initial values
-Yb<-vector("numeric", length=length(y))		#Delta Y term
-Yb[1:p]<-y[1:p]
-
-
-z2<-vector("numeric", length=length(y))
-z2[1:p]<-y[1:p]
-
-
-
-innov<-switch(type, "boot"=sample(res, replace=TRUE), "simul"=rnorm(length(y)-p,sd=sigma), "check"=res)
-resb<-c(rep(0,p),innov)	
-
-if(missing(setarObject)){
+  npar<-esp
   if(nthresh==1){
     BDown<-B[seq_len(npar)]
     BUp<-B[-seq_len(npar)]
@@ -160,17 +36,82 @@ if(missing(setarObject)){
     BUp <- B[seq_len(npar)+2*npar]
   }
 }
-print(BUp)
-print(BDown)
-cat("\nnthresh", nthresh, "\n")
-print(c(m,p))
-print(Thresh)
-cat("\nThdelay", thDelay, "\n")
+
+
+if(!missing(data)){
+  if(nthresh==0){
+    lin<-linear(data, m=m, include="const")
+  }
+  else if (nthresh %in% c(1,2)){
+    selSet<-selectSETAR(data, nthresh=nthresh, m=2, criterion="SSR", trace=FALSE, plot=FALSE)
+    th<-selSet$bests[seq_len(nthresh)+1]
+    setarObject<-setar(data, nthresh=nthresh, m=m, th=th, trace=FALSE)
+   }
+} 
+
+
+if(!missing(setarObject)){
+  y<-setarObject$str$x
+  Thresh<-getTh(coef(setarObject))
+  nthresh<-setarObject$model.specific$nthresh
+  incNames<-setarObject$model.specific$incNames
+  thDelay<-setarObject$model.specific$thDelay
+  m<-max(c(setarObject$model.specific$ML, setarObject$model.specific$MH))
+  p<-m
+  if(incNames%in%c("none", "trend"))
+    stop("Arg include = none or trend currently not implemented")
+  if(incNames=="trend")
+    trend<-TRUE
+  npar<-length(coef(setarObject))-nthresh
+  B<-coef(setarObject)[seq_len(npar)]
+  res<-na.omit(residuals(setarObject))
+  BUp<-B[grep("H", names(B))]
+  BDown<-B[grep("L", names(B))]
+  if(nthresh==2)
+    BMiddle<-B[grep("M", names(B))]
+  sigma<-NULL #should be removed after
+}
+
+
+### Try to compute number of digits of the input series and round output correspondly
+#bootstraped series should not have more digits than input: this allows
+if(FALSE){
+if(type=="simul")
+	ndig<-4
+else
+	ndig<-getndp(y)
+	
+if(ndig>.Options$digits){
+	ndig<-.Options$digits
+	y<-round(y,ndig)
+}
+
+if(nthresh!=0)
+	Thresh<-round(Thresh, ndig)
+ }
+ else
+  ndig<-10
+
+##############################
+###Bootstrap
+##############################
+thDelay<-thDelay+1
+#initial values
+Yb<-vector("numeric", length=length(y))		#Delta Y term
+Yb[1:p]<-y[1:p]
+
+z2<-vector("numeric", length=length(y))
+z2[1:p]<-y[1:p]
+
+innov<-switch(type, "boot"=sample(res, replace=TRUE), "simul"=rnorm(length(y)-p,sd=sigma), "check"=res)
+resb<-c(rep(0,p),innov)	
+
 if(nthresh==0){
 for(i in (p+1):length(y)){
 	Yb[i]<-sum(B[1],B[-1]*Yb[i-c(1:m)],resb[i])
 	}
 }
+
 
 else if(nthresh==1){
 	for(i in (m+1):length(y)){
@@ -228,17 +169,16 @@ setar.sim(data=sun,nthresh=2, type="boot", Thresh=c(7,9))$serie
 ##Check the bootstrap
 checkBoot<-setar.sim(data=sun,nthresh=1, type="check", Thresh=6.14)$serie
 cbind(checkBoot,sun)
-
+#prob with the digits!
 ###setar object
-environment(setar.sim)<-environment(star)
 setarSun<-setar(sun, m=1, nthresh=1)
 checkBoot2<-setar.sim(setarObject=setarSun, type="check")$serie
 cbind(round(checkBoot2,6),sun)
 
 setarSun<-setar(sun, m=3, nthresh=2)
 checkBoot3<-setar.sim(setarObject=setarSun, type="check")$serie
-cbind(round(checkBoot3,6),sun)
+cbind(checkBoot3,sun)
+#ndig approach: works with m=2, m=3, m=4
+#no ndig approach: output has then more digits than input
 
 }
-
-

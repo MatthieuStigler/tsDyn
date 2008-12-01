@@ -252,16 +252,13 @@ else{
 	#}
 }
 
-getSetarXRegimeCoefs <- function(x, regime=c("L","M","H"), returnFirstSlopeCoef=TRUE) {
+getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
 	regime <- match.arg(regime)
 	x <- x$coef
 	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
 	x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
 	x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
-	if(returnFirstSlopeCoef)
 	  return(c(x1, x2, x3))
-	else
-	  return(c(x2, x3,x1))
 }
 
 getTh<-function(x){
