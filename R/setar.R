@@ -81,8 +81,8 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
   constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
-  inc<-constMatrix$inc #matrix of none, const, trend, noth
-  const<-constMatrix$const #vector of names
+  incNames<-constMatrix$incNames #vector of names
+  const<-constMatrix$const #matrix of none, const, trend, both
   ninc<-constMatrix$ninc #number of terms (0,1, or 2)
 
 ### SETAR 3: Set-up of transition variable
@@ -189,23 +189,23 @@ z<-as.matrix(z)
 	res$coefficients <- c(res$coefficients, th)
 
 		if(FALSE){
-			names(res$coefficients) <- na.omit(c(paste(inc, rep(1,ninc)), paste("phi1", ML, sep="."), paste(inc,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
+			names(res$coefficients) <- na.omit(c(paste(incNames, rep(1,ninc)), paste("phi1", ML, sep="."), paste(incNames,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
 		} 
 if(FALSE){
-			names(res$coefficients) <- na.omit(c(inc,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
+			names(res$coefficients) <- na.omit(c(incNames,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
 		}
 
 if(!common){
   if(nthresh==1)
-    co<-c(getIncNames(inc,ML), getArNames(ML), getIncNames(inc,MH), getArNames(MH),"th")
+    co<-c(getIncNames(incNames,ML), getArNames(ML), getIncNames(incNames,MH), getArNames(MH),"th")
   else
-    co<-c(getIncNames(inc,ML), getArNames(ML), getIncNames(inc,MM), getArNames(MM), getIncNames(inc,MH), getArNames(MH),"th1","th2")
+    co<-c(getIncNames(incNames,ML), getArNames(ML), getIncNames(incNames,MM), getArNames(MM), getIncNames(incNames,MH), getArNames(MH),"th1","th2")
 }
 else{
   if(nthresh==1)
-    co<-c(inc, getArNames(ML), getArNames(MH),"th")
+    co<-c(incNames, getArNames(ML), getArNames(MH),"th")
   else 
-    co<-c(inc, getArNames(ML), getArNames(MM), getArNames(MH),"th1","th2")
+    co<-c(incNames, getArNames(ML), getArNames(MM), getArNames(MH),"th1","th2")
 }
   names(res$coefficients) <- na.omit(co)
   
@@ -231,7 +231,7 @@ else{
 		res$MH <- MH
 		res$externThVar <- externThVar
 		res$thVar <- z
-		res$nconst<-inc
+		res$incNames<-incNames
 		res$common<-common  	#wheter arg common was given by user
 		res$nthresh<-nthresh 	#n of threshold
 		res$model<-model
@@ -252,13 +252,16 @@ else{
 	#}
 }
 
-getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
+getSetarXRegimeCoefs <- function(x, regime=c("L","M","H"), returnFirstSlopeCoef=TRUE) {
 	regime <- match.arg(regime)
 	x <- x$coef
 	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
 	x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
 	x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
-	return(c(x1, x2, x3))
+	if(returnFirstSlopeCoef)
+	  return(c(x1, x2, x3))
+	else
+	  return(c(x2, x3,x1))
 }
 
 getTh<-function(x){
@@ -291,7 +294,6 @@ print.setar <- function(x, ...) {
 	order.H <- x$mH
 	order2.H <- length(x$MH)
 	common <- x$common
-	nconst <- x$nconst
 	nthresh<-x$nthresh
 	externThVar <- x$externThVar
 	cat("\nSETAR model (",nthresh+1,"regimes)\n")
@@ -347,8 +349,7 @@ summary.setar <- function(object, ...) {
 	order2.L <- length(mod$ML)
 	order.H <- mod$mH
 	order2.H <- length(mod$MH)
-	nthresh<-mod$nthresh		#numer of thresholds
-	nconst<-mod$nconst		
+	nthresh<-mod$nthresh		#number of thresholds
 	common<-mod$common
 	ans$lowCoef <- getSetarXRegimeCoefs(object, "L")
 	ans$highCoef<- getSetarXRegimeCoefs(object, "H")
@@ -500,7 +501,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   yy <- getYY(str)
   externThVar <- FALSE
   
-##Lags selection
+##SelectSETAR: Lags selection
 	if(missing(ML)) {		#ML: different lags
 		if (missing(mL)) {	#mL: suit of lags
 			mL <- m
@@ -527,12 +528,12 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
 		MH <- seq_len(mH)
 	}
 
-###includes const, trend
+###SelectSETAR: includes const, trend
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
   constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
-  inc<-constMatrix$inc #matrix of none, const, trend, noth
-  const<-constMatrix$const #vector of names
+  incNames<-constMatrix$incNames #vector of names
+  const<-constMatrix$const #matrix of none, const, trend, both
   ninc<-constMatrix$ninc #number of terms (0,1, or 2)
 
 ### selectSETAR 2: Set-up of transition variable
@@ -616,7 +617,7 @@ else if(is.numeric(th$around)){
 		ngrid<-20
 	if(trace)
 		cat("Searching within", ngrid, "values around", th$around,"\n")
-	th<-aroundGrid(th$around,allvalues=allTh,ngrid=ngrid,trim=trim)
+	th<-aroundGrid(th$around,allvalues=allTh,ngrid=ngrid,trim=trim, trace=trace) #fun stored in TVECM.R
 }
 
 #Default method: grid from lower to higher point

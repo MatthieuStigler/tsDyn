@@ -115,7 +115,7 @@ gammas<-allgammas[seq(from=intDown, to=intUp, length.out=min(ngridG,intUp-intDow
 }
 #value to search around given by user
 if(is.numeric(gamma1$around))
-gammas<-aroundGrid(gamma$around,allvalues=allgammas,ngridG,trim)
+gammas<-aroundGrid(gamma$around,allvalues=allgammas,ngridG,trim, trace=trace)
 gammas<-round(gammas, ndig)
 
 ###Grid for beta
@@ -387,10 +387,10 @@ if(is.numeric(gamma2$around))
 secondBestThresh<-gamma2$around
 
 smallThresh <- min(bestThresh,secondBestThresh)
-gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim)
+gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim, trace=trace)
 
 bigThresh <- max(bestThresh,secondBestThresh)
-gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim)
+gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim, trace=trace)
 
 storeIter <- matrix(NA,ncol=length(gammasUp), nrow=length(gammasDown))
 
@@ -734,11 +734,11 @@ toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
 }
 
 #Function to select values around a given point
-aroundGrid <- function(around,allvalues,ngrid,trim){
+aroundGrid <- function(around,allvalues,ngrid,trim, trace){
 	ng <- length(allvalues)
 	wh.around <- which.min(abs(allvalues-around))
 	if(length(which(allvalues==around))==0){
-		if(trace) cat("\nThe value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead")
+		if(trace) cat("The value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead\n")
 	}
 	if(length(wh.around)>1){
 		if(trace) {warning("\n\tThere were", length(wh.around)," values corresponding to the around argument. The first one was taken")}

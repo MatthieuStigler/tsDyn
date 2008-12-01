@@ -84,27 +84,13 @@ if(!missing(gamma)){
 	plot<-FALSE}
 Y<-t(Y)					#dim k x t
 
-aroundGrid <- function(around,allvalues,ngrid,trim){
-	ng <- length(allvalues)
-	wh.around <- which.min(abs(allvalues-around))
-	if(length(which(allvalues==around))==0)
-		stop("\nThe value ", around, " did not match to existing ones", allvalues[wh.around], "was taken instead")
-	if(length(wh.around)>1){
-		warning("\nThere were", length(wh.around)," values corresponding to the around argument. The first one was taken")
-		wh.around<-wh.around[1]}
-	ar <- c((wh.around-round(ngrid/2)): (wh.around+round(ngrid/2)))		#Values around the point
-	ar2 <- ar[ar>=round(trim*ng)&ar<=round((1-trim)*ng)]			#Bounding with trim 
-	gammas <- allvalues[ar2]
-	return(gammas)
-}#end if missing around
-
 if(!missing(around)){
 	if(missing(ngrid)) ngrid<-20
 	if(length(around)==1)
-		gammas <- aroundGrid(around, allgammas,ngrid,trim)
+		gammas <- aroundGrid(around, allgammas,ngrid,trim, trace=trace)
 	if(length(around)==2) {
-		gammas <- aroundGrid(around[1], allgammas,ngrid,trim)
-		gammas2 <- aroundGrid(around[2], allgammas,ngrid,trim)
+		gammas <- aroundGrid(around[1], allgammas,ngrid,trim, trace=trace)
+		gammas2 <- aroundGrid(around[2], allgammas,ngrid,trim, trace=trace)
 	}
 }
 
@@ -204,7 +190,7 @@ loop2_oneIntercept <- function(gam1, gam2,thDelay){
 ###Search for one threshold
 ############################
 if(!missing(around))
-	gammas <- aroundGrid(around,allgammas,ngrid,trim)
+	gammas <- aroundGrid(around,allgammas,ngrid,trim, trace=trace)
 if(dummyToBothRegimes){
 	if(commonInter)
 		func<-loop1_twodummy_oneIntercept
@@ -250,10 +236,10 @@ bests<-c(last$threshRef, last$newThresh)
 
 ###Alternative step: grid around the points from first step
 smallThresh <- min(bests)		#bestThresh,secondBestThresh)
-gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim)
+gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim, trace=trace)
 
 bigThresh <- max(bests)			#bestThresh,secondBestThresh)
-gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim)
+gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim, trace=trace)
 
 bestThresh<-grid(gammasUp, gammasDown, bestDelay, fun=func2, method=trick)
 
@@ -271,8 +257,8 @@ if(missing(gamma)==FALSE){
 if(missing(around)==FALSE){
 	if(length(around)!=2)
 		stop("Please give two thresholds possible values to search around")
-	gammas <- aroundGrid(min(around), allgammas, ngrid=ngrid, trim=trim)
-	gammas2 <- aroundGrid(max(around), allgammas, ngrid=ngrid, trim=trim)
+	gammas <- aroundGrid(min(around), allgammas, ngrid=ngrid, trim=trim, trace=trace)
+	gammas2 <- aroundGrid(max(around), allgammas, ngrid=ngrid, trim=trim, trace=trace)
 }
 else {
 	gammas2 <- gammas

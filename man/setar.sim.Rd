@@ -1,11 +1,11 @@
-\name{TAR_simul}
-\alias{TAR_simul}
+\name{setar.sim}
+\alias{setar.sim}
 \title{Simulation and bootstrap of Treshold Autoregressive model}
 \description{
 Simulate or bootstrap a Threshold VAR
 }
 \usage{
-TAR_simul(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL)
+setar.sim(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL)
 }
 \value{
 a list with the simulated/bootstraped data and the parameter matrix used. 
@@ -35,7 +35,7 @@ TODO
 \author{Matthieu Stigler}
 \examples{
 ##Simulation of a TAR with 1 threshold
-sim<-TAR_simul(B=c(2.9,-0.4,-0.1,-1.5, 0.2,0.3),lag=2, type="simul", nthresh=1, sigma=1.2,Thresh=2, starting=c(2.8,2.2))$serie
+sim<-setar.sim(B=c(2.9,-0.4,-0.1,-1.5, 0.2,0.3),lag=2, type="simul", nthresh=1, sigma=1.2,Thresh=2, starting=c(2.8,2.2))$serie
 mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
 
 #check the result
@@ -43,10 +43,10 @@ selectSETAR(sim, m=2)
 
 ##Bootstrap a TAR with two threshold (three regimes)
 sun<-(sqrt(sunspot.year+1)-1)*2
-TAR_simul(data=sun,nthresh=2,n=500, type="boot", Thresh=c(7,9))$serie
+setar.sim(data=sun,nthresh=2,n=500, type="boot", Thresh=c(7,9))$serie
 
 ##Check the bootstrap
-cbind(TAR_simul(data=sun,nthresh=2,n=500, type="check", Thresh=c(7,9))$serie,sun)
+cbind(setar.sim(data=sun,nthresh=2,n=500, type="check", Thresh=c(7,9))$serie,sun)
 }
 \keyword{ ts }
 \references{

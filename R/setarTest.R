@@ -217,13 +217,13 @@ if(!missing(thVar)) zext<-embed(thVar,m+1)[round(trim*ng):round((1-trim)*ng),]
 
 #loop
 bootlinear<-function(x){
-resib1<-c(rep(0,m),sample(reslin, replace=TRUE))	#residual sampling, 
-if(check)
-	resib1<-c(rep(0,m),linear$residuals)				#uncomment this line to verify the bootstrap
-for(i in (m+1):length(x)){
-	xboot[i]<-sum(B[1],B[-1]*xboot[i-c(1:m)],resib1[i])
-	}
-return(xboot)
+  resib1<-c(rep(0,m),sample(reslin, replace=TRUE))	#residual sampling, 
+  if(check)
+	  resib1<-c(rep(0,m),linear$residuals)				#uncomment this line to verify the bootstrap
+  for(i in (m+1):length(x)){
+	  xboot[i]<-sum(B[1],B[-1]*xboot[i-c(1:m)],resib1[i])
+	  }
+  return(xboot)
 }
 
 ### Reconstruction of series from 1 thresh model for Ftest 2vs3
