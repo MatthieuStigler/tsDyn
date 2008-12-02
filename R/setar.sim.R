@@ -193,7 +193,7 @@ cbind(checkBoot,sun)
 lin<-linear(sun, m=1)
 checkBootL<-setar.sim(setarObject=lin, type="check")$serie
 cbind(checkBootL,sun)
-
+linear(checkBootL, m=1)
 ###setar object
 setarSun<-setar(sun, m=2, nthresh=1)
 checkBoot2<-setar.sim(setarObject=setarSun, type="check")$serie

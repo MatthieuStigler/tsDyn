@@ -5,30 +5,28 @@
 \description{Test of linearity against threshold of Hansen (1999) with bootstrap distribution
 }
 \usage{
-setarTest(x, m, d = 1, steps = d, series, thDelay = 0:1, mL, mH,
-    mTh, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"),check=FALSE)
+setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
 }
 
-\value{A list containing:
+\value{A object of class "Hansen99Test" containing:
 
--The residual Sum of squares of model AR, 1 threshold TAR and 2 thresholds TAR
+-The residual Sum of squares of model AR, 1 threshold TAR and 2 thresholds TAR (SSRs)
 
--The Ftest statistic for each test
+-The Ftest statistic for the test (Ftests)
 
--The bootstrap Pvalues and critical values for the test selected
+-The bootstrap Pvalues (PvalBoot) and critical values (CriticalValBoot) for the test selected, and all Ftest computed (Ftestboot)
+
+-The thresholds for the original series, obtained from search for 1 thresh (firstBests) and conditional search for 2 thresh (secBests)
+
+-The number of bootstrap replications (nboot), the lags used (m) and the type of test (type)
 }
 \arguments{
 \item{x}{ time series }
 \item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 \item{series}{ time series name (optional) }
-\item{mL}{autoregressive order for 'low' regime (dafult: m). Must be <=m}
-\item{mH}{autoregressive order for 'high' regime (default: m). Must be <=m}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d)}
-\item{mTh}{coefficients for the lagged time series, to obtain the threshold variable}
-\item{thVar}{external threshold variable}
 \item{nboot}{numer of bootstrap replications}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
-\item{plot}{Whether a plot with the bootstrap distribution and the Ftest should be shown}
 \item{test}{Type of test. See details}
 \item{check}{Possibility to check if the bootstrap is correct by not sampling the residuals. The result given should be the same as in the original data}
 }
@@ -51,7 +49,7 @@ Test \bold{2vs3}: 1 threshold TAR versus 2 threshold2 TAR
 
 The both first are computed together and avalaible with test="1vs". The third test is avalaible with test="2vs3". 
 
-The homoskedastik bootstrap distribution is based on resampling the residuals from H0 model, estimating the threshold parameter and then computing the Ftest, so it involves many computations and is pretty slow. 
+The homoskedastik bootstrap distribution is based on resampling the residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3), estimating the threshold parameter and then computing the Ftest, so it involves many computations and is pretty slow. 
 }
 \seealso{
 \code{\link{TVAR_LRtest}} for the multivariate version. \code{\link{SETAR}} for estimation of the model.
