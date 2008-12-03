@@ -5,7 +5,7 @@
 Simulate or bootstrap a Threshold VAR
 }
 \usage{
-setar.sim(data,B, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=1, Thresh, thVar=NULL, mTh=NULL, type=c("boot", "simul", "check"), starting=NULL)
+setar.sim(data,B, setarObject, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=0, Thresh, type=c("boot", "simul", "check"), starting=NULL)
 }
 \value{
 a list with the simulated/bootstraped data and the parameter matrix used. 
@@ -13,6 +13,7 @@ a list with the simulated/bootstraped data and the parameter matrix used.
 \arguments{
 \item{data}{ univariate time series }
 \item{B}{vector of coefficients to simulate}
+\item{setarObject}{Object of class linear or setar to be bootstrapped}
 \item{sigma}{variance of the errors}
 \item{n}{Number of observations to create when type="simul"}
 \item{Thresh}{The threshold value(s). Vector of length nthresh}
@@ -21,8 +22,6 @@ a list with the simulated/bootstraped data and the parameter matrix used.
 \item{type}{Whether a bootstrap or simulation is to employ. See details}
 \item{trend}{If a trend should be included in the model}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d). }
-\item{thVar}{external transition variable}
-\item{mTh}{Currently not implemented}
 \item{starting}{Starting values when a simulation with given parameter matrix is made}
 }
 \details{

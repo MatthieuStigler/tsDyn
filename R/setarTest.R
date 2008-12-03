@@ -21,7 +21,7 @@
 #replicate()
 
 
-setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
+setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
 {
 test<-match.arg(test)
 
