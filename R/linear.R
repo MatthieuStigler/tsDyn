@@ -74,7 +74,7 @@ print.summary.linear <- function(x, digits=max(3, getOption("digits") - 2),
 }
 
 oneStep.linear <- function(object, newdata, ...) {
-	if((names(coef(a))[1]!="const" |names(coef(a))[2]=="trend"))
+	if((names(coef(object))[1]!="const" |names(coef(object))[2]=="trend"))
 	  stop("Currently, only arg const is implemented for predict method")
 	cbind(1,newdata) %*% object$coefficients
 }
