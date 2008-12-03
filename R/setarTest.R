@@ -23,6 +23,7 @@
 
 setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
 {
+test<-match.arg(test)
 
 include<-"const" #other types not implemented in setar.sim
 
@@ -30,7 +31,7 @@ include<-"const" #other types not implemented in setar.sim
   linear<-linear(x, m, d = 1, steps = d, series)
   SSR<-deviance(linear)
   
- 
+
 ###setarTest 2: search best thresholds: call selectSETAR
   search<-selectSETAR(x, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
   

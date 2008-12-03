@@ -148,3 +148,76 @@ buildConstants<-function(include=c("const", "trend","none", "both"), n){
   res<-list(const=const, incNames=incNames, ninc=ninc)
   return(res)
 }
+
+
+
+makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val"), thSteps = 7,ngrid="ALL", trace=FALSE){
+  ng <- length(allTh)
+  down<-ceiling(trim*ng)
+  up<-floor(ng*(1-trim))
+  allin<-up-down
+  ninter<-max(down, ng-up)
+
+#gamma pre-specified
+if(!is.null(th$exact)){
+	th<-allTh[which.min(abs(allTh-th$exact))]
+	if(length(th)>1){
+		th<-th[1]
+		cat("Many values correspond to the one you gave. The first one",th, "was taken")
+		}
+	ngrid<-1
+	}
+#interval to search inside given by user
+else if(is.numeric(th$int)){
+	if(missing(ngrid))
+		ngrid<-20
+	intDown<-which.min(abs(allTh-th$int[1]))
+	intUp<-which.min(abs(allTh-th$int[2]))
+	if(length(intDown)>1|length(intUp)>1)
+		intDown<-intDown[1];intUp<-intUp[1];
+	lengthInt<-min(ngrid,intUp-intDown)
+	if(trace)
+		cat("Searching within",lengthInt, "values between",allTh[intDown], "and", allTh[intUp],"\n")
+	th<-allTh[seq(from=intDown, to=intUp, length.out=lengthInt)]
+	}
+#value to search around	given by user
+else if(is.numeric(th$around)){
+	if(missing(ngrid))
+		ngrid<-20
+	if(trace)
+		cat("Searching within", ngrid, "values around", th$around,"\n")
+	th<-aroundGrid(th$around,allvalues=allTh,ngrid=ngrid,trim=trim, trace=trace) #fun stored in TVECM.R
+}
+
+#Default method: grid from lower to higher point
+else{
+	if(ngrid=="ALL")
+		ngrid<-allin
+	else if(ngrid>allin)
+		ngrid<-allin
+	
+	th<-allTh[seq(from=down, to=up, length.out=ngrid)]
+	if(trace)
+		cat("Searching on",ngrid, "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
+}
+# th<-round(th, getndp(x)) bad idea, rather use format in print and summary
+res<-list(th=th, ninter=ninter)
+return(res)
+}
+
+if(FALSE){
+environment(makeTh)<-environment(star)
+a<-makeTh(unique(embed(lynx, 2)[,2, drop=FALSE]), trim=0.15)
+a
+length(a)
+length(unique(a))
+length(lynx)
+length(unique(lynx))
+  
+  cat("ng", ng, "\n")
+  cat("ng*(1-trim)", ng*(1-trim), "\n")
+  cat("up", up, "\n")
+  print(c(down, up, allin, ninter))
+}
+
+

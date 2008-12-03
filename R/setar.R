@@ -22,7 +22,7 @@
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
-setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15){
+setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15, type=c("level", "diff", "ADF")){
 # 1: preliminaries
 # 2:  Build the regressors matrix and Y vector
 # 3: Set-up of transition variable
@@ -35,7 +35,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 
 ###SETAR 1: preliminaries
 	include<-match.arg(include)
-
+	type<-match.arg(type)
 	model<-match.arg(model)
 	if(missing(m))
 		m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
@@ -46,6 +46,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
   if(missing(series))
     series <- deparse(substitute(x))
 ### SETAR 2:  Build the regressors matrix and Y vector
+	m<-switch(type, "level"=m, "diff"=m+1, "ADF"=m+1)
         str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	xx <- getXX(str)
 	yy <- getYY(str)
@@ -136,7 +137,7 @@ z<-as.matrix(z)
 #call the function selectSETAR
 	if (missing(th)|length(thDelay)>1) { 
 		ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
-		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",thSteps = 7,ngrid=ngrid, plot=FALSE,max.iter=2)
+		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",ngrid=ngrid, plot=FALSE,max.iter=2)
 		thDelay<-search$bests[1]
 		th<-search$bests[2:(nthresh+1)]
 		nested<-TRUE
@@ -584,52 +585,10 @@ z<-as.matrix(z)
 #value to search around	given by user
 #Default method: grid from lower to higher point
   allTh <- sort(unique(z[,1]))
-  ng <- length(allTh)
-  ninter<-round(trim*ng)
-  nmax<-ng-2*ninter
-
-#gamma pre-specified
-if(!is.null(th$exact)){
-	th<-allTh[which.min(abs(allTh-th$exact))]
-	if(length(th)>1){
-		cat("Many values correspond to the one you gave. The first one was taken")
-		th<-th[1]}
-	ngrid<-1
-	}
-#interval to search inside given by user
-else if(is.numeric(th$int)){
-	if(missing(ngrid))
-		ngrid<-20
-	intDown<-which.min(abs(allTh-th$int[1]))
-	intUp<-which.min(abs(allTh-th$int[2]))
-	if(length(intDown)>1|length(intUp)>1)
-		intDown<-intDown[1];intUp<-intUp[1];
-	if(trace)
-		cat("Searching within",min(ngrid,intUp-intDown), "values between",allTh[intDown], "and", allTh[intUp],"\n")
-	th<-allTh[seq(from=intDown, to=intUp, length.out=min(ngrid,intUp-intDown))]
-	}
-#value to search around	given by user
-else if(is.numeric(th$around)){
-	if(missing(ngrid))
-		ngrid<-20
-	if(trace)
-		cat("Searching within", ngrid, "values around", th$around,"\n")
-	th<-aroundGrid(th$around,allvalues=allTh,ngrid=ngrid,trim=trim, trace=trace) #fun stored in TVECM.R
-}
-
-#Default method: grid from lower to higher point
-else{
-	if(ngrid=="ALL")
-		ngrid<-nmax
-	else if(ngrid>nmax)
-		ngrid<-nmax
-	th<-allTh[round(seq(from=trim, to=1-trim, length.out=ngrid)*ng)]
-	if(trace)
-		cat("Searching on",ngrid, "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
-}
-# th<-round(th, getndp(x)) bad idea, rather use format in print and summary
-gammas<-th
-
+  thGrid<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace)
+  gammas<-thGrid$th
+  ninter<-thGrid$ninter
+  th<-gammas
 ### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
 #have been moved to miscSETAR.R, call before functions to build the regressors matrix
 ### selectSETAR 4b:Function pooled AIC 
@@ -665,7 +624,7 @@ pooledAIC <- function(parms) {
   if(criterion=="SSR"){
     ncombin<-length(thDelay)*length(th)
     if(trace)
-      cat("Searching on", ncombin, " combinations of threshold and thDelay\n")
+      cat("Searching on ", ncombin, " combinations of threshold and thDelay\n", sep="")
     IDS <- as.matrix(expand.grid(thDelay, th))
     colnames(IDS)<-c("thDelay", "th")
   }
@@ -713,7 +672,8 @@ if(nthresh==2){
   }
   More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,trim=trim)
   if(criterion=="pooled-AIC")
-    stop("\ncriterion pooled AIC currently not implemented for nthresh=2, use rather SSR\n")
+    warning("\ncriterion pooled AIC currently not implemented for nthresh=2, criterion SSR was used\n")
+    criterion<-"SSR"
   if(common)
     func<-switch(criterion, "AIC" = AIC_2threshCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshCommon)	
   else
@@ -752,7 +712,7 @@ if(plot==TRUE){
 
 ###selectSETAR 10: return results
 if(trace)
-	cat("\nNumber of combinations tested:", nrow(IDS),"\n")
+	cat("Number of combinations tested:", nrow(IDS),"\n")
 ret<-list(res=res, bests=bests, th=getTh(bests), nthresh=nthresh, allTh=allres, criterion=criterion,firstBests=firstBests)
 class(ret)<-"selectSETAR"
 return(ret)
