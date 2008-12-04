@@ -132,7 +132,6 @@ if(test=="1vs"){
 else{
   Ftestboot<-replicate(nboot, bootHoSetar1(set1, type))
   Ftestboot23<-Ftestboot
-  print(Ftestboot23)
   PvalBoot23<-mean(ifelse(Ftestboot23>Ftest23,1,0))
   CriticalValBoot23<-quantile(Ftestboot23, probs=probs)
   CriticalValBoot<-matrix(CriticalValBoot23, nrow=1, dimnames=list("2vs3", probs))
@@ -235,23 +234,20 @@ selectSETAR(lynx, m=11, thDelay=1, nthresh=2, th=list(exact=c(5.3,8)), criterion
 selectSETAR(sun, m=11, thDelay=1, nthresh=2, th=list(exact=c(5.3,8)), criterion="SSR")
 
 ###US IP
-IP<-read.table(file="/media/sda5/Mes documents/Uni/Statistique/Time Series/Handbooks/datasets/Hansen/Hansen1999Linearity/GAUSS/IP.DAT")
-IPts<-ts(IP, start=c(1960,1), freq=12)
-IPts
-
 IP<-read.table(file="/media/sda5/Mes documents/Uni/Statistique/Time Series/Handbooks/datasets/Hansen/Hansen1999Linearity/Matlab/ipdat.txt")
 
 #transform as in Hansen 1999
 dat<-log(IP[,1])
 dat2<-diff(dat, 12)*100 # dat=(dat(13:length(dat(:,1)))-dat(1:length(dat(:,1))-12))*100
-dat3<-dat2[157:length(dat)] #dat=dat(157:length(dat(:,1)));
+dat3<-dat2[157:length(dat2)] #dat=dat(157:length(dat(:,1)));
 dat4<-ts(dat3, start=c(1960,1), freq=12)
 
+end(dat4)
+length(dat4)
 #plot
 plot(dat4)
 
 #save
 IIPUs<-dat4
 save(IIPUs, file="IIPUs.rda")
-
 }

@@ -10,6 +10,10 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const) {
 	xxL <- cbind(const,xx[,ML])*isL
 	xxH <- cbind(const,xx[,MH])*(1-isL)
 	xxLH<-cbind(xxL,xxH)
+
+	if(min(isL, 1-isL)<trim){
+		cat("\n 1 T: Trim not respected: ", c(isL, 1-isL))
+
 	return(xxLH)
 }
 
@@ -45,7 +49,7 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
 # print(dummydown)
 	ndown <- mean(dummydown)
-	dummyup <- ifelse(trans[, thDelay + 1]>gam2, 1, 0)
+	dummyup <- ifelse(trans[, thDelay + 1]>=gam2, 1, 0)
 # print(dummyup)
 	nup <- mean(dummyup)
 	##Construction of the matrix
@@ -56,12 +60,13 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 	xxLMH<-cbind(xxL,xxM,xxH)
 
 	##return result
-	if(min(nup, ndown, 1-nup-ndown)>=trim){
+	if(min(nup, ndown, 1-nup-ndown)>=trim-0.01){
 		res <- xxLMH	#SSR
 	}
-	else
-		res <- NA
-
+	else{
+		cat("\nTrim not respected: ", c(nup, ndown, 1-nup-ndown))
+		res <- xxLMH
+	}
 	return(res)
 }
 

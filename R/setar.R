@@ -510,6 +510,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
 ### SelectSETAR 0: preliminary checks
   include<-match.arg(include)
   model<-match.arg(model)
+  type<-match.arg(type)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(missing(series))
