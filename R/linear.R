@@ -17,22 +17,45 @@
 
 #linear model fitter (via OLS)
 #str: call to nlar.struct
-linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none", "both")) {
+linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none", "both"), type=c("level", "diff", "ADF")) {
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	xx <- getXX(str)
-	yy <- getYY(str)
-	#build rergessors matrix
+	type<-match.arg(type)
+	
+	###Build regressor matrix
+	if(type=="level"){
+	  xx <- getXX(str)
+	  yy <- getYY(str)
+	}
+	else{ 
+	  if(type=="diff"){
+	    xx <- getdXX(str)
+	    yy <- getdYY(str)
+	  }
+	  else if(type=="ADF"){
+	    xx <- cbind(getdX1(str),getdXX(str))
+	    yy <- getdYY(str)
+	  }
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	
 	constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
 	incNames<-constMatrix$incNames #vector of names
 	const<-constMatrix$const #matrix of none, const, trend, both
 	ninc<-constMatrix$ninc #number of terms (0,1, or 2)
 	xx <- cbind(const,xx)
-	colnames(xx) <- c(incNames, paste("phi",1:(ncol(xx)-ninc), sep="."))
+	###name the regressor matrix
+	phi<-ifelse(type=="level", "phi", "Δphi")
+	dX1<- if(type=="ADF") "phi.1" else NULL
+	nlags<-if(type=="ADF") ncol(xx)-ninc-1 else ncol(xx)-ninc
+	colnames(xx) <- c(incNames, dX1, paste(phi,1:nlags, sep="."))
+	
 	#evaluate the model
 	res <- lm.fit(xx, yy)
 	res$incNames<-incNames
 	#check if unit root lie outside unit circle
-	is<-isRoot(coef(res), regime=".", lags=seq_len(m))
+	if(type=="level")
+	  is<-isRoot(coef(res), regime=".", lags=seq_len(m))
 	
 	return(extend(nlar(str, coefficients=res$coefficients, fitted.values=res$fitted.values,
 		residuals=res$residuals, k=res$rank, model.specific=res), 
