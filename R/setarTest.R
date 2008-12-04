@@ -240,17 +240,18 @@ IPts<-ts(IP, start=c(1960,1), freq=12)
 IPts
 
 IP<-read.table(file="/media/sda5/Mes documents/Uni/Statistique/Time Series/Handbooks/datasets/Hansen/Hansen1999Linearity/Matlab/ipdat.txt")
-IPts<-ts(IP, start=c(1960,1), freq=12)
-IPts
-dat<-log(IPts)
-dat2<-(dat[13:length(dat)]-dat[1:(length(dat)-12)])*100
-dat2bis<-diff(dat, 12)*100
-cbind(dat2, dat2bis)
-# dat=(dat(13:length(dat(:,1)))-dat(1:length(dat(:,1))-12))*100
-dat3<-dat2[157:length(dat)]
-# dat=dat(157:length(dat(:,1)));
+
+#transform as in Hansen 1999
+dat<-log(IP[,1])
+dat2<-diff(dat, 12)*100 # dat=(dat(13:length(dat(:,1)))-dat(1:length(dat(:,1))-12))*100
+dat3<-dat2[157:length(dat)] #dat=dat(157:length(dat(:,1)));
 dat4<-ts(dat3, start=c(1960,1), freq=12)
-dat4
+
+#plot
 plot(dat4)
-plot(dat)
+
+#save
+IIPUs<-dat4
+save(IIPUs, file="IIPUs.rda")
+
 }

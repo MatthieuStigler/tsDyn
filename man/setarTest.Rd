@@ -61,7 +61,7 @@ The homoskedastik bootstrap distribution is based on resampling the residuals fr
 sun<-(sqrt(sunspot.year+1)-1)*2
 
 #Test 1vs2 and 1vs3
-#setarTest(sun, m=11, thDelay=0:1, nboot=5, plot=TRUE, trim=0.1, test="1vs")
+#setarTest(sun, m=11, thDelay=0:1, nboot=5,trim=0.1, test="1vs")
 }
 \keyword{ ts }
 \references{

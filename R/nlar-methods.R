@@ -58,6 +58,25 @@ getXX <- function(obj, ...)
 getYY <- function(obj, ...)
 	getXXYY(obj, ...)[ , obj$m+1]
 
+getdXXYY <- function(obj, ...) UseMethod("getdXXYY")
+
+getdXXYY.nlar.struct <- function(obj, ...) {
+	x <- obj$x
+	m <- obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getdXX <- function(obj, ...)
+	diff(getdXXYY(obj,...))[ , 1:obj$m , drop=FALSE]
+
+getdYY <- function(obj, ...)
+	diff(getdXXYY(obj, ...))[ , obj$m+1]
+
+getdX1 <- function(obj, ...)
+	getdXXYY(obj,...)[ -1, 1, drop=FALSE]
+
 getNUsed <- function(obj, ...)
 	UseMethod("getNUsed")
 
