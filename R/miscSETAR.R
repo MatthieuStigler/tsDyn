@@ -13,7 +13,7 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const) {
 
 	if(min(isL, 1-isL)<trim){
 		cat("\n 1 T: Trim not respected: ", c(isL, 1-isL))
-
+	}
 	return(xxLH)
 }
 
