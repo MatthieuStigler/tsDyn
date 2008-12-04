@@ -46,11 +46,26 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
   if(missing(series))
     series <- deparse(substitute(x))
 ### SETAR 2:  Build the regressors matrix and Y vector
-	m<-switch(type, "level"=m, "diff"=m+1, "ADF"=m+1)
-        str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	xx <- getXX(str)
-	yy <- getYY(str)
-	externThVar <- FALSE
+	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+	
+	if(type=="level"){
+	  xx <- getXX(str)
+	  yy <- getYY(str)
+	}
+	else{ 
+	  if(type=="diff"){
+	    xx <- getdXX(str)
+	    yy <- getdYY(str)
+	  }
+	  else if(type=="ADF"){
+	    xx <- cbind(getdX1(str),getdXX(str))
+	    yy <- getdYY(str)
+	  }
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	
+	externThVar <- FALSE #mmh should maybe be removed
 	##Lags selection
 	if(missing(ML)) {		#ML: different lags
 		if (missing(mL)) {	#mL: suit of lags
@@ -137,7 +152,7 @@ z<-as.matrix(z)
 #call the function selectSETAR
 	if (missing(th)|length(thDelay)>1) { 
 		ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
-		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",ngrid=ngrid, plot=FALSE,max.iter=2)
+		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",ngrid=ngrid, plot=FALSE,max.iter=2, type=type)
 		thDelay<-search$bests[1]
 		th<-search$bests[2:(nthresh+1)]
 		nested<-TRUE
@@ -150,78 +165,80 @@ z<-as.matrix(z)
 	if(missing(thVar)&missing(mTh))
 	  z<-xx[,thDelay+1, drop=FALSE]
 ### SETAR 5: Build the threshold dummies and then the matrix of regressors
-	#if(!missing(th)) {
-		#check number of observations)
-		if(nthresh==1){
-			isL <- ifelse(z<=th, 1, 0)
-			isM<-NA
-			isH <- 1-isL}	
-		else{
-			isL <- ifelse(z<=th[1], 1, 0)
-			isH <- ifelse(z>th[2], 1, 0)
-			isM <- 1-isL-isH
-		}
 
-		nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
-		if(min(nobs)<trim){
-			stop("\nWith the threshold you gave, there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
-		}
-		if(min(nobs)==0)
-			stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
-		#build the X matrix
-		if(nthresh==1){
-		  if(common)
-		    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=z, ML=ML, MH=MH,const)	
-		  else
-		    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=z, ML=ML, MH=MH,const)	
-			midCommon<-mid<-NA}
-		else if(nthresh==2){
-		  if(common)
-		    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
-		  else
-		    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const,trim=trim)
+	#check number of observations)
+	if(nthresh==1){
+		isL <- ifelse(z<=th, 1, 0)
+		isM<-NA
+		isH <- 1-isL}	
+	else{
+		isL <- ifelse(z<=th[1], 1, 0)
+		isH <- ifelse(z>th[2], 1, 0)
+		isM <- 1-isL-isH
+	}
+
+  nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
+	if(min(nobs)<trim){
+	stop("\nWith the threshold you gave, there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
+	}
+	if(min(nobs)==0)
+		stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
+		
+	#build the X matrix
+	if(type=="ADF"){
+	  exML<-c(1, ML+1)
+	  exMH<-c(1, MH+1)
+	  exMM<-if(nthresh==2) c(1, MM+1) else NULL
+	}
+	else{
+	  exML<-ML
+	  exMH<-MH
+	  exMM<-if(nthresh==2) MM else NULL
+	 }
+	if(nthresh==1){
+	  if(common)
+	    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const)	
+	  else
+	    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const)	
+		midCommon<-mid<-NA}
+	else if(nthresh==2){
+	  if(common)
+	    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
+	  else
+	    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
 			#midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep=".")) no more used: 
 			#mid<-c(paste("phi3", MH, sep=".")) #no more used
-		}
+	}
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
 	res <- lm.fit(xxLH, yy)
 #Coefficients and names
 	res$coefficients <- c(res$coefficients, th)
 
-		if(FALSE){
-			names(res$coefficients) <- na.omit(c(paste(incNames, rep(1,ninc)), paste("phi1", ML, sep="."), paste(incNames,rep(2,ninc)),paste("phi2", if(nthresh==1)MH else MM, sep="."),midCommon, rep("th",nthresh)))
-		} 
-if(FALSE){
-			names(res$coefficients) <- na.omit(c(incNames,paste("phi1", ML, sep="."),paste("phi2",if(nthresh==1)MH else MM, sep="."),mid, rep("th",nthresh)))
-		}
-
+t<-type #just shorter
 if(!common){
   if(nthresh==1)
-    co<-c(getIncNames(incNames,ML), getArNames(ML), getIncNames(incNames,MH), getArNames(MH),"th")
+    co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MH), getArNames(MH,t),"th")
   else
-    co<-c(getIncNames(incNames,ML), getArNames(ML), getIncNames(incNames,MM), getArNames(MM), getIncNames(incNames,MH), getArNames(MH),"th1","th2")
+    co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MM), getArNames(MM,t), getIncNames(incNames,MH), getArNames(MH,t),"th1","th2")
 }
 else{
   if(nthresh==1)
-    co<-c(incNames, getArNames(ML), getArNames(MH),"th")
+    co<-c(incNames, getArNames(ML,t), getArNames(MH,t),"th")
   else 
-    co<-c(incNames, getArNames(ML), getArNames(MM), getArNames(MH),"th1","th2")
+    co<-c(incNames, getArNames(ML,t), getArNames(MM,t), getArNames(MH,t),"th1","th2")
 }
+
   names(res$coefficients) <- na.omit(co)
   
 ###check for unit roots
-
+if(type=="level"){
    isRootH<-isRoot(res$coefficients, regime="H", lags=MH)
    isRootL<-isRoot(res$coefficients, regime="L", lags=ML)
    if(nthresh==2)
      isRootM<-isRoot(res$coefficients, regime="M", lags=MM)
-#    for(i in c(isRootH, isRootL, ifelse(ntresh==2, isRootM, NULL))){
-#     if(i$warn){
-#       warning(i$message)
-#       print(paste("\nUnit roots", i$root, "\n", sep=""))
-#     }
-#    }
+}
+
 ### SETAR 7: return the infos
 		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
 		res$thDelay<-thDelay
@@ -274,15 +291,18 @@ getIncNames<-function(inc,ML){
 }
 
 #get a vector with names of the coefficients
-getArNames<-function(ML){
+getArNames<-function(ML, type=c("level", "diff", "ADF")){
+  phi<-ifelse(type=="level", "phi", "Δphi")
   if(any(ML==0))
     return(NA)
   else{
     letter<-deparse(substitute(ML))
     letter<-sub("M","",letter)
-    paste(paste("phi",letter, sep=""),".", ML, sep="")
+    dX1<- if(type=="ADF") paste("phi", letter, ".1", sep="") else NULL
+    c(dX1, paste(paste(phi,letter, sep=""),".", ML, sep=""))
   }
 }
+
 print.setar <- function(x, ...) {
 	NextMethod(...)
 	x.old <- x
@@ -474,7 +494,7 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 }
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF")) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -487,16 +507,35 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
 #9: plot of the results of the grid search
 #10: return results
 {
-### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
+### SelectSETAR 0: preliminary checks
   include<-match.arg(include)
   model<-match.arg(model)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(missing(series))
       series <- deparse(substitute(x))
-  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-  xx <- getXX(str)
-  yy <- getYY(str)
+
+
+### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )    
+	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+	
+	if(type=="level"){
+	  xx <- getXX(str)
+	  yy <- getYY(str)
+	}
+	else{ 
+	  if(type=="diff"){
+	    xx <- getdXX(str)
+	    yy <- getdYY(str)
+	  }
+	  else if(type=="ADF"){
+	    xx <- cbind(getdX1(str),getdXX(str))
+	    yy <- getdYY(str)
+	  }
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	
   externThVar <- FALSE
   
 ##SelectSETAR: Lags selection
