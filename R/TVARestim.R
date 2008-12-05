@@ -530,7 +530,7 @@ plot3<-function(th,nthresh, allTh){
       posBestTh1<-which(allTh[,2]==th[1])
       posBestTh2<-which(allTh[,2]==th[2])
       posBestTh<-c(posBestTh1,posBestTh2)}
-    plot(allTh[,2], allTh[,3], col=col,xlab="Treshold Value",ylab="SSR")
+    plot(allTh[,2], allTh[,3], col=col,xlab="Threshold Value",ylab="SSR")
     title("Results of the grid search")
     points(th,allTh[posBestTh,3], col=c(2:(nthresh+1)), cex=2)
     leg<-c(paste("Threshold Delay", allDelay),(paste("th", 1:nthresh)))

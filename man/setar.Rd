@@ -58,7 +58,7 @@ type=c("level", "diff", "ADF"))
 \item{model}{Currently not implemented}
 \item{nthresh}{Number of threshold of the model}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime. Default to 0.15}
-\item{type}{Whether the variable is taken is level, difference or a mix (diff y, y-1, diff lags) as in the ADF test}
+\item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
 \item{...}{further arguments to be passed to \code{nlar}}
 }
 \details{

@@ -199,7 +199,7 @@ z<-as.matrix(z)
 	  if(common)
 	    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const)	
 	  else
-	    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const)	
+	    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const=const, trim=trim)	
 		midCommon<-mid<-NA}
 	else if(nthresh==2){
 	  if(common)
@@ -680,7 +680,12 @@ pooledAIC <- function(parms) {
 ###selectSETAR 6: Computation for 1 thresh
 
 if (criterion == "pooled-AIC") {
-    computedCriterion <- apply(IDS, 1, pooledAIC)} 
+    computedCriterion <- apply(IDS, 1, pooledAIC)
+    if(nthresh==2){
+      warning("\ncriterion pooled AIC currently not implemented for nthresh=2, criterion SSR was used\n")
+      criterion<-"SSR"
+    }
+} 
 else if(criterion=="AIC"){
   if(common)
     computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,4], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,3], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common))
@@ -689,9 +694,9 @@ else if(criterion=="AIC"){
 } 
 else if(criterion=="SSR"){
   if(common)
-    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,fun=buildXth1Common))
+    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=buildXth1Common))
   else
-    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,fun=buildXth1NoCommon))
+    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=buildXth1NoCommon))
 }
 
 ###selectSETAR 7: sorts the results to show the best values
@@ -711,9 +716,6 @@ if(nthresh==2){
 	cat("Result of the one threshold search:\n -Thresh: ",res[1,"th"],"\t-Delay: ",res[1,"thDelay"],"\t-",criterion, res[1,criterion], "\n" )
   }
   More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=MM, const=const,trim=trim)
-  if(criterion=="pooled-AIC")
-    warning("\ncriterion pooled AIC currently not implemented for nthresh=2, criterion SSR was used\n")
-    criterion<-"SSR"
   if(common)
     func<-switch(criterion, "AIC" = AIC_2threshCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshCommon)	
   else

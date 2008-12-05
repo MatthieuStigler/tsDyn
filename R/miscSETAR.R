@@ -1,18 +1,18 @@
 ###Build the xx matrix with 1 thresh and common=TRUE
-buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const) {
+buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim) {
   isL <- ifelse(trans[, thDelay + 1]<= gam1,1,0)	### isL: dummy variable
   LH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
 }
 
 ###Build the xx matrix with 1 thresh and common=FALSE
-buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const) {
+buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim) {
         isL <- ifelse(trans[, thDelay + 1]<= gam1,1,0)	### isL: dummy variable
 	xxL <- cbind(const,xx[,ML])*isL
 	xxH <- cbind(const,xx[,MH])*(1-isL)
 	xxLH<-cbind(xxL,xxH)
-
-	if(min(isL, 1-isL)<trim){
-		cat("\n 1 T: Trim not respected: ", c(isL, 1-isL))
+	nisL<-mean(isL)
+	if(min(nisL, 1-nisL)<trim){
+		cat("\n 1 T: Trim not respected: ", c(nisL, 1-nisL))
 	}
 	return(xxLH)
 }
@@ -44,7 +44,6 @@ buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 
 ###Build the xx matrix with 2 thresh and common=FALSE
 buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
-	trans<-as.matrix(trans)
 	##Threshold dummies
 	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
 # print(dummydown)
@@ -71,13 +70,8 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 }
 
 
-
-
-
-
-
-SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,fun=buildXth1Common){
-	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH,const)
+SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,trim, fun=buildXth1Common){
+	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH,const, trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
@@ -106,8 +100,9 @@ SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH
   SSR_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2NoCommon,trim=trim)
 }
 
+
 AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common ){
-	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const)
+	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
