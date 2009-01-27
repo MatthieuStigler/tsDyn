@@ -5,7 +5,7 @@
 Automatic selection of SETAR hyper-parameters
 }
 \usage{
-selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"))
+selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"))
 }
 
 \arguments{
@@ -16,7 +16,7 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=lis
 \item{thDelay}{ Vector of possible \sQuote{threshold delay} values to check for}
 \item{mTh}{coefficients for the lagged time series, to obtain the threshold variable}
 \item{thVar}{external threshold variable}
-\item{th}{List with different possiblities to set the threshold values to search for. either an exact value  \sQuote{exact=}, or an interval \sQuote{int=c('from','to')} or a value to search around \sQuote{around}}
+\item{th}{Different specifications of the grid search, to pre-specify a value or set the number of points to search. See\code{\link{MakeThSpec}}}
 \item{trace}{should additional infos be printed? (logical)}
 \item{include} {Type of deterministic regressors to include}
 \item{common}{Whether the deterministic regressors are regime specific (common=FALSE) or not.}

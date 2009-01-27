@@ -156,15 +156,15 @@ print.Hansen99Test<-function(x,...){
    }
 }
 
-summary.Hansen99Test<-function(x, ...){
-  print.Hansen99Test(x)
+summary.Hansen99Test<-function(object, ...){
+  print.Hansen99Test(object)
   cat("\nCritical values:\n")
-  print(x$CriticalValBoot)
+  print(object$CriticalValBoot)
   cat("\nSSR of original series:\n")
-  print(matrix(x$SSRs, ncol=1, dimnames=list(c("AR", "SETAR(2)", "SETAR(3)"), "SSR")))
+  print(matrix(object$SSRs, ncol=1, dimnames=list(c("AR", "SETAR(2)", "SETAR(3)"), "SSR")))
   cat("\nThreshold of original series:\n")
-  print(matrix(c(x$firstBests, NA, x$secBests),byrow=TRUE, ncol=2, dimnames=list(c("SETAR(2)", "SETAR(3)"), c("th1", "th2"))))
-  cat("\nNumber of bootstrap replications: ", x$nboot, "\n")
+  print(matrix(c(object$firstBests, NA, object$secBests),byrow=TRUE, ncol=2, dimnames=list(c("SETAR(2)", "SETAR(3)"), c("th1", "th2"))))
+  cat("\nNumber of bootstrap replications: ", object$nboot, "\n")
 }
 
 plot.Hansen99Test<-function(x,...){

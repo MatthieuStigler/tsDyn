@@ -76,6 +76,9 @@ allgammas <- sort(unique(trans[,1]))
 nga <- length(allgammas)
 ninter <- round(trim*nga)
 gammas <- allgammas[(trim*nga):((1-trim)*nga)]
+
+
+
 if(!missing(ngrid)){
 	gammas <- allgammas[seq(from=ceiling(trim*nga), to=floor((1-trim)*nga), length.out=ngrid)]
 }
@@ -672,11 +675,10 @@ onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){
 
 condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More=NULL){
 
-	wh.thresh <- which.min(abs(allgammas-threshRef))
-	
+	wh.thresh <- max(which.min(abs(allgammas-threshRef)))
 	#search for a second threshold smaller than the first
 	if(wh.thresh>2*ninter){
-		gammaMinus<-allgammas[seq(from=ninter, to=wh.thresh-ninter)]
+		gammaMinus<-unique(allgammas[seq(from=ninter, to=wh.thresh-ninter)])
 # print(gammaMinus)
 		storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)	
 	}
@@ -685,7 +687,7 @@ condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More
 
 	#search for a second threshold higher than the first
 	if(wh.thresh<length(allgammas)-2*ninter){
-		gammaPlus<-allgammas[seq(from=wh.thresh+ninter, to=length(allgammas)-ninter)]
+		gammaPlus<-unique(allgammas[seq(from=wh.thresh+ninter, to=length(allgammas)-ninter)])
 		storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
 	}
 	else

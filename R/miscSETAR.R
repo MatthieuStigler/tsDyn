@@ -12,7 +12,7 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim) {
 	xxLH<-cbind(xxL,xxH)
 	nisL<-mean(isL)
 	if(min(nisL, 1-nisL)<trim){
-		cat("\n 1 T: Trim not respected: ", c(nisL, 1-nisL))
+		cat("\n 1 T: Trim not respected: ", c(nisL, 1-nisL), "from th:", gam1)
 	}
 	return(xxLH)
 }
@@ -63,7 +63,7 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 		res <- xxLMH	#SSR
 	}
 	else{
-		cat("\nTrim not respected: ", c(nup, ndown, 1-nup-ndown))
+		cat("\nTrim not respected: ", c(nup, ndown, 1-nup-ndown), "from", c(gam1, gam2))
 		res <- xxLMH
 	}
 	return(res)
@@ -153,22 +153,48 @@ buildConstants<-function(include=c("const", "trend","none", "both"), n){
 
 
 
-makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val"), thSteps = 7,ngrid="ALL", trace=FALSE){
+MakeThSpec<-function(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int=c("from","to"), around="val",...){
+  if(is.character(ngrid))
+    ngrid<-match.arg(ngrid)
+  exCheck<-ifelse(is.null(exact),0,1)
+  inCheck<-ifelse(int==c("from","to"),0,1)
+  aroundCheck<-ifelse(around=="val",0,1)
+  if(sum(exCheck, inCheck, aroundCheck)>1)
+    stop("Only one of the makeThSpec args should be specified")
+  return(list(exact=exact, int=int, around=around, ngrid=ngrid))
+} 
+
+makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val"), thSteps = 7,ngrid="ALL", trace=FALSE, nthresh=1){
   ng <- length(allTh)
   down<-ceiling(trim*ng)
   up<-floor(ng*(1-trim))
   allin<-up-down
   ninter<-max(down, ng-up)
 
-#gamma pre-specified
+#threshold pre-specified
 if(!is.null(th$exact)){
-	th<-allTh[which.min(abs(allTh-th$exact))]
-	if(length(th)>1){
-		th<-th[1]
-		cat("Many values correspond to the one you gave. The first one",th, "was taken")
-		}
-	ngrid<-1
-	}
+  if(length(th$exact)==1){
+    if(nthresh==2)
+      stop("Please either provide two pre-specified threshold values or set nthresh to 1")
+    th<-unique(allTh[which.min(abs(allTh-th$exact))])
+    if(length(th)>1){
+      th<-th[1]
+      cat("Many values correspond to the threshold you gave. The first one",th, "was taken")
+    }
+    ngrid<-1
+  }
+  else if(length(th$exact)==2){
+    th1<-unique(allTh[which.min(abs(allTh-th$exact[1]))])
+    th2<-unique(allTh[which.min(abs(allTh-th$exact[2]))])
+    if(length(c(th1, th2))>2){
+      th1<-th1[1]
+      th2<-th2[2]
+      cat("Many values correspond to the threshold you gave. The first ones",c(th1, th2), "were taken")
+    }
+  }
+  else
+    warning("Too many threshold values given")
+}	  
 #interval to search inside given by user
 else if(is.numeric(th$int)){
 	if(missing(ngrid))
@@ -198,9 +224,10 @@ else{
 	else if(ngrid>allin)
 		ngrid<-allin
 	
-	th<-allTh[seq(from=down, to=up, length.out=ngrid)]
+	ths<-allTh[seq(from=down, to=up, length.out=ngrid)]
+	th <-unique(ths)
 	if(trace)
-		cat("Searching on",ngrid, "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
+		cat("Searching on",length(th), "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
 }
 # th<-round(th, getndp(x)) bad idea, rather use format in print and summary
 res<-list(th=th, ninter=ninter)

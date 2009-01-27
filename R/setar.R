@@ -494,7 +494,7 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 }
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=list(exact=NULL, int=c("from","to"), around="val"), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF")) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF")) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -624,11 +624,11 @@ z<-as.matrix(z)
 #interval to search inside given by user
 #value to search around	given by user
 #Default method: grid from lower to higher point
-  allTh <- sort(unique(z[,1]))
-  thGrid<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace)
-  gammas<-thGrid$th
+  allTh <- sort(z[,1])
+  thGrid<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace, nthresh=nthresh)
+  th<-thGrid$th
   ninter<-thGrid$ninter
-  th<-gammas
+  
 ### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
 #have been moved to miscSETAR.R, call before functions to build the regressors matrix
 ### selectSETAR 4b:Function pooled AIC 
@@ -775,6 +775,7 @@ plot.selectSETAR<-function(x,...){
   if(x$criterion!="SSR")
     stop("Currently only implemented for criterion SSR")
   plot3(th=x$th,nthresh=x$nthresh,allTh= x$allTh)
+#  plot3a(th=x$th,nthresh=x$nthresh,allTh= x$allTh, bestDelay=x$bests[1])
 }
 
 ###Try it

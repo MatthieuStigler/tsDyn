@@ -3,7 +3,18 @@ linear2<-function(data, lag, include = c( "const", "trend","none", "both"), mode
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
 T <- nrow(y) 		#Size of start sample
-p <- lag
+
+if(length(lag)==1){
+  p <- lag
+  notAllLags<-FALSE
+  Lags<-1:p
+}
+else{
+  notAllLags<-TRUE
+  p<-max(lag)
+  Lags<-lag
+}
+
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
 t<-T-p			#Size of end sample
@@ -16,6 +27,9 @@ model<-match.arg(model)
 I<-match.arg(I)
 Y <- y[(p+1):T,] #
 X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
+
+if(notAllLags)
+  X<-X[,sort(rep((Lags*k-k+1), k))+0:(k-1)]
 
 DeltaY<-diff(y)[(p+1):(T-1),]
 Xminus1<-embed(y,p+2)[,(k+1):(k+k)]
@@ -99,7 +113,7 @@ else if(include=="both")
 npar<-ncol(B)*nrow(B)
 
 rownames(B)<-paste("Equation",colnames(data))
-LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
+LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
 
 
 if(model=="VECM")
@@ -144,7 +158,7 @@ environment(linear2)<-environment(star)
 data(zeroyld)
 dat<-zeroyld
 
-aVAR<-linear2(dat[1:100,], lag=2, include="both", model="VECM")
+aVAR<-linear2(dat[1:100,], lag=c(1,2), include="both", model="VAR")
 #lag2, 2 thresh, trim00.05: 561.46
 class(aVAR)
 aVAR
