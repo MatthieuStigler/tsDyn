@@ -625,9 +625,7 @@ z<-as.matrix(z)
 #value to search around	given by user
 #Default method: grid from lower to higher point
   allTh <- sort(z[,1])
-  thGrid<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace, nthresh=nthresh)
-  th<-thGrid$th
-  ninter<-thGrid$ninter
+  th<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace, nthresh=nthresh)
   
 ### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
 #have been moved to miscSETAR.R, call before functions to build the regressors matrix
@@ -722,12 +720,12 @@ if(nthresh==2){
     func<-switch(criterion, "AIC" = AIC_2threshNoCommon, "pooled-AIC" = IDS, "SSR" = SSR_2threshNoCommon)
 #first conditional search
 
-last<-condiStep(allTh,threshRef=res[1,"th"], delayRef=res[1,"thDelay"],ninter=ninter, fun=func, trace=trace, More=More)
+last<-condiStep(allTh,threshRef=res[1,"th"], delayRef=res[1,"thDelay"], fun=func, trim=trim, trace=trace, More=More)
 
 #iterative loop for conditional search
 i<-1	#initialise the loop
 while(i<max.iter){
-	b<-condiStep(allTh,last$newThresh, delayRef=res[1,1],ninter=ninter, fun=func, trace=trace, More=More)
+	b<-condiStep(allTh,last$newThresh, delayRef=res[1,1], fun=func, trim=trim, trace=trace, More=More)
 	if(b$SSR<last$SSR){	#minimum still not reached
 		i<-i+1
 		last<-b}

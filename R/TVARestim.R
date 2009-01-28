@@ -223,10 +223,10 @@ if(nthresh==2){
 # secondBestThresh<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)$newThresh
 # step2FirstBest<-condiStep(allgammas, threshRef=secondBestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)
 
-last<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)
+last<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay, fun=func2, trim=trim)
 i<-1
 while(i<max.iter){
-	b<-condiStep(allgammas, threshRef=last$newThresh, delayRef=bestDelay,ninter=ninter, fun=func2)
+	b<-condiStep(allgammas, threshRef=last$newThresh, delayRef=bestDelay, fun=func2, trim=trim)
 	if(b$SSR<last$SSR){	#minimum still not reached
 		i<-i+1
 		last<-b}
@@ -256,6 +256,7 @@ if(missing(gamma)==FALSE){
 	gammas <- gamma[1]
 	gammas2 <- gamma[2]
 	ninter<- 2
+	cat("To be corrected!!")
 }
 if(missing(around)==FALSE){
 	if(length(around)!=2)
@@ -673,21 +674,39 @@ onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){
         return(res)
 }#end of function one search
 
-condiStep<-function(allgammas, threshRef, delayRef,ninter, fun, trace=TRUE, More=NULL){
-
-	wh.thresh <- max(which.min(abs(allgammas-threshRef)))
+condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL){
+  ng <- length(allTh)
+  down<-ceiling(trim*ng)
+   #correction for case with few unique values
+  if(allTh[down]==allTh[down+1]){
+    sames<-which(allTh==allTh[down])
+    down <-sames[length(sames)]+1
+  }
+  up<-floor(ng*(1-trim))
+  #correction for case with few unique values
+  if(allTh[up]==allTh[up-1]){
+    up<-which(allTh==allTh[up])[1]-1
+  }
+  ninter<-max(down, ng-up)
+  nMin<-ceiling(trim*ng)
+  
+	wh.thresh <- max(which.min(abs(allTh-threshRef)))
+	
 	#search for a second threshold smaller than the first
-	if(wh.thresh>2*ninter){
-		gammaMinus<-unique(allgammas[seq(from=ninter, to=wh.thresh-ninter)])
-# print(gammaMinus)
-		storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)	
+	if(wh.thresh>down+nMin){
+	  upInter<-wh.thresh-nMin
+	  if(allTh[upInter]==allTh[upInter-1])
+	    upInter<-which(allTh==allTh[upInter])[1]-1
+	  gammaMinus<-unique(allTh[seq(from=down+nMin+1, to=upInter)])
+
+	  storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)	
 	}
 	else
 		storeMinus <- NA
 
 	#search for a second threshold higher than the first
-	if(wh.thresh<length(allgammas)-2*ninter){
-		gammaPlus<-unique(allgammas[seq(from=wh.thresh+ninter, to=length(allgammas)-ninter)])
+	if(wh.thresh<ng-nMin-up){
+		gammaPlus<-unique(allTh[seq(from=wh.thresh+nMin+1, to=up)])
 		storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
 	}
 	else

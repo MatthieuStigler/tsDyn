@@ -48,7 +48,7 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
 # print(dummydown)
 	ndown <- mean(dummydown)
-	dummyup <- ifelse(trans[, thDelay + 1]>=gam2, 1, 0)
+	dummyup <- ifelse(trans[, thDelay + 1]>gam2, 1, 0)
 # print(dummyup)
 	nup <- mean(dummyup)
 	##Construction of the matrix
@@ -63,7 +63,7 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 		res <- xxLMH	#SSR
 	}
 	else{
-		cat("\nTrim not respected: ", c(nup, ndown, 1-nup-ndown), "from", c(gam1, gam2))
+		cat("\nTrim not respected: ", c( ndown,1-nup-ndown, nup), "from", c(gam1, gam2))
 		res <- xxLMH
 	}
 	return(res)
@@ -169,7 +169,6 @@ makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="va
   down<-ceiling(trim*ng)
   up<-floor(ng*(1-trim))
   allin<-up-down
-  ninter<-max(down, ng-up)
 
 #threshold pre-specified
 if(!is.null(th$exact)){
@@ -230,8 +229,7 @@ else{
 		cat("Searching on",length(th), "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
 }
 # th<-round(th, getndp(x)) bad idea, rather use format in print and summary
-res<-list(th=th, ninter=ninter)
-return(res)
+return(th)
 }
 
 if(FALSE){
