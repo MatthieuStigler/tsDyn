@@ -678,6 +678,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
   allThUniq <- unique(allTh)
   ng <- length(allTh)
   down<-ceiling(trim*ng)
+
    #correction for case with few unique values
   if(allTh[down]==allTh[down+1]){
     sames<-which(allTh==allTh[down])
@@ -699,7 +700,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
     upInter<-wh.thresh-nMin
     if(allTh[upInter]==allTh[upInter-1])
       upInter<-which(allTh==allTh[upInter])[1]-1
-    gammaMinus<-unique(allTh[seq(from=down+nMin+1, to=upInter)])
+    gammaMinus<-unique(allTh[seq(from=down+1, to=upInter)])
     #if only one unique value in middle regime
      if(allThUniq[which(allThUniq==allTh[upInter])+1]==allTh[wh.thresh]){
        gammaMinus <- gammaMinus[- length(gammaMinus)]#cut last one

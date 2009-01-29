@@ -33,8 +33,8 @@ include<-"const" #other types not implemented in setar.sim
   
 
 ###setarTest 2: search best thresholds: call selectSETAR
-  search<-selectSETAR(x, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
-  
+  search<-selectSETAR(x, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model="TAR",nthresh=2,trim=trim,criterion = "SSR",thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
+
   firstBests<-search$firstBests
   bests<-search$bests
   thDelay<-search$bests[1]
@@ -212,7 +212,7 @@ sun<-(sqrt(sunspot.year+1)-1)*2
 ###Sunsport test
 #Test 1vs2 and 1vs3
 environment(setarTest)<-environment(star)
-Han1<-setarTest(sun, m=11, thDelay=0:1, nboot=2, plot=TRUE, trim=0.1, test="1vs")
+Han1<-setarTest(sun, m=11, thDelay=0:1, nboot=2,  trim=0.1, test="1vs")
 
 print(Han1)
 summary(Han1)
