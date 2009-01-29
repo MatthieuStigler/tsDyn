@@ -705,7 +705,10 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
      if(allThUniq[which(allThUniq==allTh[upInter])+1]==allTh[wh.thresh]){
        gammaMinus <- gammaMinus[- length(gammaMinus)]#cut last one
       }
-    storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)
+    if(length(gammaMinus)>0)
+      storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)
+    else
+      storeMinus <- NA
   }
   else
     storeMinus <- NA
@@ -726,8 +729,10 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
     if(allThUniq[which(allThUniq==allTh[downInter])-1]==allTh[wh.thresh]){
       gammaPlus <- gammaPlus[-1]#cut last one
     }
-    
-    storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
+    if(length(gammaPlus)>1)
+      storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
+    else
+      storePlus <- NA
   }
   else
     storePlus <- NA
