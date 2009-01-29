@@ -178,8 +178,8 @@ z<-as.matrix(z)
 	}
 
   nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
-	if(min(nobs)<trim){
-	stop("\nWith the threshold you gave, there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
+	if(min(nobs)<trim-0.01){
+	warning("\nWith the threshold you gave (", th, "there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
 	}
 	if(min(nobs)==0)
 		stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
@@ -212,6 +212,8 @@ z<-as.matrix(z)
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
 	res <- lm.fit(xxLH, yy)
+if(any(is.na(res$coefficients)))
+  warning("Problem with the regression, it may arrive if there is only one unique value in the middle regime")
 #Coefficients and names
 	res$coefficients <- c(res$coefficients, th)
 
@@ -230,7 +232,7 @@ else{
 }
 
   names(res$coefficients) <- na.omit(co)
-  
+
 ###check for unit roots
 if(type=="level"){
    isRootH<-isRoot(res$coefficients, regime="H", lags=MH)

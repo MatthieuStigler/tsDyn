@@ -675,6 +675,7 @@ onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){
 }#end of function one search
 
 condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL){
+  allThUniq <- unique(allTh)
   ng <- length(allTh)
   down<-ceiling(trim*ng)
    #correction for case with few unique values
@@ -689,40 +690,58 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
   }
   ninter<-max(down, ng-up)
   nMin<-ceiling(trim*ng)
+
+  possibleThresh <- abs(allTh-threshRef)
+  wh.thresh <- max(which(possibleThresh==min(possibleThresh)))
   
-	wh.thresh <- max(which.min(abs(allTh-threshRef)))
-	
-	#search for a second threshold smaller than the first
-	if(wh.thresh>down+nMin){
-	  upInter<-wh.thresh-nMin
-	  if(allTh[upInter]==allTh[upInter-1])
-	    upInter<-which(allTh==allTh[upInter])[1]-1
-	  gammaMinus<-unique(allTh[seq(from=down+nMin+1, to=upInter)])
-
-	  storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)	
-	}
-	else
-		storeMinus <- NA
-
+#search for a second threshold smaller than the first one
+  if(wh.thresh>down+nMin){
+    upInter<-wh.thresh-nMin
+    if(allTh[upInter]==allTh[upInter-1])
+      upInter<-which(allTh==allTh[upInter])[1]-1
+    gammaMinus<-unique(allTh[seq(from=down+nMin+1, to=upInter)])
+    #if only one unique value in middle regime
+     if(allThUniq[which(allThUniq==allTh[upInter])+1]==allTh[wh.thresh]){
+       gammaMinus <- gammaMinus[- length(gammaMinus)]#cut last one
+      }
+    storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)
+  }
+  else
+    storeMinus <- NA
+  
 	#search for a second threshold higher than the first
-	if(wh.thresh<ng-nMin-up){
-		gammaPlus<-unique(allTh[seq(from=wh.thresh+nMin+1, to=up)])
-		storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
-	}
-	else
-		storePlus <- NA
+  if(wh.thresh<up-nMin){
+    downInter <- wh.thresh+nMin
+    if(FALSE){#allTh[downInter]==allTh[wh.thresh]){
+      samesTh <-which(allTh==allTh[downInter])
+      downInter <-samesTh[length(samesTh)]+nMin
+    }    
+    if(allTh[downInter]==allTh[downInter+1]){
+      samesInter <-which(allTh==allTh[downInter])
+      downInter <-samesInter[length(samesInter)]+1
+    }
+    gammaPlus<-unique(allTh[seq(from=downInter, to=up)])
+          #if only one unique value in middle regime
+    if(allThUniq[which(allThUniq==allTh[downInter])-1]==allTh[wh.thresh]){
+      gammaPlus <- gammaPlus[-1]#cut last one
+    }
+    
+    storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
+  }
+  else
+    storePlus <- NA
 
 	#results
-	store2 <- c(storeMinus, storePlus)
-	positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
-	if(positionSecond<=length(storeMinus))
-		newThresh<-gammaMinus[positionSecond]
-	else
-		newThresh<-gammaPlus[positionSecond-length(storeMinus)]
-	SSR<-min(store2, na.rm=TRUE)
-	if(trace)
-		cat("Second best: ",newThresh, " (conditionnal on th=",threshRef, "and Delay=", delayRef," ) \t SSR:", SSR, "\n")
-	list(threshRef=threshRef, newThresh=newThresh, SSR=SSR)
+  store2 <- c(storeMinus, storePlus)
+  positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
+  if(positionSecond<=length(storeMinus))
+    newThresh<-gammaMinus[positionSecond]
+  else
+    newThresh<-gammaPlus[positionSecond-length(storeMinus)]
+  SSR<-min(store2, na.rm=TRUE)
+  if(trace)
+    cat("Second best: ",newThresh, " (conditionnal on th=",threshRef, "and Delay=", delayRef," ) \t SSR:", SSR, "\n", sep="")
+  list(threshRef=threshRef, newThresh=newThresh, SSR=SSR)
 }
 
 

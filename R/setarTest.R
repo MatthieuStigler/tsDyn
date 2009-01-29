@@ -37,13 +37,13 @@ include<-"const" #other types not implemented in setar.sim
   
   firstBests<-search$firstBests
   bests<-search$bests
-  
+  thDelay<-search$bests[1]
 
   
   ### Obtain infos for the two thresh models
-  set1<-setar(x, m, d=d, steps=steps, thDelay=0, th=firstBests["th"], trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), nthresh=1,trim=trim)
+  set1<-setar(x, m, d=d, steps=steps, thDelay=thDelay, th=firstBests["th"], trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), nthresh=1,trim=trim)
   
-   set2<-setar(x, m, d=d, steps=steps, thDelay=0, th=bests[c("th1", "th2")], trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), nthresh=2,trim=trim)
+   set2<-setar(x, m, d=d, steps=steps, thDelay=thDelay, th=bests[c("th1", "th2")], trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), nthresh=2,trim=trim)
   #RESTRICTED currently:
   #common: FALSE
   #nthresh=2
@@ -126,7 +126,7 @@ if(test=="1vs"){
   CriticalValBoot12<-quantile(Ftestboot12, probs=probs)
   PvalBoot13<-mean(ifelse(Ftestboot13>Ftest13,1,0))
   CriticalValBoot13<-quantile(Ftestboot13, probs=probs)
-  CriticalValBoot<-matrix(c(CriticalValBoot12,CriticalValBoot13), nrow=2, dimnames=list(c("1vs2", "1vs3"), probs))
+  CriticalValBoot<-matrix(c(CriticalValBoot12,CriticalValBoot13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
   PvalBoot<-c(PvalBoot12,PvalBoot13)
 }
 else{
