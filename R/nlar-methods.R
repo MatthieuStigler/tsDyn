@@ -73,6 +73,7 @@ getdXX <- function(obj, ...)
 
 getdYY <- function(obj, ...)
 	diff(getdXXYY(obj, ...))[ , obj$m+1]
+	
 
 getdX1 <- function(obj, ...)
 	getdXXYY(obj,...)[ -1, 1, drop=FALSE]

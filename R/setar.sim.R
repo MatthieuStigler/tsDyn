@@ -198,6 +198,7 @@ linear(checkBootL, m=1)
 setarSun<-setar(sun, m=2, nthresh=1)
 checkBoot2<-setar.sim(setarObject=setarSun, type="check")$serie
 cbind(checkBoot2,sun)
+#does not work
 
 setarSun<-setar(sun, m=3, nthresh=2)
 checkBoot3<-setar.sim(setarObject=setarSun, type="check")$serie

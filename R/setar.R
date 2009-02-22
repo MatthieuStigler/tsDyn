@@ -247,8 +247,10 @@ if(type=="level"){
 		res$fixedTh <- if(nested) FALSE else TRUE
 		res$mL <- max(ML)
 		res$mH <- max(MH)
+		res$mM <- if(nthresh==2) max(MH) else NULL
 		res$ML <- ML
 		res$MH <- MH
+		res$MM <- if(nthresh==2)  MM else NULL
 		res$externThVar <- externThVar
 		res$thVar <- z
 		res$incNames<-incNames
@@ -282,7 +284,12 @@ getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
 }
 
 getTh<-function(x){
-	x[grep("th",names(x))]}
+	allth<-x[grep("th",names(x))]
+	if(length(grep("thD",names(allth)))!=0)
+	  allth<-allth[-grep("thD",names(allth))]
+	return(allth)
+	}
+
 
 #gets a vector with names of the arg inc
 getIncNames<-function(inc,ML){

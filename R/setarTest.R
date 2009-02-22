@@ -23,10 +23,11 @@
 
 setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
 {
-test<-match.arg(test)
-
-include<-"const" #other types not implemented in setar.sim
-
+  test<-match.arg(test)
+  
+  include<-"const" #other types not implemented in setar.sim
+  if(missing(series))
+      series <- deparse(substitute(x))
 ###setarTest 1: SSR and check linear model
   linear<-linear(x, m, d = 1, steps = d, series)
   SSR<-deviance(linear)
@@ -48,105 +49,113 @@ include<-"const" #other types not implemented in setar.sim
   #common: FALSE
   #nthresh=2
   #max.iter=1
- n<-length(na.omit(residuals(set2)))
-  ###setarTest 10: SSR of TAR(+) and (2),compute F stat and print
-  SSR1thresh<-search$firstBests["SSR"]
-  SSR2thresh<-search$bests["SSR"]
-  SSRs<-matrix(c(SSR, SSR1thresh, SSR2thresh), ncol=3, dimnames=list("SSR", c("AR", "TAR(1)", "TAR(2)")))
-  
-  ###F test for original data
-  Ftest12<-as.numeric(n*(SSR-SSR1thresh)/SSR1thresh)
-  Ftest13<-as.numeric(n*(SSR-SSR2thresh)/SSR2thresh)
-  Ftest23<-as.numeric(n*(SSR1thresh-SSR2thresh)/SSR2thresh)
-  Ftests<-matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
-  
-########
-###Boot
-########
-bootHoAr<-function(linearObject, type){
-  ### Bootstrap under null: ar model
-  bootLin<-setar.sim(setarObject=linearObject, type=type)$serie
-  
-###setarTest 1: SSR and check linear model
-  linearBoot<-linear(bootLin, m=m)
-  SSR<-deviance(linearBoot)
-   
-###setarTest 2: search best thresholds: call selectSETAR
-  searchBoot<-selectSETAR(bootLin, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
-  
-  firstBests<-searchBoot$firstBests
-  bests<-searchBoot$bests
-  
-###setarTest 10: SSR of all boot models
-  SSR1thresh<-searchBoot$firstBests["SSR"]
-  SSR2thresh<-searchBoot$bests["SSR"]
+ 
+  n<-length(na.omit(residuals(set2)))
+    ###setarTest 10: SSR of TAR(+) and (2),compute F stat and print
+    SSR1thresh<-search$firstBests["SSR"]
+    SSR2thresh<-search$bests["SSR"]
+    SSRs<-matrix(c(SSR, SSR1thresh, SSR2thresh), ncol=3, dimnames=list("SSR", c("AR", "TAR(1)", "TAR(2)")))
     
-###F test for boot data
-  Ftest12<-as.numeric(n*(SSR-SSR1thresh)/SSR1thresh)
-  Ftest13<-as.numeric(n*(SSR-SSR2thresh)/SSR2thresh)
-  return(c(Ftest12, Ftest13))
-}
-
-bootHoSetar1<-function(setarObject, type ){
-  ### Bootstrap under null: Setar(1t) model
-  bootSet<-setar.sim(setarObject=set1, type=type, nthresh=1)$serie
-  if(check)
-    print(all(bootSet-set1$str$x<0.00005))
-
-
-###setarTest 2: search best thresholds: call selectSETAR
-  searchBoot<-selectSETAR(bootSet, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
-  
-  firstBests<-searchBoot$firstBests
-  bests<-searchBoot$bests
-  
-###setarTest 10: SSR of all boot models
-  SSR1thresh<-searchBoot$firstBests["SSR"]
-  SSR2thresh<-searchBoot$bests["SSR"]
+    ###F test for original data
+    Ftest12<-as.numeric(n*(SSR-SSR1thresh)/SSR1thresh)
+    Bound<-(n/(2*log(log(n))))*Ftest12
+    Ftest13<-as.numeric(n*(SSR-SSR2thresh)/SSR2thresh)
+    Ftest23<-as.numeric(n*(SSR1thresh-SSR2thresh)/SSR2thresh)
+    Ftests<-matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
+ if(nboot>1){   
+  ########
+  ###Boot
+  ########
+  bootHoAr<-function(linearObject, type){
+    ### Bootstrap under null: ar model
+    bootLin<-setar.sim(setarObject=linearObject, type=type)$serie
     
-###F test for boot data
-  Ftest23<-as.numeric(n*(SSR1thresh-SSR2thresh)/SSR2thresh)
+  ###setarTest 1: SSR and check linear model
+    linearBoot<-linear(bootLin, m=m)
+    SSR<-deviance(linearBoot)
+    
+  ###setarTest 2: search best thresholds: call selectSETAR
+    searchBoot<-selectSETAR(bootLin, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
+    
+    firstBests<-searchBoot$firstBests
+    bests<-searchBoot$bests
+    
+  ###setarTest 10: SSR of all boot models
+    SSR1thresh<-searchBoot$firstBests["SSR"]
+    SSR2thresh<-searchBoot$bests["SSR"]
+      
+  ###F test for boot data
+    Ftest12<-as.numeric(n*(SSR-SSR1thresh)/SSR1thresh)
+    Ftest13<-as.numeric(n*(SSR-SSR2thresh)/SSR2thresh)
+    return(c(Ftest12, Ftest13))
+  }
   
-
-return(Ftest23)
+  bootHoSetar1<-function(setarObject, type ){
+    ### Bootstrap under null: Setar(1t) model
+    bootSet<-setar.sim(setarObject=set1, type=type, nthresh=1)$serie
+    if(check)
+      print(all(bootSet-set1$str$x<0.00005))
+  
+  
+  ###setarTest 2: search best thresholds: call selectSETAR
+    searchBoot<-selectSETAR(bootSet, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common=FALSE, model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
+    
+    firstBests<-searchBoot$firstBests
+    bests<-searchBoot$bests
+    
+  ###setarTest 10: SSR of all boot models
+    SSR1thresh<-searchBoot$firstBests["SSR"]
+    SSR2thresh<-searchBoot$bests["SSR"]
+      
+  ###F test for boot data
+    Ftest23<-as.numeric(n*(SSR1thresh-SSR2thresh)/SSR2thresh)
+    
+  
+  return(Ftest23)
+  }
+  
+  
+  ### Run the function (boot, search best SSR for lin, set 1 and set2 ) and extract results
+  
+  
+  type<-ifelse(check, "check", "boot")
+  
+  probs<-c(0.9, 0.95, 0.975,0.99)
+  if(test=="1vs"){
+    Ftestboot<-replicate(nboot, bootHoAr(linear, type))
+    Ftestboot12<-Ftestboot[1,]
+    Ftestboot13<-Ftestboot[2,]
+    PvalBoot12<-mean(ifelse(Ftestboot12>Ftest12,1,0))
+    CriticalValBoot12<-quantile(Ftestboot12, probs=probs)
+    PvalBoot13<-mean(ifelse(Ftestboot13>Ftest13,1,0))
+    CriticalValBoot13<-quantile(Ftestboot13, probs=probs)
+    CriticalValBoot<-matrix(c(CriticalValBoot12,CriticalValBoot13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
+    PvalBoot<-c(PvalBoot12,PvalBoot13)
+  }
+  else{
+    Ftestboot<-replicate(nboot, bootHoSetar1(set1, type))
+    Ftestboot23<-Ftestboot
+    PvalBoot23<-mean(ifelse(Ftestboot23>Ftest23,1,0))
+    CriticalValBoot23<-quantile(Ftestboot23, probs=probs)
+    CriticalValBoot<-matrix(CriticalValBoot23, nrow=1, dimnames=list("2vs3", probs))
+    PvalBoot<-PvalBoot23
+  }
 }
-
-
-### Run the function (boot, search best SSR for lin, set 1 and set2 ) and extract results
-
-
-type<-ifelse(check, "check", "boot")
-
-probs<-c(0.9, 0.95, 0.975,0.99)
-if(test=="1vs"){
-  Ftestboot<-replicate(nboot, bootHoAr(linear, type))
-  Ftestboot12<-Ftestboot[1,]
-  Ftestboot13<-Ftestboot[2,]
-  PvalBoot12<-mean(ifelse(Ftestboot12>Ftest12,1,0))
-  CriticalValBoot12<-quantile(Ftestboot12, probs=probs)
-  PvalBoot13<-mean(ifelse(Ftestboot13>Ftest13,1,0))
-  CriticalValBoot13<-quantile(Ftestboot13, probs=probs)
-  CriticalValBoot<-matrix(c(CriticalValBoot12,CriticalValBoot13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
-  PvalBoot<-c(PvalBoot12,PvalBoot13)
-}
-else{
-  Ftestboot<-replicate(nboot, bootHoSetar1(set1, type))
-  Ftestboot23<-Ftestboot
-  PvalBoot23<-mean(ifelse(Ftestboot23>Ftest23,1,0))
-  CriticalValBoot23<-quantile(Ftestboot23, probs=probs)
-  CriticalValBoot<-matrix(CriticalValBoot23, nrow=1, dimnames=list("2vs3", probs))
-  PvalBoot<-PvalBoot23
-}
-
-
+  else{ #nboot=0
+    CriticalValBoot<-NULL
+    PvalBoot<-NULL
+    Ftestboot<-NULL
+  }
+  
+  args<-list(x=x, m=m, d = d, steps = steps, series=series, thDelay = thDelay, nboot=nboot, trim=trim, test=test, check=FALSE)
 ###res
-  res<-list(Ftests=Ftests, SSRs=SSRs, firstBests=search$firstBests["th"],secBests=search$bests[c("th1", "th2")], CriticalValBoot=CriticalValBoot,PvalBoot=PvalBoot, test=test, m=m, Ftestboot=Ftestboot, nboot=nboot)
+  res<-list(Ftests=Ftests, SSRs=SSRs, firstBests=search$firstBests["th"],secBests=search$bests[c("th1", "th2")], CriticalValBoot=CriticalValBoot,PvalBoot=PvalBoot, Ftestboot=Ftestboot, nboot=nboot, args=args, Bound=Bound, updated=NULL)
   class(res)<-"Hansen99Test"
   return(res)
 }
   
 print.Hansen99Test<-function(x,...){
-  if(x$test=="1vs"){
+  if(x$args$test=="1vs"){
     cat("Test of linearity against setar(2) and setar(3)\n\n")
     print(matrix(c(x$Ftests[-3], x$PvalBoot), ncol=2, dimnames=list(c("1vs2", "1vs3"), c("Test", "Pval"))))
   }
@@ -165,11 +174,25 @@ summary.Hansen99Test<-function(object, ...){
   cat("\nThreshold of original series:\n")
   print(matrix(c(object$firstBests, NA, object$secBests),byrow=TRUE, ncol=2, dimnames=list(c("SETAR(2)", "SETAR(3)"), c("th1", "th2"))))
   cat("\nNumber of bootstrap replications: ", object$nboot, "\n")
+  if(object$args$test=="1vs"){
+    cat("Asymptotic bound: ", object$Bound, "\n")
+  }
+    
 }
 
 plot.Hansen99Test<-function(x,...){
-  m<-x$m
-  if(x$test=="1vs"){
+  m<-x$args$m
+  test<-x$args$test
+  leg<-c("Asymptotic Chi 2", "Bootstrap", "Test value")
+  col<-c(3,1,2)
+  updated<-ifelse(!is.null(x$updated), TRUE, FALSE)
+  if(updated){
+      leg<-c(leg[1:3], "Old Bootstrap")
+      col<-c(col,4)
+   }
+  
+  
+  if(test=="1vs"){
     layout(c(1,2))
     Ftestboot12<-x$Ftestboot[1,]
     Ftestboot13<-x$Ftestboot[2,]
@@ -181,15 +204,18 @@ plot.Hansen99Test<-function(x,...){
     title("Test linear AR vs 1 threshold SETAR")
     abline(v=Ftest12, lty=2, col=2)
     curve(dchisq(x, df=1+m, ncp=0), from=0, n=Ftest12+5, add=TRUE, col=3)
-    legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+    if(updated)
+      lines(density(Ftestboot12[1:x$updated], from=0), col=4)
+    legend("topright", legend=leg, col=col, lty=c(1,1,2), bg="white")
   
     #Plot 1vs3
     plot(density(Ftestboot13, from=0), xlab="Ftest13", xlim=c(0,max(Ftest13+1,max(Ftestboot13))),ylim=c(0,max(density(Ftestboot13)$y,dchisq(0:Ftest12, df=2*(1+m)))), main="")
     title("Test linear AR vs 2 thresholds SETAR")
     abline(v=Ftest13, lty=2, col=2)
-    cat("ok\n")
     curve(dchisq(x, df=2*(1+m), ncp=0), from=0, n=Ftest13+5, add=TRUE, col=3)
-    legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+    if(updated)
+      lines(density(Ftestboot13[1:x$updated], from=0), col=4)
+    legend("topright", legend=leg, col=col, lty=c(1,1,2), bg="white")
   }
   #plot 2vs3
   else {
@@ -200,10 +226,57 @@ plot.Hansen99Test<-function(x,...){
     title("Test 1 threshold SETAR vs 2 thresholds SETAR")
     abline(v=Ftest23, lty=2, col=2)
     curve(dchisq(x, df=1+m, ncp=0), from=0, n=Ftest23+5, add=TRUE, col=3)
-    legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+    if(updated)
+      lines(density(Ftestboot23[1:x$updated], from=0), col=4)
+    legend("topright", legend=leg, col=col, lty=c(1,1,2), bg="white")
   }
 }
 
+
+extendBoot<-function(x, n){
+  if(class(x)!="Hansen99Test")
+    stop("Function only works for setarTest object")
+  args<-x$args
+  newTestRuns <-setarTest(x=args$x, m=args$m, d = args$d, steps = args$steps, series=args$series, thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test, check=args$check)
+  if(any(x$Ftests!=newTestRuns$Ftests))
+    stop("Problem..")
+  OldVal<-x$Ftestboot
+  NewVal<-newTestRuns$Ftestboot
+  
+  probs<-c(0.9, 0.95, 0.975,0.99)
+  if(args$test=="1vs"){
+    Ftestboot<-cbind(OldVal, NewVal)
+    Ftestboot12<-Ftestboot[1,]
+    Ftestboot13<-Ftestboot[2,]
+    PvalBoot12<-mean(ifelse(Ftestboot12>x$Ftests[1],1,0))
+    CriticalValBoot12<-quantile(Ftestboot12, probs=probs)
+    PvalBoot13<-mean(ifelse(Ftestboot13>x$Ftests[2],1,0))
+    CriticalValBoot13<-quantile(Ftestboot13, probs=probs)
+    CriticalValBoot<-matrix(c(CriticalValBoot12,CriticalValBoot13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
+    PvalBoot<-c(PvalBoot12,PvalBoot13)
+  }
+  else{
+    Ftestboot<-c(OldVal, NewVal)
+    Ftestboot23<-Ftestboot
+    PvalBoot23<-mean(ifelse(Ftestboot23>x$Ftests[3],1,0))
+    CriticalValBoot23<-quantile(Ftestboot23, probs=probs)
+    CriticalValBoot<-matrix(CriticalValBoot23, nrow=1, dimnames=list("2vs3", probs))
+    PvalBoot<-PvalBoot23
+  }
+  newNboot<-ifelse(args$test=="1vs", ncol(Ftestboot), length(Ftestboot))
+  #second check
+  
+  if(x$nboot+newTestRuns$nboot!=newNboot)
+    stop("Problem2")
+  
+  res<-list(Ftests=x$Ftests, SSRs=x$SSRs, firstBests=x$firstBests,secBests=x$secBests, CriticalValBoot=CriticalValBoot,PvalBoot=PvalBoot,Ftestboot=Ftestboot, nboot=newNboot, args=args, updated=x$nboot)
+  
+  class(res)<-"Hansen99Test"
+  return(res)
+}
+  
+  
+  
 
 if(FALSE){  
 library(tsDyn)
@@ -250,4 +323,13 @@ plot(dat4)
 #save
 IIPUs<-dat4
 save(IIPUs, file="IIPUs.rda")
+
+###junk test
+a<-setarTest(sun[1:100], m=1, nboot=100, check=TRUE)
+summary(a)
+plot(a)
+b<-extendBoot(a, n=100)
+print(b)
+summary(b)
+plot(b)
 }

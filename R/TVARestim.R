@@ -244,7 +244,7 @@ gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim, trace
 bigThresh <- max(bests)			#bestThresh,secondBestThresh)
 gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim, trace=trace)
 
-bestThresh<-grid(gammasUp, gammasDown, bestDelay, fun=func2, method=trick)
+bestThresh<-grid(gammasUp, gammasDown, fun=func2, method=trick, thDelay=bestDelay)
 
 }#end if nthresh=2
 
@@ -752,7 +752,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
 
 
 ###Function for nthresh=2, Alternative step: grid around the points from first step
-grid<-function(gammasUp, gammasDown, bestDelay, fun, trace=TRUE, method=c("for", "apply", "mapply")){
+grid<-function(gammasUp, gammasDown, fun, trace=TRUE, method=c("for", "apply", "mapply"),...){
 	store <- matrix(NA,ncol=length(gammasUp), nrow=length(gammasDown))
 	method<-match.arg(method)
 	if(method=="for"){
@@ -761,7 +761,7 @@ grid<-function(gammasUp, gammasDown, bestDelay, fun, trace=TRUE, method=c("for",
 			gam1 <- gammasDown[i]
 			for(j in 1: length(gammasUp)){
 				gam2 <- gammasUp[j]
-				store[i,j] <- fun(gam1=gam1, gam2=gam2, thDelay=bestDelay)
+				store[i,j] <- fun(gam1=gam1, gam2=gam2,...)
 			}
 		}
 
@@ -778,7 +778,7 @@ grid<-function(gammasUp, gammasDown, bestDelay, fun, trace=TRUE, method=c("for",
 	else if(method=="apply"){
 		grid<-expand.grid(gammasDown,gammasUp)
 # 		fun(gam1=gam1, gam2=gam2, d=bestDelay)
-		temp<-function(a) fun(gam1=c(a)[1],gam2=c(a)[2],thDelay=bestDelay)
+		temp<-function(a) fun(gam1=c(a)[1],gam2=c(a)[2],...)
 		store<-apply(grid,1,temp)
 		bests<-which(store==min(store, na.rm=TRUE))
 		if(length(bests)>1) {
@@ -790,7 +790,7 @@ grid<-function(gammasUp, gammasDown, bestDelay, fun, trace=TRUE, method=c("for",
 	}
 	else if(method=="mapply"){
 		grid<-expand.grid(gammasDown,gammasUp)	
-		store<-mapply(fun, gam1=grid[,1],gam2=grid[,2], MoreArgs=list(thDelay=bestDelay))
+		store<-mapply(fun, gam1=grid[,1],gam2=grid[,2], MoreArgs=list(...))
 		bests<-which(store==min(store, na.rm=TRUE))
 		if(length(bests)>1) {
 			warning("There were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken") 	

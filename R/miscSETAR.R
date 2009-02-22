@@ -70,7 +70,7 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 }
 
 
-SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,trim, fun=buildXth1Common){
+SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim, fun=buildXth1Common){
 	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH,const, trim)
 	if(any(is.na(XX))){
 		res<-NA}
@@ -84,8 +84,8 @@ SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=con
 
 
 
-SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2Common,trim=trim){
-	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim){
+	XX<-buildXth2Common(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
@@ -96,12 +96,23 @@ SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=M
 	return(res)
 }
 
-SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2Common,trim=trim){
-  SSR_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2NoCommon,trim=trim)
+# SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2Common,trim=trim){
+#   SSR_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2NoCommon,trim=trim)
+# }
+
+SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim){
+  	XX<-buildXth2NoCommon(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
+		#res2<-deviance(lm(yy~XX-1))
+		#print(c(res,res2))
+	}
+	return(res)
 }
 
-
-AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common ){
+AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common ){
 	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
@@ -113,7 +124,7 @@ AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH,const=cons
 	return(res)
 }
 
-AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=z, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
+AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
 	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
