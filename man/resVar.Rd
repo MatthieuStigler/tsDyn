@@ -4,7 +4,7 @@
 \description{Extracts the global and regime-dependant variance of the residuals
 }
 \usage{
-resVar(x, adj=c("OLS", "ML")
+resVar(x, adj=c("OLS", "ML"))
 }
 
 

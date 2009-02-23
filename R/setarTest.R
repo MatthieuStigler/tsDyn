@@ -180,12 +180,12 @@ summary.Hansen99Test<-function(object, ...){
     
 }
 
-plot.Hansen99Test<-function(x,...){
+plot.Hansen99Test<-function(x,show.extended=TRUE, ...){
   m<-x$args$m
   test<-x$args$test
   leg<-c("Asymptotic Chi 2", "Bootstrap", "Test value")
   col<-c(3,1,2)
-  updated<-ifelse(!is.null(x$updated), TRUE, FALSE)
+  updated<-ifelse(!is.null(x$updated)&show.extended, TRUE, FALSE)
   if(updated){
       leg<-c(leg[1:3], "Old Bootstrap")
       col<-c(col,4)
@@ -233,10 +233,11 @@ plot.Hansen99Test<-function(x,...){
 }
 
 
-extendBoot<-function(x, n){
+extendBoot<-function(x, nboot){
   if(class(x)!="Hansen99Test")
     stop("Function only works for setarTest object")
   args<-x$args
+  n <- nboot
   newTestRuns <-setarTest(x=args$x, m=args$m, d = args$d, steps = args$steps, series=args$series, thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test, check=args$check)
   if(any(x$Ftests!=newTestRuns$Ftests))
     stop("Problem..")
@@ -324,12 +325,15 @@ plot(dat4)
 IIPUs<-dat4
 save(IIPUs, file="IIPUs.rda")
 
-###junk test
-a<-setarTest(sun[1:100], m=1, nboot=100, check=TRUE)
-summary(a)
+###Test extendBoot
+# test with 10 bootstrap replications:
+a<-setarTest(sun[1:100], m=1, nboot=10)
 plot(a)
-b<-extendBoot(a, n=100)
-print(b)
-summary(b)
+
+#use old results and compue 20 new replications
+b<-extendBoot(a, n=20)
+#see the different distributions:
 plot(b)
+
+plot(b, show.extended=FALSE)
 }
