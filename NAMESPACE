@@ -13,7 +13,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        nlarDialog, linear, isLinear, nnetTs, aar,
 	star, ncstar, ncgstar, ncstar.predefined,ncgstar.predefined,
        TVAR, TVECM,TVAR_LRtest, setar.sim, TVAR_simul, TVECM_SeoTest, linear2, setarTest,
-	BIC, MakeThSpec,BBCTest)
+	BIC, MakeThSpec,BBCTest,KapShinTest)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
@@ -42,6 +42,7 @@ S3method(print, VAR)
 S3method(print, selectSETAR)
 S3method(print, Hansen99Test)
 S3method(print, BBC2004Test)
+S3method(print, KapShin2006Test)
 S3method(summary, nlar)
 S3method(summary, linear)
 S3method(summary, setar)
