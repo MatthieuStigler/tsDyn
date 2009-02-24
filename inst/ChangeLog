@@ -11,9 +11,11 @@ M. Stigler)
 -fixed typo in print.star
 
 -version 0.6-1
+-fixed bug in nnetTs: control args were not passed to 'nnet' fitter
+	reported by prof. Joachim Zietz
 -fixed bug in llar.predict (spotted by Markus Gross)
 
--version 0.6-0 released
+-version 0.6-0
 -fixed Matrix dependency in DESCRIPTION
 -added minimal docs for newly created internal objects
 -added STAR model option to the tcltk GUI
