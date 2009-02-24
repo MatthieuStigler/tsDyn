@@ -1,6 +1,6 @@
 citEntry(entry="Manual",
 	title = "tsDyn: Time series analysis based on dynamical systems theory",
-	author = "Antonio, Fabio Di Narzo",
-	year = 2007,
+	author = "Antonio, Fabio Di Narzo, Josè Luis Aznarte, Matthieu Stigler",
+	year = 2009,
 	note = "R package version 0.7",
-	textVersion = "Antonio, Fabio Di Narzo and Josè Luis Aznarte (2007). tsDyn: Time series analysis based on dynamical systems theory")
+	textVersion = "Antonio, Fabio Di Narzo, Josè Luis Aznarte and Matthieu Stigler (2009). tsDyn: Time series analysis based on dynamical systems theory")

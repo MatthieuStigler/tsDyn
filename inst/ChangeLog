@@ -11,6 +11,7 @@ M. Stigler)
 -fixed typo in print.star
 
 -version 0.6-1
+-fixed CITATION file to the new R format
 -fixed bug in nnetTs: control args were not passed to 'nnet' fitter
 	reported by prof. Joachim Zietz
 -fixed bug in llar.predict (spotted by Markus Gross)
