@@ -1,5 +1,7 @@
 \name{selectSETAR}
 \alias{selectSETAR}
+\alias{selectSetar}
+\alias{selectsetar}
 \title{Automatic selection of SETAR hyper-parameters}
 \description{
 Automatic selection of SETAR hyper-parameters
@@ -49,12 +51,19 @@ When two thresholds(\code{nthresh}=2) have to be computed, the search for the se
 By default, all threshold values excluding the upper and lower \code{trim} of the threshold values are taken as potential threshold. restriction can be made with arg \code{th}. See function \link{MakeThSpec}. 
 }
 \value{
-  A data-frame, with columns giving hyper-parameter values and the
-  computed AIC for each row (only the best 10s are returned)
+An obkect of class "selectSETAR" (print and plot methods) with: 
+  \item{res} {A data-frame, with columns giving hyper-parameter values and the
+  computed AIC for each row (only the best 10/5s are returned)}
+\item{res2} {Same as res, returned if ntresh=2 otherwise set to NULL}
+\item{bests}{estimated hyper-parameters}
+\item{th, firstBests, bests2th, ML, MM, MH}{estimated parameters, from first and conditional search}
+\item{criterion, nthresh,same.lags}{returns args given by user}
+\item{allTh}{all threshold values and correspoinding criterion from first search}
 }
 \seealso{
   \code{\link{selectLSTAR}}, \code{\link{selectNNET}}, \link{MakeThSpec}
 }
+\references{Gonzalo, J. & Pitarakis, J. (2002) Estimation and model selection based inference in single and multiple threshold models, Journal of Econometrics, 110, 319 - 352}
 \author{ Antonio, Fabio Di Narzo and Stigler, Matthieu}
 \examples{
 llynx <- log10(lynx)
