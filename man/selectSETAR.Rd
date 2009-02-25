@@ -5,7 +5,7 @@
 Automatic selection of SETAR hyper-parameters
 }
 \usage{
-selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"))
+selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE)
 }
 
 \arguments{
@@ -30,27 +30,32 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=Mak
 \item{plot}{Should a plot showing the criterion values be printed? (logical)}
 \item{max.iter}{Number of iterations for the alogorithm}
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
+\item{same.lags}{Logical. When AIC or pooled-AIC is used and arg m is given, should it search for same number of lags in each regime (TRUE) or allow for different (FALSE) lags in each regime. Different lags involves more computation}
 }
 \details{
   Routine for automatic selection of SETAR models hyper parameters.
   
   An exhaustive search over all possible combinations of values of
-  specified hyper-parameters is performed.
+  specified hyper-parameters is performed. Thus the threshold delay, the number of lags in each regime and the threshold value are computed. 
   
-  Embedding parameters \code{m,d,steps} are kept fixed.
+  Embedding parameters \code{d,steps} are kept fixed.
 
-  Possible criteria are the usual AIC and a pooled AIC formula:
+  Possible criteria are the usual SSR, AIC and a pooled AIC formula:
   \eqn{AIC(low regime model) + AIC(high regime model)}. The default
-  criterion is the pooled AIC formula.
+  criterion is the pooled AIC formula. SSR criterion can't be used to compare models with different lags. 
+
+When two thresholds(\code{nthresh}=2) have to be computed, the search for the second is made conditional on results for first threshold as suggested in Gonzalo and Pittarakis (2002). Refinements can be obtained by using \code{max.iter} (first threshold being restimated based on the second one). If SSR is used, the number of lags in the inner regime is either the same if only arg m was given, otherwise it has to be pre-specified. Criterion AIC can be used to determine the number of lags in the nner regime, whereas pooled-aic is currently not implemented for nthresh=2. 
+
+By default, all threshold values excluding the upper and lower \code{trim} of the threshold values are taken as potential threshold. restriction can be made with arg \code{th}. See function \link{MakeThSpec}. 
 }
 \value{
   A data-frame, with columns giving hyper-parameter values and the
   computed AIC for each row (only the best 10s are returned)
 }
 \seealso{
-  \code{\link{selectLSTAR}}, \code{\link{selectNNET}}
+  \code{\link{selectLSTAR}}, \code{\link{selectNNET}}, \link{MakeThSpec}
 }
-\author{ Antonio, Fabio Di Narzo }
+\author{ Antonio, Fabio Di Narzo and Stigler, Matthieu}
 \examples{
 llynx <- log10(lynx)
 selectSETAR(llynx, m=2)
