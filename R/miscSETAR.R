@@ -112,33 +112,33 @@ SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML
 	return(res)
 }
 
-AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common ){
+AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common , k=2){
 	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
 		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
-		res<-length(yy)*log(res)+2*ncol(xx)
+		res<-length(yy)*log(res)+k*ncol(xx)
 		#res2<-AIC(lm(yy~XX-1))}
 	}
 	return(res)
 }
 
-AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
+AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2){
 	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
 		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
-		res<-length(yy)*log(res)+2*ncol(xx)
+		res<-length(yy)*log(res)+k*ncol(xx)
 		#res2<-AIC(lm(yy~XX-1))
 		#print(c(res,res2))
 	}
 	return(res)
 }
 
-AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common){
-  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon)
+AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2){
+  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, k=k)
 }
 
 

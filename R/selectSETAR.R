@@ -17,7 +17,7 @@
 
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -235,12 +235,13 @@ pooledAIC <- function(parms) {
   if (criterion == "pooled-AIC") {
       computedCriterion <- apply(IDS, 1, pooledAIC)
   } 
-  else if(criterion=="AIC"){
+  else if(criterion%in%c("AIC","BIC")){
+    kaic<-switch(criterion, "AIC"=2, "BIC"=log(length(yy)))
     mHPos<-ifelse(same.lags, 2,3)
     if(common)
-      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common))
+      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common, k=kaic))
     else
-      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon))
+      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon, k=kaic))
   } 
   else if(criterion=="SSR"){
     if(common)
@@ -291,7 +292,7 @@ pooledAIC <- function(parms) {
     ###set lags according to first search
     potMM<-list()
     
-    if(criterion=="AIC"){
+    if(criterion%in%c("AIC", "BIC")){
       if(same.lags){
 	ML<-firstBests["m"]
 	MH<-ML
@@ -309,9 +310,9 @@ pooledAIC <- function(parms) {
       potMM[[1]]<-ML
     
     if(common)
-      func<-switch(criterion, "AIC" = AIC_2threshCommon, "SSR" = SSR_2threshCommon)	
+      func<-switch(criterion, "AIC" = AIC_2threshCommon,"BIC" = AIC_2threshCommon, "SSR" = SSR_2threshCommon)	
     else
-      func<-switch(criterion, "AIC" = AIC_2threshNoCommon, "SSR" = SSR_2threshNoCommon)
+      func<-switch(criterion, "AIC" = AIC_2threshNoCommon,"BIC" = AIC_2threshNoCommon, "SSR" = SSR_2threshNoCommon)
     
     Bests<-matrix(NA, nrow=length(potMM), ncol=4)
     colnames(Bests)<-c("th1", "th2", criterion, "pos")
@@ -367,9 +368,9 @@ pooledAIC <- function(parms) {
 ###selectSETAR 9: plot of the results of the grid search
 if(plot==TRUE){
 	allcol <- seq_len(max(thDelay+1)*max(ML)*max(MH))
-	col <- switch(criterion, AIC=allcol, "pooled-AIC"=allcol,"SSR"=(thDelay+1) )
+	col <- switch(criterion, "AIC"=allcol, "BIC"=allcol,"pooled-AIC"=allcol,"SSR"=(thDelay+1) )
 	big <- apply(expand.grid(thDelay,ML, MH),1,function(a) paste("Th:", a[1],"mL:", a[2], "mH:", a[3]))
-	legend <- switch(criterion, "AIC"=big, "pooled-AIC"=big, "SSR"=paste("Threshold Delay", thDelay))
+	legend <- switch(criterion, "AIC"=big,"BIC"=big, "pooled-AIC"=big, "SSR"=paste("Threshold Delay", thDelay))
 
 	plot(allres[,"th"], allres[,ncol(allres)], col=col, xlab="Treshold Value",ylab=criterion, main="Results of the grid search")
  	legend("topleft", pch=1, legend=legend, col=col, bg=0)
