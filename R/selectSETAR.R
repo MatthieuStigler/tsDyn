@@ -34,6 +34,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   include<-match.arg(include)
   model<-match.arg(model)
   type<-match.arg(type)
+  criterion<-match.arg(criterion)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(missing(series))
@@ -205,7 +206,6 @@ pooledAIC <- function(parms) {
 
 
 ###selectSETAR 5: Grid of combinations of all parameters
-  criterion <- match.arg(criterion)
   if(criterion=="SSR"){
     ncombin<-length(thDelay)*length(th)
     if(trace)
