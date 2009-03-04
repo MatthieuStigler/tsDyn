@@ -464,15 +464,15 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 	d <- str$d
 	lags <- c((0:(m-1))*(-d), str$steps)
 	xxyy <- getXXYY(str)
+	restriction<-x$model.specific$restriction
+	nthresh<-x$model.specific$nthresh
+	regime<-x$model.specific$regime
 	x.old <- x
 	x <- c(x, x$model.specific)
 	series <- str$x
 	z <- x$thVar
 	th <- getTh(coef(x)) #x$coefficients["th"]
-	nthresh<-x.old$model.specific$nthresh
-	regime<-ifelse(z<=th[1],1,2)
-	if(nthresh==2)
-	  regime[regime==2]<-ifelse(z[regime==2]<th[2], 2,3)
+	  
 	regime.id<-regime
 	#regime <- factor(z <= th, levels=c(TRUE, FALSE), labels=c("low","high"))
 	#regime.id <- as.numeric(regime) #1/2 vector indicating the regime
@@ -514,15 +514,21 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 	y0 <- series[t]
 	y1 <- series[t+1]
 	par(mar=c(0,4,4,0))	#number of lines of margin to be specified on the 4 sides of the plot
-	plot(t, series, type="p", ax=FALSE, ylab="time series values", main="Regime switching plot")
-	if(legend)
-	    legend("topright", legend=c("low",if(nthresh==2) "middle","high"), pch=pch[c(1,1)], col=1:(nthresh+1), merge=FALSE, title="regime")
+	plot(t, series, type=ifelse(length(regime)<=300, "p", "n"), ax=FALSE, ylab="time series values", main="Regime switching plot")
+	legRSP<-c("low",if(nthresh==2|restriction=="OuterSymAll") "middle","high")
+	legend("topright", legend=legRSP, pch=pch[c(1,1)], col=seq_len(length(legRSP)), merge=FALSE, title="regime")
 	abline(h=th)
+	if(restriction=="OuterSymAll")
+	  abline(h=-th)
 	axis(2)		#adds an axis on the left
 	segments(x0,y0,x1,y1,col=regime.id)	#adds segments between the points with color depending on regime
 	#plot for the transition variable
 	par(mar=c(5,4,4,2))
 	layout(matrix(1:2, ncol=1))
+	if(restriction=="OuterSymAll"){
+	  nthresh<-2
+	  th<-c(-th, th)
+	}
 	plot1(th, nthresh,usedThVar=x$model.specific$thVar) #shows transition variable, stored in TVARestim.R
 	plot2(th, nthresh,usedThVar=x$model.specific$thVar, trim=x$model.specific$trim) #ordered transition variabl
 	par(op)
