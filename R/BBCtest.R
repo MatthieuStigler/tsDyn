@@ -24,16 +24,6 @@ thValues<-matrix(sort(abs(z))[seq(down, up)], ncol=1)
 
 
 #check that there is at least enough observations in each regime for the regression
-PercInRegime<-function(th, Xtrans, fun, crit, dep, grid){
-  LowRegime<-fun(Xtrans<= -abs(th))
-  HighRegime<-fun(Xtrans> abs(th))
-  MiddleRegime<-dep-LowRegime-HighRegime
-  RegProportions<-c(LowRegime, MiddleRegime, HighRegime)
-  
-  ret<-ifelse(any(RegProportions<crit), 0,1)
-  return(ret)
-}
-
   if(trim*length(z)<m+2){
     warning("It may have not enough observations with this trim parameter, has been changed from ", trim, " to ", round((m+2)/length(z),3))
     trim<-(m+2)/length(z)
@@ -41,7 +31,7 @@ PercInRegime<-function(th, Xtrans, fun, crit, dep, grid){
   critMin<-switch(grid, "minPerc"=trim, "minObs"= m+2)
   fun<-switch(grid, "minPerc"=mean, "minObs"= sum)
   dep<-switch(grid, "minPerc"=1, "minObs"= length(z))
-  A<-apply(thValues, 1, PercInRegime, Xtrans=z,fun=fun, crit=critMin,dep=dep, grid=grid)
+  A<-apply(thValues, 1, PercInRegime, Xtrans=z,fun=fun, crit=critMin,dep=dep)
   B<-cbind(thValues,A)
   
   th<-B[which(B[,2]==1),1]
@@ -177,4 +167,13 @@ environment(BBCTest)<-environment(star)
 ar<-cumsum(rnorm(20))
   Wald <- BBCTest(ar, m=1, testStat="Wald")$statistic
 
+}
+PercInRegime<-function(th, Xtrans, fun, crit, dep){
+  LowRegime<-fun(Xtrans<= -abs(th))
+  HighRegime<-fun(Xtrans> abs(th))
+  MiddleRegime<-dep-LowRegime-HighRegime
+  RegProportions<-c(LowRegime, MiddleRegime, HighRegime)
+  
+  ret<-ifelse(any(RegProportions<crit), 0,1)
+  return(ret)
 }

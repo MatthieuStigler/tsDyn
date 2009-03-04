@@ -17,7 +17,7 @@
 
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh") ) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -35,6 +35,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   model<-match.arg(model)
   type<-match.arg(type)
   criterion<-match.arg(criterion)
+  restriction<-match.arg(restriction)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(missing(series))
@@ -44,6 +45,13 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
       warning("\ncriterion pooled AIC currently not implemented for nthresh=2, criterion SSR is used\n")
       criterion<-"SSR"
     }
+  if(criterion == "pooled-AIC"&restriction!="none"){
+    warning("\ncriterion pooled AIC currently not implemented for restriction=OuterSymAll, criterion SSR is used\n")
+      criterion<-"SSR"
+    }
+    
+  
+  
 ### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )    
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	
@@ -166,15 +174,30 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
 
 z<-as.matrix(z)
 
+
 ### selectSETAR 3: set-up of the grid
 #Possibilities:
 #gamma pre-specified
 #interval to search inside given by user
 #value to search around	given by user
 #Default method: grid from lower to higher point
-  allTh <- sort(z[,1])
-  th<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace, nthresh=nthresh)
+  if(restriction=="none")
+    allTh <- sort(z[,1])
+  else
+    allTh <- sort(abs(z[,1]))
   
+  th<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace, nthresh=nthresh)
+
+###select only values with sufficient of observations in middle regime
+  if(restriction!="none"){
+    if(mean(x<0)<trim)
+      warning("there are only ", mean(x<0), " negative observations. Taking symetric threholds might be inapropriate")
+    A<-apply(matrix(th, ncol=1), 1, PercInRegime, Xtrans=z[,1],fun=mean, crit=trim,dep=1)
+    B<-cbind(th,A)
+    th<-B[which(B[,2]==1),1]
+    z<-abs(z)
+  }
+
 ### selectSETAR 4: Sets up functions to compute the SSR/AIC/Pooled-AIC for th= 1 or 2
 #have been moved to miscSETAR.R, call before functions to build the regressors matrix
 ### selectSETAR 4b:Function pooled AIC 
@@ -239,7 +262,7 @@ pooledAIC <- function(parms) {
     kaic<-switch(criterion, "AIC"=2, "BIC"=log(length(yy)))
     mHPos<-ifelse(same.lags, 2,3)
     if(common)
-      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common, k=kaic))
+	computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common, k=kaic))	
     else
       computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon, k=kaic))
   } 

@@ -160,20 +160,20 @@ z<-as.matrix(z)
 ### SETAR 4: Search of the treshold if th not specified by user
 #if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
 #call the function selectSETAR
-	if (missing(th)|length(thDelay)>1) { 
-		ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
-		search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",ngrid=ngrid, plot=FALSE,max.iter=2, type=type)
-		thDelay<-search$bests[1]
-		th<-search$bests[2:(nthresh+1)]
-		nested<-TRUE
-		if(trace) {
-			cat("Selected threshold: ", th,"\n")
-			cat("Selected delay: ", thDelay,"\n")
-		}
-		#missing(th)<-FALSE
-	}
-	if(missing(thVar)&missing(mTh))
-	  z<-xx[,thDelay+1, drop=FALSE]
+  if (missing(th)|length(thDelay)>1) { 
+    ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
+    search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",ngrid=ngrid, plot=FALSE,max.iter=2, type=type, restriction=restriction)
+    thDelay<-search$bests[1]
+    th<-search$bests[2:(nthresh+1)]
+    nested<-TRUE
+    if(trace) {
+      cat("Selected threshold: ", th,"\n")
+      cat("Selected delay: ", thDelay,"\n")
+    }
+    #missing(th)<-FALSE
+  }
+  if(missing(thVar)&missing(mTh))
+    z<-xx[,thDelay+1, drop=FALSE]
 	  
   if(restriction=="none")
     transV<-z
