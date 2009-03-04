@@ -22,7 +22,7 @@
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
-setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15, type=c("level", "diff", "ADF")){
+setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15, type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") ){
 # 1: preliminaries
 # 2:  Build the regressors matrix and Y vector
 # 3: Set-up of transition variable
@@ -34,17 +34,19 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 
 
 ###SETAR 1: preliminaries
-	include<-match.arg(include)
-	type<-match.arg(type)
-	model<-match.arg(model)
-	if(missing(m))
-		m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
-	if(!missing(th)){
-		if(length(th)==2)
-			nthresh<-2
-	}
-  if(missing(series))
+  include<-match.arg(include)
+  type<-match.arg(type)
+  model<-match.arg(model)
+  restriction<-match.arg(restriction)
+  if(missing(m))
+    m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
+  if(!missing(th)){
+		  if(length(th)==2)
+			  nthresh<-2
+	  }
+    if(missing(series))
     series <- deparse(substitute(x))
+    
 ### SETAR 2:  Build the regressors matrix and Y vector
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	
@@ -66,33 +68,39 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 	}
 	
 	externThVar <- FALSE #mmh should maybe be removed
-	##Lags selection
-	if(missing(ML)) {		#ML: different lags
-		if (missing(mL)) {	#mL: suit of lags
-			mL <- m
-			if (trace) 
-				cat("Using maximum autoregressive order for low regime: mL =", m,"\n")
-		}
-		ML <- seq_len(mL)
-	}
+##Lags selection
+  ###ML
+  if(missing(ML)) {		#ML: different lags
+    if (missing(mL)) {	#mL: suit of lags
+      if(missing(m))
+	cat("arg m is missing")
+      else
+	mL <- m
+      if (trace) 
+	cat("Using maximum autoregressive order for low regime: mL =", m,"\n")
+    }
+    ML <- seq_len(mL)
+  }
 
-	if(missing(MM)) {
-		if (missing(mM)) {
-			mM <- m
-		    if (trace&nthresh==2) 
-				cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
-		}
-		MM <- seq_len(mM)
-	}
-	if(missing(MH)) {
-		if (missing(mH)) {
-			mH <- m
-			if (trace) 
-				cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
-		}
-		MH <- seq_len(mH)
-	}
-
+  ###MH
+  if(missing(MH)) {
+    if (missing(mH)) {
+    mH <- m
+    if (trace) 
+      cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
+    }
+  MH <- seq_len(mH)
+  }
+  
+  ###MM
+  if(missing(MM)) {
+    if (missing(mM)) {
+    mM <- m
+    if (trace&nthresh==2) 
+      cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
+    }
+  MM <- seq_len(mM)
+  }
 ###includes const, trend
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
@@ -147,6 +155,8 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
 
 z<-as.matrix(z)
 
+
+
 ### SETAR 4: Search of the treshold if th not specified by user
 #if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
 #call the function selectSETAR
@@ -164,22 +174,36 @@ z<-as.matrix(z)
 	}
 	if(missing(thVar)&missing(mTh))
 	  z<-xx[,thDelay+1, drop=FALSE]
+	  
+  if(restriction=="none")
+    transV<-z
+  else if(restriction=="OuterSymAll")
+    transV<-abs(z)
 ### SETAR 5: Build the threshold dummies and then the matrix of regressors
 
 	#check number of observations)
-	if(nthresh==1){
-		isL <- ifelse(z<=th, 1, 0)
-		isM<-NA
-		isH <- 1-isL}	
-	else{
-		isL <- ifelse(z<=th[1], 1, 0)
-		isH <- ifelse(z>th[2], 1, 0)
-		isM <- 1-isL-isH
-	}
-
+  if(restriction=="none"){
+    if(nthresh==1){
+      isL <- ifelse(z<=th, 1, 0)
+      isM<-NA
+      isH <- 1-isL}	
+    else{
+      isL <- ifelse(z<=th[1], 1, 0)
+      isH <- ifelse(z>th[2], 1, 0)
+      isM <- 1-isL-isH
+    }
+  }
+  else if(restriction=="OuterSymAll"){
+      isL <- ifelse(z<= -abs(th), 1, 0)
+      isH <- ifelse(z>abs(th), 1, 0)
+      isM <- 1-isL-isH
+   }
+  
+  regime<-if(nthresh==1&restriction=="none") isL+2*isH else isL+2*isM+3*isH
+  
   nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
 	if(min(nobs)<trim-0.01){
-	warning("\nWith the threshold you gave (", th, "there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
+	warning("\nWith the threshold you gave (", th, ") there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
 	}
 	if(min(nobs)==0)
 		stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
@@ -195,17 +219,19 @@ z<-as.matrix(z)
 	  exMH<-MH
 	  exMM<-if(nthresh==2) MM else NULL
 	 }
+
+	 
 	if(nthresh==1){
 	  if(common)
-	    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const)	
+	    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const)	
 	  else
-	    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=z, ML=exML, MH=exMH,const=const, trim=trim)	
+	    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const=const, trim=trim)	
 		midCommon<-mid<-NA}
 	else if(nthresh==2){
 	  if(common)
-	    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
+	    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
 	  else
-	    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=z, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
+	    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
 			#midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep=".")) no more used: 
 			#mid<-c(paste("phi3", MH, sep=".")) #no more used
 	}
@@ -242,35 +268,36 @@ if(type=="level"){
 }
 
 ### SETAR 7: return the infos
-		res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
-		res$thDelay<-thDelay
-		res$fixedTh <- if(nested) FALSE else TRUE
-		res$mL <- max(ML)
-		res$mH <- max(MH)
-		res$mM <- if(nthresh==2) max(MH) else NULL
-		res$ML <- ML
-		res$MH <- MH
-		res$MM <- if(nthresh==2)  MM else NULL
-		res$externThVar <- externThVar
-		res$thVar <- z
-		res$incNames<-incNames
-		res$common<-common  	#wheter arg common was given by user
-		res$nthresh<-nthresh 	#n of threshold
-		res$model<-model
-		res$RegProp <- c(mean(isL),mean(isH))
-		res$trim<-trim
-		if(nthresh==2)
-			res$RegProp <- c(mean(isL),mean(isM),mean(isH))
-		res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
-		if(!externThVar) {
-			if(missing(mTh)) {
-				mTh <- rep(0,m)
-				mTh[thDelay+1] <- 1
-			}
-			res$mTh <- mTh
+	res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
+	res$thDelay<-thDelay
+	res$fixedTh <- if(nested) FALSE else TRUE
+	res$mL <- max(ML)
+	res$mH <- max(MH)
+	res$mM <- if(nthresh==2) max(MH) else NULL
+	res$ML <- ML
+	res$MH <- MH
+	res$MM <- if(nthresh==2)  MM else NULL
+	res$externThVar <- externThVar
+	res$thVar <- z
+	res$incNames<-incNames
+	res$common<-common  	#wheter arg common was given by user
+	res$nthresh<-nthresh 	#n of threshold
+	res$model<-model
+	res$restriction<-restriction
+	res$trim<-trim
+	res$regime<-regime
+	res$RegProp <- c(mean(isL),mean(isH))
+	if(nthresh==2|restriction=="OuterSymAll")
+		res$RegProp <- c(mean(isL),mean(isM),mean(isH))
+	res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
+	if(!externThVar) {
+		if(missing(mTh)) {
+			mTh <- rep(0,m)
+			mTh[thDelay+1] <- 1
 		}
-		return(extend(nlar(str,	coef=res$coef,	fit=res$fitted.values,	res=res$residuals,
-			k=res$k,model.specific=res), "setar"))
+		res$mTh <- mTh
+	}
+	return(extend(nlar(str,	coef=res$coef,	fit=res$fitted.values,	res=res$residuals,k=res$k,model.specific=res), "setar"))
 	#}
 }
 
@@ -362,7 +389,7 @@ print.setar <- function(x, ...) {
 	if(x$fixedTh) cat(" (fixed)")
 	cat("\n")
 	cat("Proportion of points in ")
-	if(nthresh==1)
+	if(nthresh==1&x$restriction=="none")
 		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
 	else
 		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")

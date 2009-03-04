@@ -1,11 +1,10 @@
-
-
 resVar<-function(x, adj=c("OLS", "ML")){
   if(!inherits(x, "setar"))
     stop("Object must be created by setar()")
   adj<-match.arg(adj)
   obj<-x$model.specific
   z<-obj$z
+  regime<-obj$regime
   sigGen<-crossprod(na.omit(x$res))/(length(x$res)-ifelse(adj=="OLS",obj$k,0))
   names(sigGen)<-"Total"
   nc<-ifelse(adj=="OLS", length(obj$IncNames), 0)
@@ -14,8 +13,8 @@ resVar<-function(x, adj=c("OLS", "ML")){
   MM<-ifelse(adj=="OLS", length(obj$MM), 0)
 
   if(obj$nthresh==1){
-    isL <- ifelse(obj$thVar<= getTh(x$coef),1,0)	### isL: dummy variable
-    isH<-1-isL
+    isL <- ifelse(regime==ifelse(obj$restriction=="none",1,2), 1,0)
+    isH <- 1-isL
     resL<-isL*x$res
     sigL<-crossprod(na.omit(resL))/(sum(isL)-ML-nc)
     resH<-isH*x$res
@@ -24,9 +23,9 @@ resVar<-function(x, adj=c("OLS", "ML")){
     names(sigReg)<-c("L", "H")
   }
   if(obj$nthresh==2){
-    isL <- ifelse(obj$thVar<= getTh(x$coef)[1],1,0)	### isL: dummy variable
-    isH <- ifelse(obj$thVar> getTh(x$coef)[2],1,0)	### isL: dummy variable
-    isM<-1-isL-isH
+    isL<-ifelse(regime==1, 1,0)
+    isM<-ifelse(regime==2, 1,0)
+    isH<-1-isL-isM
     resL<-isL*x$res
     resM<-isM*x$res
     resH<-isH*x$res
@@ -42,11 +41,14 @@ c(sigGen,sigReg)
 
 if(FALSE){
 library(tsDyn)
+environment(resVar)<-environment(star)
 a<-setar(lynx, m=2)
+
 resVar(a)
 
 aa<-setar(lynx, m=2, nthresh=2)
 aa
 resVar(aa)
+
 }
 

@@ -7,23 +7,23 @@
 Self Exciting Threshold AutoRegressive model.
 }
 \synopsis{
-setar(x, m, d=1, steps=d, series, mL, mM, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE, include = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MM=seq_len(mM), MH=seq_len(mH),nthresh=1,trim=0.15, type=c("level", "diff", "ADF"))
+setar(x, m, d=1, steps=d, series, mL, mM, mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE, include = c( "const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MM=seq_len(mM), MH=seq_len(mH),nthresh=1,trim=0.15, type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") )
 }
 \usage{
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thDelay=0, th,
 trace=FALSE,include = c( "const", "trend","none", "both"),
 common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MH=seq_len(mH),nthresh=1,trim=0.15,
- type=c("level", "diff", "ADF"))
+ type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") )
 
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, mTh, th,
 trace=FALSE,include = c( "const", "trend","none", "both"), 
 common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MH=seq_len(mH),nthresh=1,trim=0.15, 
-type=c("level", "diff", "ADF"))
+type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") )
 
 setar(x, m, d=1, steps=d, series, mL=m, mH=m, thVar, th,
 trace=FALSE,include = c( "const", "trend","none", "both"), 
 common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL), MH=seq_len(mH),nthresh=1,trim=0.15, 
-type=c("level", "diff", "ADF"))
+type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") )
 }
 \value{
   An object of class \code{nlar}, subclass \code{setar}
@@ -59,6 +59,7 @@ type=c("level", "diff", "ADF"))
 \item{nthresh}{Number of threshold of the model}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime. Default to 0.15}
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
+\item{restriction}{Restriction on the threshold. \code{OuterSymAll} will take a symmetric threshold and symmetric coefficients for outer regimes. OuterSymTh currently unavailable}
 \item{...}{further arguments to be passed to \code{nlar}}
 }
 \details{
