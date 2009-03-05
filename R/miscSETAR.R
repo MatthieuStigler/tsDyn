@@ -1,11 +1,19 @@
 ###Build the xx matrix with 1 thresh and common=TRUE
-buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim) {
+buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+  if(temp){
+    ML<-seq_len(ML)
+    MH<-seq_len(MH)
+  }
   isL <- ifelse(trans[, thDelay + 1]<= gam1,1,0)	### isL: dummy variable
   LH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
 }
 
 ###Build the xx matrix with 1 thresh and common=FALSE
-buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim) {
+buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+  if(temp){
+      ML<-seq_len(ML)
+      MH<-seq_len(MH)
+    }
         isL <- ifelse(trans[, thDelay + 1]<= gam1,1,0)	### isL: dummy variable
 	xxL <- cbind(const,xx[,ML])*isL
 	xxH <- cbind(const,xx[,MH])*(1-isL)
@@ -19,7 +27,11 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim) {
 
 
 ###Build the xx matrix with 2 thresh and common=TRUE
-buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
+buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+  if(temp){
+      ML<-seq_len(ML)
+      MH<-seq_len(MH)
+    }
 	trans<-as.matrix(trans)
 
 	##Threshold dummies
@@ -43,7 +55,11 @@ buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
 }
 
 ###Build the xx matrix with 2 thresh and common=FALSE
-buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim){
+buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+  if(temp){
+      ML<-seq_len(ML)
+      MH<-seq_len(MH)
+    }
 	##Threshold dummies
 	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
 # print(dummydown)
@@ -112,33 +128,33 @@ SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML
 	return(res)
 }
 
-AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common , k=2, T){
-	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim)
+AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common , k=2, T, temp=FALSE){
+	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim, temp=temp)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
-		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
-		res<-T*log(res)+k*ncol(xx)
+		SSR <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		res<-T*log(SSR/T)+k*(ncol(XX)+1)
 		#res2<-AIC(lm(yy~XX-1))}
 	}
 	return(res)
 }
 
-AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T){
-	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T, temp=FALSE){
+	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, temp=temp)
 	if(any(is.na(XX))){
 		res<-NA}
 	else{
-		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
-		res<-T*log(res)+k*ncol(xx)
+		SSR <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		res<-T*log(SSR/T)+k*(ncol(XX)+2)
 		#res2<-AIC(lm(yy~XX-1))
 		#print(c(res,res2))
 	}
 	return(res)
 }
 
-AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2,T){
-  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, k=k,T)
+AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2,T, temp=FALSE){
+  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, k=k,T, temp=temp)
 }
 
 

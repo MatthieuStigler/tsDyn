@@ -268,7 +268,7 @@ if(type=="level"){
 }
 
 ### SETAR 7: return the infos
-	res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1 more fitted parameter: th
+	res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1/2 more fitted parameter: th
 	res$thDelay<-thDelay
 	res$fixedTh <- if(nested) FALSE else TRUE
 	res$mL <- max(ML)
@@ -287,6 +287,8 @@ if(type=="level"){
 	res$trim<-trim
 	res$regime<-regime
 	res$RegProp <- c(mean(isL),mean(isH))
+
+	
 	if(nthresh==2|restriction=="OuterSymAll")
 		res$RegProp <- c(mean(isL),mean(isM),mean(isH))
 	res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))

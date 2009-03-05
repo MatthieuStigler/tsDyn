@@ -84,6 +84,9 @@ getNUsed <- function(obj, ...)
 getNUsed.nlar.struct <- function(obj, ...)
 	length(obj$x)
 
+getNUsed.nlar <- function(obj, ...)
+	length(obj$str$x)
+	
 #non-linear autoregressive model fitting
 #str: result of a call to nlar.struct
 nlar <- function(str, coefficients, fitted.values, residuals, k,
@@ -157,7 +160,7 @@ BIC.lm<-function(object, ...,k)
 
 #BIC for the fitted nlar model
 BIC.nlar <- function(object, ...,k)
-	AIC.nlar(object, k=log(object$str$n.used))
+	AIC.nlar(object, k=log(getNUsed(object)))
 
 
 
