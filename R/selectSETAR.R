@@ -54,6 +54,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   
 ### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )    
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+	N<-length(x)
 	
 	if(type=="level"){
 	  xx <- getXX(str)
@@ -262,9 +263,9 @@ pooledAIC <- function(parms) {
     kaic<-switch(criterion, "AIC"=2, "BIC"=log(length(yy)))
     mHPos<-ifelse(same.lags, 2,3)
     if(common)
-	computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common, k=kaic))	
+	computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common, k=kaic, T=N))	
     else
-      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon, k=kaic))
+      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon, k=kaic, T=N))
   } 
   else if(criterion=="SSR"){
     if(common)
@@ -339,9 +340,13 @@ pooledAIC <- function(parms) {
     
     Bests<-matrix(NA, nrow=length(potMM), ncol=4)
     colnames(Bests)<-c("th1", "th2", criterion, "pos")
+    
+###loop for 2 th when different lags to test for      
     for(j in 1:length(potMM)){
-  
-      More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim)
+      if(criterion=="SSR")
+	More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim)
+      else
+	More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim, T=N)
       #first conditional search
       last<-condiStep(allTh,threshRef=res[1,"th"], delayRef=res[1,"thDelay"], fun=func, trim=trim, trace=trace, More=More)
       
