@@ -60,9 +60,9 @@ getYY <- function(obj, ...)
 
 getdXXYY <- function(obj, ...) UseMethod("getdXXYY")
 
-getdXXYY.nlar.struct <- function(obj, ...) {
+getdXXYY.nlar.struct <- function(obj,same.dim=FALSE, ...) {
 	x <- obj$x
-	m <- obj$m
+	m<-if(same.dim) obj$m-1 else obj$m
 	d <- obj$d
 	steps <- obj$steps
 	embedd(x, lags=c((0:(m-1))*(-d), steps) )
@@ -73,7 +73,6 @@ getdXX <- function(obj, ...)
 
 getdYY <- function(obj, ...)
 	diff(getdXXYY(obj, ...))[ , obj$m+1]
-	
 
 getdX1 <- function(obj, ...)
 	getdXXYY(obj,...)[ -1, 1, drop=FALSE]

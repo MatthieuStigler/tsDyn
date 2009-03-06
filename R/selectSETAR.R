@@ -73,6 +73,12 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
 	  str$yy<-yy
 	}
 	
+	if(type=="MTAR"){
+	  if( !missing(mTh)|!missing(thVar))
+	    stop("type MTAR only valid with own lagged values, do not provide either mTh or thVar")
+	  
+	  }
+	
   externThVar <- FALSE
   
 ##SelectSETAR: Lags selection
@@ -123,6 +129,84 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
     same.lags<- if(isTRUE(all.equal(ML,MM))&isTRUE(all.equal(ML,MH))) TRUE else FALSE
 
 
+
+
+### selectSETAR 2: Set-up of transition variable
+#two models: TAR or MTAR (z is differenced)
+#three possibilitiees for thVar:
+#mTh: combination of lags. Z is matrix nrow(xx) x 1
+#thVar: external variable, if thDelay specified, lags will be taken, Z is matrix/vector nrow(xx) x thDelay
+#former args not specified: lags of explained variable (SETAR), Z is matrix nrow(xx) x (thDelay)
+# Default: thDelay=0
+
+  maxTh<-max(thDelay)
+  SeqmaxTh<-seq_len(maxTh+1)
+  ###combination of lagged values
+  if(!missing(mTh)) {
+    if(length(mTh) != m) 
+      stop("length of 'mTh' should be equal to 'm'")
+    z <- xx %*% mTh #threshold variable
+    dim(z) <- NULL
+  } 
+  ###external variable
+  else if(!missing(thVar)) {
+    thvarLength<-length(thVar)
+    thVarTheoLen<-if(!missing(thDelay)) nrow(xx)+maxTh else nrow(xx)
+    TD<-if(!missing(thDelay)) maxTh+1 else 1
+    if(thvarLength>thVarTheoLen) {
+      thVar <- thVar[1:thVarTheoLen]
+      if(trace) 
+	cat("Using only first", thVarTheoLen, "elements of thVar\n")
+    }
+    else if(thvarLength<thVarTheoLen) {
+      if(thvarLength!=nrow(xx))
+	stop("thVar has not enough/too much observations when taking thDelay")
+      else{
+	TD<-1
+	thDelay<-0
+	if(trace)
+	  cat("thdelay set to default value 0")
+      }
+    }
+    z <- embed(thVar, TD)
+    externThVar <- TRUE
+  }
+  
+  ### lagged values
+  else {
+    if(max(thDelay)>=m) 
+      stop(paste("thDelay too high: should be < m (=",m,")"))
+    if(model=="TAR"){
+      if(type =="level")
+	z <- getXX(str)[,SeqmaxTh]
+      else
+	z<-getXX(str)[-1,SeqmaxTh]
+      #z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE] equivalent if d=steps=1
+      #z4<-embed(x,m+1)[,-1]
+    }
+    else{
+      if(max(thDelay)==m-1){
+	if(type =="level"){
+	  z<-getdXX(str)[, SeqmaxTh]
+	  xx<-xx[-1,]
+	  yy<-yy[-1]
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	else 
+	  z<-getdXX(str)[, SeqmaxTh]
+      }
+      else{
+	if(type =="level")
+	  z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
+	else
+	  z<-getdXX(str)[,SeqmaxTh]
+      }
+    }
+  } 
+
+z<-as.matrix(z)
+
 ###SelectSETAR: includes const, trend
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
@@ -130,50 +214,6 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   incNames<-constMatrix$incNames #vector of names
   const<-constMatrix$const #matrix of none, const, trend, both
   ninc<-constMatrix$ninc #number of terms (0,1, or 2)
-
-### selectSETAR 2: Set-up of transition variable
-#two models: TAR or MTAR (z is differenced)
-#three possibilitiees for thVar:
-#thDelay: scalar: prespecified lag, or vector: of lags to search for. Z is a matrix
-#mTh: combination of lags. Z is one vector-matrix
-#thVar: external variable Zis one vector-matrix.
-# Default: thDelay=0
-	if(!missing(thDelay)) {
-		if(max(thDelay)>=m) 
-			stop(paste("thDelay too high: should be < m (=",m,")"))
-		if(model=="TAR"){
-			z <- xx
-			z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE]
-			z4<-embed(x,m+1)[,-1]
-		}
-		else{
-			if(thDelay==m-1)
-				stop("th Delay too high, should be <m-1 (=",m,")(because of differencing)")
- 		z<-embed(diff(x),m)[,thDelay+2]
-		#print(cbind(yy,xx,z))
-		#z<-z[if(m-thDelay-2>0)-seq_len(m-thDelay-2>0) else seq_len(nrow(z)),thDelay+2]
-		}
-	}
- 	else if(!missing(mTh)) {
-		if(length(mTh) != m) 
-			stop("length of 'mTh' should be equal to 'm'")
-		z <- xx %*% mTh #threshold variable
-		dim(z) <- NULL
-	} else if(!missing(thVar)) {
-		if(length(thVar)>nrow(xx)) {
-			z <- thVar[seq_len(nrow(xx))]
-			if(trace) 
-				cat("Using only first", nrow(xx), "elements of thVar\n")
-		}
-		else 
-			z <- thVar
-		externThVar <- TRUE
-	} else {
-		z <- xx
-	}
-
-
-z<-as.matrix(z)
 
 
 ### selectSETAR 3: set-up of the grid
@@ -233,7 +273,7 @@ pooledAIC <- function(parms) {
   if(criterion=="SSR"){
     ncombin<-length(thDelay)*length(th)
     if(trace)
-      cat("Searching on ", ncombin, " combinations of threshold and thDelay\n", sep="")
+      cat("Searching on ", ncombin, " combinations of thresholds (",length(th), ") and thDelay (",length(thDelay), ") \n", sep="")
     IDS <- as.matrix(expand.grid(thDelay, th))
     colnames(IDS)<-c("thDelay", "th")
   }
@@ -241,14 +281,14 @@ pooledAIC <- function(parms) {
     if(same.lags){
       ncombin<-length(thDelay)*length(th)*length(ML)
       if(trace)
-	cat("Searching on ", ncombin, " combinations of threshold, thDelay and m \n")
+	cat("Searching on ", ncombin, " combinations of thresholds (",length(th), "), thDelay (",length(thDelay), ") and m (", length(ML),") \n")
       IDS <- as.matrix(expand.grid(thDelay,  ML, th))			
       colnames(IDS)<-c("thDelay", "m", "th")
     }
     else{
       ncombin<-length(thDelay)*length(th)*length(ML)*length(MH)
       if(trace)
-	cat("Searching on ", ncombin, " combinations of threshold, thDelay, ML and MM\n")
+      cat("Searching on ", ncombin, " combinations of thresholds (",length(th), "), thDelay (",length(thDelay), "), mL (", length(ML),") and MM (", length(MM),") \n")
       IDS <- as.matrix(expand.grid(thDelay,  ML, MH, th))			
       colnames(IDS)<-c("thDelay", "mL", "mH", "th")
    }
@@ -324,7 +364,6 @@ pooledAIC <- function(parms) {
       else{
 	ML<-1:firstBests["mL"]
 	MH<-1:firstBests["mH"]
-	print(MM)
 	for(i in 1:length(MM))
 	  potMM[[i]]<-seq_len(MM[i])
       }
