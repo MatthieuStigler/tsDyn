@@ -317,13 +317,13 @@ pooledAIC <- function(parms) {
     
     if(criterion%in%c("AIC", "BIC")){
       if(same.lags){
-	ML<-firstBests["m"]
+	ML<-1:firstBests["m"]
 	MH<-ML
 	potMM[[1]]<-ML
       }
       else{
-	ML<-firstBests["mL"]
-	MH<-firstBests["mH"]
+	ML<-1:firstBests["mL"]
+	MH<-1:firstBests["mH"]
 	print(MM)
 	for(i in 1:length(MM))
 	  potMM[[i]]<-seq_len(MM[i])
