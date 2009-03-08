@@ -5,12 +5,12 @@
 Generic non-linear autogregressive model class constructor.
 }
 \usage{
-nlar(str, coefficients, fitted.values, residuals, k, model.specific=NULL, ...)
+nlar(str, coefficients, fitted.values, residuals, k, model, model.specific=NULL, ...)
 }
 
 \arguments{
   \item{str}{a \code{nlar.struct} object, i.e. the result of a call to \code{\link{nlar.struct}}}
-	\item{coefficients, fitted.values, residuals, k, model.specific}{ internal structure }
+	\item{coefficients, fitted.values, residuals, k, model,  model.specific}{ internal structure }
   \item{\dots}{ further model specific fields }
 }
 \details{
@@ -25,6 +25,7 @@ An object of the \code{nlar} class is a list of (at least) components:
   \item{k}{ total number of estimated coefficients }
 	\item{fitted.values}{ model fitted values }
 	\item{residuals}{ model residuals }
+	\item{model}{ data frame containing the variables used }
 	\item{model.specific}{ (optional) model specific additional infos}
 }
 

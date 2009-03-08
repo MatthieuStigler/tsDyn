@@ -27,6 +27,7 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 		residuals=res$residuals,
 		fitted=res$fitted,
 		k=res$k,
+		model=NULL,
 		model.specific=res), "nnetTs"))
 }
 

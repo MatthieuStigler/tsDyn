@@ -687,6 +687,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                        residuals = temp$residuals,
                        noRegimes = noRegimes,
                        k = temp$k,
+		       model=temp$model,
                        model.specific = temp$model.specific), "star"))
   } 
   
@@ -901,6 +902,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                      res = residuals,
                      k   = length(as.vector(phi1)) +
                                  length(as.vector(phi2)),
+		    model=NULL,
                      model.specific=res), "star"))
 }
 

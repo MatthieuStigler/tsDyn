@@ -231,6 +231,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
                      fit =res$fitted,
                      res =res$residuals,
                      k   =res$k,
+		     model = data.frame(yy,xxL, xxH * G(z, gamma, th)),
                      model.specific=res),
                 "lstar"))
 }

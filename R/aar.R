@@ -30,6 +30,7 @@ aar <- function(x, m, d=1, steps=d, series){
 		fitted.values = model$fitted.values,
 		residuals = model$residuals,
 		k = model$rank,
+		model= model$model,
 		model.specific=model
 		), "aar") )
 }

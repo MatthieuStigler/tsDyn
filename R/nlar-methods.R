@@ -88,7 +88,7 @@ getNUsed.nlar <- function(obj, ...)
 	
 #non-linear autoregressive model fitting
 #str: result of a call to nlar.struct
-nlar <- function(str, coefficients, fitted.values, residuals, k,
+nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                  model.specific=NULL, ...) {
   return(extend(list(), "nlar",
                 str=str,
@@ -96,6 +96,7 @@ nlar <- function(str, coefficients, fitted.values, residuals, k,
                 fitted.values= fitted.values,
                 residuals = residuals,
                 k=k,
+		model=model,
                 model.specific=model.specific,
                 ...
                 ))

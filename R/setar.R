@@ -330,7 +330,13 @@ if(type=="level"){
 		}
 		res$mTh <- mTh
 	}
-	return(extend(nlar(str,	coef=res$coef,	fit=res$fitted.values,	res=res$residuals,k=res$k,model.specific=res), "setar"))
+	return(extend(nlar(str,	
+	  coef=res$coef,
+	  fit=res$fitted.values,
+	  res=res$residuals,
+	  k=res$k,
+	  model=data.frame(yy,xxLH),
+	  model.specific=res), "setar"))
 	#}
 }
 
@@ -598,8 +604,8 @@ toLatex.setar <- function(object, digits=3, ...) {
 	obj <- object
 	res <- character()
   beta <- formatSignedNum(coefficients(obj),digits=digits,...)
-  mL <- obj$model$mL
-  mH <- obj$model$mH
+  mL <- obj$model.specific$mL
+  mH <- obj$model.specific$mH
   steps <- obj$str$steps
   d <- obj$str$d
   namesL <- paste("phi1",0:mL,sep=".")
@@ -620,16 +626,16 @@ toLatex.setar <- function(object, digits=3, ...) {
 	res[6] <- "\\]"
 	res[7] <- ""
 
-  if(!obj$model$externThVar) {
-    mTh <- formatSignedNum(obj$model$mTh)
+  if(!obj$model.specific$externThVar) {
+    mTh <- formatSignedNum(obj$model.specific$mTh)
     m <- obj$str$m
 		res[8] <- "\\["
 		res[9] <- "Z_t = "
     for(j in seq_len(m)) {
-      if(obj$model$mTh[j]==1)
+      if(obj$model.specific$mTh[j]==1)
         res[9] <- paste(res[9],"X_{t-",(j-1)*d,"} ",sep="")
-      else if(obj$model$mTh[j]!=0)
-        res[9] <- paste(res[9], obj$model$mTh[j]," X_{t-",(j-1)*d,"} ",sep="")
+      else if(obj$model.specific$mTh[j]!=0)
+        res[9] <- paste(res[9], obj$model.specific$mTh[j]," X_{t-",(j-1)*d,"} ",sep="")
     }
 		res[10] <- "\\]"
 		res[11] <- ""
