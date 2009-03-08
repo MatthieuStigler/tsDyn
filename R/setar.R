@@ -101,61 +101,91 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
     }
   MM <- seq_len(mM)
   }
-###includes const, trend
+
+
+### SETAR 3: Set-up of transition variable (different from selectSETAR)
+#two models: TAR or MTAR (z is differenced)
+#three possibilitiees for thVar:
+#mTh: combination of lags. Z is matrix nrow(xx) x 1
+#thVar: external variable, if thDelay specified, lags will be taken, Z is matrix/vector nrow(xx) x thDelay
+#former args not specified: lags of explained variable (SETAR), Z is matrix nrow(xx) x (thDelay)
+# Default: thDelay=0
+
+  maxTh<-max(thDelay)
+  SeqmaxTh<-seq_len(maxTh+1)
+  ###combination of lagged values
+  if(!missing(mTh)) {
+    if(length(mTh) != m) 
+      stop("length of 'mTh' should be equal to 'm'")
+    z <- xx %*% mTh #threshold variable
+    dim(z) <- NULL
+  } 
+  ###external variable
+  else if(!missing(thVar)) {
+    thvarLength<-length(thVar)
+    thVarTheoLen<-if(!missing(thDelay)) nrow(xx)+maxTh else nrow(xx)
+    TD<-if(!missing(thDelay)) maxTh+1 else 1
+    if(thvarLength>thVarTheoLen) {
+      thVar <- thVar[1:thVarTheoLen]
+      if(trace) 
+	cat("Using only first", thVarTheoLen, "elements of thVar\n")
+    }
+    else if(thvarLength<thVarTheoLen) {
+      if(thvarLength!=nrow(xx))
+	stop("thVar has not enough/too much observations when taking thDelay")
+      else{
+	TD<-1
+	thDelay<-0
+	if(trace)
+	  cat("thdelay set to default value 0")
+      }
+    }
+    z <- embed(thVar, TD)
+    externThVar <- TRUE
+  }
+  
+  ### lagged values
+  else {
+    if(max(thDelay)>=m) 
+      stop(paste("thDelay too high: should be < m (=",m,")"))
+    if(model=="TAR"){
+      if(type =="level")
+	z <- getXX(str)[,SeqmaxTh]
+      else
+	z<-getXX(str)[-1,SeqmaxTh]
+      #z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE] equivalent if d=steps=1
+      #z4<-embed(x,m+1)[,-1]
+    }
+    else{
+      if(max(thDelay)==m-1){
+	if(type =="level"){
+	  z<-getdXX(str)[, SeqmaxTh]
+	  xx<-xx[-1,]
+	  yy<-yy[-1]
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	else 
+	  z<-getdXX(str)[, SeqmaxTh]
+      }
+      else{
+	if(type =="level")
+	  z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
+	else
+	  z<-getdXX(str)[,SeqmaxTh]
+      }
+    }
+  } 
+
+z<-as.matrix(z)
+
+###includes const, trend (identical to selectSETAR)
   if(include=="none" && any(c(ML,MM,MH)==0))
     stop("you cannot have a regime without constant and lagged variable")
   constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
   incNames<-constMatrix$incNames #vector of names
   const<-constMatrix$const #matrix of none, const, trend, both
   ninc<-constMatrix$ninc #number of terms (0,1, or 2)
-
-### SETAR 3: Set-up of transition variable
-#two models: TAR or MTAR (z is differenced)
-#three possibilitiees for thVar:
-#thDelay: scalar: prespecified lag, or vector: of lags to search for. Z is a matrix
-#mTh: combination of lags. Z is one vector-matrix
-#thVar: external variable Zis one vector-matrix.
-# Default: thDelay=0
-	if(!missing(thDelay)) {
-		if(max(thDelay)>=m) 
-			stop(paste("thDelay too high: should be < m (=",m,")"))
-		if(model=="TAR"){
-			z <- xx		#xx <- getXX(str) 
-			z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE]
-			z4<-embed(x,m+1)[,-1]
-		}
-		else{
-			if(thDelay==m-1)
-				stop("th Delay too high, should be <m-1 (=",m,")(because of differencing)")
-			z<-embed(diff(x),m)[,thDelay+2]
-		#print(cbind(yy,xx,z))
-		#z<-z[if(m-thDelay-2>0)-seq_len(m-thDelay-2>0) else seq_len(nrow(z)),thDelay+2]
-		}
-	}
- 	else if(!missing(mTh)) {
-		if(length(mTh) != m) 
-			stop("length of 'mTh' should be equal to 'm'")
-		z <- xx %*% mTh #threshold variable
-		dim(z) <- NULL
-	} else if(!missing(thVar)) {
-		if(length(thVar)>nrow(xx)) {
-			z <- thVar[seq_len(nrow(xx))]
-			if(trace) 
-				cat("Using only first", nrow(xx), "elements of thVar\n")
-		}
-		else 
-			z <- thVar
-		externThVar <- TRUE
-	} else {
-		if(trace) 
-			cat("Using default threshold variable: thDelay=0\n")
-		z <- xx
-		thDelay<-0
-	}
-
-z<-as.matrix(z)
-
-
 
 ### SETAR 4: Search of the treshold if th not specified by user
 #if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
@@ -166,19 +196,20 @@ z<-as.matrix(z)
     thDelay<-search$bests[1]
     th<-search$bests[2:(nthresh+1)]
     nested<-TRUE
+    z<-z[,thDelay+1, drop=FALSE]
     if(trace) {
       cat("Selected threshold: ", th,"\n")
       cat("Selected delay: ", thDelay,"\n")
     }
     #missing(th)<-FALSE
   }
-  if(missing(thVar)&missing(mTh))
-    z<-xx[,thDelay+1, drop=FALSE]
+  
 	  
   if(restriction=="none")
     transV<-z
   else if(restriction=="OuterSymAll")
     transV<-abs(z)
+    
 ### SETAR 5: Build the threshold dummies and then the matrix of regressors
 
 	#check number of observations)
@@ -330,7 +361,7 @@ getIncNames<-function(inc,ML){
 
 #get a vector with names of the coefficients
 getArNames<-function(ML, type=c("level", "diff", "ADF")){
-  phi<-ifelse(type=="level", "phi", "Δphi")
+  phi<-ifelse(type=="level", "phi", "Dphi")
   if(any(ML==0))
     return(NA)
   else{
@@ -372,7 +403,7 @@ print.setar <- function(x, ...) {
 	cat("\nThreshold:")
 	if(x$model=="MTAR"){
 		cat("\nMomentum Threshold (MTAR) Adjustment")
-		D<-"Δ"}
+		D<-"D"}
 	else
 		D<-NULL
 	cat("\n-Variable: ")
