@@ -1135,6 +1135,7 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, tests = FALSE,
                           fitted = linearModel$fitted.values,
                           residuals = linearModel$residuals,
                           k=NCOL(x_t), noRegimes=1,
+                          model=data.frame(yy,xx),
                           model.specific=list),
                      "ncstar")
 
@@ -1162,6 +1163,7 @@ ncstar <- function(x, m=2, noRegimes, d = 1, steps = d, series, tests = FALSE,
                           fitted = linearModel$fitted.values,
                           residuals = linearModel$residuals,
                           k=NCOL(x_t), noRegimes=1,
+                          model=data.frame(yy,xx),
                           model.specific=list),
                      "ncstar")
 
@@ -1316,6 +1318,7 @@ ncstar.predefined <- function(x, m=2, d = 1, steps = d,
                         fitted = NA,
                         residuals = NA,
                         k =length(c(phi1, phi2omega)),  noRegimes=noRegimes,
+                        model=NULL,
                         model.specific=list),
                    "ncstar")
 
