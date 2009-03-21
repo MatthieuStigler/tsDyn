@@ -62,15 +62,16 @@ if(!missing(data)){
 
 
 if(!missing(setarObject)){
+mod<-setarObject$model.specific
   if(inherits(setarObject,"linear")){
     B<-coef(setarObject)
     nthresh<-0
   }
   if(inherits(setarObject,"setar")){
     Thresh<-getTh(coef(setarObject))
-    nthresh<-setarObject$model.specific$nthresh
-    incNames<-setarObject$model.specific$incNames
-    thDelay<-setarObject$model.specific$thDelay
+    nthresh<-mod$nthresh
+    incNames<-mod$incNames
+    thDelay<-mod$thDelay
     if(incNames%in%c("none", "trend"))
       stop("Arg include = none or trend currently not implemented")
     if(incNames=="trend")
@@ -79,8 +80,15 @@ if(!missing(setarObject)){
     B<-coef(setarObject)[seq_len(TotNpar)]
     BUp<-B[grep("H", names(B))]
     BDown<-B[grep("L", names(B))]
-    if(nthresh==2)
+    if(mod$nthresh==2)
       BMiddle<-B[grep("M", names(B))]
+    if(mod$restriction=="OuterSymAll"){
+    BUp<-B[grep("H", names(B))]
+    BMiddle<-B[grep("L", names(B))]
+    BDown<-BUp
+    nthresh<-2
+    Thresh<-c(-Thresh, Thresh)
+    }
   }
   y<-setarObject$str$x
 #   m<-setarObject$str$m
