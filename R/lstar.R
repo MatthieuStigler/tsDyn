@@ -392,19 +392,19 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
 }
 
 oneStep.lstar <- function(object, newdata, itime, thVar, ...){
-  mL <- object$model$mL
-  mH <- object$model$mH
+  mL <- object$model.specific$mL
+  mH <- object$model.specific$mH
   phi1 <- object$coefficients[1:(mL+1)]
   phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
   gamma <- object$coefficients["gamma"]
   c <- object$coefficients["th"]
-  ext <- object$model$externThVar
+  ext <- object$model.specific$externThVar
 
   if(ext) {
     z <- thVar[itime]
   }
   else {
-    z <- newdata %*% object$model$mTh
+    z <- newdata %*% object$model.specific$mTh
     dim(z) <- NULL
   }
   z <- plogis(z, c, 1/gamma)

@@ -917,7 +917,7 @@ oneStep.star <- function(object, newdata, itime, thVar, ...)
   if(object$model.specific$externThVar) {
     z <- thVar[itime]
   } else {
-    z <- newdata %*% object$model$mTh;
+    z <- newdata %*% object$model.specific$mTh;
     dim(z) <- NULL;
   }
 
