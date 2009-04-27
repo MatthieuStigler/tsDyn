@@ -22,7 +22,7 @@
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
-setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15, type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") ){
+setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15, type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") ){
 # 1: preliminaries
 # 2:  Build the regressors matrix and Y vector
 # 3: Set-up of transition variable
@@ -37,6 +37,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
   include<-match.arg(include)
   type<-match.arg(type)
   model<-match.arg(model)
+  common<-match.arg(common)
   restriction<-match.arg(restriction)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
@@ -47,6 +48,13 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
     if(missing(series))
     series <- deparse(substitute(x))
     
+    if(common%in%c("both", "lags")&type!="ADF")
+    stop("Arg common ==", common, " only for ADF specification\n")   
+    if(restriction=="OuterSymTh") 
+    stop("Currently not implemented")
+    if(restriction=="OuterSymAll"&nthresh==2){
+	warning("With restriction ='OuterSymAll', you can only have one th. Changed to nthresh=1\n")
+  	nthresh<-1}
 ### SETAR 2:  Build the regressors matrix and Y vector
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	
@@ -160,7 +168,7 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
       if(max(thDelay)==m-1){
 	if(type =="level"){
 	  z<-getdXX(str)[, SeqmaxTh]
-	  xx<-xx[-1,]
+	  xx<-xx[-1,, drop=FALSE]
 	  yy<-yy[-1]
 	  str$xx<-xx
 	  str$yy<-yy
@@ -196,20 +204,21 @@ z<-as.matrix(z)
     thDelay<-search$bests[1]
     th<-search$bests[2:(nthresh+1)]
     nested<-TRUE
-    z<-z[,thDelay+1, drop=FALSE]
+
     if(trace) {
       cat("Selected threshold: ", th,"\n")
       cat("Selected delay: ", thDelay,"\n")
     }
-    #missing(th)<-FALSE
+    # missing(th)<-FALSE
   }
   
-	  
+  z<-z[,thDelay+1, drop=FALSE]
+  
   if(restriction=="none")
     transV<-z
   else if(restriction=="OuterSymAll")
     transV<-abs(z)
-    
+  
 ### SETAR 5: Build the threshold dummies and then the matrix of regressors
 
 	#check number of observations)
@@ -253,18 +262,12 @@ z<-as.matrix(z)
 
 	 
 	if(nthresh==1){
-	  if(common)
-	    xxLH<-buildXth1Common(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const)	
-	  else
-	    xxLH<-buildXth1NoCommon(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const=const, trim=trim)	
-		midCommon<-mid<-NA}
-	else if(nthresh==2){
-	  if(common)
-	    xxLH<-buildXth2Common(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
-	  else
-	    xxLH<-buildXth2NoCommon(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
-			#midCommon<-c(paste(inc,rep(3,ninc)),paste("phi3", MH, sep=".")) no more used: 
-			#mid<-c(paste("phi3", MH, sep=".")) #no more used
+	funBuild1<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
+	    xxLH<-funBuild1(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const, trim=trim)
+	    }
+	else{
+		funBuild2<-switch(common, "include"=buildXth2Common, "none"=buildXth2NoCommon, "both"=buildXth2LagsIncCommon, "lags"=buildXth2LagsCommon)
+	    xxLH<-funBuild2(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
 	}
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
@@ -275,17 +278,29 @@ if(any(is.na(res$coefficients)))
 	res$coefficients <- c(res$coefficients, th)
 
 t<-type #just shorter
-if(!common){
+if(common=="none"){
   if(nthresh==1)
     co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MH), getArNames(MH,t),"th")
   else
     co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MM), getArNames(MM,t), getIncNames(incNames,MH), getArNames(MH,t),"th1","th2")
 }
-else{
+else if(common=="include"){
   if(nthresh==1)
     co<-c(incNames, getArNames(ML,t), getArNames(MH,t),"th")
   else 
     co<-c(incNames, getArNames(ML,t), getArNames(MM,t), getArNames(MH,t),"th1","th2")
+}
+else if(common=="both"){
+  if(nthresh==1)
+    co<-c(incNames, "phiL.1", "phiH.1", paste("Dphi.", ML),"th")
+  else 
+    co<-c(incNames, "phiL.1", "phiM.1","phiH.1", paste("Dphi.", ML),"th1","th2")
+}
+else if(common=="lags"){ #const*isL,xx[,1]*isL,xx[,1]*(1-isL),const*isH, xx[,-1]
+  if(nthresh==1)
+    co<-c(getIncNames(incNames,ML), "phiL.1", "phiH.1", getIncNames(incNames,ML), paste("Dphi.", ML),"th")
+  else 
+	co<-c(getIncNames(incNames,ML), "phiL.1", getIncNames(incNames,MM), "phiM.1", getIncNames(incNames,MM), "phiH.1",paste("Dphi.", ML),"th")
 }
 
   names(res$coefficients) <- na.omit(co)
@@ -391,7 +406,7 @@ print.setar <- function(x, ...) {
 	externThVar <- x$externThVar
 	cat("\nSETAR model (",nthresh+1,"regimes)\n")
 	cat("Coefficients:\n")
-	if(common==FALSE){
+	if(common=="none"){
 		lowCoef <- getSetarXRegimeCoefs(x.old, "L")
 		highCoef<- getSetarXRegimeCoefs(x.old, "H")
 		cat("Low regime:\n")
@@ -576,17 +591,17 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 
 
 oneStep.setar <- function(object, newdata, itime, thVar, ...){
-	mL <- object$model$mL
-	mH <- object$model$mH
+	mL <- object$model.specific$mL
+	mH <- object$model.specific$mH
 	phi1 <- object$coefficients[1:(mL+1)]
 	phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
 	th <- object$coefficients[mL+mH+3]
-	ext <- object$model$externThVar
+	ext <- object$model.specific$externThVar
 	if(ext)	{
 		z <- thVar[itime]
 	}
 	else {
-		z <- newdata %*% object$model$mTh
+		z <- newdata %*% object$model.specific$mTh
 		dim(z) <- NULL
 	}
 	z <- (z<=th)+0

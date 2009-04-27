@@ -8,6 +8,24 @@ buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FA
   LH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
 }
 
+buildXth1LagsIncCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+  if(temp){
+    ML<-seq_len(ML)
+    MH<-seq_len(MH)
+  }
+  isL <- ifelse(trans[, thDelay + 1]<= gam1,1,0)	### isL: dummy variable
+  LH<-cbind(const,xx[,1]*isL,xx[,1]*(1-isL), xx[,-1])
+}
+
+buildXth1LagsCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+  if(temp){
+    ML<-seq_len(ML)
+    MH<-seq_len(MH)
+  }
+  isL <- ifelse(trans[, thDelay + 1]<= gam1,1,0)	### isL: dummy variable
+  LH<-cbind(const*isL,xx[,1]*isL,xx[,1]*(1-isL),const*isL, xx[,-1])
+}
+
 ###Build the xx matrix with 1 thresh and common=FALSE
 buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
   if(temp){
@@ -24,6 +42,9 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=
 	}
 	return(xxLH)
 }
+
+
+
 
 
 ###Build the xx matrix with 2 thresh and common=TRUE
@@ -53,6 +74,40 @@ buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, tem
 
 	return(res)
 }
+
+buildXth2LagsIncCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+  if(temp){
+      ML<-seq_len(ML)
+      MH<-seq_len(MH)
+    }
+	trans<-as.matrix(trans)
+
+	##Threshold dummies
+	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
+	dummyup <- ifelse(trans[, thDelay + 1]>gam2, 1, 0)
+	##Construction of the matrix
+
+	xxLMH<-cbind(const,xx[,1]*dummydown,xx[,1]*(1-dummydown-dummyup),xx[,1]*(dummyup), xx[,-1])
+	return(xxLMH)
+}
+
+
+buildXth2LagsCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+  if(temp){
+      ML<-seq_len(ML)
+      MH<-seq_len(MH)
+    }
+	trans<-as.matrix(trans)
+
+	##Threshold dummies
+	dummydown <- ifelse(trans[, thDelay + 1]<=gam1, 1, 0)
+	dummyup <- ifelse(trans[, thDelay + 1]>gam2, 1, 0)
+	##Construction of the matrix
+
+	xxLMH<-cbind(const*dummydown,xx[,1]*dummydown,const*(1-dummydown-dummyup), xx[,1]*(1-dummydown-dummyup),const*dummyup, xx[,1]*(dummyup), xx[,-1])
+	return(xxLMH)
+}
+
 
 ###Build the xx matrix with 2 thresh and common=FALSE
 buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
@@ -97,6 +152,19 @@ SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const
 	}
 	return(res)
 }
+
+SSR<-function(X,y){
+	res<-crossprod(y- X %*%chol2inv(chol(crossprod(X)))%*%crossprod(X,y))
+	#res2<-deviance(lm(y~X-1))
+	return(res)
+	}
+
+AIC.matrices<-function(X,y, T, k=2){
+	SSR<-crossprod(y- X %*%chol2inv(chol(crossprod(X)))%*%crossprod(X,y))
+	res<-T*log(SSR/T)+k*(ncol(X)+2)
+	return(res)
+	}
+
 
 
 
@@ -152,6 +220,37 @@ AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, 
 	}
 	return(res)
 }
+
+AIC_2th <-function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T, temp=FALSE){
+	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, temp=temp)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		SSR <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		res<-T*log(SSR/T)+k*(ncol(XX)+2)
+		print(SSR)
+		print(T)
+		print(k)
+		print(ncol(XX))
+		#res2<-AIC(lm(yy~XX-1))
+		#print(c(res,res2))
+	}
+	return(res)
+}
+
+SSR_2th<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon){
+  	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+	if(any(is.na(XX))){
+		res<-NA}
+	else{
+		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
+		#res2<-deviance(lm(yy~XX-1))
+		#print(c(res,res2))
+	}
+	return(res)
+}
+
+
 
 AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2,T, temp=FALSE){
   AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, k=k,T, temp=temp)
