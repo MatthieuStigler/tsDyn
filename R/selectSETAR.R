@@ -17,7 +17,7 @@
 
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=FALSE, model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh") ) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh") ) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -35,6 +35,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   model<-match.arg(model)
   type<-match.arg(type)
   criterion<-match.arg(criterion)
+  common<-match.arg(common)
   restriction<-match.arg(restriction)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
@@ -50,6 +51,12 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
       criterion<-"SSR"
     }
     
+    if(common%in%c("both", "lags")&type!="ADF")
+    stop("Arg common ==", common, " only for ADF specification\n")
+  if(restriction=="OuterSymAll"&nthresh==2){
+  	warning("With restriction ='OuterSymAll', you can only have one th. Changed to nthresh=1\n")
+  	nthresh<-1}
+  
   
   
 ### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )    
@@ -188,7 +195,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
       if(max(thDelay)==m-1){
 	if(type =="level"){
 	  z<-getdXX(str)[, SeqmaxTh]
-	  xx<-xx[-1,]
+	  xx<-xx[-1,,drop=FALSE]
 	  yy<-yy[-1]
 	  str$xx<-xx
 	  str$yy<-yy
@@ -295,22 +302,18 @@ pooledAIC <- function(parms) {
   }
 
 ###selectSETAR 6: Computation for 1 thresh
+funBuild<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
+
   if (criterion == "pooled-AIC") {
       computedCriterion <- apply(IDS, 1, pooledAIC)
   } 
   else if(criterion%in%c("AIC","BIC")){
     kaic<-switch(criterion, "AIC"=2, "BIC"=log(N))
     mHPos<-ifelse(same.lags, 2,3)
-    if(common)
-	computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1Common, k=kaic, T=N, temp=TRUE))	
-    else
-      computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=buildXth1NoCommon, k=kaic, T=N, temp=TRUE))
+    computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=funBuild, k=kaic, T=N, temp=TRUE))	
   } 
   else if(criterion=="SSR"){
-    if(common)
-      computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=buildXth1Common))
-    else
-      computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=buildXth1NoCommon))
+    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild))
   }
 
 ###selectSETAR 7: sorts the results to show the best values
@@ -371,10 +374,9 @@ pooledAIC <- function(parms) {
     else
       potMM[[1]]<-ML
     
-    if(common)
-      func<-switch(criterion, "AIC" = AIC_2threshCommon,"BIC" = AIC_2threshCommon, "SSR" = SSR_2threshCommon)	
-    else
-      func<-switch(criterion, "AIC" = AIC_2threshNoCommon,"BIC" = AIC_2threshNoCommon, "SSR" = SSR_2threshNoCommon)
+    funBuild2<-switch(common, "include"=buildXth2Common, "none"=buildXth2NoCommon, "both"=buildXth2LagsIncCommon, "lags"=buildXth2LagsCommon)
+    func<-switch(criterion, "AIC" = AIC_2th,"BIC" = AIC_2th, "SSR" = SSR_2th)	
+
     
     Bests<-matrix(NA, nrow=length(potMM), ncol=4)
     colnames(Bests)<-c("th1", "th2", criterion, "pos")
@@ -382,9 +384,9 @@ pooledAIC <- function(parms) {
 ###loop for 2 th when different lags to test for      
     for(j in 1:length(potMM)){
       if(criterion=="SSR")
-	More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim)
+	More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim, fun=funBuild2)
       else
-	More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim,k=kaic , T=N)
+	More<-list(yy=yy, xx=xx,trans=z, ML=ML, MH=MH,MM=potMM[[j]], const=const,trim=trim, fun=funBuild2, k=kaic, T=N)
       #first conditional search
       last<-condiStep(allTh,threshRef=res[1,"th"], delayRef=res[1,"thDelay"], fun=func, trim=trim, trace=trace, More=More)
       
