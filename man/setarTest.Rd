@@ -5,7 +5,7 @@
 \description{Test of linearity against threshold of Hansen (1999) with bootstrap distribution
 }
 \usage{
-setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
+setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"),restriction=c("none","OuterSymAll","OuterSymTh"), check=FALSE)
 }
 
 \value{A object of class "Hansen99Test" containing:
@@ -28,6 +28,7 @@ setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=
 \item{nboot}{numer of bootstrap replications}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{test}{Type of test. See details}
+\item{restriction}{Restriction on the threshold as in \code{setar}}
 \item{check}{Possibility to check if the bootstrap is correct by not sampling the residuals. The result given should be the same as in the original data}
 }
 \details{

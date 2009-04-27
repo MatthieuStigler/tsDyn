@@ -14,7 +14,7 @@ Fitted model data
 \arguments{
 \item{data}{ time series }
 \item{lag}{Number of lags to include in each regime}
-\item{include} {Type of deterministic regressors to include}
+\item{include}{Type of deterministic regressors to include}
 \item{model}{Whether the transition variable is taken in levels (TAR) or difference (MTAR)}
 \item{commonInter}{Whether the deterministic regressors are regime specific (commonInter=FALSE) or not.}
 \item{nthresh}{Number of thresholds}
@@ -25,8 +25,8 @@ Fitted model data
 \item{ngrid}{number of elements of the grid, especially for \code{nthresh=3}}
 \item{gamma}{prespecified threshold values}
 \item{around}{The grid search is restricted to \var{ngrid} values around this point. Especially useful for \code{nthresh=3}. }
-\item{plot} {Whether a plot showing the results of the grid search should be printed}
-\item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
+\item{plot}{Whether a plot showing the results of the grid search should be printed}
+\item{dummyToBothRegimes}{Whether the dummy in the one threshold model is applied to each regime or not. }
 \item{trace}{should additional infos be printed out?}
 \item{trick}{type of R function called: for or mapply}
 \item{max.iter}{Number of iterations for the alogorithm}

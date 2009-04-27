@@ -13,7 +13,7 @@
 Hansen (1999) Testing for linearity, Journal of Economic Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26)
 avalaible at: \url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 }
-\example{
+\examples{
 data(IIPUs)
 end(IIPUs) #not same date as in the paper
 plot(IIPUs)#exactly same graph as in the paper
@@ -34,7 +34,7 @@ XX<-embed(IIPUs, 17)
 Y<-XX[,1]
 X<-XX[,-1]
 dummyDown<-ifelse(X[,6]<= -2.5, 1,0)
-sum(dum)
+sum(dummyDown)
 M<-cbind(1*dummyDown,X*dummyDown )
 lm(Y~M-1)
 

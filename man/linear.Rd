@@ -18,7 +18,7 @@ AR(m) model
 	\item{x}{ time series }
 	\item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 	\item{series}{ time series name (optional) }
-	\item{include} {Type of deterministic regressors to include}
+	\item{include}{Type of deterministic regressors to include}
 	\item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
 }
 \details{

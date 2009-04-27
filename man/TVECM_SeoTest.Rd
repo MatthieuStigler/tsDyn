@@ -5,7 +5,7 @@
 Test the null of no cointegration against threshold cointegration with bootstrap distribution of Seo (2006)
 }
 \usage{
-TVECM_SeoTest(data,lag, beta, trim=0.1,nboot, plot=FALSE,check=FALSE)
+TVECM_SeoTest(data,lag, beta, trim=0.1,nboot, plot=FALSE,check=FALSE, trace=FALSE)
 }
 \value{A list cointaining diverse informations:
 
@@ -23,6 +23,7 @@ Critical and Pvalue from bootstrap distribution.
 \item{nboot}{Number of bootstrap replications}
 \item{plot}{Whether a grid with the SSR of each threshold should be printed}
 \item{check}{Possiblity to check the function by no sampling: the test value should be the sme as in the original data}
+\item{trace}{should additional infos be printed? (logical)}
 }
 \details{
 For this test, the cointegrating value has to be specified by the user. 

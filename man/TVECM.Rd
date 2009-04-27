@@ -21,11 +21,11 @@ Fitted model data
 \item{gamma1}{different possibilities to pre-specify an exact value, an interval or a central point for the search of gamma1}
 \item{gamma2}{different possibilities to pre-specify an exact value or a central point for the search of gamma2}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
-\item{dummyToBothRegimes} {Whether the dummy in the one threshold model is applied to each regime or not. }
+\item{dummyToBothRegimes}{Whether the dummy in the one threshold model is applied to each regime or not. }
 \item{methodMapply}{only for programming. Is to make the choice between a for loop or mapply implementation}
 \item{restr}{Currently not avalaible}
 \item{model}{The choice of the model. See details}
-\item{include} {Type of deterministic regressors to include}
+\item{include}{Type of deterministic regressors to include}
 \item{beta0}{Additional regressors to include in the cointegrating relation}
 \item{trace}{should additional infos be printed? (logical)}
 }

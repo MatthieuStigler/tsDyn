@@ -17,17 +17,17 @@ TVAR_LRtest(data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=
 \arguments{
 \item{data}{ multivariate time series }
 \item{lag}{Number of lags to include in each regime}
-\item{trend} {whether a trend should be added}
+\item{trend}{whether a trend should be added}
 \item{series}{name of the series}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases. }
 \item{mTh}{combination of variables with same lag order for the transition variable. Either a single value (indicating which variable to take) or a combination}
 \item{thVar}{external transition variable}
 \item{nboot}{Number of bootstrap replications}
-\item{plot} {Whether a plot showing the results of the grid search should be printed}
+\item{plot}{Whether a plot showing the results of the grid search should be printed}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{test}{Type of usual and alternative hypothesis. See details}
 \item{check}{Possiblity to check the function by no sampling: the test value should be the sme as in the original data}
-\item{model} {Whether the threshold variable is taken in level (TAR) or difference (MTAR)}
+\item{model}{Whether the threshold variable is taken in level (TAR) or difference (MTAR)}
 
 }
 \details{
