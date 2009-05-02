@@ -62,7 +62,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
     Ftest13<-as.numeric(n*(SSR-SSR2thresh)/SSR2thresh)
     Ftest23<-as.numeric(n*(SSR1thresh-SSR2thresh)/SSR2thresh)
     Ftests<-matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
- if(nboot>1){   
+ if(nboot>0){   
   ########
   ###Boot
   ########
