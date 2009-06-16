@@ -230,3 +230,27 @@ asListIfMat<-function(x){
     else
       return(x)
 }
+
+
+myInsertCol<-function (m, c, v = NA) {
+#m: matrix
+#c: columns numbers
+#v: value to add (scalar only)
+    nr <- nrow(m)
+    nc <- ncol(m)
+    #first
+    m2 <- if (1 %in% c) cbind(matrix(v, nrow = nr), m) else m
+    #inter
+    for(i in c[!c%in%c(1,nc + 1)])
+        m2 <- cbind(m2[, 1:(i - 1)], matrix(v, nrow = nr), m2[,i:ncol(m2)])
+    #last
+    if (eval(nc + 1) %in% c) 
+      m2 <- cbind(m2, matrix(v, nrow = nr))
+
+    return(m2)
+}
+
+if(FALSE){
+myInsertCol(X, 1, 2)
+myInsertCol(X, c(1,3,5), 1)
+}
