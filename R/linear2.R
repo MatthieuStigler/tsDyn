@@ -135,6 +135,12 @@ colnames(B)<-Bnames
 fitted<-Z%*%t(B)
 res<-Y-fitted
 
+###Y and regressors matrix
+naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=ifelse(model=="VAR", p, p+1)), Z)
+YnaX<-cbind(data, naX)
+colnames(YnaX)<-c(colnames(data), Bnames)
+
+###Return outputs
 model.specific<-list()
 model.specific$nthresh<-0
 if(model=="VECM"){
@@ -142,11 +148,12 @@ if(model=="VECM"){
 	model.specific$betaLT_std<-betaLT_std}
 
 
-z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=model, model.specific=model.specific)
+z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=YnaX, model.specific=model.specific)
 if(model=="VAR")
   class(z)<-c("VAR","nlVar")
 if(model=="VECM")
   class(z)<-c("VAR","VECM", "nlVar")
+attr(z, "model")<-model
 return(z)
 }
 
@@ -155,9 +162,11 @@ if(FALSE) { #usage example
 ###Hansen Seo data
 library(tsDyn)
 environment(linear2)<-environment(star)
+environment(summary.VAR)<-environment(star)
 data(zeroyld)
 dat<-zeroyld
 
+#tests
 aVAR<-linear2(dat[1:100,], lag=c(1,2), include="both", model="VAR")
 #lag2, 2 thresh, trim00.05: 561.46
 class(aVAR)
@@ -215,11 +224,11 @@ summary.VAR<-function(object, digits=4,...){
 
 
 print.summary.VAR<-function(x,...){
-	cat("#############\n###Model", x$model,"\n#############")
+	cat("#############\n###Model", attr(x,"model"),"\n#############")
 	cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
 	cat("\nNumber of variables:", x$k,"\tNumber of estimated slope parameters", x$npar)
 	cat("\nAIC",x$aic , "\tBIC", x$bic, "\tSSR", x$SSR)
-	if(x$model=="VECM")
+	if(attr(x,"model")=="VECM")
 		cat("\nCointegrating vector:", x$model.specific$betaLT)
 	cat("\n\n")
 	print(noquote(x$bigcoefficients))
@@ -261,7 +270,7 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	res[8]<- "\\end{smatrix}="
  	res<-include(x, res, coeftoprint)
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
-	if(x$model=="VECM"){
+	if(attr(x,"model")=="VECM"){
 		len<-length(res)
 		res[len+1]<-"+\\begin{smatrix}  %ECT"
 		res[len+2]<-TeXVec(coeftoprint[,ninc+1])
