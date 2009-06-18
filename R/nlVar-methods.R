@@ -41,6 +41,19 @@ coef.nlVar<-function(object,...){
 	return(object$coefficients)
 }
 
+coefMat <- function (object, ...)  
+  UseMethod("coefMat")
+
+coefmat.default<-function(object, ...)
+  coefficients(object)
+  
+coefMat.nlVar<-function(object,...){
+  if(inherits(object, "VAR"))
+    return(object$coefficients)
+  else
+    return(object$coeffmat)
+}
+
 summary.nlVar2<-function(x, ...){
 	r<-4
 	t<-x$t
