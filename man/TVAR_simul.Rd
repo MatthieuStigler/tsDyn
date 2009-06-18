@@ -48,10 +48,10 @@ TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 ##Bootstrap a TVAR with two threshold (three regimes)
 data(zeroyld)
 serie<-zeroyld
-TVAR_simul(data=serie,nthresh=2,n=500, type="boot",mTh=1, Thresh=c(7,9))
+TVAR_simul(data=serie,nthresh=2, type="boot",mTh=1, Thresh=c(7,9))
 
 ##Check the bootstrap
-cbind(TVAR_simul(data=serie,nthresh=2,n=500, type="check",mTh=1, Thresh=c(7,9))$serie,serie)
+cbind(TVAR_simul(data=serie,nthresh=2, type="check",mTh=1, Thresh=c(7,9))$serie,serie)
 }
 \keyword{ ts }
 \references{
