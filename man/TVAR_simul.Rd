@@ -5,8 +5,7 @@
 Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
-TVAR_simul(data,B,Thresh, nthresh=1, type=c("simul","boot", "check"), 
-sigma,n=200, lag=1, trend=TRUE,  thDelay=1,  thVar=NULL, mTh=1, starting=NULL)
+TVAR_simul(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, sigma, round=FALSE)
 }
 
 
@@ -16,20 +15,22 @@ a list with the simulated/bootstraped data and the parameter matrix used.
 \arguments{
 \item{data}{matrix of parameter to simulate}
 \item{B}{Matrix of coefficients to simulate}
+\item{TVARobject}{Object computed by function TVAR()}
 \item{Thresh}{The threshold value(s). Vector of length nthresh}
 \item{nthresh}{number of threshold (see details)}
 \item{type}{Whether a bootstrap or simulation is to employ. See details}
-\item{sigma}{variance of the errors}
 \item{n}{Number of observations to create when type="simul"}
 \item{lag}{Number of lags to include in each regime}
-\item{trend}{If a trend should be included in the model}
+\item{include}{Type of deterministic regressors to include. NOT WORKING PROPERLY CURRENTLY if not const}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases.  }
 \item{thVar}{external transition variable}
 \item{mTh}{combination of variables with same lag order for the transition variable. Either a single value (indicating which variable to take) or a combination}
 \item{starting}{Starting values when a simulation with given parameter matrix is made}
+\item{sigma}{variance of the errors}
+\item{round}{Rounds the series created to have the same digits (hopefully) as original series. Useful when t}
 }
 \details{
-This function offers the possibility to generate series following a TVAR from two approaches: bootstrap or simulation. When the data is given, one can use a simple residual bootstrap or simulate a serie with the same parameter matrix and with normal distributed residuals (with variance pre-specified). The choice "check" is just there to check the function: one should obtain the same values as the given values. 
+This function offers the possibility to generate series following a TVAR from two approaches: bootstrap or simulation. When the data is given, one can use a simple residual bootstrap or simulate a serie with the same parameter matrix and with normal distributed residuals (with variance pre-specified). The function calls internaly TVAR() to compute the parameter matrix. an alternative is to give a 
 When the parameter matrix is given, there is only the possibility to simulate series. The starting values (of length equal to the number of lags) can be given. The user should take care for the choice of the starting values and parameters values, since it is not sure that the simulated values will cross the threshold even once.
 }
 \seealso{

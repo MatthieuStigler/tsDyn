@@ -1,4 +1,4 @@
-TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=TRUE, dummyToBothRegimes=TRUE, trace=TRUE, trick="for", max.iter=2){
+TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=FALSE, dummyToBothRegimes=TRUE, trace=TRUE, trick="for", max.iter=2){
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
 T <- nrow(y) 		#Size of start sample
@@ -104,7 +104,7 @@ if(!missing(around)){
 #Model with dummy applied to only one regime
 loop1_onedummy <- function(gam1, thDelay){
 	##Threshold dummies
-	dummyDown <- ifelse(trans[,thDelay]<gam1, 1,0) * Z
+	dummyDown <- ifelse(trans[,thDelay]<=gam1, 1,0) * Z
 	ndown<-mean(dummyDown)
 	regimeDown<-dummyDown*Z
 	##SSR
@@ -121,7 +121,7 @@ loop1_onedummy <- function(gam1, thDelay){
 #Model with dummy applied to both regimes
 loop1_twodummy <- function(gam1, thDelay){
 	##Threshold dummies
-	d1<-ifelse(trans[,thDelay]<gam1, 1,0)
+	d1<-ifelse(trans[,thDelay]<=gam1, 1,0)
 	ndown<-mean(d1)
 	##SSR
 	if(min(ndown, 1-ndown)>=trim){
@@ -136,7 +136,7 @@ loop1_twodummy <- function(gam1, thDelay){
 #Model with dummy applied to both regimes and a common intercept
 loop1_twodummy_oneIntercept <- function(gam1, thDelay){
 	##Threshold dummies
-	d1<-ifelse(trans[,thDelay]<gam1, 1,0)
+	d1<-ifelse(trans[,thDelay]<=gam1, 1,0)
 	ndown<-mean(d1)
 	if(min(ndown, 1-ndown)>=trim){
 		Z1 <- t(cbind(1,d1 * Z[,-1], (1-d1)*Z[,-1]))		# dim k(p+1) x t
@@ -154,10 +154,10 @@ loop1_twodummy_oneIntercept <- function(gam1, thDelay){
 
 loop2 <- function(gam1, gam2,thDelay){
 	##Threshold dummies
-	dummydown <- ifelse(trans[,thDelay]<gam1, 1, 0)
+	dummydown <- ifelse(trans[,thDelay]<=gam1, 1, 0)
 	regimedown <- dummydown*Z
 	ndown <- mean(dummydown)
-	dummyup <- ifelse(trans[,thDelay]>=gam2, 1, 0)
+	dummyup <- ifelse(trans[,thDelay]>gam2, 1, 0)
 	regimeup <- dummyup*Z
 	nup <- mean(dummyup)
 	##SSR from TVAR(3)
@@ -173,10 +173,10 @@ loop2 <- function(gam1, gam2,thDelay){
 
 loop2_oneIntercept <- function(gam1, gam2,thDelay){
 	##Threshold dummies
-	dummydown <- ifelse(trans[,thDelay]<gam1, 1, 0)
+	dummydown <- ifelse(trans[,thDelay]<=gam1, 1, 0)
 	regimedown <- dummydown*Z[,-1]
 	ndown <- mean(dummydown)
-	dummyup <- ifelse(trans[,thDelay]>=gam2, 1, 0)
+	dummyup <- ifelse(trans[,thDelay]>gam2, 1, 0)
 	regimeup <- dummyup*Z[,-1]
 	nup <- mean(dummyup)
 	##SSR from TVAR(3)
@@ -301,11 +301,12 @@ else
 	val<- -(seq_len(ncol(Z)))
 
 if(nthresh==1){
-	dummydown <- ifelse(trans[,bestDelay]<bestThresh, 1, 0)
+	dummydown <- ifelse(trans[,bestDelay]<=bestThresh, 1, 0)
 	ndown <- mean(dummydown)
 	regimeDown <- dummydown*Z[,-val]
+	dummyup<-1-dummydown
 	if(dummyToBothRegimes) 
-		regimeUp<-(1-dummydown)*Z[,-val]
+		regimeUp<-dummyup*Z[,-val]
 	else regimeUp<-Z
 	if(commonInter)
 		Zbest<-t(cbind(1,regimeDown,regimeUp))
@@ -314,17 +315,20 @@ if(nthresh==1){
 }
 
 if(nthresh==2|nthresh==3){
-	dummydown <- ifelse(trans[,bestDelay]<bestThresh[1], 1,0)
+	dummydown <- ifelse(trans[,bestDelay]<=bestThresh[1], 1,0)
 	ndown <- mean(dummydown)
 	regimedown <- dummydown*Z[,-val]
-	dummyup <- ifelse(trans[,bestDelay]>=bestThresh[2], 1,0)
+	dummyup <- ifelse(trans[,bestDelay]>bestThresh[2], 1,0)
 	nup <- mean(dummyup)
 	regimeup <- dummyup*Z[,-val]
+	dummymid<-1-dummydown-dummyup
 	if(commonInter)
-		Zbest <- t(cbind(1,regimedown,(1-dummydown-dummyup)*Z[,-1], regimeup))	# dim k(p+1) x t
+		Zbest <- t(cbind(1,regimedown,dummymid*Z[,-1], regimeup))	# dim k(p+1) x t
 	else
-		Zbest <- t(cbind(regimedown,(1-dummydown-dummyup)*Z, regimeup))	# dim k(p+1) x t
+		Zbest <- t(cbind(regimedown,dummymid*Z, regimeup))	# dim k(p+1) x t
 }
+
+regime<-if(nthresh==1) dummydown+2*dummyup else dummydown+2*dummymid+3*dummyup
 
 Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
 fitted<-Bbest %*% Zbest
@@ -335,6 +339,10 @@ nparbest<-nrow(Bbest)*ncol(Bbest)
 Sigmabest<-matrix(1/t*crossprod(resbest),ncol=k,dimnames=list(colnames(data), colnames(data)))
 SigmabestOls<-Sigmabest*(t/(t-ncol(Bbest)))
 
+###Y and regressors matrix
+tZbest<-t(Zbest)
+naX<-rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
+YnaX<-cbind(data, naX)
 
 
 
@@ -368,17 +376,25 @@ else
 
 Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
 
+
+colnames(YnaX)<-c(colnames(data),colnames(Blist))
+colnames(Bbest)<-colnames(Blist)
+
+##number of obs in each regime
 if(nthresh==1)
 	nobs <- c(ndown=ndown, nup=1-ndown)
 else if (nthresh==2)
 	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 
-#elements to return
+###elements to return
 specific<-list()
 specific$allgammas<-allgammas
 specific$gammas<-gammas
+specific$thDelay<-bestDelay
 specific$Thresh<-bestThresh
 specific$nthresh<-nthresh
+specific$transCombin<-combin
+specific$regime<-regime
 specific$nreg<-nthresh+1
 specific$nrowB<-npar
 specific$nobs<-nobs
@@ -387,8 +403,11 @@ specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
 specific$allThSSR<-allThSSR#SSR values for all the th computed
 specific$Bnames<-Bnames
 
-z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model.matrix=Zbest, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific, usedThVar=trans[,bestDelay], trim=trim)
+z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model=YnaX, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific, usedThVar=trans[,bestDelay], trim=trim)
 class(z)<-c("TVAR","nlVar")
+attr(z, "levelTransVar")<-model
+attr(z, "transVar")<-if(!missing(thVar)) "external" else "internal"
+
 if(plot){
   layout(matrix(1:ifelse(z$model.specific$threshEstim,3,2), ncol=1))
   plot1(bestThresh, nthresh,usedThVar=z$usedThVar)
@@ -399,29 +418,6 @@ if(plot){
 return(z)
 }	#end of the whole function
 
-if(FALSE) { #usage example
-###Hansen Seo data
-library(tsDyn)
-data(zeroyld)
-dat<-zeroyld
-
-VAR<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const")
-#lag2, 2 thresh, trim00.05: 561.46
-class(VAR)
-VAR
-print(VAR)
-logLik(VAR)
-AIC(VAR)
-BIC(VAR)
-coef(VAR)
-deviance(VAR)
-summary(VAR)
-toLatex(VAR)
-toLatex(summary(VAR))
-VAR[["model.specific"]][["oneMatrix"]]
-###TODO
-#pre specified gamma
-}
 
 print.TVAR<-function(x,...){
 # 	NextMethod(...)
@@ -746,7 +742,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
     newThresh<-gammaPlus[positionSecond-length(storeMinus)]
   SSR<-min(store2, na.rm=TRUE)
   if(trace)
-    cat("Second best: ",newThresh, " (conditionnal on th= ",threshRef, " and Delay= ", delayRef," ) \t SSR: ", SSR, "\n", sep="")
+    cat("Second best: ",newThresh, " (conditionnal on th= ",threshRef, " and Delay= ", delayRef," ) \t SSR/AIC: ", SSR, "\n", sep="")
   list(threshRef=threshRef, newThresh=newThresh, SSR=SSR)
 }
 
@@ -808,3 +804,36 @@ grid<-function(gammasUp, gammasDown, fun, trace=TRUE, method=c("for", "apply", "
 #  system.time(TVAR(dat, lag=2, nthresh=2,thDelay=1, plot=FALSE, commonInter=TRUE, include="const", trick="apply"))
 #  system.time(TVAR(dat, lag=2, nthresh=2,thDelay=1, plot=FALSE, commonInter=TRUE, include="const", trick="mapply"))
 #  system.time(TVAR(dat, lag=2, nthresh=2,thDelay=1, plot=FALSE, commonInter=TRUE, include="const", trick="for"))
+
+if(FALSE) { #usage example
+###Hansen Seo data
+library(tsDyn)
+data(zeroyld)
+dat<-zeroyld
+environment(TVAR)<-environment(star)
+
+VAR<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const", gamma=c(3.016, 3.307))
+VAR<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const")
+#lag2, 2 thresh, trim00.05: 561.46
+
+#problem:
+TV<-TVAR(data=dat,nthresh=2, mTh=1, lag=1, plot=FALSE)
+reg<-TV$model.specific$regime
+cbind(reg[244:249],dat[244:249,])
+#
+
+class(VAR)
+VAR
+print(VAR)
+logLik(VAR)
+AIC(VAR)
+BIC(VAR)
+coef(VAR)
+deviance(VAR)
+summary(VAR)
+toLatex(VAR)
+toLatex(summary(VAR))
+VAR[["model.specific"]][["oneMatrix"]]
+###TODO
+#pre specified gamma
+}
