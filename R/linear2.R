@@ -137,8 +137,8 @@ res<-Y-fitted
 
 ###Y and regressors matrix
 naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=ifelse(model=="VAR", p, p+1)), Z)
+dimnames(naX)<-list(rownames(data), Bnames)
 YnaX<-cbind(data, naX)
-colnames(YnaX)<-c(colnames(data), Bnames)
 
 ###Return outputs
 model.specific<-list()

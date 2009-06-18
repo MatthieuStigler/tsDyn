@@ -12,6 +12,8 @@ if(!missing(n)&any(!missing(data), !missing(TVARobject)))
   stop("arg n should not be given with arg data or TVARobject")
 if(max(thDelay)>p)
 	stop("Max of thDelay should be smaller or equal to the number of lags")
+if(!missing(TVARobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag), !missing(thDelay), !missing(mTh)))
+  warning("When object TVARobject is given, only args 'type' and 'round' are relevant, others are not considered")
 ##include term
   if(include=="none")
     ninc<-0
@@ -80,12 +82,12 @@ else if(!missing(data)){
 }
 ### possibility 3: setarobject is given by user (or by poss 2)
 if(!missing(TVARobject)){
+  k<-TVARobject$k
+  T<-TVARobject$T
+  p<-TVARobject$lag
   modSpe<-TVARobject$model.specific
   res<-residuals(TVARobject)
   Bmat<-coefMat(TVARobject)
-  k<-TVARobject$k
-  T<-TVARobject$T
-  browser()
   Sigma<- matrix(1/T*crossprod(res),ncol=k)
   y<-as.matrix(TVARobject$model)[,1:k]
   ndig<-getndp(y[,1])
@@ -101,6 +103,7 @@ if(!missing(TVARobject)){
     Thresh<-modSpe$Thresh
     thDelay<-modSpe$thDelay
     combin<-modSpe$transCombin
+    nthresh<-modSpe$nthresh
   }
 }
 
@@ -150,7 +153,6 @@ else if(nthresh==1){
 	BUp<-Bmat[,-seq_len(nparBmat)]
 
 	for(i in (p+1):(nrow(y))){
-	if(i==348) browser()
 		if(round(z2[i-thDelay],ndig)<=Thresh) {
 			Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
 			if(round)
@@ -227,10 +229,14 @@ all(TVAR_simul(data=serie,nthresh=0,lag=3, type="check",mTh=2)$serie==serie) #TR
 all(TVAR_simul(data=serie,nthresh=1,lag=2, type="check",mTh=2)$serie==serie) #TRUE
 
 
-a<-TVAR(serie, nthresh=2, lag=1)
-head(a$model[,1:a$k])
-environment(TVAR_simul)<-environment(star)
-all(TVAR_simul(TVARobject=a,nthresh=1,lag=2, type="check",mTh=2)$serie==serie) #TRUE
+###with TVARobject
+all(TVAR_simul(TVARobject=TVAR(serie, nthresh=2, lag=1),type="check")$serie==serie) #TRUE
+all(TVAR_simul(TVARobject=TVAR(serie, nthresh=1, lag=1),type="check")$serie==serie) #TRUE
+all(TVAR_simul(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")$serie==serie) #TRUE
+all(TVAR_simul(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")$serie==serie) #TRUE
+
+all(TVAR_simul(TVARobject=linear2(serie, lag=1),type="check")$serie==serie) #TRUE
+
 ##Check the bootstrap: no! prob with trend... both.. none...
 TVAR_simul(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE)$serie==serie
 TVAR_simul(data=serie,nthresh=1, type="check",mTh=1, include="trend")$serie==serie

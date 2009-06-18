@@ -375,10 +375,10 @@ else
 	Bnames<-c(LagNames)
 
 Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
+BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
 
-
-colnames(YnaX)<-c(colnames(data),colnames(Blist))
-colnames(Bbest)<-colnames(Blist)
+colnames(YnaX)<-c(colnames(data),BnamesVec)
+colnames(Bbest)<-BnamesVec
 
 ##number of obs in each regime
 if(nthresh==1)
@@ -430,12 +430,15 @@ print.TVAR<-function(x,...){
 summary.TVAR<-function(object,...){
 	x<-object
 	xspe<-x$model.specific
-	Z<-x$model.matrix
+	k<-x$k
+	t<-x$t
+	p<-x$lag
+	Z<-t(as.matrix(tail(x$model[,-c(1:k)],t)))
 	###Stdev, VarCov
-	Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=x$k)
+	Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=k)
 	SigmabestOls<-Sigmabest*(x$t/(x$t-ncol(x$coeffmat)))
 	VarCovB<-solve(tcrossprod(Z))%x%SigmabestOls
-	StDevB<-matrix(diag(VarCovB)^0.5, nrow=x$k)
+	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
 	Tvalue<-x$coeffmat/StDevB
 	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
 	Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
@@ -811,16 +814,13 @@ library(tsDyn)
 data(zeroyld)
 dat<-zeroyld
 environment(TVAR)<-environment(star)
+environment(summary.TVAR)<-environment(star)
 
-VAR<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const", gamma=c(3.016, 3.307))
+VAR<-TVAR(as.matrix(dat[1:100,]),lag=2, nthresh=1,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const", gamma=c(3.016, 3.307))
+
+VAR<-TVAR(dat[1:100,],lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const", gamma=c(3.016, 3.307))
 VAR<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, commonInter=TRUE, include="const")
 #lag2, 2 thresh, trim00.05: 561.46
-
-#problem:
-TV<-TVAR(data=dat,nthresh=2, mTh=1, lag=1, plot=FALSE)
-reg<-TV$model.specific$regime
-cbind(reg[244:249],dat[244:249,])
-#
 
 class(VAR)
 VAR
@@ -835,5 +835,6 @@ toLatex(VAR)
 toLatex(summary(VAR))
 VAR[["model.specific"]][["oneMatrix"]]
 ###TODO
-#pre specified gamma
+#pre specified gamma: not working!
+#Bname: give different output... either matrix or list... to improve
 }
