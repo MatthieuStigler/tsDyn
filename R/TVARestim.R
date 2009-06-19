@@ -407,6 +407,7 @@ z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model=YnaX, nobs_
 class(z)<-c("TVAR","nlVar")
 attr(z, "levelTransVar")<-model
 attr(z, "transVar")<-if(!missing(thVar)) "external" else "internal"
+attr(z, "varsLevel")<-"level"
 
 if(plot){
   layout(matrix(1:ifelse(z$model.specific$threshEstim,3,2), ncol=1))

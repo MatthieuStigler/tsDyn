@@ -151,8 +151,11 @@ if(model=="VECM"){
 z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=YnaX, model.specific=model.specific)
 if(model=="VAR")
   class(z)<-c("VAR","nlVar")
-if(model=="VECM")
+else{
   class(z)<-c("VAR","VECM", "nlVar")
+  I<-"diff"
+}
+attr(z, "varsLevel")<-I
 attr(z, "model")<-model
 return(z)
 }
@@ -263,7 +266,8 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
 	res[5]<-"\\begin{equation}"
 	res[6]<- "\\begin{smatrix} %explained vector"
-	if(inherits(x, "VECM"))
+	###explained vector
+        if(attr(x, "varsLevel")=="diff")
 	  res[7]<-TeXVec(paste("slashDelta X_{t}^{",seq(1, x$k),"}", sep=""))
 	else
 	  res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))

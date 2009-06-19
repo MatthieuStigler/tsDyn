@@ -152,7 +152,7 @@ include<-function(x, res, coef, skip=0, mat="smatrix"){
 
 ###Function lag
 LagTeX<-function(res, x, coef, skip,mat="smatrix"){
-	if(inherits(x,c("VECM","TVECM")))
+	if(attr(x, "varsLevel")=="diff")
 	    delta<-"slashDelta "
 	else
 	    delta<-NULL

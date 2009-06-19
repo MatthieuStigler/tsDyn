@@ -547,6 +547,7 @@ z<-list(coefficients=Blist, residuals=resbest, model.matrix=t(Zbest), VAR=VarCov
 
 
 class(z)<-c("TVECM","nlVar")
+attr(z, "varsLevel")<-"diff"
 return(z)
 }
 
