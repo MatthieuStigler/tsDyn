@@ -319,7 +319,8 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	###Const
  	res<-include(x, res, coeftoprint)	#nlVar-methods.R
 	###Lags
-	res<-LagTeX(res, x, coeftoprint, ninc+1)	#nlVar-methods.R
+	a<-if(attr(x,"model")=="VECM") 1 else 0
+	res<-LagTeX(res, x, coeftoprint, ninc+a)	#nlVar-methods.R
 	res[length(res)+1]<-"\\end{equation}"
 	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]
