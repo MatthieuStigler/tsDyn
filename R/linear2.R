@@ -178,7 +178,7 @@ YnaX<-cbind(data, naX)
 model.specific<-list()
 model.specific$nthresh<-0
 if(model=="VECM"){
-  model.specific$betaLT<-betaLT
+  model.specific$beta<-betaLT
   #model.specific$betaLT_std<-betaLT_std
   }
 
@@ -268,7 +268,7 @@ print.summary.VAR<-function(x,...){
 	cat("\nNumber of variables:", x$k,"\tNumber of estimated slope parameters", x$npar)
 	cat("\nAIC",x$aic , "\tBIC", x$bic, "\tSSR", x$SSR)
 	if(attr(x,"model")=="VECM")
-		cat("\nCointegrating vector:", x$model.specific$betaLT)
+		cat("\nCointegrating vector: (1, -", x$model.specific$beta, ")")
 	cat("\n\n")
 	print(noquote(x$bigcoefficients))
 

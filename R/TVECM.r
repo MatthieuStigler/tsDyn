@@ -533,7 +533,7 @@ specific$Thresh<-bestThresh	#threshold value
 specific$threshEstim<-ifelse(is.null(gamma1), TRUE, FALSE) #whether the threshold was estimated or pre-specified
 specific$nthresh<-nthresh	#number of thresholds
 specific$nreg<-nthresh+1	#num of regimes
-specific$beta<-c(1, -bestBeta)	#beta value
+specific$beta<-bestBeta	#beta value
 specific$nrowB<-npar		#number of parameters
 specific$nobs<-nobs		#percent of observations in each regime
 specific$model<-model
@@ -639,11 +639,11 @@ print.summary.TVECM<-function(x,...){
 	cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
 	cat("\nNumber of variables:", x$k,"\tNumber of estimated parameters", x$npar)
 	cat("\nAIC",x$aic , "\tBIC", x$bic,"\tSSR", x$SSR,"\n\n")
+	cat("\nCointegrating vector: (1, -", x$model.specific$beta, ")")
 	print(noquote(x$bigcoefficients))
 	cat("\nThreshold")
 	cat("\nValues:", x$model.specific$Thresh)
 	cat("\nPercentage of Observations in each regime", percent(x$model.specific$nobs,digits=3,by100=TRUE))
-	cat("\nCointegrating vector", x$model.specific$beta)
 }
 
 toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
