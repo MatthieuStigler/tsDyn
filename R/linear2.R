@@ -345,7 +345,7 @@ dat<-zeroyld
 environment(linear2)<-environment(star)
 environment(summary.VAR)<-environment(star)
 
-aVAR<-linear2(dat[1:100,], lag=1, include="both", model="VAR")
+aVAR<-linear2(dat, lag=1, include="both", model="VAR")
 aVAR<-linear2(dat, lag=1, include="const", model="VECM", estim="ML", beta=0.98)
 #lag2, 2 thresh, trim00.05: 561.46
 aVAR
@@ -362,19 +362,24 @@ environment(toLatex.VAR)<-environment(star)
 toLatex(aVAR)
 toLatex(summary(aVAR))
 
-#compare with vars
+###Check VAR: comparing with vars
+myVAR<-linear2(dat, lag=1)
+
 library(vars)
-library(urca)
-var<-VAR(dat[1:100,], lag=1)
-summary(var)
+var<-VAR(dat, lag=1)
 
+vaco1<-coef(var)$short.run[c(3,1,2),1]
+vaco2<-coef(var)$long.run[c(3,1,2),1]
+round(coef(myVAR),8)==round(rbind(vaco1, vaco2),8)
 
-aVAR<-linear2(dat[1:100,], lag=1, include="const", model="VAR")
-summary(aVAR, digits=6)
-
-
-a<-ca.jo(dat[1:100,], spec="trans")
+###Check Johansen MLE
+myVECM<-linear2(dat, lag=1, include="const", model="VECM", estim="ML")
+summary(myVECM, digits=7) 
+#comparing with Hansen paper:reported in Gauss procedure is:
+#coint vector: 1.02206: ok!
+#coeff: 
+#comparing with vars package
+a<-ca.jo(dat, spec="trans")
 summary(a)
-lm(dat[1:100,1]~dat[1:100,2])
-lm(dat[1:100,1]~dat[1:100,2]-1)
+#same answer also!
 }
