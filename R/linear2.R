@@ -1,4 +1,4 @@
-linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, coINT=FALSE, LRinclude=c("none", "const", "trend","both"), beta0=0)
+linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, coINT=FALSE, LRinclude=c("none", "const", "trend","both"), beta0=0, estim=c("2OLS", "ML"))
 {
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
@@ -23,11 +23,14 @@ if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 
 include<-match.arg(include)
+ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
 model<-match.arg(model)
+estim<-match.arg(estim)
 I<-match.arg(I)
 Y <- y[(p+1):T,] #
 X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 
+#Set up of dependant and independant variables matrices
 if(notAllLags)
   X<-X[,sort(rep((Lags*k-k+1), k))+0:(k-1)]
 
@@ -43,8 +46,17 @@ if(model=="VECM"|I=="diff"){
 	Y<-DeltaY
 	t<-t-1}
 
-##Long-run relationship OLS estimation
-if(model=="VECM"){
+###Regressors matrix
+if(include=="const")
+	Z<-cbind(1, Z)
+else if(include=="trend")
+	Z<-cbind(seq_len(t), Z)
+else if(include=="both")
+	Z<-cbind(rep(1,t),seq_len(t), Z)
+
+
+##VECM: Long-run relationship OLS estimation
+if(model=="VECM"&estim=="2OLS"){
 	#beta has to be estimated
 	if(is.null(beta) ){
 	  if(class(LRinclude)=="character"){
@@ -95,21 +107,43 @@ if(model=="VECM"){
 #print(all.equal(residuals(coint)[-c(seq_len(p),T)], (y%*%c(1,-betaLT)-(LRplusplus))[-c(seq_len(p),T),]))
 }
 
-###Regressors matrix
+##VECM: ML (Johansen ) estimation of cointegrating vector
+else if(model=="VECM"&estim=="ML"){
+  if (is.null(beta)){
+    u<-qr.resid(qr(Z),Y)		#Residuals for auxiliary regression 1 #u=y-x*xx*(x'*y) and xx=inv(x'*x)
+    v<-qr.resid(qr(Z),Xminus1)		#Residuals for auxiliary regression 2# v=xlag-x*xx*(x'*xlag);
+    S00<-crossprod(u)				#S00 of size 2x2		#uu=u'*u;
+    S11<-crossprod(v)				#S11 of size 2x2
+    m<-solve(S11)%*%(t(v)%*%u)%*%solve(S00)%*%(t(u)%*%v)	#m2x2 #m=inv(v'*v)*(v'*u)*inv(uu)*(u'*v);
+    ve<-eigen(m)$vectors 			#eigenvectors 2x2		#[ve,va]=eig(m);
+    va<-eigen(m)$values				#Eigenvalues 2
+    maa<-which.max(va)				#Selection of the biggest eigenvalue	#   [temp,maa]=max(va);
+    h<-ve[,maa]					#Eigenvector of the Biggest eigenvalue		#h=ve(:,maa);
+    betaLT<- -h[2]/h[1]				#Normalization		#b0= -h(2)/h(1);
+		}
+else{ betaLT<-beta}				#b0=cvalue_;
+  ECTminus1<-Xminus1%*%c(1,-betaLT)
+  Z<-cbind(ECTminus1,Z)
+}
+if(FALSE){#useless?
+###Estimation of the parameters
+  w0<-xlag%*%c(1,-b0)				#ECT 	#w0=xlag*[1;-b0];
+  z0<-cbind(w0,Z)					#ALL REGRESSORS	#z0=[w0,x];
+  kk<-length(z0[1,])				#kk=length(z0(1,:));
+  zz0<-solve(t(z0)%*%z0)			#	zz0=inv(z0'*z0);
+  zzz0<-z0%*%zz0				#	zzz0=z0*zz0;
+  beta0<-t(zzz0)%*%y			#ALL Parameters	beta0=zzz0'*y;
+  colnames(beta0)<-paste("Equation",colnames(dat))
+  if(intercept==TRUE){rownames(beta0)<-c("ECM","Intercept",c(paste(rep(colnames(dat),k), -rep(1:k, each=nequ))))}
+  if(intercept==FALSE) {rownames(beta0)<-c("ECM",c(paste(rep(colnames(dat),k), -rep(1:k, each=nequ))))}
+}
 
 
-if(include=="const")
-	Z<-cbind(1, Z)
-else if(include=="trend")
-	Z<-cbind(seq_len(t), Z)
-else if(include=="both")
-	Z<-cbind(rep(1,t),seq_len(t), Z)
-##################
-###Linear model
-#################
+###Slope parameters
  B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
 
 
+###naming of variables and parameters
 npar<-ncol(B)*nrow(B)
 
 rownames(B)<-paste("Equation",colnames(data))
@@ -123,11 +157,11 @@ else
 
 
 if(include=="const")
-	Bnames<-c("Intercept",ECT, LagNames)
+	Bnames<-c(ECT,"Intercept", LagNames)
 else if(include=="trend")
-	Bnames<-c("Trend",ECT, LagNames)
+	Bnames<-c(ECT,"Trend", LagNames)
 else if(include=="both")
-	Bnames<-c("Intercept","Trend",ECT, LagNames)
+	Bnames<-c(ECT,"Intercept","Trend", LagNames)
 else
 	Bnames<-c(ECT,LagNames)
 
@@ -144,8 +178,9 @@ YnaX<-cbind(data, naX)
 model.specific<-list()
 model.specific$nthresh<-0
 if(model=="VECM"){
-	model.specific$betaLT<-betaLT
-	model.specific$betaLT_std<-betaLT_std}
+  model.specific$betaLT<-betaLT
+  #model.specific$betaLT_std<-betaLT_std
+  }
 
 
 z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=YnaX, model.specific=model.specific)
@@ -155,6 +190,7 @@ else{
   class(z)<-c("VAR","VECM", "nlVar")
   I<-"diff"
 }
+
 attr(z, "varsLevel")<-I
 attr(z, "model")<-model
 return(z)
@@ -267,20 +303,23 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	res[5]<-"\\begin{equation}"
 	res[6]<- "\\begin{smatrix} %explained vector"
 	###explained vector
-        if(attr(x, "varsLevel")=="diff")
+	if(attr(x, "varsLevel")=="diff")
 	  res[7]<-TeXVec(paste("slashDelta X_{t}^{",seq(1, x$k),"}", sep=""))
 	else
 	  res[7]<-TeXVec(paste("X_{t}^{",seq(1, x$k),"}", sep=""))
 	res[8]<- "\\end{smatrix}="
- 	res<-include(x, res, coeftoprint)
+	###ECT
 	ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
 	if(attr(x,"model")=="VECM"){
 		len<-length(res)
 		res[len+1]<-"+\\begin{smatrix}  %ECT"
-		res[len+2]<-TeXVec(coeftoprint[,ninc+1])
+		res[len+2]<-TeXVec(coeftoprint[,1]) #see nlVar-methods.R
 		res[len+3]<-"\\end{smatrix}ECT_{-1}"
-		ninc<-ninc+1}
-	res<-LagTeX(res, x, coeftoprint, ninc)
+	  }
+	###Const
+ 	res<-include(x, res, coeftoprint)	#nlVar-methods.R
+	###Lags
+	res<-LagTeX(res, x, coeftoprint, ninc+1)	#nlVar-methods.R
 	res[length(res)+1]<-"\\end{equation}"
 	res<-gsub("slash", "\\", res, fixed=TRUE)
 	res<-res[res!="blank"]
@@ -289,4 +328,52 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 }
 
 
+if(FALSE){
+###TODO
+#check if const/trend/both in LR rel and VECM makes sense!
+#check for standaard deviation of coint vector whith ML estim!
+#consistency between ML and OLS coint estimator?
+}
 
+
+if(FALSE) { #usage example
+###Hansen Seo data
+library(tsDyn)
+data(zeroyld)
+dat<-zeroyld
+environment(linear2)<-environment(star)
+environment(summary.VAR)<-environment(star)
+
+aVAR<-linear2(dat[1:100,], lag=1, include="both", model="VAR")
+aVAR<-linear2(dat, lag=1, include="const", model="VECM", estim="ML", beta=0.98)
+#lag2, 2 thresh, trim00.05: 561.46
+aVAR
+summary(aVAR)
+sqrt(diag(summary(aVAR, cov=0)$Sigma))
+vcov.VAR(aVAR)
+vcovHC.VAR(aVAR)
+logLik(aVAR)
+AIC(aVAR)
+BIC(aVAR)
+deviance(aVAR)
+coef(aVAR)
+environment(toLatex.VAR)<-environment(star)
+toLatex(aVAR)
+toLatex(summary(aVAR))
+
+#compare with vars
+library(vars)
+library(urca)
+var<-VAR(dat[1:100,], lag=1)
+summary(var)
+
+
+aVAR<-linear2(dat[1:100,], lag=1, include="const", model="VAR")
+summary(aVAR, digits=6)
+
+
+a<-ca.jo(dat[1:100,], spec="trans")
+summary(a)
+lm(dat[1:100,1]~dat[1:100,2])
+lm(dat[1:100,1]~dat[1:100,2]-1)
+}
