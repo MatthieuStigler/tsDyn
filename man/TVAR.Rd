@@ -6,7 +6,7 @@
 Estimate a multivariate Threshold VAR
 }
 \usage{
-TVAR(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=TRUE, dummyToBothRegimes=TRUE,trace=TRUE, trick="for", max.iter=2)
+TVAR(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=FALSE, dummyToBothRegimes=TRUE,trace=TRUE, trick="for", max.iter=2)
 }
 \value{
 Fitted model data
