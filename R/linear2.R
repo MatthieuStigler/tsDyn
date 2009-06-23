@@ -170,7 +170,7 @@ fitted<-Z%*%t(B)
 res<-Y-fitted
 
 ###Y and regressors matrix
-naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=ifelse(model=="VAR", p, p+1)), Z)
+naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=T-t), Z)
 dimnames(naX)<-list(rownames(data), Bnames)
 YnaX<-cbind(data, naX)
 
