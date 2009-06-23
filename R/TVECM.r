@@ -499,6 +499,10 @@ Tvalue<-Bbest/StDevB
 Pval<-pt(abs(Tvalue), df=(t-ncol(Zbest)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(t-ncol(Zbest)), lower.tail=TRUE)
 
 
+###Y and regressors matrix
+naX<-rbind(matrix(NA, ncol=ncol(Zbest), nrow=p+1), Zbest)
+YnaX<-cbind(data, naX)
+
 ###naming the parameter matrix
 rownames(Bbest) <- paste("Equation", colnames(data))
 rownames(Pval) <- paste("Equation", colnames(data))
@@ -516,16 +520,20 @@ else if(include=="both")
 else if(include=="none")
   Bcolnames <- c("ECT",DeltaXnames)
 
+#partitionning the matrix following the regimes, and naming it
+Blist<-nameB(Bbest,commonInter=ifelse(model=="All",FALSE,TRUE), Bnames=Bcolnames,nthresh=nthresh,npar=npar, model="TVECM", TVECMmodel=model)
 
-###partitionning the matrix following the regimes
+BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
+colnames(YnaX)<-c(colnames(data),BnamesVec)
+colnames(Bbest)<-BnamesVec
 
+###Number of observations in each regime
 if(nthresh==1)
   nobs <- c(ndown=ndown, nup=nup)
 else if(nthresh==2)
   nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 
-Blist<-nameB(Bbest,commonInter=ifelse(model=="All",FALSE,TRUE), Bnames=Bcolnames,nthresh=nthresh,npar=npar, model="TVECM", TVECMmodel=model)
-
+###elements to return
 specific<-list()
 specific$Thresh<-bestThresh	#threshold value
 specific$threshEstim<-ifelse(is.null(gamma1), TRUE, FALSE) #whether the threshold was estimated or pre-specified
@@ -541,11 +549,12 @@ specific$Bnames<-Bcolnames
 
 # specific$commonInter<-commonInter
 
-z<-list(coefficients=Blist, residuals=resbest, model.matrix=t(Zbest), VAR=VarCovB, coeffmat=Bbest,nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+z<-list(coefficients=Blist, residuals=resbest, model=YnaX, VAR=VarCovB, coeffmat=Bbest,nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
 
 
 class(z)<-c("TVECM","nlVar")
 attr(z, "varsLevel")<-"diff"
+attr(z, "model")<-model
 return(z)
 }
 
@@ -567,7 +576,10 @@ beta0<-rep(1.12,480)
 TVECM(dat, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
 
 
-tvecm<-TVECM(dat, nthresh=2,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="All")
+tvecm<-TVECM(dat, nthresh=1,lag=2, bn=10, ngridG=10, plot=FALSE,trim=0.05, model="All")
+
+###To FIX:
+tvecm2<-TVECM(dat, nthresh=2,lag=1, bn=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridG=20, plot=FALSE,trim=0.05, model="All")
 class(tvecm)
 tvecm
 print(tvecm)
@@ -595,17 +607,20 @@ print.TVECM<-function(x,...){
 
 summary.TVECM<-function(object,digits=4,...){
   x<-object
-  Z<-x$model.matrix
+  k<-x$k
+  t<-x$t
+  Z<-t(as.matrix(tail(x$model[,-c(1:k)],t)))
   xspe<-x$model.specific
+  model<-attr(object, "model")
 ###Stdev, VarCov
-  Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=x$k)
-  SigmabestOls<-Sigmabest*(x$t/(x$t-ncol(x$coeffmat)))
+  Sigmabest<-matrix(1/t*crossprod(x$residuals),ncol=k)
+  SigmabestOls<-Sigmabest*(t/(t-ncol(x$coeffmat)))
   VarCovB<-solve(tcrossprod(Z))%x%SigmabestOls
-  StDevB<-matrix(diag(VarCovB)^0.5, nrow=x$k)
+  StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
   Tvalue<-x$coeffmat/StDevB
-  StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB,model="TVECM", TVECMmodel=xspe$model)
+  StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB,model="TVECM", TVECMmodel=model)
   Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
-  Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB,model="TVECM", TVECMmodel=xspe$model)
+  Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB,model="TVECM", TVECMmodel=model)
   x$coefficients<-asListIfMat(x$coefficients)
   x$StDev<-asListIfMat(StDevB)
   x$Pvalues<-asListIfMat(Pval)
