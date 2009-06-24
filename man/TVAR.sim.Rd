@@ -10,7 +10,7 @@ TVAR.sim(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), 
 
 
 \value{
-a list with the simulated/bootstraped data and the parameter matrix used. 
+A matrix with the simulated/bootstraped series.
 }
 \arguments{
 \item{data}{matrix of parameter to simulate}
@@ -43,9 +43,19 @@ TODO
 }
 \author{Matthieu Stigler}
 \examples{
+##simulate VAR as in Enders 2004, p 268
+B1<-matrix(c(0.7, 0.2, 0.2, 0.7), 2)
+var1<-TVAR.sim(B=B1,nthresh=0,n=100, type="simul", include="none")
+plot(var1)
+
+B2<-rbind(c(0.5, 0.5, 0.5), c(0, 0.5, 0.5))
+varcov<-matrix(c(1,0.2, 0.3, 1),2)
+var2<-TVAR.sim(B=B2,nthresh=0,n=100, type="simul", include="const", varcov=varcov)
+plot(var2)
+
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
-sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5))$serie
+sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5))
 
 #estimate the new serie
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
@@ -56,7 +66,7 @@ serie<-zeroyld
 TVAR.sim(data=serie,nthresh=2, type="boot",mTh=1, Thresh=c(7,9))
 
 ##Check the bootstrap
-cbind(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, Thresh=c(7,9))$serie,serie)
+cbind(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, Thresh=c(7,9)),serie)
 }
 \keyword{ ts }
 \references{

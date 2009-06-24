@@ -1,4 +1,4 @@
-TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k)){
+TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
 
 
 if(!missing(data)&!missing(B))
@@ -157,8 +157,10 @@ else if(nthresh==2){
   }
 }
 
-
-list(B=Bmat,serie=round(Yb,ndig))
+if(show.parMat)
+  print(Bmat)
+res<-round(Yb, ndig)
+return(res)
 }
 
 if(FALSE){
@@ -166,7 +168,7 @@ library(tsDyn)
 environment(TVECM.sim)<-environment(star)
 
 ##Simulation of a TVAR with 1 threshold
-a<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1, lag=1,include="none", starting=c(2,2))$serie
+a<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1, lag=1,include="none", starting=c(2,2))
 ECT<-a[,1]-a[,2]
 
 layout(matrix(1:2, ncol=1))
@@ -174,8 +176,8 @@ plot(a[,1], type="l", xlab="", ylab="", ylim=range(a, ECT))
 lines(a[,2], col=2, type="l")
 
 plot(ECT, type="l")
-
-sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))$serie
+  
+sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))
 
 
 #estimate the new serie
@@ -188,29 +190,29 @@ TVECM.sim(data=dat,nthresh=2, type="boot", Thresh=c(7,9))
 
 ##Check the bootstrap
 linObject<-linear2(dat, lag=1, model="VECM")
-all(TVECM.sim(TVECMobject=linObject,type="check")$serie==dat)
-all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="none"),type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=linObject,type="check")==dat)
+all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="none"),type="check")==dat)
 
 #not working: (probably trend coefficients too small so digits errors)
-all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="trend"),type="check")$serie==dat)
-all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="both"),type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="trend"),type="check")==dat)
+all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="both"),type="check")==dat)
 
 #nthresh=1
 TVECMobject<-TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE)
-all(TVECM.sim(TVECMobject=TVECMobject,type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=TVECMobject,type="check")==dat)
 
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE),type="check")$serie==dat)
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")$serie==dat)
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
 
 #nthresh=2
 TVECMobject2<-TVECM(dat, nthresh=2, lag=1, bn=20, ngridG=20, plot=FALSE)
-all(TVECM.sim(TVECMobject=TVECMobject2,type="check")$serie==dat)
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE),type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=TVECMobject2,type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE),type="check")==dat)
 
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=1, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")$serie==dat) 
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=1, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat) 
 #famous rounding problem...
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
 
 ###TODO:
 #improve trend/both case

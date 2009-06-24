@@ -5,12 +5,12 @@
 Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
-TVECM.sim(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, sigma)
+TVECM.sim(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE)
 }
 
 
 \value{
-a list with the simulated/bootstraped data and the parameter matrix used. 
+A matrix with the simulated/bootstraped series.
 }
 \arguments{
 \item{data}{matrix of parameter to simulate}
@@ -25,8 +25,8 @@ a list with the simulated/bootstraped data and the parameter matrix used.
 \item{include}{Type of deterministic regressors to include. NOT WORKING PROPERLY CURRENTLY if not const}
 \item{starting}{Starting values when a simulation with given parameter matrix is made}
 \item{innov}{Innovations used for simulation. Should be matrix of dim nxk. By default multivariate normal.}
-\item{varcov}{Variance-covariance matrix for the inov when default multivariate normal is used.
-\item{sigma}{variance of the errors}
+\item{varcov}{Variance-covariance matrix for the inov when default multivariate normal is used.}
+\item{show.parMat}{Logical. Should the parameter matrix be shown? Usefull to understand how to give right input}
 }
 \details{
 This function offers the possibility to generate series following a VECM/TVECM from two approaches: bootstrap or simulation. 
@@ -40,7 +40,7 @@ TODO
 \examples{
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.2, 0.11928245, 1.00880447, -0.009974585, 0.3, -0.089316, 0.95425564, 0.02592617),c( -0.1, 0.25283578, 0.09182279,  0.914763741, 0.35,-0.0530613, 0.02248586, 0.94309347))
-sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))$serie
+sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))
 
 
 
@@ -51,7 +51,7 @@ TVECMobject<-TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE)
 TVECM.sim(TVECMobject=TVECMobject,type="boot")
 
 ##Check the bootstrap
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")$serie==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
 }
 \keyword{ ts }
 \references{

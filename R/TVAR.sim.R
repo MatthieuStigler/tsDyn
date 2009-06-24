@@ -1,4 +1,4 @@
-TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), round=FALSE){
+TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, round=FALSE){
 if(!missing(data)&!missing(B))
 	stop("You have to provide either B or y, but not both")
 p<-lag
@@ -59,8 +59,8 @@ if(!missing(B)){
     if(length(Thresh)!=2)
       stop("please give two Thresh values if you choose nthresh=2")
   }
-  
-  Thresh<-round(Thresh,ndig)
+  if(nthresh%in%c(1,2))
+    Thresh<-round(Thresh,ndig)
   k <- ncol(y) 		#Number of variables
   T <- nrow(y) 		#Size of start sample
 }
@@ -189,7 +189,10 @@ if(FALSE){
 }
 # print(cbind(y, round(Yb,3)))
 
-list(B=Bmat,serie=round(Yb,ndig))
+if(show.parMat)
+  print(Bmat)
+res<-round(Yb, ndig)
+return(res)
 }
 
 if(FALSE){
