@@ -1,4 +1,4 @@
-TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, sigma){
+TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k)){
 
 
 if(!missing(data)&!missing(B))
@@ -32,10 +32,6 @@ if(!missing(B)){
     type<-"simul"
     warning("Type check or boot are only avalaible with pre specified data. The type simul was used")
     }
-  if(missing(sigma)){
-	warning("sigma is missing, the values taken are 0.25 for each variable")
-	sigma<-rep(0.25,nrow(B))
-	}
   nB<-nrow(B)
   ndig<-4
   esp<-p*nB+1+ninc #number of lags +ecm
@@ -77,11 +73,8 @@ if(!missing(TVECMobject)){
   beta<-modSpe$beta
   res<-residuals(TVECMobject)
   Bmat<-coefMat(TVECMobject)
-  Sigma<- matrix(1/T*crossprod(res),ncol=k)
   y<-as.matrix(TVECMobject$model)[,1:k]
   ndig<-getndp(y[,1])
-  if(missing(sigma)&type=="simul")
-      sigma<-diag(Sigma)
   if(nthresh>0){
     Thresh<-modSpe$Thresh
     nthresh<-modSpe$nthresh
@@ -117,8 +110,10 @@ BETA<-matrix(c(1, -beta), nrow=1)
 
 
 #resampling/ simulation of residual/innovations
-innov<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"=t(sqrt(sigma)*t(matrix(rnorm(k*t), ncol=k))), "check"=res)
-resb<-rbind(matrix(0,nrow=p+1, ncol=k),innov)	
+if(type=="simul"&&dim(innov)!=c(n,k))
+  stop(paste("input innov is not of right dim, should be matrix with", n,"rows and ", k, "cols\n"))
+resids<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"= innov, "check"=res)
+resb<-rbind(matrix(0,nrow=p+1, ncol=k),resids)
 
 
 if(nthresh==0){
@@ -171,8 +166,17 @@ library(tsDyn)
 environment(TVECM.sim)<-environment(star)
 
 ##Simulation of a TVAR with 1 threshold
-B<-rbind(c(0.2, 0.11928245, 1.00880447, -0.009974585, 0.3, -0.089316, 0.95425564, 0.02592617),c( -0.1, 0.25283578, 0.09182279,  0.914763741, 0.35,-0.0530613, 0.02248586, 0.94309347))
-sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5), sigma=c(0.3,0.4))$serie
+a<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1, lag=1,include="none", starting=c(2,2))$serie
+ECT<-a[,1]-a[,2]
+
+layout(matrix(1:2, ncol=1))
+plot(a[,1], type="l", xlab="", ylab="", ylim=range(a, ECT))
+lines(a[,2], col=2, type="l")
+
+plot(ECT, type="l")
+
+sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))$serie
+
 
 #estimate the new serie
 TVECM(sim, lag=1)
