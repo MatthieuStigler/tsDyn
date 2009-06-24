@@ -1,4 +1,4 @@
-TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, sigma, round=FALSE){
+TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), round=FALSE){
 if(!missing(data)&!missing(B))
 	stop("You have to provide either B or y, but not both")
 p<-lag
@@ -29,9 +29,6 @@ if(!missing(B)){
   if(type!="simul"){
     type<-"simul"
     warning("Type check or boot are only avalaible with pre specified data. The type simul was used")}
-  if(missing(sigma)){
-    warning("sigma is missing, the values taken are 0.25 for each variable")
-    sigma<-rep(0.25,nrow(B))}
   nB<-nrow(B)
   ndig<-4
   esp<-p*nB+ninc 
@@ -88,11 +85,8 @@ if(!missing(TVARobject)){
   modSpe<-TVARobject$model.specific
   res<-residuals(TVARobject)
   Bmat<-coefMat(TVARobject)
-  Sigma<- matrix(1/T*crossprod(res),ncol=k)
   y<-as.matrix(TVARobject$model)[,1:k]
   ndig<-getndp(y[,1])
-  if(missing(sigma)&type=="simul")
-      sigma<-diag(Sigma)
   if(nthresh>0){
     if(modSpe$oneMatrix)
       stop("arg commoninter in TVAR currently not implemented in TVAR.sim")
@@ -126,11 +120,10 @@ npar<-k*(p+ninc)
 ##############################
 ###Reconstitution boot/simul
 ##############################
-#initial values
 
+#initial values
 Yb<-matrix(0, nrow=T, ncol=k)
 Yb[1:p,]<-y[1:p,]		
-
 
 if(nthresh>0){
   z2<-vector("numeric", length=nrow(y))
@@ -139,7 +132,10 @@ if(nthresh>0){
 
 trend<-1:T
 
-innov<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"=t(sqrt(sigma)*t(matrix(rnorm(k*t), ncol=k))), "check"=res)
+##resampling
+if(type=="simul"&&dim(innov)!=c(n,k))
+  stop(paste("input innov is not of right dim, should be matrix with", n,"rows and ", k, "cols\n"))
+innov<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"=innov, "check"=res)
 resb<-rbind(matrix(0,nrow=p, ncol=k),innov)	
 
 if(nthresh==0){
@@ -189,7 +185,7 @@ if(FALSE){
 	if(mean(ifelse(new[,thDelay]<Thresh, 1,0))>0.05)
 		list(B=Bmat,Yb=Yb)
 	else
-		Recall(B=Bmat, sigma=sigma,n=n, lag=lag, nthresh=nthresh, thDelay=thDelay, Thresh, thVar=thVar, mTh=mTh, type=type, starting=starting)
+		Recall(B=Bmat, n=n, lag=lag, nthresh=nthresh, thDelay=thDelay, Thresh, thVar=thVar, mTh=mTh, type=type, starting=starting)
 }
 # print(cbind(y, round(Yb,3)))
 
@@ -202,7 +198,7 @@ environment(TVAR.sim)<-environment(star)
 
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
-sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5), sigma=c(0.3,0.4))$serie
+sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5))$serie
 
 #estimate the new serie
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
