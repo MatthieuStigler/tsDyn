@@ -1,11 +1,11 @@
-\name{TVAR_simul}
-\alias{TVAR_simul}
+\name{TVAR.sim}
+\alias{TVAR.sim}
 \title{Simulation and bootstrap of multivariate Treshold Autoregressive model}
 \description{
 Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
-TVAR_simul(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, sigma, round=FALSE)
+TVAR.sim(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, sigma, round=FALSE)
 }
 
 
@@ -40,7 +40,7 @@ TODO
 \examples{
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
-sim<-TVAR_simul(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5), sigma=c(0.3,0.4))$serie
+sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5), sigma=c(0.3,0.4))$serie
 
 #estimate the new serie
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
@@ -48,10 +48,10 @@ TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 ##Bootstrap a TVAR with two threshold (three regimes)
 data(zeroyld)
 serie<-zeroyld
-TVAR_simul(data=serie,nthresh=2, type="boot",mTh=1, Thresh=c(7,9))
+TVAR.sim(data=serie,nthresh=2, type="boot",mTh=1, Thresh=c(7,9))
 
 ##Check the bootstrap
-cbind(TVAR_simul(data=serie,nthresh=2, type="check",mTh=1, Thresh=c(7,9))$serie,serie)
+cbind(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, Thresh=c(7,9))$serie,serie)
 }
 \keyword{ ts }
 \references{
