@@ -81,7 +81,7 @@ if(!missing(TVECMobject)){
   }
 }
 
-t <- T-p 		#Size of end sample
+t <- T-p-1 		#Size of end sample
 npar<-k*(p+ninc+1)
 
   ##### put coefficients vector in right form according to arg include (arg both need no modif)
@@ -107,7 +107,6 @@ Yb[1:(p+1),]<-y[1:(p+1),]
 
 trend<-c(rep(NA, T-t),1:t)
 BETA<-matrix(c(1, -beta), nrow=1)
-
 
 #resampling/ simulation of residual/innovations
 if(type=="simul"&&dim(innov)!=c(n,k))

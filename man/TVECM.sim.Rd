@@ -38,9 +38,19 @@ TODO
 }
 \author{Matthieu Stigler}
 \examples{
-##Simulation of a TVAR with 1 threshold
-B<-rbind(c(0.2, 0.11928245, 1.00880447, -0.009974585, 0.3, -0.089316, 0.95425564, 0.02592617),c( -0.1, 0.25283578, 0.09182279,  0.914763741, 0.35,-0.0530613, 0.02248586, 0.94309347))
-sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))
+
+###reproduce example in Enders 2004, p. 350
+#see that:
+a<-matrix(c(-0.2, 0.2), ncol=1)
+b<-matrix(c(1,-1), nrow=1)
+a%*%b
+
+innov<-rmnorm(100, varcov=diag(2))
+vecm1<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1,n=100, lag=1,include="none", innov=innov)
+ECT<-vecm1[,1]-vecm1[,2]
+
+#add an intercept as in panel B
+b<-TVECM.sim(B=rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0)), nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov)
 
 
 

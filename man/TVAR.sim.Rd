@@ -5,7 +5,7 @@
 Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
-TVAR.sim(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL,  innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), round=FALSE)
+TVAR.sim(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL,  innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, round=FALSE)
 }
 
 
@@ -28,6 +28,7 @@ A matrix with the simulated/bootstraped series.
 \item{starting}{Starting values when a simulation with given parameter matrix is made}
 \item{innov}{Innovations used for simulation. Should be matrix of dim nxk. By default multivariate normal.}
 \item{varcov}{Variance-covariance matrix for the inov when default multivariate normal is used.}
+\item{show.parMat}{Logical. Should the parameter matrix be shown? Usefull to understand how to give right input}
 \item{round}{Rounds the series created to have the same digits (hopefully) as original series. Useful when t}
 }
 \details{
@@ -46,12 +47,14 @@ TODO
 ##simulate VAR as in Enders 2004, p 268
 B1<-matrix(c(0.7, 0.2, 0.2, 0.7), 2)
 var1<-TVAR.sim(B=B1,nthresh=0,n=100, type="simul", include="none")
-plot(var1)
+ts.plot(var1, type="l", col=c(1,2))
+
 
 B2<-rbind(c(0.5, 0.5, 0.5), c(0, 0.5, 0.5))
 varcov<-matrix(c(1,0.2, 0.3, 1),2)
 var2<-TVAR.sim(B=B2,nthresh=0,n=100, type="simul", include="const", varcov=varcov)
-plot(var2)
+ts.plot(var2, type="l", col=c(1,2))
+
 
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
