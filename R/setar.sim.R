@@ -1,4 +1,4 @@
-setar.sim<-function(data,B, setarObject, sigma,n=200, lag=1, trend=TRUE, nthresh=0, thDelay=0, Thresh, type=c("boot", "simul", "check"), starting=NULL){
+setar.sim<-function(data,B, setarObject, n=200, lag=1, trend=TRUE, nthresh=0, thDelay=0, Thresh, type=c("boot", "simul", "check"), starting=NULL,  rand.gen = rnorm, innov = rand.gen(n, ...),...){
 ###1: 3 possibilities: 
 #either simulation with given th and coefMat B
 # or bootstrap of linear/setar object or raw data converted into it
@@ -17,9 +17,6 @@ if(!missing(B)){
   if(type!="simul"){
     type<-"simul"
     warning("Type check or boot are only avalaible with pre-specified data. The type simul was used")}
-  if(missing(sigma)){
-    warning("sigma is missing, the value taken is 0.25 ")
-    sigma<-0.25}
     esp<-lag
   if(trend)
     esp<-lag+1
@@ -128,9 +125,9 @@ Yb[1:lag]<-y[1:lag]
 
 z2<-vector("numeric", length=length(y))
 z2[1:lag]<-y[1:lag]
-
-innov<-switch(type, "boot"=sample(res, replace=TRUE), "simul"=rnorm(length(y)-lag,sd=sigma), "check"=res)
-resb<-c(rep(0,lag),innov)	
+#rnorm(length(y)-lag,sd=sigma)
+innova<-switch(type, "boot"=sample(res, replace=TRUE), "simul"=innov, "check"=res)
+resb<-c(rep(0,lag),innova)	
 
 if(nthresh==0){
 for(i in (lag+1):length(y)){
@@ -165,16 +162,16 @@ if(FALSE){
 	while(mean(ifelse(Yb<Thresh, 1,0))>0.05){
 		cat("not enough")
 		if(!missing(thVar)) 
-			Recall(B=B, sigma=sigma,n=n, lag=lag, trend=trend, nthresh=nthresh, thDelay=thDelay,thVar=thVar, type="simul", starting=starting)
+			Recall(B=B,n=n, lag=lag, trend=trend, nthresh=nthresh, thDelay=thDelay,thVar=thVar, type="simul", starting=starting)
 		else
-			Recall(B=B, sigma=sigma,n=n, lag=lag, trend=trend, nthresh=nthresh, thDelay=thDelay,mTh=mTh, type="simul", starting=starting)
+			Recall(B=B, n=n, lag=lag, trend=trend, nthresh=nthresh, thDelay=thDelay,mTh=mTh, type="simul", starting=starting)
 		y<-NULL
 		
 		}
 }
 
 
-list(B=B, serie=round(Yb,ndig),Sigma=sigma)
+list(B=B, serie=round(Yb,ndig))
 }
 
 if(FALSE){
@@ -182,7 +179,7 @@ library(tsDyn)
 environment(setar.sim)<-environment(star)
 
 ##Simulation of a TAR with 1 threshold
-sim<-setar.sim(B=c(2.9,-0.4,-0.1,-1.5, 0.2,0.3),lag=2, type="simul", nthresh=1, sigma=1.2,Thresh=2, starting=c(2.8,2.2))$serie
+sim<-setar.sim(B=c(2.9,-0.4,-0.1,-1.5, 0.2,0.3),lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))$serie
 mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
 
 #check the result
