@@ -1,6 +1,5 @@
 \name{BBCTest}
 \alias{BBCTest}
-\alias{BBCtest}
 \title{Test of unit root against SETAR alternative}
 \description{Test of unit root against a stationnary three regime SETAR alternative
 }
