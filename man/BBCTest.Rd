@@ -4,7 +4,7 @@
 \description{Test of unit root against a stationnary three regime SETAR alternative
 }
 \usage{
-BBCtest(x, m, series, testStat=c("LR", "Wald", "LM"), trim=0.1, grid=c("minPerc", "minObs"))
+BBCTest(x, m, series, testStat=c("LR", "Wald", "LM"), trim=0.1, grid=c("minPerc", "minObs"))
 }
 
 
