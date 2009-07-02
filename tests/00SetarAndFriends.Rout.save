@@ -1,29 +1,29 @@
 
-R version 2.9.0 (2009-04-17)
+R version 2.9.1 (2009-06-26)
 Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
 
-  Natural language support but running in an English locale
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
 
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
 
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
+[Sauvegarde de la session précédente restaurée]
 
 > library(tsDyn)
-Loading required package: mgcv
-This is mgcv  1.5-2 . For overview type `help("mgcv-package")'.
-Loading required package: Matrix
-Loading required package: lattice
+Le chargement a nécessité le package : mgcv
+This is mgcv  1.5-3 . For overview type `help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
 
-Attaching package: 'Matrix'
+Attachement du package : 'Matrix'
 
 
 	The following object(s) are masked from package:stats :
@@ -44,7 +44,7 @@ Attaching package: 'Matrix'
 	 rowMeans,
 	 rowSums 
 
-Loading required package: minpack.lm
+Le chargement a nécessité le package : minpack.lm
 
 This product includes software developed by the University of Chicago, as
 Operator of Argonne National Laboratory.
@@ -52,10 +52,11 @@ Operator of Argonne National Laboratory.
 See the LICENSE file distributed with the minpack.lm source code or
 http://www.netlib.org/minpack/disclaimer for the full license.
 
-Loading required package: rgenoud
+Le chargement a nécessité le package : rgenoud
 ##  rgenoud (Version 5.5-1, Build Date: 2009-03-13)
 ##  See http://sekhon.berkeley.edu/rgenoud for additional documentation.
-Loading required package: snow
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
 > 
 > data(zeroyld)
 > dat<-zeroyld
@@ -298,11 +299,11 @@ With lags:
 > 
 > ###TVAR
 > tvar<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, include="const")
-Best unique threshold 3.189 
-Second best: 2.99 (conditionnal on th= 3.189 and Delay= 1 ) 	 SSR/AIC: 5.513542
-Second best: 3.189 (conditionnal on th= 2.99 and Delay= 1 ) 	 SSR/AIC: 5.513542
+Best unique threshold 3.173 
+Second best: 2.987 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 5.513542
+Second best: 3.173 (conditionnal on th= 2.987 and Delay= 1 ) 	 SSR/AIC: 5.513542
 
-Second step best thresholds 3.173 3.468 		 SSR: 5.359576 
+Second step best thresholds 3.091 3.405 		 SSR: 5.359576 
 > class(tvar)
 [1] "TVAR"  "nlVar"
 > tvar
@@ -324,7 +325,7 @@ Equation short.run  1.705713  0.379160720 -0.008943793    0.3090020 -0.13887286
 Equation long.run   1.890135 -0.008113763  0.633504924   -0.1262766 -0.01764579
 
 
-Threshold value[1] "3.173 3.468"
+Threshold value[1] "3.091 3.405"
 > print(tvar)
 Model TVAR with  2  thresholds
 
@@ -344,7 +345,7 @@ Equation short.run  1.705713  0.379160720 -0.008943793    0.3090020 -0.13887286
 Equation long.run   1.890135 -0.008113763  0.633504924   -0.1262766 -0.01764579
 
 
-Threshold value[1] "3.173 3.468"
+Threshold value[1] "3.091 3.405"
 > coefficients(tvar)
 $Bdown
                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
@@ -480,7 +481,7 @@ Equation long.run   1.890135 -0.008113763  0.633504924   -0.1262766 -0.01764579
 70   0.0547826463 -0.1109586772
 71  -0.0711955359  0.1992462236
 72   0.1097139696  0.0957669029
-73  -0.4300350490 -0.4914503196
+73  -0.4300350490 -0.4914503197
 74   0.0460879343  0.2469480863
 75   0.0465481010  0.0494722916
 76   0.3241140953  0.4936044513
@@ -589,7 +590,7 @@ Equation long.run  -0.1263(0.3443)  -0.0176(0.1576)
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
-Threshold value: 3.173 3.468
+Threshold value: 3.091 3.405
 Percentage of Observations in each regime: 71.4% 10.2% 18.4%> 
 > options(show.signif.stars=FALSE)
 > summary(tvar)
@@ -624,7 +625,7 @@ Equation short.run 0.3090(0.2665)  -0.1389(0.1220)
 Equation long.run  -0.1263(0.3443) -0.0176(0.1576)
 
 
-Threshold value: 3.173 3.468
+Threshold value: 3.091 3.405
 Percentage of Observations in each regime: 71.4% 10.2% 18.4%> 
 > print(summary(tvar), digits=3)
 Model TVAR with  2  thresholds
@@ -658,7 +659,7 @@ Equation short.run -0.139(0.122)
 Equation long.run  -0.018(0.158)
 
 
-Threshold value: 3.173 3.468
+Threshold value: 3.091 3.405
 Percentage of Observations in each regime: 71.4% 10.2% 18.4%> 
 > toLatex(tvar)
 %insert in the preamble and uncomment the line you want for usual /medium /small matrix
@@ -688,7 +689,7 @@ X_{t-1}^{1} \\ X_{t-1}^{2}
 \begin{smatrix}
 X_{t-2}^{1} \\ X_{t-2}^{2}
 \end{smatrix}
-& \text{if Th}< 3.173 \\
+& \text{if Th}< 3.091 \\
 \begin{smatrix}     %const
 5.1844 \\ 7.3273
 \end{smatrix}
@@ -706,7 +707,7 @@ X_{t-1}^{1} \\ X_{t-1}^{2}
 \begin{smatrix}
 X_{t-2}^{1} \\ X_{t-2}^{2}
 \end{smatrix}
-& \text{if } 3.173 < \text{Th} < 3.468 \\
+& \text{if } 3.091 < \text{Th} < 3.405 \\
 \begin{smatrix}     %const
 1.7057 \\ 1.8901
 \end{smatrix}
@@ -724,7 +725,7 @@ X_{t-1}^{1} \\ X_{t-1}^{2}
 \begin{smatrix}
 X_{t-2}^{1} \\ X_{t-2}^{2}
 \end{smatrix}
-& \text{if Th}> 3.468 \\
+& \text{if Th}> 3.405 \\
 \end{array}
 \right.
 \end{equation}
@@ -1785,7 +1786,8 @@ Full sample size: 482 	End sample size: 480
 Number of variables: 2 	Number of estimated parameters 24
 AIC -2220.684 	BIC -2112.165 	SSR 155.6996 
 
-$Bdown
+
+Cointegrating vector: (1, - 1.057203 )$Bdown
                    ECT                Const              short.run t -1  
 Equation short.run 0.2226(0.0221)*    0.5699(0.0046)**   0.2244(0.1984)  
 Equation long.run  1.0936(1.6e-11)*** 1.9832(2.6e-09)*** 0.8186(0.0042)**
@@ -1812,8 +1814,7 @@ Equation long.run  -0.0316(0.7878)
 
 Threshold
 Values: -1.414 0.643
-Percentage of Observations in each regime 6.7% 52.9% 40.4%
-Cointegrating vector 1 -1.057203> 
+Percentage of Observations in each regime 6.7% 52.9% 40.4%> 
 > toLatex(tvecm)
 %insert in the preamble and uncomment the line you want for usual /medium /small matrix
 %\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
@@ -2025,16 +2026,16 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 > class(linVECM)
 [1] "VAR"   "VECM"  "nlVar"
 > linVECM
-                     Intercept         ECT short.run -1 long.run -1
-Equation short.run  0.01574772 -0.01462511   0.03605199  0.02351545
-Equation long.run  -0.01217832  0.07510479   0.30947969  0.06668876
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
                    short.run -2 long.run -2
 Equation short.run  -0.04290810 -0.02323537
 Equation long.run   -0.02727195 -0.07024155
 > print(linVECM)
-                     Intercept         ECT short.run -1 long.run -1
-Equation short.run  0.01574772 -0.01462511   0.03605199  0.02351545
-Equation long.run  -0.01217832  0.07510479   0.30947969  0.06668876
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
                    short.run -2 long.run -2
 Equation short.run  -0.04290810 -0.02323537
 Equation long.run   -0.02727195 -0.07024155
@@ -2047,9 +2048,9 @@ Equation long.run   -0.02727195 -0.07024155
 > deviance(linVECM)
 [1] 175.0327
 > coef(linVECM)
-                     Intercept         ECT short.run -1 long.run -1
-Equation short.run  0.01574772 -0.01462511   0.03605199  0.02351545
-Equation long.run  -0.01217832  0.07510479   0.30947969  0.06668876
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
                    short.run -2 long.run -2
 Equation short.run  -0.04290810 -0.02323537
 Equation long.run   -0.02727195 -0.07024155
@@ -2060,11 +2061,11 @@ Equation long.run   -0.02727195 -0.07024155
 Full sample size: 482 	End sample size: 479
 Number of variables: 2 	Number of estimated slope parameters 12
 AIC -2146.536 	BIC -2133.506 	SSR 175.0327
-Cointegrating vector: 1.059351
+Cointegrating vector: (1, - 1.059351 )
 
-                   Intercept           ECT                 short.run -1      
-Equation short.run 0.0157(0.0145)      -0.0146(0.0150)     0.0361(0.0683)    
-Equation long.run  -0.0122(0.0248)     0.0751(0.0257)**    0.3095(0.1170)**  
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0146(0.0150)     0.0157(0.0145)      0.0361(0.0683)    
+Equation long.run  0.0751(0.0257)**    -0.0122(0.0248)     0.3095(0.1170)**  
                    long.run -1        short.run -2        long.run -2        
 Equation short.run 0.0235(0.0396)     -0.0429(0.0687)     -0.0232(0.0390)    
 Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)    
@@ -2077,12 +2078,12 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 \begin{smatrix} %explained vector
 \Delta X_{t}^{1} \\ \Delta X_{t}^{2}
 \end{smatrix}=
-\begin{smatrix}     %const
-0.0157 \\ -0.0122
-\end{smatrix}
 +\begin{smatrix}  %ECT
 -0.0146 \\ 0.0751
 \end{smatrix}ECT_{-1}
+\begin{smatrix}     %const
+-0.0146 \\ 0.0751
+\end{smatrix}
 +\begin{smatrix}      %Lag1
 0.0361 & 0.0235 \\
 0.3095 & 0.0667 
@@ -2105,30 +2106,30 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 %\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
 \begin{equation}
 \begin{smatrix} %explained vector
-X_{t}^{1} \\ X_{t}^{2}
+\Delta X_{t}^{1} \\ \Delta X_{t}^{2}
 \end{smatrix}=
-\begin{smatrix}     %const
-0.0157(0.0145) \\ -0.0122(0.0248)
-\end{smatrix}
 +\begin{smatrix}  %ECT
 -0.0146(0.0150) \\ 0.0751(0.0257)
 \end{smatrix}ECT_{-1}
+\begin{smatrix}     %const
+-0.0146(0.0150) \\ 0.0751(0.0257)
+\end{smatrix}
 +\begin{smatrix}      %Lag1
 0.0361(0.0683) & 0.0235(0.0396) \\
 0.3095(0.1170) & 0.0667(0.0679) 
 \end{smatrix}
 \begin{smatrix}
-X_{t-1}^{1} \\ X_{t-1}^{2}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
 \end{smatrix}
 +\begin{smatrix}      %Lag2
 -0.0429(0.0687) & -0.0232(0.0390) \\
 -0.0273(0.1177) & -0.0702(0.0668) 
 \end{smatrix}
 \begin{smatrix}
-X_{t-2}^{1} \\ X_{t-2}^{2}
+\Delta X_{t-2}^{1} \\ \Delta X_{t-2}^{2}
 \end{smatrix}
 \end{equation}
 > 
 > proc.time()
-   user  system elapsed 
-  5.536   0.084   5.754 
+utilisateur     système      écoulé 
+     11.092       0.100      12.718 
