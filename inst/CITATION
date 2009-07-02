@@ -1,3 +1,5 @@
+ citHeader("To cite package 'tsDyn' in publications use:")
+
 citEntry(entry="Manual",
 	title = "tsDyn: Time series analysis based on dynamical systems theory",
 	author = "Antonio, Fabio Di Narzo, Josè Luis Aznarte, Matthieu Stigler",
