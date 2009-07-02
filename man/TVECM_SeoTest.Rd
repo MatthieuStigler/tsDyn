@@ -5,7 +5,7 @@
 Test the null of no cointegration against threshold cointegration with bootstrap distribution of Seo (2006)
 }
 \usage{
-TVECM_SeoTest(data,lag, beta, trim=0.1,nboot, plot=FALSE,check=FALSE, trace=FALSE)
+TVECM_SeoTest(data,lag, beta, trim=0.1,nboot, plot=FALSE,check=FALSE)
 }
 \value{A list cointaining diverse informations:
 
