@@ -1,13 +1,26 @@
 -version 0.7-0
--added args demean, common, model, trim and possibility to select only some lags in setar and selectSETAR (tnx to
-M. Stigler)
 -added possibilty to have two thresolds and hence three regimes in setar and selectSETAR (arg nthresh)
--added criterion "SSR" (sum of squares residual) and argument max.iter in selectSETAR
+-created new functions for unit roots tests: KapShinTest() and BBCTest()
+-created new functions for estimating VAR and VECM: currently linear2
+-created new function for estimating TVECM: function TVECM()
+-created new function for estimating TVAR: function TVAR()
+-created new function to test for setar: function setarTest()
+-created new function to test for TVAR: function TVAR_LRtest()
+-created new function to test for TVECM: functions TVECM_SeoTest() and HanSeo_TVECM()
+-created new function to simulate/bootstrap a TVAR: function TVAR.sim()
+-created new function to simulate/bootstrap a TVECM: function TVECM.sim()
+-created new function to simulate/bootstrap a setar: function setar.sim()
+-created new function to estimate regime-specific variance in setar: function resVar()
+-created new function to extend a bootstrap replication in setarTest: function extendBoot()
+-added 'zeroyld' dataset
+-added 'unemp' dataset
+-added 'IIPUs' dataset
+-added in selectSETAR() and setar() following args: include, common, model, trim, MM, ML, MH, model, restriction
+-added MakeThSpec() function for specification of the threshold in the search
+-added in selectSETAR(): criterion "SSR" (sum of squares residual) and argument max.iter 
 -extended arg th in selectSETAR to search inside an intervall or around a point or on the whole grid
 -added k parameter to the AIC method and fixed a bug
--added 'zeroyld' dataset
 -standardized license naming in description
--added functions star and ncstar
 -fixed typo in print.star
 
 -version 0.6-1
