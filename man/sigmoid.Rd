@@ -9,7 +9,6 @@ Some sigmoid functions. See R sources for their definition
 \usage{
 sigmoid(x)
 dsigmoid(x)
-d2sigmoid(x)
 }
 \arguments{
 \item{x}{ numeric vector }

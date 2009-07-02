@@ -501,9 +501,7 @@ print(i)
             wr<-xlagr%*%c(1,(h[2]/h[1]))
 	}#end if coint==1
         else{ wr<-xlagr%*%c(1-UserSpecified_beta)}
-        boot01[r]<-lmtest01(yr,xr,wr,gamma1)
-        r<-r11
-
+        boot01[r]<-lmtest01(yr,xr,wr,gamma1)
 #cat("wr")
 #print(wr)
 #cat("xr")
