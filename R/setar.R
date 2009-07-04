@@ -1,4 +1,4 @@
-## Copyright (C) 2005/2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2005,2006,2009  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -507,86 +507,83 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 }
 
 plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop, ...) {
-	op <- par(no.readonly=TRUE)
-	par(ask=ask)
-	NextMethod(ask=ask, ...)
-	str <- x$str
-	xx <- getXX(str)
-	yy <- getYY(str)
-	nms <- colnames(xx)
-	m <- str$m
-	d <- str$d
-	lags <- c((0:(m-1))*(-d), str$steps)
-	xxyy <- getXXYY(str)
-	restriction<-x$model.specific$restriction
-	nthresh<-x$model.specific$nthresh
-	regime<-x$model.specific$regime
-	x.old <- x
-	x <- c(x, x$model.specific)
-	series <- str$x
-	z <- x$thVar
-	th <- getTh(coef(x)) #x$coefficients["th"]
+  op <- par(no.readonly=TRUE)
+  on.exit(par(op))
+  par(ask=ask)
+  NextMethod(ask=ask, ...)
+  str <- x$str
+  xx <- getXX(str)
+  yy <- getYY(str)
+  nms <- colnames(xx)
+  m <- str$m
+  d <- str$d
+  lags <- c((0:(m-1))*(-d), str$steps)
+  xxyy <- getXXYY(str)
+  restriction<-x$model.specific$restriction
+  nthresh<-x$model.specific$nthresh
+  regime<-x$model.specific$regime
+  x.old <- x
+  x <- c(x, x$model.specific)
+  series <- str$x
+  z <- x$thVar
+  th <- getTh(coef(x))
 	  
-	regime.id<-regime
-	#regime <- factor(z <= th, levels=c(TRUE, FALSE), labels=c("low","high"))
-	#regime.id <- as.numeric(regime) #1/2 vector indicating the regime
-	if(length(regime)<=300) {
-		pch <- c(20,23)[regime.id]
-		  cex <- 1
-	}
-	else {
-		pch <- '.'
-		cex <- 4
-	}
-#Phase plot
-	for(j in 1:m) {
-		plot(xxyy[,j], xxyy[,m+1], xlab=paste("lag", -lags[j]), ylab=paste("lag", -lags[m+1]),
-			col=regime.id, pch=pch, cex=cex, ...)
-		lines.default(xxyy[,j], x.old$fitted, lty=2)
-                if(nthresh==2)
-                  title("Curently not implemented for nthresh=2!")
-		if(legend)
-			legend("topleft", legend=c("low","high"), pch=pch[c(1,1)], col=1:2, merge=FALSE, title="regime")
-	}
-#Regime switching plot
-	sta <- 1
-	sto <- length(regime.id)
-	if(!missing(regSwStart))
-		sta <- regSwStart
-	if(!missing(regSwStop))
-		sto <- regSwStop
-	t <- sta:sto
-	regime.id <- regime.id[t]
-	series <- series[t+(m*d)]
-	ylim <- range(series)
-	l <- ylim[1] * 0.9
-	h <- ylim[2] * 1.1
-	ylim[1] <- ylim[1] * 0.8
-	ylim[2] <- ylim[2] * 1.2
-	x0 <- t
-	x1 <- t+1
-	y0 <- series[t]
-	y1 <- series[t+1]
-	par(mar=c(0,4,4,0))	#number of lines of margin to be specified on the 4 sides of the plot
-	plot(t, series, type=ifelse(length(regime)<=300, "p", "n"), ax=FALSE, ylab="time series values", main="Regime switching plot")
-	legRSP<-c("low",if(nthresh==2|restriction=="OuterSymAll") "middle","high")
-	legend("topright", legend=legRSP, pch=pch[c(1,1)], col=seq_len(length(legRSP)), merge=FALSE, title="regime")
-	abline(h=th)
-	if(restriction=="OuterSymAll")
-	  abline(h=-th)
-	axis(2)		#adds an axis on the left
-	segments(x0,y0,x1,y1,col=regime.id)	#adds segments between the points with color depending on regime
-	#plot for the transition variable
-	par(mar=c(5,4,4,2))
-	layout(matrix(1:2, ncol=1))
-	if(restriction=="OuterSymAll"){
-	  nthresh<-2
-	  th<-c(-th, th)
-	}
-	plot1(th, nthresh,usedThVar=x$model.specific$thVar) #shows transition variable, stored in TVARestim.R
-	plot2(th, nthresh,usedThVar=x$model.specific$thVar, trim=x$model.specific$trim) #ordered transition variabl
-	par(op)
-	invisible(x)
+  regime.id<-regime
+  if(length(regime)<=300) {
+    pch <- c(20,23)[regime.id]
+    cex <- 1
+  } else {
+    pch <- '.'
+    cex <- 4
+  }
+  ##Phase plot
+  for(j in 1:m) {
+    plot(xxyy[,j], xxyy[,m+1], xlab=paste("lag", -lags[j]), ylab=paste("lag", -lags[m+1]),
+         col=regime.id, pch=pch, cex=cex, ...)
+    lines.default(xxyy[,j], x.old$fitted, lty=2)
+    if(nthresh==2)
+      title("Curently not implemented for nthresh=2!")
+    if(legend)
+      legend("topleft", legend=c("low","high"), pch=pch[c(1,1)], col=1:2, merge=FALSE, title="regime")
+  }
+  ##Regime switching plot
+  sta <- 1
+  sto <- length(regime.id)
+  if(!missing(regSwStart))
+    sta <- regSwStart
+  if(!missing(regSwStop))
+    sto <- regSwStop
+  t <- sta:sto
+  regime.id <- regime.id[t]
+  series <- series[t+(m*d)]
+  ylim <- range(series)
+  l <- ylim[1] * 0.9
+  h <- ylim[2] * 1.1
+  ylim[1] <- ylim[1] * 0.8
+  ylim[2] <- ylim[2] * 1.2
+  x0 <- t
+  x1 <- t+1
+  y0 <- series[t]
+  y1 <- series[t+1]
+  par(mar=c(0,4,4,0))	#number of lines of margin to be specified on the 4 sides of the plot
+  plot(t, series, type=ifelse(length(regime)<=300, "p", "n"), ax=FALSE, ylab="time series values", main="Regime switching plot")
+  legRSP<-c("low",if(nthresh==2|restriction=="OuterSymAll") "middle","high")
+  legend("topright", legend=legRSP, pch=pch[c(1,1)], col=seq_len(length(legRSP)), merge=FALSE, title="regime")
+  abline(h=th)
+  if(restriction=="OuterSymAll")
+    abline(h=-th)
+  axis(2)		#adds an axis on the left
+  segments(x0,y0,x1,y1,col=regime.id)	#adds segments between the points with color depending on regime
+  ##plot for the transition variable
+  par(mar=c(5,4,4,2))
+  layout(matrix(1:2, ncol=1))
+  if(restriction=="OuterSymAll"){
+    nthresh<-2
+    th<-c(-th, th)
+  }
+  plot1(th, nthresh,usedThVar=x$model.specific$thVar) #shows transition variable, stored in TVARestim.R
+  plot2(th, nthresh,usedThVar=x$model.specific$thVar, trim=x$model.specific$trim) #ordered transition variabl
+  invisible(x)
 }
 
 
