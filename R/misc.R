@@ -1,3 +1,7 @@
+.onAttach <- function(...) { 
+	cat("Version 0.7 of package tsDyn may have many few minor further revisions. User should update the package often. Minor revisions will be announced only on the tsdyn mailing list\n")
+}
+
 extend <- function(...)
 	UseMethod("extend")
 
