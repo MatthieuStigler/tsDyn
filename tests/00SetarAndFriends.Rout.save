@@ -19,7 +19,7 @@ Tapez 'q()' pour quitter R.
 
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
-This is mgcv  1.5-3 . For overview type `help("mgcv-package")'.
+This is mgcv  1.5-5 . For overview type `help("mgcv-package")'.
 Le chargement a nécessité le package : Matrix
 Le chargement a nécessité le package : lattice
 
@@ -31,30 +31,10 @@ Attachement du package : 'Matrix'
 	 xtabs 
 
 
-	The following object(s) are masked from package:methods :
-
-	 .selectSuperClasses 
-
-
 	The following object(s) are masked from package:base :
 
-	 colMeans,
-	 colSums,
-	 rcond,
-	 rowMeans,
-	 rowSums 
+	 rcond 
 
-Le chargement a nécessité le package : minpack.lm
-
-This product includes software developed by the University of Chicago, as
-Operator of Argonne National Laboratory.
-
-See the LICENSE file distributed with the minpack.lm source code or
-http://www.netlib.org/minpack/disclaimer for the full license.
-
-Le chargement a nécessité le package : rgenoud
-##  rgenoud (Version 5.5-1, Build Date: 2009-03-13)
-##  See http://sekhon.berkeley.edu/rgenoud for additional documentation.
 Le chargement a nécessité le package : snow
 Le chargement a nécessité le package : mnormt
 > 
@@ -2132,4 +2112,4 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-     11.092       0.100      12.718 
+     10.420       0.104      10.639 
