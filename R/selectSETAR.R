@@ -1,4 +1,4 @@
-## Copyright (C) 2005/2006/2009  Antonio, Fabio Di Narzo
+## Copyright (C) 2005,2006,2009  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by

@@ -616,80 +616,77 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
 }
 
 toLatex.setar <- function(object, digits=3, ...) {
-	obj <- object
-	res <- character()
+  obj <- object
+  res <- character()
   beta <- formatSignedNum(coefficients(obj),digits=digits,...)
   mL <- obj$model.specific$mL
   mH <- obj$model.specific$mH
   steps <- obj$str$steps
   d <- obj$str$d
-  namesL <- paste("phi1",0:mL,sep=".")
-  namesH <- paste("phi2",0:mH,sep=".")
+  namesL <- paste("phi1", 0:mL, sep=".")
+  namesH <- paste("phi2", 0:mH, sep=".")
   betaL <- beta[namesL]
   betaH <- beta[namesH]
-	res[1] <- "\\["
+  res[1] <- "\\["
   res[2] <- paste("X_{t+",steps,"} = \\left\\{\\begin{array}{lr}",sep="")
-	res[3] <- betaL[1]
+  res[3] <- betaL[1]
   for(j in seq_len(mL-1))
-		res[3] <- paste(res[3],betaL[j+1]," X_{t-",  (j-1)*d,"}",sep="")
-	res[3] <- paste(res[3],betaL[mL+1]," X_{t-",  (mL-1)*d,"}", "& Z_t \\leq ",beta["th"],"\\\\",sep="")
+    res[3] <- paste(res[3],betaL[j+1]," X_{t-",  (j-1)*d,"}",sep="")
+  res[3] <- paste(res[3],betaL[mL+1]," X_{t-",  (mL-1)*d,"}", "& Z_t \\leq ",beta["th"],"\\\\",sep="")
   res[4] <- betaH[1]
   for(j in seq_len(mH-1))
     res[4] <- paste(res[4], betaH[j+1]," X_{t-",  (j-1)*d,"} ",sep="")
-	res[4] <- paste(res[4], betaH[mL+1]," X_{t-",  (mH-1)*d,"}", "& Z_t > ",beta["th"],"\\\\",sep="")
-	res[5] <- "\\end{array}\\right."
-	res[6] <- "\\]"
-	res[7] <- ""
+  res[4] <- paste(res[4], betaH[mL+1]," X_{t-",  (mH-1)*d,"}", "& Z_t > ",beta["th"],"\\\\",sep="")
+  res[5] <- "\\end{array}\\right."
+  res[6] <- "\\]"
+  res[7] <- ""
 
   if(!obj$model.specific$externThVar) {
     mTh <- formatSignedNum(obj$model.specific$mTh)
     m <- obj$str$m
-		res[8] <- "\\["
-		res[9] <- "Z_t = "
+    res[8] <- "\\["
+    res[9] <- "Z_t = "
     for(j in seq_len(m)) {
       if(obj$model.specific$mTh[j]==1)
         res[9] <- paste(res[9],"X_{t-",(j-1)*d,"} ",sep="")
       else if(obj$model.specific$mTh[j]!=0)
         res[9] <- paste(res[9], obj$model.specific$mTh[j]," X_{t-",(j-1)*d,"} ",sep="")
     }
-		res[10] <- "\\]"
-		res[11] <- ""
+    res[10] <- "\\]"
+    res[11] <- ""
   }
-	return(structure(res, class="Latex"))
+  return(structure(res, class="Latex"))
 }
 
 showDialog.setar <- function(x, ...) {
-	vD <- tclVar(1)
-	vSteps <- tclVar(1)
+  vD <- tclVar(1)
+  vSteps <- tclVar(1)
   vML  <- tclVar(1)
   vMH  <- tclVar(1)
   vThDelay <- tclVar(0)
   vFixedTh <- tclVar(0)
   vTh <- tclVar(0)
 
-	frTop <- Frame(opts=list(side="left"))
-	frLeft <- Frame()
-	add(frLeft,
-		namedSpinbox("low reg. AR order", vML, from=1, to=1000, increment=1, width=4),
-		namedSpinbox("high reg. AR order", vMH, from=1, to=1000, increment=1, width=4)
-	)
-	frRight <- Frame()
-	add(frRight,
-		Widget(opts=list(type="checkbutton", text="fixed treshold", variable=vFixedTh)),
-		namedEntry("treshold value", vTh, width=4),
-		namedSpinbox("treshold delay", vThDelay, from=0, to=1000)
-	)
-	frExtra <- Frame()
-	add(frExtra,
-		namedSpinbox("time delay", vD, from=1, to=1000),
-		namedSpinbox("forecasting steps", vSteps, from=1, to=1000)
-	)
-	add(frTop, frExtra, frLeft, frRight)
-	frRoot <- Frame()	
+  frTop <- Frame(opts=list(side="left"))
+  frLeft <- Frame()
+  add(frLeft,
+      namedSpinbox("low reg. AR order", vML, from=1, to=1000, increment=1, width=4),
+      namedSpinbox("high reg. AR order", vMH, from=1, to=1000, increment=1, width=4))
+  frRight <- Frame()
+  add(frRight,
+      Widget(opts=list(type="checkbutton", text="fixed treshold", variable=vFixedTh)),
+      namedEntry("treshold value", vTh, width=4),
+      namedSpinbox("treshold delay", vThDelay, from=0, to=1000))
+  frExtra <- Frame()
+  add(frExtra,
+      namedSpinbox("time delay", vD, from=1, to=1000),
+      namedSpinbox("forecasting steps", vSteps, from=1, to=1000))
+  add(frTop, frExtra, frLeft, frRight)
+  frRoot <- Frame()
 
   onFinish <- function() {
-		d <- as.numeric(tclObj(vD))
-		steps <- as.numeric(tclObj(vSteps))
+    d <- as.numeric(tclObj(vD))
+    steps <- as.numeric(tclObj(vSteps))
     mL <- as.numeric(tclObj(vML))
     mH <- as.numeric(tclObj(vMH))
     fixedTh <- as.logical(tclObj(vFixedTh))
@@ -697,15 +694,15 @@ showDialog.setar <- function(x, ...) {
     thDelay <- as.numeric(tclObj(vThDelay))
     tkdestroy(frRoot$tkvar)
     if(fixedTh)
-			res <- setar(x, d=d, steps=steps, mL=mL, mH=mH, th=th, thDelay=thDelay)
+      res <- setar(x, d=d, steps=steps, mL=mL, mH=mH, th=th, thDelay=thDelay)
     else
-			res <- setar(x, d=d, steps=steps, mL=mL, mH=mH, thDelay=thDelay)
+      res <- setar(x, d=d, steps=steps, mL=mL, mH=mH, thDelay=thDelay)
     assign("nlarModel", res, .GlobalEnv)
   }
   onCancel <- function()
     tkdestroy(frRoot$tkvar)
 
-	bttnFrame <- makeButtonsFrame(list(Finish=onFinish, Cancel=onCancel))
-	add(frRoot, frTop, bttnFrame)
-	buildDialog(title="SETAR model", frRoot)
+  bttnFrame <- makeButtonsFrame(list(Finish=onFinish, Cancel=onCancel))
+  add(frRoot, frTop, bttnFrame)
+  buildDialog(title="SETAR model", frRoot)
 }
