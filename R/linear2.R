@@ -1,4 +1,4 @@
-linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, coINT=FALSE, LRinclude=c("none", "const", "trend","both"), beta0=0, estim=c("2OLS", "ML"))
+linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
 {
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
@@ -90,6 +90,8 @@ if(model=="VECM"&estim=="2OLS"){
 	}
 	#beta is given by user
 	else{
+	  if(LRinclude!="none")
+	  	warning("Arg LRinclude not taken into account when beta is given by user")
 	  coint<-c(1, -beta)
 	  betaLT<-beta
 	}
