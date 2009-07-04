@@ -648,7 +648,7 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"),
 			if(model=="TVAR")
 				colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
 			else if(model=="TVECM")
-				colnames(Bbest)<-c("ECT-","ECT+", Bcolnames[-which(Bcolnames=="ECT")])
+				colnames(Bbest)<-c("ECT-","ECT+", sBnames)
 			Blist<-mat}
 		else{
 			colnames(mat)<-rep(Bnames,3)
