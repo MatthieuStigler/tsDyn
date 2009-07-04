@@ -5,7 +5,7 @@
 Estimate either a VAR or a VEC
 }
 \usage{
-linear2(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, LRinclude=c("none", "const", "trend","both"), estim=c("2OLS", "ML"))
+linear2(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
 }
 \value{
 Fitted model data
