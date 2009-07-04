@@ -178,38 +178,38 @@ Sigma_mod1thresh<-Sigma_1thresh(gam1=bestThresh, d=bestDelay,Z=Z,Y=Y, trans=z)
 ###Function for conditional search
 condiStep<-function(allgammas, threshRef, delayRef, fun,MoreArgs=NULL, target=NULL){
 
-wh.thresh <- which.min(abs(allgammas-threshRef))
-Thr2<-which.min(abs(allgammas-target))
-
+  wh.thresh <- which.min(abs(allgammas-threshRef))
+  Thr2<-which.min(abs(allgammas-target))
+  
 #search for a second threshold smaller than the first
-if(wh.thresh>2*nmin){
-	gammaMinus<-unique(allgammas[seq(from=max(nmin, Thr2-20), to=min(wh.thresh-nmin, Thr2+20))])
-	storeMinus <- mapply(fun, gam1=gammaMinus,gam2=threshRef,MoreArgs=MoreArgs)	
-}
-else
-	storeMinus <- NA
-
-#search for a second threshold higher than the first
-if(wh.thresh<ng-2*nmin){
-	gammaPlus<-unique(allgammas[seq(from=max(wh.thresh+nmin,Thr2-20), to=min(ng-nmin, Thr2+20))])
-	storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus,  MoreArgs=MoreArgs)
-}
-else
-	storePlus <- NA
-
-#results
-
-
-store2 <- c(storeMinus, storePlus)
-
-positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)[1]
-if(positionSecond<=length(storeMinus))
-	newThresh<-gammaMinus[positionSecond]
-else
-	newThresh<-gammaPlus[positionSecond-length(storeMinus)]
-
-# cat("Second best: ",newThresh, " (conditionnal on ",threshRef, " ) \t SSR", min(store2, na.rm=TRUE), "\n")
-list(newThresh=newThresh, SSR=min(store2, na.rm=TRUE))
+  if(wh.thresh>2*nmin){
+    gammaMinus<-unique(allgammas[seq(from=max(nmin, Thr2-20), to=min(wh.thresh-nmin, Thr2+20))])
+    storeMinus <- mapply(fun, gam1=gammaMinus,gam2=threshRef,MoreArgs=MoreArgs)	
+  }
+  else
+    storeMinus <- NA
+  
+                                        #search for a second threshold higher than the first
+  if(wh.thresh<ng-2*nmin){
+    gammaPlus<-unique(allgammas[seq(from=max(wh.thresh+nmin,Thr2-20), to=min(ng-nmin, Thr2+20))])
+    storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus,  MoreArgs=MoreArgs)
+  }
+  else
+    storePlus <- NA
+  
+                                        #results
+  
+  
+  store2 <- c(storeMinus, storePlus)
+  
+  positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)[1]
+  if(positionSecond<=length(storeMinus))
+    newThresh<-gammaMinus[positionSecond]
+  else
+    newThresh<-gammaPlus[positionSecond-length(storeMinus)]
+  
+ # cat("Second best: ",newThresh, " (conditionnal on ",threshRef, " ) \t SSR", min(store2, na.rm=TRUE), "\n")
+  list(newThresh=newThresh, SSR=min(store2, na.rm=TRUE))
 }	#end function condistep
 
 
@@ -244,10 +244,10 @@ res_lin<-res
 Yb<-matrix(0, nrow=nrow(y), ncol=k)		#Delta Y term
 Yb[1:m,]<-y[1:m,]			
 
-bootlinear<-function(x){
-	resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin[sample(seq_len(nrow(res_lin)), replace=TRUE),])
+bootlinear<-function(res){ #res=res_lin
+	resi<-rbind(matrix(0,nrow=m, ncol=k),res[sample(seq_len(nrow(res)), replace=TRUE),])
 	if(check)
-		resi<-rbind(matrix(0,nrow=m, ncol=k),res_lin)		#Uncomment this line to check the bootstrap
+		resi<-rbind(matrix(0,nrow=m, ncol=k),res)		#Uncomment this line to check the bootstrap
 	for(i in (m+1):(nrow(y))){
 		Yb[i,]<-rowSums(cbind(B[,1], B[,-1]%*%matrix(t(Yb[i-c(1:m),]), ncol=1),resi[i,]))
 	}
@@ -271,10 +271,10 @@ Yb2[1:m,]<-y[1:m,]
 z2<-vector("numeric", length=nrow(y))
 z2[1:m]<-y[1:m,]%*%combin			
 
-boot1thresh<-function(x){	
-	resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
+boot1thresh<-function(res){	#res=res_thresh
+	resiT<-rbind(matrix(0,nrow=m, ncol=k),res[sample(seq_len(nrow(res)), replace=TRUE),])
 	if(check)
-		resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)
+		resiT<-rbind(matrix(0,nrow=m, ncol=k),res)
 
 	for(i in (m+1):(nrow(y))){
 		if(round(z2[i-bestDelay],ndig)<= bestThresh) 
@@ -287,10 +287,10 @@ boot1thresh<-function(x){
 	return(Yb2)
 }#end boot1thresh
 
-boot1threshBIS<-function(x){	
-	resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh[sample(seq_len(nrow(res_thresh)), replace=TRUE),])
+boot1threshBIS<-function(res){	
+	resiT<-rbind(matrix(0,nrow=m, ncol=k),res[sample(seq_len(nrow(res)), replace=TRUE),])
 	if(check)
-		resiT<-rbind(matrix(0,nrow=m, ncol=k),res_thresh)
+		resiT<-rbind(matrix(0,nrow=m, ncol=k),res)
 
 	for(i in (m+1):(nrow(y))){
 		if(round(z2[i-bestDelay]-z2[i-bestDelay-1],ndig)<= bestThresh) 
@@ -311,76 +311,77 @@ else
 	bootThresh<-boot1threshBIS
 	
 bootModel<-switch(test, "1vs"=bootlinear, "2vs3"=bootThresh)
+resids<-switch(test, "1vs"=res_lin, "2vs3"=res_thresh)
 
-bootstraploop<-function(x, thVar=NULL){
-
-xboot<-round(bootModel(x=x),ndig)
-
-
+bootstraploop<-function(y, thVar=NULL){
+  
+  xboot<-round(bootModel(res=y),ndig)
+  
+  
 # Sigma of linear boot model
-string<-embed(xboot,m+1)
-Yboot <- string[,seq_len(k)] 	#
-Zb <- string[, -seq_len(k)]	#Lags matrix
-if(trend==TRUE)
-	Zb <- cbind(1,Zb)
-Bboot<-t(Yboot)%*%Zb%*%solve(t(Zb)%*%Zb)		#B: OLS parameters, dim 2 x npar
-resboot<-Yboot-Zb%*%t(Bboot)
-Sigmab<- matrix(1/T*crossprod(resboot),ncol=k)
-
+  string<-embed(xboot,m+1)
+  Yboot <- string[,seq_len(k)] 	#
+  Zb <- string[, -seq_len(k)]	#Lags matrix
+  if(trend==TRUE)
+    Zb <- cbind(1,Zb)
+  Bboot<-t(Yboot)%*%Zb%*%solve(t(Zb)%*%Zb)		#B: OLS parameters, dim 2 x npar
+  resboot<-Yboot-Zb%*%t(Bboot)
+  Sigmab<- matrix(1/T*crossprod(resboot),ncol=k)
+  
 #grid for threshold boot model
-
-if(!missing(thVar)) 
-	{stop("thVar currently badly implemented"); zcombin<-thVar}
-else 
-	zcombin<-xboot%*%combin
-if(model=="MTAR"){
-	if(max(thDelay)<p)
-		zb<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
-	else if(max(thDelay)==p){
-		zb<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
-		zb<-rbind(0,as.matrix(zb))}
-}
-else
-	zb <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
-zb<-as.matrix(zb)
-
+  
+  if(!missing(thVar)) 
+    {stop("thVar currently badly implemented"); zcombin<-thVar}
+  else 
+    zcombin<-xboot%*%combin
+  if(model=="MTAR"){
+    if(max(thDelay)<p)
+      zb<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
+    else if(max(thDelay)==p){
+      zb<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
+      zb<-rbind(0,as.matrix(zb))}
+  }
+  else
+    zb <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
+  zb<-as.matrix(zb)
+  
 #  print(cbind(z,zb))
 
-allgammasb<-sort(zb[,b])
-gammasb<-unique(allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)])
-
-
+  allgammasb<-sort(zb[,b])
+  gammasb<-unique(allgammasb[(ceiling(trim*ng)+1):floor((1-trim)*ng-1)])
+  
+  
 ###One threshold Search on bootstrap data
 
-IDSb<-as.matrix(expand.grid(thDelay, gammasb))
-resultb <- apply(IDSb, 1, SSR_1thresh,Z=Zb, Y=t(Yboot),trans=zb)
-postBestb<-which(resultb==min(resultb, na.rm=TRUE))[1]
-bestDelayb<-IDSb[postBestb,1]
-bestThreshb<-IDSb[postBestb,2]
-
-Sigma_mod1threshb<-Sigma_1thresh(gam1=bestThreshb, d=bestDelayb,Z=Zb,Y=t(Yboot), trans=zb)
+  IDSb<-as.matrix(expand.grid(thDelay, gammasb))
+  resultb <- apply(IDSb, 1, SSR_1thresh,Z=Zb, Y=t(Yboot),trans=zb)
+  postBestb<-which(resultb==min(resultb, na.rm=TRUE))[1]
+  bestDelayb<-IDSb[postBestb,1]
+  bestThreshb<-IDSb[postBestb,2]
+  
+  Sigma_mod1threshb<-Sigma_1thresh(gam1=bestThreshb, d=bestDelayb,Z=Zb,Y=t(Yboot), trans=zb)
 # print(bestThreshb)
 ###Two threshold Search (conditional and 1 iteration) on bootstrap data
-Moreb<-list(d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
-Thresh2b<-condiStep(allgammasb, bestThreshb, fun=SSR_2thresh, MoreArgs=Moreb)$newThresh
-Thresh3b<-condiStep(allgammasb, Thresh2b, fun=SSR_2thresh, MoreArgs=Moreb)
-smallThreshb<-min(Thresh2b, Thresh3b$newThresh)
-bigThreshb<-max(Thresh2b, Thresh3b$newThresh)
+  Moreb<-list(d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
+  Thresh2b<-condiStep(allgammasb, bestThreshb, fun=SSR_2thresh, MoreArgs=Moreb)$newThresh
+  Thresh3b<-condiStep(allgammasb, Thresh2b, fun=SSR_2thresh, MoreArgs=Moreb)
+  smallThreshb<-min(Thresh2b, Thresh3b$newThresh)
+  bigThreshb<-max(Thresh2b, Thresh3b$newThresh)
 
 
-Sigma_mod2threshb<-Sigma_2thresh(gam1=smallThreshb,gam2=bigThreshb,d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
-
+  Sigma_mod2threshb<-Sigma_2thresh(gam1=smallThreshb,gam2=bigThreshb,d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
+  
 ###Test statistic on bootstrap data
-LRtest12b<-as.numeric(t*(log(det(Sigmab))-log(det(Sigma_mod1threshb))))
-LRtest13b<-as.numeric(t*(log(det(Sigmab))-log(det(Sigma_mod2threshb))))
-LRtest23b<-as.numeric(t*(log(det(Sigma_mod1threshb))-log(det(Sigma_mod2threshb))))
+  LRtest12b<-as.numeric(t*(log(det(Sigmab))-log(det(Sigma_mod1threshb))))
+  LRtest13b<-as.numeric(t*(log(det(Sigmab))-log(det(Sigma_mod2threshb))))
+  LRtest23b<-as.numeric(t*(log(det(Sigma_mod1threshb))-log(det(Sigma_mod2threshb))))
+  
+  list(LRtest12b, LRtest13b, LRtest23b)
+}#end of bootstraploop
 
-list(LRtest12b, LRtest13b, LRtest23b)
- }#end of bootstraploop
 
 
-
-LRtestboot<-replicate(n=nboot,bootstraploop(x=data))
+LRtestboot<-replicate(n=nboot,bootstraploop(y=resids))
 LRtestboot12<-unlist(LRtestboot[1,])
 LRtestboot13<-unlist(LRtestboot[2,])
 LRtestboot23<-unlist(LRtestboot[3,])
@@ -442,20 +443,18 @@ print.TVARtest<-function(x,...){
   print(LR)
 }
 
-summary.TVARtest<-function(x,...){
-  class(x)<-"summary.TVARtest"
-  return(x)}
-
-print.summary.TVARtest<-function(x,...){
+summary.TVARtest<-function(object,...){
   cat("Test of linear AR against TAR(1) and TAR(2)\n\nLR test:\n")
-  LR<-rbind(x$LRtest.val,x$Pvalueboot)
+  LR<-rbind(object$LRtest.val,object$Pvalueboot)
   rownames(LR)<-c("Test", "P-Val")
   print(LR)
   cat("\n Bootstrap critical values for test 1 vs 2 regimes\n")
-  print(x$CriticalValBoot[1,])
+  print(object$CriticalValBoot[1,])
   cat("\n Bootstrap critical values for test 1 vs 3 regimes\n")
-  print(x$CriticalValBoot[2,])
+  print(object$CriticalValBoot[2,])
 }
+
+
 if(FALSE){ #usage example
 environment(TVAR_LRtest)<-environment(star)
 data(zeroyld)
