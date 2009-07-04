@@ -45,7 +45,7 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	ninc<-constMatrix$ninc #number of terms (0,1, or 2)
 	xx <- cbind(const,xx)
 	###name the regressor matrix
-	phi<-ifelse(type=="level", "phi", "phi")
+	phi<-ifelse(type=="level", "phi", "Dphi")
 	dX1<- if(type=="ADF") "phi.1" else NULL
 	nlags<-if(type=="ADF") ncol(xx)-ninc-1 else ncol(xx)-ninc
 	colnames(xx) <- c(incNames, dX1, paste(phi,1:nlags, sep="."))
