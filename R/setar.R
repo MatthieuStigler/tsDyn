@@ -617,26 +617,36 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
 
 toLatex.setar <- function(object, digits=3, ...) {
   obj <- object
+  if(obj$model.specific$nthresh > 1)
+    stop("not implemented")
   res <- character()
-  beta <- formatSignedNum(coefficients(obj),digits=digits,...)
-  mL <- obj$model.specific$mL
-  mH <- obj$model.specific$mH
+  ML <- obj$model.specific$ML
+  MH <- obj$model.specific$MH
   steps <- obj$str$steps
   d <- obj$str$d
-  namesL <- paste("phi1", 0:mL, sep=".")
-  namesH <- paste("phi2", 0:mH, sep=".")
-  betaL <- beta[namesL]
-  betaH <- beta[namesH]
+  betaL <- formatSignedNum(getSetarXRegimeCoefs(obj, "L"), digits=digits, ...)
+  betaH <- formatSignedNum(getSetarXRegimeCoefs(obj, "H"), digits=digits, ...)
+  th <- formatSignedNum(getTh(coefficients(obj)), digits=digits, ...)
   res[1] <- "\\["
   res[2] <- paste("X_{t+",steps,"} = \\left\\{\\begin{array}{lr}",sep="")
-  res[3] <- betaL[1]
-  for(j in seq_len(mL-1))
-    res[3] <- paste(res[3],betaL[j+1]," X_{t-",  (j-1)*d,"}",sep="")
-  res[3] <- paste(res[3],betaL[mL+1]," X_{t-",  (mL-1)*d,"}", "& Z_t \\leq ",beta["th"],"\\\\",sep="")
-  res[4] <- betaH[1]
-  for(j in seq_len(mH-1))
-    res[4] <- paste(res[4], betaH[j+1]," X_{t-",  (j-1)*d,"} ",sep="")
-  res[4] <- paste(res[4], betaH[mL+1]," X_{t-",  (mH-1)*d,"}", "& Z_t > ",beta["th"],"\\\\",sep="")
+  translateCoefs <- function(coefs, lags) {
+    ans <- ""
+    if(length(lags) == (length(coefs) - 1)) { #there is a constant term
+      iconst <- grep("const", names(coefs))
+      stopifnot(length(iconst) == 1)
+      ans <- paste(ans, coefs[iconst], " ", sep="")
+      coefs <- coefs[-iconst]
+    }
+    for(j in seq_along(coefs)) {
+      lag <- (lags[j] - 1) * d
+      ans <- paste(ans, coefs[j], " X_{t-", lag, "}", sep="")
+    }
+    return(ans)
+  }
+  res[3] <- translateCoefs(betaL, ML)
+  res[3] <- paste(res[3], "& Z_t \\leq ", th, "\\\\", sep="")
+  res[4] <- translateCoefs(betaH, MH)
+  res[4] <- paste(res[4], "& Z_t > ", th, "\\\\", sep="")
   res[5] <- "\\end{array}\\right."
   res[6] <- "\\]"
   res[7] <- ""
