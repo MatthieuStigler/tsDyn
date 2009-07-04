@@ -411,19 +411,22 @@ if(plot==TRUE&nboot>0){
 	layout(c(1,2))
 	plot(density(LRtestboot12), xlab="LRtest12", xlim=c(0,max(LRtest12+1,max(LRtestboot12))),ylim=c(0,max(density(LRtestboot12)$y,dchisq(0:LRtest12, df=1+m))), main="Test linear VAR vs 1 threshold TVAR")
 	abline(v=LRtest12, lty=2, col=2)
-	curve(dchisq(x, df=1+k*m, ncp=0), from=0, n=LRtest12+5, add=TRUE, col=3)
+	curve(function(x) dchisq(x, df=1+k*m, ncp=0),
+              from=0, n=LRtest12+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 
 
 	plot(density(LRtestboot13), xlab="LRtest13", xlim=c(0,max(LRtest13+1,max(LRtestboot13))),ylim=c(0,max(density(LRtestboot13)$y,dchisq(0:LRtest12, df=2*(1+m)))),main="Test linear VAR vs 2 thresholds TVAR")
 	abline(v=LRtest13, lty=2, col=2)
-	curve(dchisq(x, df=2*(1+k*m), ncp=0), from=0, n=LRtest13+5, add=TRUE, col=3)
+	curve(function(x) dchisq(x, df=2*(1+k*m), ncp=0),
+              from=0, n=LRtest13+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 	}
 	else {
 	plot(density(LRtestboot23), xlab="LRtest23", xlim=c(0,max(LRtest23+1,LRtestboot23)), ylim=c(0,max(density(LRtestboot23)$y,dchisq(0:LRtest12, df=1+m))), main="Test 1 threshold TVAR vs 2 thresholds TVAR")
 	abline(v=LRtest23, lty=2, col=2)
-	curve(dchisq(x, df=1+k*m, ncp=0), from=0, n=LRtest23+5, add=TRUE, col=3)
+	curve(function(x) dchisq(x, df=1+k*m, ncp=0),
+              from=0, n=LRtest23+5, add=TRUE, col=3)
 	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 	}
 }
