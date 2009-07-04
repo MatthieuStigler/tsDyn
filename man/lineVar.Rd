@@ -36,7 +36,7 @@ The arg beta is the cointegrating value,Cointegrating vector will be taken as: (
 Note that 
 }
 \seealso{
-\code{TVAR} and \code{TVECM} for the correspoding threshold models. \code{linear} for the univariate AR model.
+\code{\link{TVAR}} and \code{\link{TVECM}} for the correspoding threshold models. \code{linear} for the univariate AR model.
 }
 \author{Matthieu Stigler}
 \examples{
@@ -75,6 +75,15 @@ if(require(vars)){
 	summary(a)
 	#same answer also!
 }
+
+##export to Latex
+toLatex(VECM.EG)
+toLatex(summary(VECM.EG))
+options("show.signif.stars"=FALSE)
+toLatex(summary(VECM.EG), parenthese="Pvalue")
+options("show.signif.stars"=TRUE)
+
+
 }
 \keyword{ ts }
 
