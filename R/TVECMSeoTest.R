@@ -1,4 +1,4 @@
-TVECM_SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, check=FALSE) {
+TVECM.SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, check=FALSE) {
 y<-as.matrix(data)
 T<-nrow(y)
 k<-ncol(y)
@@ -236,5 +236,5 @@ data(zeroyld)
 data<-zeroyld
 
 
-TVECM_SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=1, plot=FALSE, check=TRUE)
+TVECM.SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=1, plot=FALSE, check=TRUE)
 }

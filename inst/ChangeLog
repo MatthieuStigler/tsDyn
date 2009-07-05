@@ -6,7 +6,7 @@
 -created new function for estimating TVAR: function TVAR()
 -created new function to test for setar: function setarTest()
 -created new function to test for TVAR: function TVAR_LRtest()
--created new function to test for TVECM: functions TVECM_SeoTest() and HanSeo_TVECM()
+-created new function to test for TVECM: functions TVECM.SeoTest() and HanSeo_TVECM()
 -created new function to simulate/bootstrap a TVAR: function TVAR.sim()
 -created new function to simulate/bootstrap a TVECM: function TVECM.sim()
 -created new function to simulate/bootstrap a setar: function setar.sim()
