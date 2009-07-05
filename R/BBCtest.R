@@ -1,6 +1,7 @@
 
 BBCTest<-function(x, m, series, testStat=c("LR", "Wald", "LM"), trim=0.1, grid=c("minPerc", "minObs")){
 
+warning("This function should be considered as experimental. No consistency checks with original paper could be made\n")
 test<-match.arg(testStat)
 grid<-match.arg(grid)
 #demean the data

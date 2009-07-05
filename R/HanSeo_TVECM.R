@@ -1,4 +1,5 @@
 HanSeo_TVECM <- function(dat, lag=1, gn=300, bn=300, trim=0.05, boot=1000, UserSpecified_beta=NULL, cov=1, p_ests=1, intercept=TRUE, UserSpecified_gamma=NULL) {
+warning("This function may be changed in a future version of tsDyn\n")
 ##de tar_ci.m je crois
 # Lags in VAR beyond EC @
 #gn=300;			# number of gridpoints for gamma @
