@@ -1910,7 +1910,7 @@ Percentage of Observations in each regime 6.7% 52.9% 40.4%>
 \end{equation}
 > 
 > ###Linear
-> lin<-linear2(dat,lag=2)
+> lin<-lineVar(dat,lag=2)
 > class(lin)
 [1] "VAR"   "nlVar"
 > lin
@@ -2002,7 +2002,7 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 \end{smatrix}
 \end{equation}
 > 
-> linVECM<-linear2(dat,lag=2, model="VECM")
+> linVECM<-lineVar(dat,lag=2, model="VECM")
 > class(linVECM)
 [1] "VAR"   "VECM"  "nlVar"
 > linVECM

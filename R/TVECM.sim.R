@@ -52,7 +52,7 @@ if(!missing(B)){
 ### possibility 2: only data is given: compute it with linear or selectSETAR
 else if(!missing(data)){
   if(nthresh==0){
-    TVECMobject<-linear2(data, lag=p, include=include, model="VECM")
+    TVECMobject<-lineVar(data, lag=p, include=include, model="VECM")
   }
   else{ 
     if(!missing(Thresh))
@@ -188,13 +188,13 @@ dat<-zeroyld
 TVECM.sim(data=dat,nthresh=2, type="boot", Thresh=c(7,9))
 
 ##Check the bootstrap
-linObject<-linear2(dat, lag=1, model="VECM")
+linObject<-lineVar(dat, lag=1, model="VECM")
 all(TVECM.sim(TVECMobject=linObject,type="check")==dat)
-all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="none"),type="check")==dat)
+all(TVECM.sim(TVECMobject=lineVar(dat, lag=1, model="VECM", include="none"),type="check")==dat)
 
 #not working: (probably trend coefficients too small so digits errors)
-all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="trend"),type="check")==dat)
-all(TVECM.sim(TVECMobject=linear2(dat, lag=1, model="VECM", include="both"),type="check")==dat)
+all(TVECM.sim(TVECMobject=lineVar(dat, lag=1, model="VECM", include="trend"),type="check")==dat)
+all(TVECM.sim(TVECMobject=lineVar(dat, lag=1, model="VECM", include="both"),type="check")==dat)
 
 #nthresh=1
 TVECMobject<-TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE)

@@ -1,11 +1,11 @@
-\name{linear2}
-\alias{linear2}
+\name{lineVar}
+\alias{lineVar}
 \title{Multivariate liner models: VAR and VECM}
 \description{
 Estimate either a VAR or a VEC
 }
 \usage{
-linear2(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
+lineVar(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
 }
 \value{
 Fitted model data
@@ -24,7 +24,7 @@ Fitted model data
 \details{
 This function provides basic functionaities for VAR and VECM models. More comprehensive functions are in package \pkg{vars}. A few differences appear in the VECM estimation:
 \itemize{
-\item{1 cointegrating value}{\code{linear2} is able ton hanfdle with only 1 cointegrating relatioship.}
+\item{1 cointegrating value}{\code{lineVar} is able ton hanfdle with only 1 cointegrating relatioship.}
 \item{Engle-Granger estimator}{The Engle-Granger estimator is available}
 \item{Presentation}{Results are printed in a different ways, using a matrix form}
 \item{lateX export}{The matrix of coefficients can be exported to latex, with or without standard-values and significance stars}
@@ -44,7 +44,7 @@ data(zeroyld)
 data<-zeroyld
 
 #Fit a VAR
-VAR<-linear2(data, lag=1)
+VAR<-lineVar(data, lag=1)
 VAR
 summary(VAR)
 
@@ -57,17 +57,17 @@ if(require(vars)) {
 }
 
 ###VECM
-VECM.EG<-linear2(data, lag=2, model="VECM")
+VECM.EG<-lineVar(data, lag=2, model="VECM")
 VECM.EG
 summary(VECM.EG)
 
-VECM.ML<-linear2(data, lag=2, model="VECM", estim="ML")
+VECM.ML<-lineVar(data, lag=2, model="VECM", estim="ML")
 VECM.ML
 summary(VECM.ML)
 
 
 ###Check Johansen MLE
-myVECM<-linear2(data, lag=1, include="const", model="VECM", estim="ML")
+myVECM<-lineVar(data, lag=1, include="const", model="VECM", estim="ML")
 summary(myVECM, digits=7) 
 #comparing with vars package
 if(require(vars)){

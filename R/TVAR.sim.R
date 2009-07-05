@@ -68,7 +68,7 @@ if(!missing(B)){
 ### possibility 2: only data is given: compute it with linear or selectSETAR
 else if(!missing(data)){
   if(nthresh==0){
-    TVARobject<-linear2(data, lag=p, include=include, model="VAR")
+    TVARobject<-lineVar(data, lag=p, include=include, model="VAR")
   }
   else{ 
     if(!missing(Thresh))
@@ -234,7 +234,7 @@ all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=1),type="check")$serie==serie
 all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")$serie==serie) #TRUE
 all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")$serie==serie) #TRUE
 
-all(TVAR.sim(TVARobject=linear2(serie, lag=1),type="check")$serie==serie) #TRUE
+all(TVAR.sim(TVARobject=lineVar(serie, lag=1),type="check")$serie==serie) #TRUE
 
 ##Check the bootstrap: no! prob with trend... both.. none...
 TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE)$serie==serie

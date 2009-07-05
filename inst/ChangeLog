@@ -1,7 +1,7 @@
 -version 0.7-0
 -added possibilty to have two thresolds and hence three regimes in setar and selectSETAR (arg nthresh)
 -created new functions for unit roots tests: KapShinTest() and BBCTest()
--created new functions for estimating VAR and VECM: currently linear2
+-created new functions for estimating VAR and VECM: lineVar
 -created new function for estimating TVECM: function TVECM()
 -created new function for estimating TVAR: function TVAR()
 -created new function to test for setar: function setarTest()

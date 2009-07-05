@@ -1,4 +1,4 @@
-linear2<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
+lineVar<-function(data, lag, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
 {
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
@@ -202,13 +202,13 @@ return(z)
 if(FALSE) { #usage example
 ###Hansen Seo data
 library(tsDyn)
-environment(linear2)<-environment(star)
+environment(lineVar)<-environment(star)
 environment(summary.VAR)<-environment(star)
 data(zeroyld)
 dat<-zeroyld
 
 #tests
-aVAR<-linear2(dat[1:100,], lag=c(1,2), include="both", model="VAR")
+aVAR<-lineVar(dat[1:100,], lag=c(1,2), include="both", model="VAR")
 #lag2, 2 thresh, trim00.05: 561.46
 class(aVAR)
 aVAR
@@ -344,11 +344,11 @@ if(FALSE) { #usage example
 library(tsDyn)
 data(zeroyld)
 dat<-zeroyld
-environment(linear2)<-environment(star)
+environment(lineVar)<-environment(star)
 environment(summary.VAR)<-environment(star)
 
-aVAR<-linear2(dat, lag=1, include="both", model="VAR")
-aVAR<-linear2(dat, lag=1, include="const", model="VECM", estim="ML", beta=0.98)
+aVAR<-lineVar(dat, lag=1, include="both", model="VAR")
+aVAR<-lineVar(dat, lag=1, include="const", model="VECM", estim="ML", beta=0.98)
 #lag2, 2 thresh, trim00.05: 561.46
 aVAR
 summary(aVAR)
@@ -365,7 +365,7 @@ toLatex(aVAR)
 toLatex(summary(aVAR))
 
 ###Check VAR: comparing with vars
-myVAR<-linear2(dat, lag=1)
+myVAR<-lineVar(dat, lag=1)
 
 library(vars)
 var<-VAR(dat, lag=1)
@@ -375,7 +375,7 @@ vaco2<-coef(var)$long.run[c(3,1,2),1]
 round(coef(myVAR),8)==round(rbind(vaco1, vaco2),8)
 
 ###Check Johansen MLE
-myVECM<-linear2(dat, lag=1, include="const", model="VECM", estim="ML")
+myVECM<-lineVar(dat, lag=1, include="const", model="VECM", estim="ML")
 summary(myVECM, digits=7) 
 #comparing with Hansen paper:reported in Gauss procedure is:
 #coint vector: 1.02206: ok!

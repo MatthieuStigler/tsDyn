@@ -79,7 +79,7 @@ options(show.signif.stars=FALSE)
 toLatex(summary(tvecm))
 
 ###Linear
-lin<-linear2(dat,lag=2)
+lin<-lineVar(dat,lag=2)
 class(lin)
 lin
 print(lin)
@@ -92,7 +92,7 @@ summary(lin)
 toLatex(lin)
 toLatex(summary(lin))
 
-linVECM<-linear2(dat,lag=2, model="VECM")
+linVECM<-lineVar(dat,lag=2, model="VECM")
 class(linVECM)
 linVECM
 print(linVECM)
