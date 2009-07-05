@@ -1,4 +1,4 @@
-TVAR_LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
+TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
 
 if (missing(series))  series <- deparse(substitute(data))
 y <- as.matrix(data) 
@@ -459,17 +459,17 @@ summary.TVARtest<-function(object,...){
 
 
 if(FALSE){ #usage example
-environment(TVAR_LRtest)<-environment(star)
+environment(TVAR.LRtest)<-environment(star)
 data(zeroyld)
 data<-zeroyld[1:150,]
 
-test<-TVAR_LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=FALSE, trim=0.1, test="1vs", model="TAR")
+test<-TVAR.LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=FALSE, trim=0.1, test="1vs", model="TAR")
 class(test)
 print(test)
 summary(test)
 ###Todo
-#does not work TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
-#TVAR_LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="2vs3", check=TRUE, model="MTAR")
+#does not work TVAR.LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
+#TVAR.LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="2vs3", check=TRUE, model="MTAR")
 }
 
 

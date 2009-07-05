@@ -52,7 +52,7 @@ The both first are computed together and avalaible with test="1vs". The third te
 The homoskedastik bootstrap distribution is based on resampling the residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3), estimating the threshold parameter and then computing the Ftest, so it involves many computations and is pretty slow. 
 }
 \seealso{
-\code{\link{TVAR_LRtest}} for the multivariate version. \code{\link{SETAR}} for estimation of the model.
+\code{\link{TVAR.LRtest}} for the multivariate version. \code{\link{SETAR}} for estimation of the model.
 }
 
 \author{ Matthieu Stigler}

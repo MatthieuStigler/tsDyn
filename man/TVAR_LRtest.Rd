@@ -1,11 +1,11 @@
-\name{TVAR_LRtest}
-\alias{TVAR_LRtest}
-\alias{Tvar_LRtest}
+\name{TVAR.LRtest}
+\alias{TVAR.LRtest}
+\alias{TVAR.LRtest}
 \title{Test of linearity}
 \description{Multivariate extension of the linearity against threshold test from Hansen (1999) with bootstrap distribution 
 }
 \usage{
-TVAR_LRtest(data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR"))
+TVAR.LRtest(data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR"))
 }
 
 \value{A list containing:
@@ -59,7 +59,7 @@ The homoskedastik bootstrap distribution is based on resampling the residuals fr
 data(zeroyld)
 data<-zeroyld
 
-TVAR_LRtest(data, lag=2, mTh=1,thDelay=1:2, nboot=3, plot=FALSE, trim=0.1, test="1vs")}
+TVAR.LRtest(data, lag=2, mTh=1,thDelay=1:2, nboot=3, plot=FALSE, trim=0.1, test="1vs")}
 \keyword{ ts }
 \references{
 Hansen (1999) Testing for linearity, Journal of Economic Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26)
