@@ -198,9 +198,36 @@ if(plot==TRUE){
 
 
 ###Output
-cat("\n Size f full sample", T)
-cat("\n Size of end sample", ncol(DeltaY), "\n")
-list(supWald=supWald,gamma1=gamma1, gamma2=gamma2, B=Bsig,PvalBoot=PvalBoot,CriticalValBoot=CriticalValBoot)
+res<-list(supWald=supWald,gamma1=gamma1, gamma2=gamma2, B=Bsig,PvalBoot=PvalBoot,CriticalValBoot=CriticalValBoot,allBoots=Waldboots)
+class(res)<-"TVECMSeo06Test"
+return(res)
+}
+
+print.TVECMSeo06Test<-function(x,...){
+  cat("## Test of no cointegration versus threshold cointegration of Seo 2006 ##\n\n", sep="")
+  
+  cat("Test Statistic:\t\t", x$supWald, "\n",sep="")
+  
+  cat("P-value (", length(x$allBoots), " bootstrap):\t", x$PvalBoot, "\n",sep="")
+}
+
+summary.TVECMSeo06Test<-function(object,...){
+  print(object)
+  cat("Critical values (bootstrap):\n", sep="")
+  print(object$CriticalValBoot)
+  
+  cat("\nThresholds: \t", object$gamma1, "\t", object$gamma2, "\n", sep="")
+  
+  cat("Parameters: \n")
+  print(object$B)
+}
+
+plot.TVECMSeo06Test<-function(x,...){
+  if( length(x$allBoots)<2)
+    stop("Should have at least 2 bootstrap replications for the plot")
+  plot(density(x$allBoots))
+  abline(v=c(x$supWald, x$CriticalValBoot[c(1,2)]), lty=c(1,2,3), col=c(2,3,4))
+  legend("topright", legend=c("SupWald", "Boot 10%", "Boot 5%"), col=c(2,3,4), lty=c(1,2,3))
 }
 
 if(FALSE) {#usage example
