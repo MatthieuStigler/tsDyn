@@ -37,6 +37,9 @@ Attachement du package : 'Matrix'
 
 Le chargement a nécessité le package : snow
 Le chargement a nécessité le package : mnormt
+Version 0.7 of package tsDyn will have probably a few minor revisions rapidly.
+ User should update the package often.
+ Minor revisions will be announced only on the tsdyn mailing list: tsdyn@googlegroups.com
 > 
 > data(zeroyld)
 > dat<-zeroyld
@@ -2112,4 +2115,4 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-     10.420       0.104      10.639 
+     10.540       0.076      10.688 
