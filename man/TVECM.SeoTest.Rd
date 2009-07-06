@@ -32,7 +32,6 @@ The model used is one where the threshold effect concerns only the cointegrating
 Due to the presence of parameters unidentified under the null hypothesis, the test employed is a Sup-Wald test, that means that for each combination of the thresholds, a Wald Test is computed and the supremum of all tests is taken. 
 For each bootstrap replication, this approach is taken, so that the test is really slow. 
 }
-\seealso{}
 \author{Matthieu Stigler}
 \keyword{ ts }
 \references{
