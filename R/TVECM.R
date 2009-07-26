@@ -224,8 +224,8 @@ oneSearch<-function(betas, gammas){
     }
 
 
-  gammaMLE<-0.02321329
-  betaMLE<-0.8916303
+  #gammaMLE<-0.02321329
+  #betaMLE<-0.8916303
 
 #bestGamma1<-gammaMLE
 #beta_grid<-betaMLE
@@ -234,12 +234,15 @@ oneSearch<-function(betas, gammas){
   if(is.null(gamma1$exact)==FALSE&is.null(beta$exact)==FALSE){plot<-FALSE}
 
   if(plot==TRUE){
-    if(is.null(beta$exact)==FALSE&is.null(gamma1$exact)==TRUE){
-      plot(gammas,store, type="l", xlab="Threshold parameter gamma", ylab="Residual Sum of Squares", main="Grid Search")}
-    if(is.null(beta$exact)==TRUE&is.null(gamma1$exact)==FALSE){
-      plot(betas,store, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares", main="Grid Search")}
-    if(is.null(beta$exact)==TRUE&is.null(gamma1$exact)==TRUE){
-                                        #mat[!is.na(apply(mat,1,sum)),]
+    if(!is.null(beta$exact)&is.null(gamma1$exact)){ #only gamma estimated
+      plot(gammas,store, type="l", xlab="Threshold parameter gamma", ylab="Residual Sum of Squares", main="Grid Search")
+      points(x=bestGamma1, y=min(store, na.rm=TRUE), col=2, cex=2)
+    }
+    if(is.null(beta$exact)&!is.null(gamma1$exact)){ #only beta estimated
+      plot(betas,store, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares", main="Grid Search")
+      points(x=beta_grid, y=min(store, na.rm=TRUE), col=2, cex=2)
+    }
+    if(is.null(beta$exact)&is.null(gamma1$exact)){ #both estimated #mat[!is.na(apply(mat,1,sum)),]                  
       options(warn=-1)
       betaRSS<-apply(store,2,FUN=min, na.rm=TRUE)
       gammaRSS<-apply(store,1,FUN=min, na.rm=TRUE)
@@ -251,7 +254,9 @@ oneSearch<-function(betas, gammas){
       points(x=bestGamma1, y=min(store, na.rm=TRUE), col=2, cex=2)
       plot(betas,betaRSS, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares")
       abline(v=betaLT, lty=3)
-      legend("topright", "OLS estimate from linear VECM", lty=3)}
+      points(x=beta_grid, y=min(store, na.rm=TRUE), col=2, cex=2)
+      legend("topright", "OLS estimate from linear VECM", lty=3)
+    }
   }#end of the plot
   
 #result of the whole function to search for one threshold
@@ -577,7 +582,8 @@ TVECM(dat, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_
 
 
 tvecm<-TVECM(dat, nthresh=1,lag=2, bn=10, ngridG=10, plot=FALSE,trim=0.05, model="All")
-
+#example in working paper 
+tvecm <- TVECM(zeroyld, nthresh = 2, lag = 1, bn = 60, ngridG = 30,plot = TRUE, trim = 0.05, model = "All", beta = list(int = c(0.7, 1.1)))
 ###To FIX:
 tvecm2<-TVECM(dat, nthresh=2,lag=1, bn=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridG=20, plot=FALSE,trim=0.05, model="All")
 class(tvecm)
