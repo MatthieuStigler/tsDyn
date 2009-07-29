@@ -1,4 +1,9 @@
-TVECM<-function(data,lag=1, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), model=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),beta0=0,trace=TRUE ) {
+TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=TRUE,  th1=list(exact=NULL, int=c("from","to"), around="val"), th2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), common=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),dummyToBothRegimes=TRUE,beta0=0,methodMapply=FALSE, trace=TRUE ) {
+bn<-ngridBeta
+ngridG<-ngridTh
+gamma1<-th1
+gamma2<-th2
+
 y<-as.matrix(data)
 T<-nrow(y) #T: number of observations
 p<-lag #p: Number of lags
@@ -11,7 +16,7 @@ if(is.null(colnames(data))==TRUE)
 ndig<-getndp(y)
 restr<-match.arg(restr)
 include<-match.arg(include)
-model<-match.arg(model)
+model<-match.arg(common)
 model<-switch(model, "All"="All", "only_ECT"="only_ECT")
 
 ysmall<-y[(p+1):T,]

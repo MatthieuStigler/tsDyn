@@ -15,8 +15,6 @@ Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
 en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
 Tapez 'q()' pour quitter R.
 
-[Sauvegarde de la session précédente restaurée]
-
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
 This is mgcv  1.5-5 . For overview type `help("mgcv-package")'.
@@ -722,7 +720,7 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 + }
 > 
 > ###TVECM
-> tvecm<-TVECM(dat, nthresh=2,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="All")
+> tvecm<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="All")
 
  29 ( 7.2% ) points of the grid lead to regimes with percentage of observations < trim and were not computed
 
@@ -2115,4 +2113,4 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-     10.540       0.076      10.688 
+     36.018       0.472      96.126 

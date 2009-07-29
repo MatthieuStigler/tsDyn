@@ -61,7 +61,7 @@ toLatex(summary(tvar), digits=2)
 }
 
 ###TVECM
-tvecm<-TVECM(dat, nthresh=2,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="All")
+tvecm<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="All")
 class(tvecm)
 tvecm
 print(tvecm)

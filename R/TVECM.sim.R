@@ -56,7 +56,7 @@ else if(!missing(data)){
   }
   else{ 
     if(!missing(Thresh))
-      TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, gamma1=Thresh)
+      TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=Thresh)
     else
       TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
   }
