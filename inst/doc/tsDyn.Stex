@@ -224,18 +224,37 @@ obj <- setar(x, m=, d=, steps=, thVar= )
 \end{Scode}
 where \texttt{thVar} is the vector containing the threshold variable values.
 
-The threshold variable isn't the only additional parameter governing the SETAR model. One can specify the \emph{low} and \emph{high} regime autoregressive orders $L$ and $H$. These can be specified with the arguments \texttt{mL} and \texttt{mH}, respectively:
+
+Models with two thresholds and hence three regime are aslo availabe through the argument \texttt{nthresh}, its default value being 1. 
 \begin{Scode}{eval=FALSE}
-obj <- setar(x, m=, d=, steps=, thDelay = , mL =, mH =)
+obj <- setar(x, m=, d=, steps=, thDelay=, nthresh=2)
 \end{Scode}
-If not specified, \texttt{mL} and \texttt{mH} defaults to \texttt{m}.
 
 Another hyper-parameter one can specify is the threshold value $\text{th}$, via the additional argument \texttt{th}.
-If not specified, this is estimated by fitting the model for a grid of different, reasonable values of $\text{th}$, and taking the best fit as the final $\text{th}$ estimate.
+If not specified, this is estimated by fitting the model for a grid of different, by default all values of $\text{th}$, and taking the best fit as the final $\text{th}$ estimate. This is done calling internally selectSETAR() with \texttt{criterion="SSR"}. 
 
 Note that, conditional on $\{Z_t\leq \text{th}\}$, the model is linear. So, for a fixed threshold value, the CLS estimation is straightforward.
 
 The summary command for this model returns asymptotic standard errors for the estimated $\phi$ coefficients, based on the assumption that $\epsilon_t$ are normally distributed.
+
+
+The threshold variable isn't the only additional parameter governing the TAR model. One can specify the \emph{low} and \emph{high} regime autoregressive orders $L$ and $H$. These can be specified with the arguments \texttt{mL} and \texttt{mH}, respectively:
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay = , mL =, mH =)
+\end{Scode}
+If not specified, \texttt{mL} and \texttt{mH} defaults to \texttt{m}.
+One can decide also only to select a few values between \texttt{1:mL} and \texttt{1:mH}. This is possible using \texttt{ML} and \texttt{MH}. Hence to have a first regime with lag 1 and 3, the second with all 3, would be: \texttt{ML=c(1,3)} and \texttt{MH=1:3}. 
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay = , ML =, MH =)
+\end{Scode}
+
+
+As suggested in Enders and Granger (1997)\cite{EndersGranger1998}, the threshold variable can be in differences, leading to the so-called Momentum-TAR (M-TAR). In this case, the regime switching depends not on the position of the variable at time $t-1$ but on its signs at $t-1$. Hence, on can estimate whethera variable behaves differently whether it was previously increasing or decreasing. A M-TAR can be specified setting the argument \texttt{model="MTAR"}. Note that when the number of lags \texttt{m} is equal to the delay \texttt{d}, there is one less observation in the series\footnote{This is for now handled not so properly and may result in failures in the different methods}.
+
+An interesting specification of the model in terms of another representation is possible with \texttt{type = c("level", "diff", "ADF")}. This will either set all variables in levels, in difference or as in the specification of the ADF test:
+
+Note that using \texttt{type=level} or \texttt{ADF} results in the same model fit but is a convenient way to test for a unit root, as the value of the variable in levels should be smaller than one. 
+
 
 \subsection{LSTAR models}
 The LSTAR model can be viewed as a generalization of the above defined SETAR model:
