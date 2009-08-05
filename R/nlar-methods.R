@@ -130,6 +130,22 @@ residuals.nlar <- function(object, ...) {
   ans
 }
 
+regime <- function (object, ...)  
+  UseMethod("regime")
+
+regime.default <- function(object, ...)
+  NULL
+
+#Observed residuals for the fitted nlar object
+regime.setar <- function(object, ...) {
+  str <- object$str
+  reg<-object$model.specific$regime
+  ans <- c(rep(NA, str$n.used - length(reg) ), reg)
+  tsp(ans) <- tsp(str$x)
+  ans <- as.ts(ans)
+  ans
+}
+
 deviance.nlar<-function(object,...) crossprod(object$residuals)
 
 #Mean Square Error for the specified object

@@ -13,7 +13,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        nlarDialog, linear, isLinear, nnetTs, aar,
 	star, 
        TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, TVECM.SeoTest, lineVar, setarTest,
-	BIC, MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim)
+	BIC, MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
@@ -77,6 +77,7 @@ S3method(coef, nlVar)
 S3method(AIC, nlVar)
 S3method(BIC, nlVar)
 S3method(BIC, lm)
+S3method(regime, setar)
 S3method(logLik, nlVar)
 S3method(residuals, nlVar)
 S3method(deviance, nlVar)
