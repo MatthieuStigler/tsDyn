@@ -581,16 +581,16 @@ environment(TVECM)<-environment(star)
 summary(lm(zeroyld[,1]~zeroyld[,2]-1))
 summary(lm(zeroyld[,1]~zeroyld[,2]))
 
-TVECM(dat, nthresh=1,lag=1, bn=80, ngridG=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
+TVECM(dat, nthresh=1,lag=1, ngridBeta=80, ngridTh=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
 beta0<-rep(1.12,480)
-TVECM(dat, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
+TVECM(dat, nthresh=1,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
 
 
-tvecm<-TVECM(dat, nthresh=1,lag=2, bn=10, ngridG=10, plot=FALSE,trim=0.05, model="All")
+tvecm<-TVECM(dat, nthresh=1,lag=2, ngridBeta=10, ngridTh=10, plot=FALSE,trim=0.05, model="All")
 #example in working paper 
-tvecm <- TVECM(zeroyld, nthresh = 2, lag = 1, bn = 60, ngridG = 30,plot = TRUE, trim = 0.05, model = "All", beta = list(int = c(0.7, 1.1)))
+tvecm <- TVECM(zeroyld, nthresh = 2, lag = 1, ngridBeta = 60, ngridTh = 30,plot = TRUE, trim = 0.05, model = "All", beta = list(int = c(0.7, 1.1)))
 ###To FIX:
-tvecm2<-TVECM(dat, nthresh=2,lag=1, bn=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridG=20, plot=FALSE,trim=0.05, model="All")
+tvecm2<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridTh=20, plot=FALSE,trim=0.05, model="All")
 class(tvecm)
 tvecm
 print(tvecm)
