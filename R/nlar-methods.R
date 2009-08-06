@@ -130,13 +130,13 @@ residuals.nlar <- function(object, ...) {
   ans
 }
 
+#indicator of the regime of the obs
 regime <- function (object, ...)  
   UseMethod("regime")
 
 regime.default <- function(object, ...)
   NULL
 
-#Observed residuals for the fitted nlar object
 regime.setar <- function(object, ...) {
   str <- object$str
   reg<-object$model.specific$regime
@@ -146,6 +146,38 @@ regime.setar <- function(object, ...) {
   ans
 }
 
+#get the threshold for setar and nlVar
+getTh<- function (object, ...)  
+  UseMethod("getTh")
+
+
+getTh.default <- function(object, ...){
+  allth<-object[grep("th",names(object))]
+  if(length(grep("thD",names(allth)))!=0)
+    allth<-allth[-grep("thD",names(allth))]
+  return(allth)
+}
+
+getTh.setar<-function(object,...){
+  object<-object$coef
+  getTh.default(object)
+}
+
+getTh.summary.setar<-function(object,...){
+  object$th
+}
+
+getTh.nlVar<-function(object,...){
+  th<-object$model.specific$Thresh
+  if(length(th)==1)
+    names(th)<-"th"
+  else
+    names(th)<-c("th1", "th2")
+  return(th)
+}
+
+
+#Observed residuals for the fitted nlar object
 deviance.nlar<-function(object,...) crossprod(object$residuals)
 
 #Mean Square Error for the specified object

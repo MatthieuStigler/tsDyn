@@ -465,7 +465,7 @@ summary.TVAR<-function(object,...){
 	x$aic<-AIC.nlVar(x)
 	x$bic<-BIC.nlVar(x)
 	x$SSR<-deviance(x)
-	class(x)<-c("summary.TVAR", "TVAR")
+	class(x)<-c("summary.TVAR", "TVAR", "nlVar")
 	return(x)
 }
 

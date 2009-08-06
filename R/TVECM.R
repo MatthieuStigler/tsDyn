@@ -651,7 +651,7 @@ summary.TVECM<-function(object,digits=4,...){
   x$aic<-AIC.nlVar(x)
   x$bic<-BIC.nlVar(x)
   x$SSR<-deviance.nlVar(x)
-  class(x)<-c("summary.TVECM", "TVECM")
+  class(x)<-c("summary.TVECM", "TVECM", "nlVar")
   return(x)
   
 }

@@ -365,13 +365,6 @@ getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
 	  return(c(x1, x2, x3))
 }
 
-getTh<-function(x){
-	allth<-x[grep("th",names(x))]
-	if(length(grep("thD",names(allth)))!=0)
-	  allth<-allth[-grep("thD",names(allth))]
-	return(allth)
-	}
-
 
 #gets a vector with names of the arg inc
 getIncNames<-function(inc,ML){
