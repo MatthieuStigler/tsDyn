@@ -282,19 +282,27 @@ buildConstants<-function(include=c("const", "trend","none", "both"), n){
 MakeThSpec<-function(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int=c("from","to"), around="val",...){
   if(is.character(ngrid))
     ngrid<-match.arg(ngrid)
+  #check if only one solution exact/int/around is choosen
   exCheck<-ifelse(is.null(exact),0,1)
   inCheck<-ifelse(int==c("from","to"),0,1)
   aroundCheck<-ifelse(around=="val",0,1)
   if(sum(exCheck, inCheck, aroundCheck)>1)
     stop("Only one of the makeThSpec args should be specified")
+  
+  #if around, user should give value for ngrid
+  if(aroundCheck==1&&is.character(ngrid)){
+    ngrid<-20
+    cat("When setting arg MakeThSpec(around), a numeric ngrid should be given. Set to 20\n")
+  }
   return(list(exact=exact, int=int, around=around, ngrid=ngrid))
 } 
 
-makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val"), thSteps = 7,ngrid="ALL", trace=FALSE, nthresh=1){
+makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val",ngrid=c("All", "Half", "Third", "Quarter")), thSteps = 7, trace=FALSE, nthresh=1){
   ng <- length(allTh)
   down<-ceiling(trim*ng)
   up<-floor(ng*(1-trim))
   allin<-up-down
+  ngrid<-th$ngrid
 
 #threshold pre-specified
 if(!is.null(th$exact)){
@@ -322,21 +330,24 @@ if(!is.null(th$exact)){
 }	  
 #interval to search inside given by user
 else if(is.numeric(th$int)){
-	if(missing(ngrid))
-		ngrid<-20
 	intDown<-which.min(abs(allTh-th$int[1]))
 	intUp<-which.min(abs(allTh-th$int[2]))
-	if(length(intDown)>1|length(intUp)>1)
-		intDown<-intDown[1];intUp<-intUp[1];
-	lengthInt<-min(ngrid,intUp-intDown)
+	if(length(intDown)>1|length(intUp)>1){
+	  intDown<-intDown[1]
+	  intUp<-intUp[1]
+	}
+	#specify how many in the int
+	nInt<-intUp-intDown
+	if(is.character(ngrid))
+	  lengthInt<-nInt*switch(ngrid, "ALL"=1, "Half"=1/2, "Third"=1/3, "Quarter"=1/4)
+	else
+	  lengthInt<-min(ngrid,nInt)
 	if(trace)
 		cat("Searching within",lengthInt, "values between",allTh[intDown], "and", allTh[intUp],"\n")
 	th<-allTh[seq(from=intDown, to=intUp, length.out=lengthInt)]
 	}
 #value to search around	given by user
 else if(is.numeric(th$around)){
-	if(missing(ngrid))
-		ngrid<-20
 	if(trace)
 		cat("Searching within", ngrid, "values around", th$around,"\n")
 	th<-aroundGrid(th$around,allvalues=allTh,ngrid=ngrid,trim=trim, trace=trace) #fun stored in TVECM.R
@@ -344,12 +355,11 @@ else if(is.numeric(th$around)){
 
 #Default method: grid from lower to higher point
 else{
-	if(ngrid=="ALL")
-		ngrid<-allin
-	else if(ngrid>allin)
-		ngrid<-allin
-	
-	ths<-allTh[seq(from=down, to=up, length.out=ngrid)]
+	if(is.character(ngrid))
+	  ninGrid<-allin*switch(ngrid, "All"=1, "Half"=1/2, "Third"=1/3, "Quarter"=1/4)
+	else 
+	  ninGrid<-min(allin, ngrid)
+	ths<-allTh[seq(from=down, to=up, length.out=ninGrid)]
 	th <-unique(ths)
 	if(trace)
 		cat("Searching on",length(th), "possible threshold values within regimes with sufficient (",percent(trim*100,2),") number of observations\n")
@@ -360,17 +370,18 @@ return(th)
 
 if(FALSE){
 environment(makeTh)<-environment(star)
-a<-makeTh(unique(embed(lynx, 2)[,2, drop=FALSE]), trim=0.15)
+x<-unique(embed(lynx, 2)[,2, drop=FALSE])
+a<-makeTh(x, trim=0.15, th=list(ngrid="All"))
 a
+aHalf<-makeTh(x, trim=0.15, th=list(ngrid="Half"))
+aNum<-makeTh(x, trim=0.15, th=list(ngrid=20))
 length(a)
+length(aHalf)
+length(aNum)
 length(unique(a))
 length(lynx)
 length(unique(lynx))
   
-  cat("ng", ng, "\n")
-  cat("ng*(1-trim)", ng*(1-trim), "\n")
-  cat("up", up, "\n")
-  print(c(down, up, allin, ninter))
 }
 
 

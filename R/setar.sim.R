@@ -184,7 +184,9 @@ mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
 
 #check the result
 selectSETAR(sim, m=2, criterion="SSR")
-selectSETAR(sim, m=2, th=list(around=2), ngrid=20)
+selectSETAR(sim, m=2, th=list(around=2, ngrid=20))
+
+
 ##Bootstrap a TAR with two threshold (three regimes)
 sun<-(sqrt(sunspot.year+1)-1)*2
 setar.sim(data=sun,nthresh=2, type="boot", Thresh=c(6,9))$serie

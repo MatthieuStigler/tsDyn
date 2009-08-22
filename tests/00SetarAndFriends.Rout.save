@@ -15,6 +15,8 @@ Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
 en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
 Tapez 'q()' pour quitter R.
 
+[Sauvegarde de la session précédente restaurée]
+
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
 This is mgcv  1.5-5 . For overview type `help("mgcv-package")'.
@@ -161,9 +163,9 @@ Warning messages:
 > setar(lynx,m=2, trace=TRUE,nthresh=1)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
-Searching on 74 possible threshold values within regimes with sufficient ( 15% ) number of observations
-Searching on 74 combinations of thresholds (74) and thDelay (1) 
-Selected threshold:  1388 
+Searching on 30 possible threshold values within regimes with sufficient ( 15% ) number of observations
+Searching on 30 combinations of thresholds (30) and thDelay (1) 
+Selected threshold:  1307 
 Selected delay:  0 
 
 Non linear autoregressive model
@@ -171,19 +173,19 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
- 2.3330905 -0.4206083 -2.4440208 
+     phiL.1      phiL.2     const L 
+  2.3631503  -0.4233459 -10.9481668 
 
 High regime:
-     phiH.1      phiH.2     const H 
-   1.044104   -0.741993 1465.133661 
+      phiH.1       phiH.2      const H 
+   1.0388479   -0.7452935 1498.2373026 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
--Value: 1388
-Proportion of points in low regime: 58.93% 	 High regime: 41.07% 
+-Value: 1307
+Proportion of points in low regime: 58.04% 	 High regime: 41.96% 
 Warning message:
-Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
+Possible unit root in the low  regime. Roots are: 0.4613 5.1208 
 > setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
@@ -221,13 +223,13 @@ Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > a<-setar(lynx,m=2)
 Warning message:
-Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
+Possible unit root in the low  regime. Roots are: 0.4613 5.1208 
 > deviance(a)
          [,1]
-[1,] 67408458
+[1,] 67518614
 > 
 > ###SelectSetar
-> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=2)
+> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
 Searching on 74 possible threshold values within regimes with sufficient ( 15% ) number of observations
@@ -245,7 +247,7 @@ Results of the grid search for 1 threshold
 8        0  808 68250304
 9        0  957 68288887
 10       0  784 68734556
-> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3)
+> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
 Using maximum autoregressive order for middle regime: mM = 2 
@@ -2113,4 +2115,4 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-     36.018       0.472      96.126 
+     10.728       0.132      11.324 

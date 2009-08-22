@@ -17,7 +17,7 @@
 
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh") ) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh") ) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -234,7 +234,7 @@ z<-as.matrix(z)
   else
     allTh <- sort(abs(z[,1]))
   
-  th<-makeTh(allTh=allTh, trim=trim, th=th,ngrid="ALL", trace=trace, nthresh=nthresh)
+  th<-makeTh(allTh=allTh, trim=trim, th=th, trace=trace, nthresh=nthresh)
 
 ###select only values with sufficient of observations in middle regime
   if(restriction!="none"){
@@ -495,15 +495,16 @@ plot.selectSETAR<-function(x,...){
 ###Try it
 if(FALSE) { #usage example
 library(tsDyn)
-environment(selectSETARmat)<-environment(selectNNET)
+environment(selectSETAR)<-environment(selectNNET)
 #Transformation like in Hansen 1999
 sun<-(sqrt(sunspot.year+1)-1)*2		
 
 ###Full grid search with OLS
-selectSETARmat(sun, m=3, criterion="SSR", d=1, thDelay=0:2,model="TAR", trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
+selectSETAR(sun, m=3, criterion="SSR", d=1, thDelay=0:2,model="TAR", trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
 
-selectSETARmat(sun, m=3, criterion="AIC", d=1, thDelay=0:2,model="TAR", trim=0.25, max.iter=10, plot=FALSE, nthresh=1)
-
+selectSETAR(sun, m=3, criterion="AIC", d=1, thDelay=0:2,model="TAR", trim=0.25, max.iter=10, plot=FALSE, nthresh=1)
+selectSETAR(sun, m=3, th=list(ngrid=2),criterion="SSR", d=1, thDelay=0:2, trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
+selectSETAR(sun, m=3, th=MakeThSpec(ngrid=2),criterion="SSR", d=1, thDelay=0:2, trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
 ###restricted search with AIC or AIC pooled around the max selected by OLS
-selectSETARmat(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)
+selectSETAR(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)
 }

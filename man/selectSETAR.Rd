@@ -7,7 +7,7 @@
 Automatic selection of SETAR hyper-parameters
 }
 \usage{
-selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC","BIC", "SSR"),thSteps = 7,ngrid="ALL",  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh"))
+selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC","BIC", "SSR"),thSteps = 7,  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh"))
 }
 
 \arguments{
@@ -28,7 +28,6 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=Mak
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime. Default to 0.15}
 \item{criterion}{ Model selection criterion}
 \item{thSteps}{Not used}
-\item{ngrid}{Number of threshold values to search for within regimes with sufficient number of observations (specified with \code{trim}). Default to "ALL"}
 \item{plot}{Should a plot showing the criterion values be printed? (logical)}
 \item{max.iter}{Number of iterations for the alogorithm}
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
