@@ -199,8 +199,7 @@ z<-as.matrix(z)
 #if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
 #call the function selectSETAR
   if (missing(th)|length(thDelay)>1) { 
-    ngrid<-ifelse(nthresh==1,30,"All") #if 1 thresh grid with 30 values, if 2 th all values
-    search<-selectSETAR(x, m, d=d, th=list(ngrid=ngrid), steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR", plot=FALSE,max.iter=2, type=type, restriction=restriction)
+    search<-selectSETAR(x, m, d=d, th=list(ngrid="All"), steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR", plot=FALSE,max.iter=2, type=type, restriction=restriction)
     thDelay<-search$bests[1]
     th<-search$bests[2:(nthresh+1)]
     nested<-TRUE
