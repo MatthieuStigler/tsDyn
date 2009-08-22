@@ -284,7 +284,7 @@ MakeThSpec<-function(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int
     ngrid<-match.arg(ngrid)
   #check if only one solution exact/int/around is choosen
   exCheck<-ifelse(is.null(exact),0,1)
-  inCheck<-ifelse(int==c("from","to"),0,1)
+  inCheck<-ifelse(is.character(int),0,1)
   aroundCheck<-ifelse(around=="val",0,1)
   if(sum(exCheck, inCheck, aroundCheck)>1)
     stop("Only one of the makeThSpec args should be specified")
@@ -294,6 +294,11 @@ MakeThSpec<-function(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int
     ngrid<-20
     cat("When setting arg MakeThSpec(around), a numeric ngrid should be given. Set to 20\n")
   }
+  #if exact, ngrid is useless
+  if(exCheck==1&&ngrid!="All"){
+    ngrid<-20
+    cat("When setting arg MakeThSpec(exact), it is useless to specify arg ngrid \n")
+  }  
   return(list(exact=exact, int=int, around=around, ngrid=ngrid))
 } 
 
@@ -339,7 +344,7 @@ else if(is.numeric(th$int)){
 	#specify how many in the int
 	nInt<-intUp-intDown
 	if(is.character(ngrid))
-	  lengthInt<-nInt*switch(ngrid, "ALL"=1, "Half"=1/2, "Third"=1/3, "Quarter"=1/4)
+	  lengthInt<-nInt*switch(ngrid, "All"=1, "Half"=1/2, "Third"=1/3, "Quarter"=1/4)
 	else
 	  lengthInt<-min(ngrid,nInt)
 	if(trace)
@@ -369,6 +374,14 @@ return(th)
 }
 
 if(FALSE){
+
+MakeThSpec(ngrid=20)
+MakeThSpec(exact=30)
+MakeThSpec(exact=30, ngrid=20)
+MakeThSpec(int=c(30, 50), ngrid=40)
+MakeThSpec(around=30)
+
+
 environment(makeTh)<-environment(star)
 x<-unique(embed(lynx, 2)[,2, drop=FALSE])
 a<-makeTh(x, trim=0.15, th=list(ngrid="All"))
@@ -381,7 +394,6 @@ length(aNum)
 length(unique(a))
 length(lynx)
 length(unique(lynx))
-  
 }
 
 

@@ -19,6 +19,14 @@ deviance(a)
 ###SelectSetar
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(ngrid="Half"), common="none",trim=0.15,criterion = "SSR", plot=FALSE)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(ngrid=20), common="none",trim=0.15,criterion = "SSR", plot=FALSE)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(exact=1388), common="none",trim=0.15,criterion = "SSR", plot=FALSE)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(around=1388, ngrid=20), common="none",criterion = "SSR", plot=FALSE)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824)), common="none",criterion = "SSR", plot=FALSE)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid=5), common="none",criterion = "SSR", plot=FALSE)
+selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid="Half"), common="none",criterion = "SSR", plot=FALSE)
+
 
 ###TVAR
 tvar<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, include="const")
@@ -37,8 +45,10 @@ AIC(tvar)
 BIC(tvar)
 coef(tvar)
 deviance(tvar)
-residuals(tvar)
-fitted(tvar)
+head(residuals(tvar))
+tail(residuals(tvar))
+head(fitted(tvar))
+tail(fitted(tvar))
 
 
 ##FIXME
@@ -70,8 +80,10 @@ logLik(tvecm)
 AIC(tvecm)
 BIC(tvecm)
 deviance(tvecm)
-residuals(tvecm)
-fitted(tvecm)
+head(residuals(tvecm))
+tail(residuals(tvecm))
+head(fitted(tvecm))
+tail(fitted(tvecm))
 summary(tvecm)
 
 toLatex(tvecm)
