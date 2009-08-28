@@ -571,6 +571,65 @@ At this point a natural question can be:
 \emph{why not use directly the original time series as input to \texttt{lyap\_k} instead of model-generated observations}?
 The answer here is that we have a too short time series for succesfully applying the Kantz algorithm, 
 so a preliminary modelling for generating more observations is necessary.
+
+\section{Annex A: Implementation details}
+
+This section is devoted to document some points in the the implementation and is intended rather for developers. Users will hopefully not need it. 
+
+\subsection{nlar.struct}
+Until Version 0.6 the building of datawas organized as follows:
+\begin{itemize}
+ \item \texttt{setar}, \texttt{star} and others all called \texttt{nlar.struct}
+\item \texttt{nlar.struct} calls \texttt{embedd} from package \texttt{tseriesChaos}. and stores it, returning xx, yy, m and d after some checks. 
+
+\begin{verbatim}
+xxyy <- embedd(x, lags=c((0:(m-1))*(-d), steps) )
+
+  extend(list(), "nlar.struct",
+         x=x, m=m, d=d, steps=steps, series=series,
+         xx=xxyy[,1:m,drop=FALSE], yy=xxyy[,m+1], n.used=length(x))
+ 
+\end{verbatim}
+\item But to use xx and yy the values are recomputed with new function \texttt{getXX(str)} used on str instead of using the returned value \texttt{str\$xx}. It has been implemented as a class:
+\begin{verbatim}
+ getXXYY <- function(obj, ...) UseMethod("getXXYY")
+
+getXXYY.nlar.struct <- function(obj, ...) {
+	x <- obj$x
+	m <- obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getXX <- function(obj, ...)
+	getXXYY(obj,...)[ , 1:obj$m , drop=FALSE]
+
+getYY <- function(obj, ...)
+	getXXYY(obj, ...)[ , obj$m+1]
+
+\end{verbatim}
+\end{itemize}
+
+\paragraph{Extension to MTAR models and ADF specification}
+
+Extension to MTAR and ADF required use of both levels of lags in the same specification. That means, one needs also to obtain the differenced series. This will affect the end sample size.
+
+In the usual case, end sample size $t$ with be equal to $t=T-m$. It would be dfferent (T-m-thDelay) with $thDelay>m$ but is is excluded. 
+In some cases of the MTAR and ADF specification, will lead to reduce the size of the end sample with 1 less observation, if
+\begin{itemize}
+ \item MTAR: the lag of the transition delay in the MTAR is: $thDelay==(m-1)$
+\item ADF and diff model: allways
+
+\end{itemize}
+
+a<-setar(lynx, m=3, d=4)
+length(na.omit(residuals(a)))
+a<-setar(lynx, m=7, d=1)
+
+a<-setar(lynx, m=7, d=5, th=3000)
+
+
 \nocite{*}
 \bibliographystyle{amsplain}
 
