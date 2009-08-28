@@ -190,6 +190,35 @@ The summary command returns asymptotics standard errors for the estimated coeffi
 
 Note that in R there are plenty of functions for AR (and, more generally, ARMA) models estimation, with different estimation methods, such as ML, CLS, Yule-Walker, $\ldots$. If you really need to fit linear models, use these methods directly.
 
+A interesting reparametrization of the model can be done using differences, as in the ADF test for unit roots:
+
+\begin{equation}\label{eq:linearADF}
+\Delta X_{t+s} = \phi + \rho X_t + \zeta_1 \Delta X_{t-d} + \ldots + \zeta_{m-1} \Delta X_{t-(m-2)d} + \epsilon_{t+s}
+\end{equation}
+
+We have (see Hamilton~\cite{Hamilton1994}): 
+\begin{itemize}
+ \item $\rho=\phi_0+\phi_1+\ldots+\phi_m$
+\item $\zeta_i =-(\phi_{j+1}+ \phi_{j+2}+\ldots+\phi_{m}) \qquad \text{for } j=1,2, \ldots, m-1$
+\end{itemize}
+
+It has the major advantage that the stationarity condition that all the roots of the polynomial in (\ref{eq:linear}) lying in the unit root circle is in the ADF representation simply that $-1<\rho<0$. 
+
+This can be set in \tsDyn using the argument \texttt{type} to \texttt{ADF} and using one lag less in \texttt{m}:
+\begin{Scode}
+usual <- linear(lynx, m=3)
+adf<- linear(lynx, m=2, type="ADF")
+\end{Scode}
+
+Note that it is only a reparametrization, the model estimated being the same:
+
+\begin{Scode}
+ all.equal(deviance(adf), deviance(usual))
+all.equal(residuals(usual), residuals(adf))
+\end{Scode}
+
+
+
 \subsection{SETAR models}
 \begin{equation}
 X_{t+s} = \left\{
@@ -577,10 +606,10 @@ so a preliminary modelling for generating more observations is necessary.
 This section is devoted to document some points in the the implementation and is intended rather for developers. Users will hopefully not need it. 
 
 \subsection{nlar.struct}
-Until Version 0.6 the building of datawas organized as follows:
+Until Version 0.6 the building of data was organized as follows:
 \begin{itemize}
  \item \texttt{setar}, \texttt{star} and others all called \texttt{nlar.struct}
-\item \texttt{nlar.struct} calls \texttt{embedd} from package \texttt{tseriesChaos}. and stores it, returning xx, yy, m and d after some checks. 
+\item \texttt{nlar.struct} calls \texttt{embedd} from package \texttt{tseriesChaos}, and stores it, returning xx, yy, m and d after some checks. 
 
 \begin{verbatim}
 xxyy <- embedd(x, lags=c((0:(m-1))*(-d), steps) )
@@ -613,22 +642,83 @@ getYY <- function(obj, ...)
 
 \paragraph{Extension to MTAR models and ADF specification}
 
-Extension to MTAR and ADF required use of both levels of lags in the same specification. That means, one needs also to obtain the differenced series. This will affect the end sample size.
+Extension to MTAR and ADF required use of both levels and lags in the same specification. That means, one needs also to obtain the differenced series. This will affect the end sample size.
 
-In the usual case, end sample size $t$ with be equal to $t=T-m$. It would be dfferent (T-m-thDelay) with $thDelay>m$ but is is excluded. 
-In some cases of the MTAR and ADF specification, will lead to reduce the size of the end sample with 1 less observation, if
+In the usual case, end sample size $t$ with be equal to $t=T-m$. It would be different (T-m-thDelay) with $thDelay>m$ but it is excluded. 
+In some cases, the MTAR and ADF specification will lead to reduce the size of the end sample with 1 less observation, if
 \begin{itemize}
  \item MTAR: the lag of the transition delay in the MTAR is: $thDelay==(m-1)$
 \item ADF and diff model: allways
-
 \end{itemize}
 
-a<-setar(lynx, m=3, d=4)
-length(na.omit(residuals(a)))
-a<-setar(lynx, m=7, d=1)
+To do this, some workarounds were needed, that are for now rather unsatisfactory. Similar functions as \texttt{getXX} and \texttt{getYY }have been created for the lags, see:
+\begin{verbatim}
+ getdXXYY <- function(obj, ...) UseMethod("getdXXYY")
 
-a<-setar(lynx, m=7, d=5, th=3000)
+getdXXYY.nlar.struct <- function(obj,same.dim=FALSE, ...) {
+	x <- obj$x
+	m<-if(same.dim) obj$m-1 else obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
 
+getdXX <- function(obj, ...)
+	diff(getdXXYY(obj,...))[ , 1:obj$m , drop=FALSE]
+
+getdYY <- function(obj, ...)
+	diff(getdXXYY(obj, ...))[ , obj$m+1]
+
+getdX1 <- function(obj, ...)
+	getdXXYY(obj,...)[ -1, 1, drop=FALSE]
+\end{verbatim}
+
+But when there is one less observation (see cases above), problems arise. So setar looks like:
+\begin{verbatim}
+   SeqmaxTh<-seq_len(maxTh+1)
+
+if(model=="TAR"){
+      if(type =="level")
+	z <- getXX(str)[,SeqmaxTh]
+      else
+	z<-getXX(str)[-1,SeqmaxTh]
+    }
+    else{
+      if(max(thDelay)==m-1){
+	if(type =="level"){
+	  z<-getdXX(str)[, SeqmaxTh]
+	  xx<-xx[-1,, drop=FALSE]
+	  yy<-yy[-1]
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	else 
+	  z<-getdXX(str)[, SeqmaxTh]
+      }
+      else{
+	if(type =="level")
+	  z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
+	else
+	  z<-getdXX(str)[,SeqmaxTh]
+      }
+    }
+\end{verbatim}
+
+The biggest problem is that sometimes the xx vector need to be cut...
+\begin{verbatim}
+ 	z<-getXX(str)[-1,SeqmaxTh]
+\end{verbatim}
+
+And so there are currently some bugs arising:
+\begin{Scode}{eval=FALSE}
+plot(setar(lynx, m=1, model="MTAR"))
+plot(setar(lynx, m=3, type="ADF"))
+ #both won't work
+\end{Scode}
+
+
+\paragraph{Adding arguments ML, MM}
+Args \texttt{ML}, \texttt{MH} (and \texttt{MM} when \texttt{nthresh}$=2$) have been added to allow to have holes in the lag structure. They are surely conflicting with arg \texttt{d}, that is, if arg \texttt{d} is not 1. 
 
 \nocite{*}
 \bibliographystyle{amsplain}
