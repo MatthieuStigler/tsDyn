@@ -473,7 +473,7 @@ r<-1
         while (i<=n){
 print(i)
             u<-mu+eb[i-k-1,]+datbi*ab
-            if (k>0){u<-u+t(dx)*capgamma}
+            if (k>0){u<-u+t(dx)%*%capgamma}
             datbi<-datbi+u
             datb<-rbind(datb,datbi)
             if (k==1){dx<-t(u)}
