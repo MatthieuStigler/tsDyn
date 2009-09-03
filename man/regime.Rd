@@ -13,6 +13,7 @@ regime(object, ...)
 }
 \arguments{
   \item{object}{ object of class \code{setar} }
+  \item{\dots}{ additional arguments to \code{regime} }
 }
 \value{
 Time series of same attributes as input to setar. 
