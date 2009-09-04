@@ -28,6 +28,11 @@ Attachement du package : 'Matrix'
 
 	The following object(s) are masked from package:stats :
 
+	 contr.helmert,
+	 contr.poly,
+	 contr.SAS,
+	 contr.sum,
+	 contr.treatment,
 	 xtabs 
 
 
@@ -1252,4 +1257,4 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-     11.432       0.080      13.612 
+     10.980       0.084      11.308 

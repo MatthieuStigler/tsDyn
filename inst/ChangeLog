@@ -1,3 +1,10 @@
+-version 0.7-1
+-Change args of TVECM from nn to ngridBeta, from ngridG to ngridTh, model to common
+-Add functions regime to extract variabl indicating state regime
+-Add function getTh to extract threshold values
+-Adapt toLatex.setar to handle MTAR models. Still needs improvement
+-Fix bugs in TVECM, in HansSeo_TVECM and in setar
+
 -version 0.7-0
 -added possibilty to have two thresolds and hence three regimes in setar and selectSETAR (arg nthresh)
 -created new functions for unit roots tests: KapShinTest() and BBCTest()
