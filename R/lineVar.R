@@ -235,8 +235,7 @@ summary.VAR<-function(object, digits=4,...){
 	r<-4
 	t<-x$t
 	k<-x$k
-
-	Sigma<-matrix(1/t*crossprod(x$residuals),ncol=k)
+	Sigma<-matrix(1/(t-ncol(coef(object)))*crossprod(x$residuals),ncol=k)
 	VarCovB<-solve(crossprod(x$model.x))%x%Sigma
 	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
 
