@@ -41,10 +41,11 @@ coef.nlVar<-function(object,...){
 	return(object$coefficients)
 }
 
+### Method coefMat
 coefMat <- function (object, ...)  
   UseMethod("coefMat")
 
-coefmat.default<-function(object, ...)
+coefMat.default<-function(object, ...)
   coefficients(object)
   
 coefMat.nlVar<-function(object,...){
@@ -53,6 +54,25 @@ coefMat.nlVar<-function(object,...){
   else
     return(object$coeffmat)
 }
+
+###Method toMlm
+toMlm<- function(x, ...) {
+  UseMethod("toMlm")
+}
+
+toMlm.default <- function(x){
+  lm(x$model)
+}
+
+toMlm.nlVar<-function(x){
+  mod<-as.data.frame(x$model[-c(1:(x$T-x$t)),] )
+  ix <- 1:x$k
+  Yt<-as.matrix(mod[,ix])
+  Ytminusi<-mod[,-ix]
+  mlm<-lm(Yt ~.-1, Ytminusi)
+  return(mlm)
+  }
+
 
 summary.nlVar2<-function(x, ...){
 	r<-4
