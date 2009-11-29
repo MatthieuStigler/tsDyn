@@ -89,6 +89,7 @@ S3method(fitted, nlVar)
 S3method(print, llar)
 S3method(plot, llar)
 S3method(as.data.frame, llar)
+S3method(vcov, VAR)
 
 
 useDynLib(tsDyn)
