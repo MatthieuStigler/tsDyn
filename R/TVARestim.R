@@ -434,7 +434,7 @@ summary.TVAR<-function(object,...){
 	k<-x$k
 	t<-x$t
 	p<-x$lag
-	Z<-t(as.matrix(tail(x$model[,-c(1:k)],t)))
+	Z<-t(as.matrix(tail.matrix(x$model[,-c(1:k)],t)))
 	###Stdev, VarCov
 	Sigmabest<-matrix(1/x$t*crossprod(x$residuals),ncol=k)
 	SigmabestOls<-Sigmabest*(x$t/(x$t-ncol(x$coeffmat)))

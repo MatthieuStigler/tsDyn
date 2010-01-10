@@ -620,7 +620,7 @@ summary.TVECM<-function(object,digits=4,...){
   x<-object
   k<-x$k
   t<-x$t
-  Z<-t(as.matrix(tail(x$model[,-c(1:k)],t)))
+  Z<-t(as.matrix(tail.matrix(x$model[,-c(1:k)],t)))
   xspe<-x$model.specific
   model<-attr(object, "model")
 ###Stdev, VarCov
