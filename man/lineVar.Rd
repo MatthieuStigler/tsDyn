@@ -1,6 +1,6 @@
 \name{lineVar}
 \alias{lineVar}
-\title{Multivariate liner models: VAR and VECM}
+\title{Multivariate linear models: VAR and VECM}
 \description{
 Estimate either a VAR or a VEC
 }
@@ -36,7 +36,7 @@ The arg beta is the cointegrating value,Cointegrating vector will be taken as: (
 Note that 
 }
 \seealso{
-\code{\link{TVAR}} and \code{\link{TVECM}} for the correspoding threshold models. \code{linear} for the univariate AR model.
+\code{\link{TVAR}} and \code{\link{TVECM}} for the correspoding threshold models. \code{\link{linear}} for the univariate AR model.
 }
 \author{Matthieu Stigler}
 \examples{
