@@ -1,3 +1,9 @@
+-version 0.7-2
+-Correct degrees of freedom for VAR covariance matrix
+-Standardize output of lineVar with lm
+-update slightly vignette
+-add specific vignette on threshold cointegration
+
 -version 0.7-1
 -Change args of TVECM from nn to ngridBeta, from ngridG to ngridTh, model to common
 -Add functions regime to extract variabl indicating state regime
