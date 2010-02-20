@@ -8,7 +8,6 @@ Imports: nnet, tseriesChaos, tseries, utils
 Suggests: tcltk, sm, scatterplot3d, rgl
 Author: Antonio Fabio Di Narzo, Jose Luis Aznarte, Matthieu Stigler
 Maintainer: Mathtieu Stigler <Matthieu.Stigler@gmail.com>
-Description: Implements nonlinear autoregressive (AR) time series models. For univariate series, a non-parametric approach is available through additive nonlinear AR. Parametric modeling and testing for regime switching dynamicsis available when the transition is either direct (TAR: threshold AR) or smooth (STAR: smooth transition AR, LSTAR).
-For multivariate series, estimation and testing of threshold cointegration TVAR/TVECM models can be done.
+Description: Implements nonlinear autoregressive (AR) time series models. For univariate series, a non-parametric approach is available through additive nonlinear AR. Parametric modeling and testing for regime switching dynamicsis available when the transition is either direct (TAR: threshold AR) or smooth (STAR: smooth transition AR, LSTAR). For multivariate series, estimation and testing of threshold cointegration TVAR/TVECM models can be done.
 License: GPL (>= 2)
 URL: http://tsdyn.googlecode.com

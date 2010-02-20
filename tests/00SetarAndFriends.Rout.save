@@ -1,25 +1,23 @@
-
-R version 2.9.1 (2009-06-26)
+R version 2.9.2 (2009-08-24)
 Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
-R est un logiciel libre livré sans AUCUNE GARANTIE.
-Vous pouvez le redistribuer sous certaines conditions.
-Tapez 'license()' ou 'licence()' pour plus de détails.
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
 
-R est un projet collaboratif avec de nombreux contributeurs.
-Tapez 'contributors()' pour plus d'information et
-'citation()' pour la façon de le citer dans les publications.
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
 
-Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
-en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
-Tapez 'q()' pour quitter R.
+REvolution R enhancements not installed.  For improved
+performance and other extensions: apt-get install revolution-r
 
 [Sauvegarde de la session précédente restaurée]
 
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
-This is mgcv  1.5-5 . For overview type `help("mgcv-package")'.
+This is mgcv 1.6-1. For overview type `help("mgcv-package")'.
 Le chargement a nécessité le package : Matrix
 Le chargement a nécessité le package : lattice
 
@@ -1087,11 +1085,11 @@ Number of variables: 2 	Number of estimated slope parameters 10
 AIC -2156.469 	BIC -2145.6 	SSR 175.6268
 
                    Intercept          short.run -1      long.run -1       
-Equation short.run 0.0673(0.0346).    1.0311(0.0692)*** 0.0233(0.0393)    
-Equation long.run  0.0366(0.0594)     0.4066(0.1188)*** 0.9595(0.0676)*** 
+Equation short.run 0.0673(0.0348).    1.0311(0.0695)*** 0.0233(0.0395)    
+Equation long.run  0.0366(0.0597)     0.4066(0.1195)*** 0.9595(0.0679)*** 
                    short.run -2        long.run -2        
-Equation short.run -0.0526(0.0678)     -0.0091(0.0390)    
-Equation long.run  -0.3320(0.1164)**   -0.0469(0.0669)    
+Equation short.run -0.0526(0.0681)     -0.0091(0.0392)    
+Equation long.run  -0.3320(0.1171)**   -0.0469(0.0673)    
 > toLatex(lin)
 %insert in the preamble and uncomment the line you want for usual /medium /small matrix
 %\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
@@ -1129,18 +1127,18 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 X_{t}^{1} \\ X_{t}^{2}
 \end{smatrix}=
 \begin{smatrix}     %const
-0.0673(0.0346) \\ 0.0366(0.0594)
+0.0673(0.0348) \\ 0.0366(0.0597)
 \end{smatrix}
 +\begin{smatrix}      %Lag1
-1.0311(0.0692) & 0.0233(0.0393) \\
-0.4066(0.1188) & 0.9595(0.0676) 
+1.0311(0.0695) & 0.0233(0.0395) \\
+0.4066(0.1195) & 0.9595(0.0679) 
 \end{smatrix}
 \begin{smatrix}
 X_{t-1}^{1} \\ X_{t-1}^{2}
 \end{smatrix}
 +\begin{smatrix}      %Lag2
--0.0526(0.0678) & -0.0091(0.0390) \\
--0.3320(0.1164) & -0.0469(0.0669) 
+-0.0526(0.0681) & -0.0091(0.0392) \\
+-0.3320(0.1171) & -0.0469(0.0673) 
 \end{smatrix}
 \begin{smatrix}
 X_{t-2}^{1} \\ X_{t-2}^{2}
@@ -1189,11 +1187,11 @@ AIC -2146.536 	BIC -2133.506 	SSR 175.0327
 Cointegrating vector: (1, - 1.059351 )
 
                    ECT                 Intercept           short.run -1      
-Equation short.run -0.0146(0.0150)     0.0157(0.0145)      0.0361(0.0683)    
-Equation long.run  0.0751(0.0257)**    -0.0122(0.0248)     0.3095(0.1170)**  
+Equation short.run -0.0146(0.0151)     0.0157(0.0146)      0.0361(0.0687)    
+Equation long.run  0.0751(0.0258)**    -0.0122(0.0250)     0.3095(0.1178)**  
                    long.run -1        short.run -2        long.run -2        
-Equation short.run 0.0235(0.0396)     -0.0429(0.0687)     -0.0232(0.0390)    
-Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)    
+Equation short.run 0.0235(0.0399)     -0.0429(0.0692)     -0.0232(0.0392)    
+Equation long.run  0.0667(0.0684)     -0.0273(0.1185)     -0.0702(0.0672)    
 > toLatex(linVECM)
 %insert in the preamble and uncomment the line you want for usual /medium /small matrix
 %\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
@@ -1234,21 +1232,21 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 \Delta X_{t}^{1} \\ \Delta X_{t}^{2}
 \end{smatrix}=
 +\begin{smatrix}  %ECT
--0.0146(0.0150) \\ 0.0751(0.0257)
+-0.0146(0.0151) \\ 0.0751(0.0258)
 \end{smatrix}ECT_{-1}
 \begin{smatrix}     %const
--0.0146(0.0150) \\ 0.0751(0.0257)
+-0.0146(0.0151) \\ 0.0751(0.0258)
 \end{smatrix}
 +\begin{smatrix}      %Lag1
-0.0361(0.0683) & 0.0235(0.0396) \\
-0.3095(0.1170) & 0.0667(0.0679) 
+0.0361(0.0687) & 0.0235(0.0399) \\
+0.3095(0.1178) & 0.0667(0.0684) 
 \end{smatrix}
 \begin{smatrix}
 \Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
 \end{smatrix}
 +\begin{smatrix}      %Lag2
--0.0429(0.0687) & -0.0232(0.0390) \\
--0.0273(0.1177) & -0.0702(0.0668) 
+-0.0429(0.0692) & -0.0232(0.0392) \\
+-0.0273(0.1185) & -0.0702(0.0672) 
 \end{smatrix}
 \begin{smatrix}
 \Delta X_{t-2}^{1} \\ \Delta X_{t-2}^{2}
@@ -1257,4 +1255,4 @@ Equation long.run  0.0667(0.0679)     -0.0273(0.1177)     -0.0702(0.0668)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-     10.980       0.084      11.308 
+      6.920       0.100       6.999 
