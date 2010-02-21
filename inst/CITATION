@@ -6,3 +6,10 @@ citEntry(entry="Manual",
 	year = 2009,
 	note = "R package version 0.7",
 	textVersion = "Antonio, Fabio Di Narzo, Josè Luis Aznarte and Matthieu Stigler (2009). tsDyn: Time series analysis based on dynamical systems theory")
+
+citEntry(entry="Manual",
+	title = "Threshold cointegration: overview and implementation in R",
+	author = "Matthieu Stigler",
+	year = 2010,
+	note = "R package version 0.7-2",
+	textVersion = "Matthieu Stigler (2010). tsDyn: Threshold cointegration: overview and implementation in R")
