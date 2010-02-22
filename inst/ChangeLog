@@ -1,4 +1,7 @@
 -version 0.7-2
+-correct bug in HanSeo_TVECM, which can now be used (but still not exported)
+
+-version 0.7-2
 -Correct degrees of freedom for VAR covariance matrix
 -Standardize output of lineVar with lm
 -update slightly vignette
