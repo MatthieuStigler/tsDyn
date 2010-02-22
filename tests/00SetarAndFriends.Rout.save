@@ -13,7 +13,8 @@ Type 'contributors()' for more information and
 REvolution R enhancements not installed.  For improved
 performance and other extensions: apt-get install revolution-r
 
-[Sauvegarde de la session précédente restaurée]
+REvolution R enhancements not installed.  For improved
+performance and other extensions: apt-get install revolution-r
 
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
@@ -1255,4 +1256,4 @@ Equation long.run  0.0667(0.0684)     -0.0273(0.1185)     -0.0702(0.0672)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      6.920       0.100       6.999 
+      7.020       0.050       7.086 
