@@ -1,4 +1,4 @@
-HanSeo_TVECM <- function(dat, lag=1, gn=300, bn=300, trim=0.05, boot=1000, UserSpecified_beta=NULL, cov=1, p_ests=1, intercept=TRUE, UserSpecified_gamma=NULL) {
+HanSeo_TVECM <- function(dat, lag=1, gn=300, bn=300, trim=0.05, boot=1000, UserSpecified_beta=NULL, cov=1, p_ests=1, intercept=TRUE, UserSpecified_gamma=NULL, boot.type=c("FixedReg", "ResBoot")) {
 warning("This function may be changed in a future version of tsDyn\n")
 ##de tar_ci.m je crois
 # Lags in VAR beyond EC @
@@ -17,6 +17,9 @@ warning("This function may be changed in a future version of tsDyn\n")
 #graph_=0;		% set to 1 to generate graph of nonlinear ECM, else 0 @
 #graph_rotate_=0;	% set to 1 to generate rotated graphs 
 #		        %(useful for some print jobs, but ackward for screen viewing) @
+
+
+boot.type<-match.arg(boot.type)
 
 ### Organize Data
 dat<-as.matrix(dat)
@@ -53,7 +56,7 @@ u<-y-x%*%xx%*%t(x)%*%y		#u=y-x*xx*(x'*y); #Residuals for the first auxiliary reg
 
 ###Estimation of the cointegrating parameter
 if (is.null(UserSpecified_beta)==TRUE){
-   v<-xlag-x%*%xx%*%(t(x)%*%xlag)		#Residuals for the first auxiliary regression  v=xlag-x*xx*(x'*xlag);
+  v<-xlag-x%*%xx%*%(t(x)%*%xlag)		#Residuals for the first auxiliary regression  v=xlag-x*xx*(x'*xlag);
     S00<-t(u)%*%u				#S00 of size 2x2		#uu=u'*u;
     S11<-t(v)%*%v				#S11 of size 2x2
     m<-solve(S11)%*%(t(v)%*%u)%*%solve(S00)%*%(t(u)%*%v)	#m2x2 #m=inv(v'*v)*(v'*u)*inv(uu)*(u'*v);
@@ -152,23 +155,23 @@ store<-matrix(rep(0, gn*bn),ncol=bn)	#store=zeros(gn,bn)+nlike;
 
 j<-1
 while (j<=gn){
-   gam<-gamma2[j]
-    bj<-1
-    while (bj<=bn){
-        betab<-betas[bj]
-       w<-xlag%*%c(1,-betab)	#ECT
-       z<-cbind(w,x)		#All variables: ECT and lag
-       d1<-ifelse(w<=gam, 1,0)	#Dummy vector 		#d1=(w<=gam);
-       n1<-sum(d1)		#Number of elements of the ECT under the threshold
-	if(is.na(n1)==TRUE){n1<-0}
-	if (min(n1,t-n1)/t>trim) {
-            zj<-cbind(z*c(d1), w)		#zj: Matrix with dummy on lags and intercept, but not on ECT #zj=[(z.*(d1*ones(1,length(z(1,:))))),w];		
-	    betaj<-solve(t(x)%*%x)%*%t(x)%*%zj        	    	#OLS regression zj=f(x)
-	    zzj<-zj-x%*%betaj					# Residuals zj=f(x) #zzj=zj-x*xx*(x'*zj);
+  gam<-gamma2[j]
+  bj<-1
+  while (bj<=bn){
+    betab<-betas[bj]
+    w<-xlag%*%c(1,-betab)	#ECT
+    z<-cbind(w,x)		#All variables: ECT and lag
+    d1<-ifelse(w<=gam, 1,0)	#Dummy vector 		#d1=(w<=gam);
+    n1<-sum(d1)		#Number of elements of the ECT under the threshold
+    if(is.na(n1)==TRUE){n1<-0}
+    if (min(n1,t-n1)/t>trim) {
+      zj<-cbind(z*c(d1), w)		#zj: Matrix with dummy on lags and intercept, but not on ECT #zj=[(z.*(d1*ones(1,length(z(1,:))))),w];		
+      betaj<-solve(t(x)%*%x)%*%t(x)%*%zj        	    	#OLS regression zj=f(x)
+      zzj<-zj-x%*%betaj					# Residuals zj=f(x) #zzj=zj-x*xx*(x'*zj);
             # warning off;
             #lastwarn(' ');
-            bz<-solve(t(zzj)%*%zzj)%*%t(zzj)%*%u		#OLS regression u=f(zzj) where u: Residuals for the first auxiliary regression inlinear VECM # (u'/zzj')';
-	    u_zzj<-u-zzj%*%bz   				#Residuals   
+      bz<-solve(t(zzj)%*%zzj)%*%t(zzj)%*%u		#OLS regression u=f(zzj) where u: Residuals for the first auxiliary regression inlinear VECM # (u'/zzj')';
+      u_zzj<-u-zzj%*%bz   				#Residuals   
 		#[mw,idw] = lastwarn;
             #lastwarn(' ');
             #warning on;
@@ -176,10 +179,10 @@ while (j<=gn){
             #    bz=pinv(zzj'*zzj)*(zzj'*u);
             #	end;
 	
-           store[j,bj]<-(t/2)*log(det((t(u_zzj)%*%u_zzj)/t))#store(j,bj)=(t/2)*log(det((u-zzj*bz)*(u-zzj*bz)/t))
-	}
-	bj<-bj+1}
-j<-j+1}
+      store[j,bj]<-(t/2)*log(det((t(u_zzj)%*%u_zzj)/t))#store(j,bj)=(t/2)*log(det((u-zzj*bz)*(u-zzj*bz)/t))
+    }
+    bj<-bj+1}
+  j<-j+1}
 
 
 m<-min(store)
@@ -191,9 +194,9 @@ gammaNLL<-apply(store,1,FUN=min)
 
 
 if(is.null(UserSpecified_beta)==TRUE){
-layout(c(1,2))
-plot(gamma2,gammaNLL, type="l", xlab="Threshold parameter gamma", ylab="Negative Log-Likelihood", main="Grid Search")
-plot(betas,betaNLL, type="l", xlab="Cointegrating parameter beta", ylab="Negative Log-Likelihood", main="Grid Search")}
+  layout(c(1,2))
+  plot(gamma2,gammaNLL, type="l", xlab="Threshold parameter gamma", ylab="Negative Log-Likelihood", main="Grid Search")
+  plot(betas,betaNLL, type="l", xlab="Cointegrating parameter beta", ylab="Negative Log-Likelihood", main="Grid Search")}
 else plot(gamma2,gammaNLL, type="l", xlab="Threshold parameter gamma", ylab="Negative Log-Likelihood", main="Grid Search")
 
 gammahat<-gamma2[r]
@@ -233,59 +236,59 @@ e2<-y2-z2%*%beta2
 ###Var Cov for the threshold model
 
 if (cov==1){
-	lz1<-ncol(z1) 			#Number of regressors (ECT, constant and lags)
-	xe1a<-z1*(e1[,1]%*%matrix(c(rep(1,lz1)),ncol=lz1))
-	xe1b<-z1*(e1[,2]%*%matrix(c(rep(1,lz1)),ncol=lz1))
-	xe1<-cbind(xe1a,xe1b)	
-	am1<-matrix(c(rep(0, nrow(zz1)*ncol(zz1))), ncol=ncol(zz1))
-	m1<-rbind(cbind(zz1, am1),cbind( am1, zz1)) 
-	v1<- m1%*%(t(xe1)%*%xe1)%*%m1		
+  lz1<-ncol(z1) 			#Number of regressors (ECT, constant and lags)
+  xe1a<-z1*(e1[,1]%*%matrix(c(rep(1,lz1)),ncol=lz1))
+  xe1b<-z1*(e1[,2]%*%matrix(c(rep(1,lz1)),ncol=lz1))
+  xe1<-cbind(xe1a,xe1b)	
+  am1<-matrix(c(rep(0, nrow(zz1)*ncol(zz1))), ncol=ncol(zz1))
+  m1<-rbind(cbind(zz1, am1),cbind( am1, zz1)) 
+  v1<- m1%*%(t(xe1)%*%xe1)%*%m1		
 
-	lz2<-ncol(z2) 			#Number of regressors (ECT, constant and lags)
-	xe2a<-z2*(e2[,1]%*%matrix(c(rep(1,lz2)),ncol=lz2))
-	xe2b<-z2*(e2[,2]%*%matrix(c(rep(1,lz2)),ncol=lz2))
-	xe2<-cbind(xe2a,xe2b)	
-	am2<-matrix(c(rep(0, nrow(zz2)*ncol(zz2))), ncol=ncol(zz2))
-	m2<-rbind(cbind(zz2,am2),cbind(am2,zz2)) 
-	v2<- m2%*%(t(xe2)%*%xe2)%*%m2	
+  lz2<-ncol(z2) 			#Number of regressors (ECT, constant and lags)
+  xe2a<-z2*(e2[,1]%*%matrix(c(rep(1,lz2)),ncol=lz2))
+  xe2b<-z2*(e2[,2]%*%matrix(c(rep(1,lz2)),ncol=lz2))
+  xe2<-cbind(xe2a,xe2b)	
+  am2<-matrix(c(rep(0, nrow(zz2)*ncol(zz2))), ncol=ncol(zz2))
+  m2<-rbind(cbind(zz2,am2),cbind(am2,zz2)) 
+  v2<- m2%*%(t(xe2)%*%xe2)%*%m2	
 } #end if cov==1
 
 else{
-    sig1<-t(e1)%*%e1/nrow(e1)
+  sig1<-t(e1)%*%e1/nrow(e1)
+  indx<-0
+  indy<-0
+  for (ii in 1:nrow(sig1)){
+    for (jj in 1:ncol(sig1)){
+      if (indx==0){
+        tempx<-zz1*sig1[ii,jj]
+        indx<-1
+      } #end if indx==0
+      else tempx<-cbind(tempx,zz1*sig1[ii,jj])
+    }#end fir jj
     indx<-0
-    indy<-0
-    for (ii in 1:nrow(sig1)){
-        for (jj in 1:ncol(sig1)){
-            if (indx==0){
-                tempx<-zz1*sig1[ii,jj]
-                indx<-1
-		} #end if indx==0
-            else tempx<-cbind(tempx,zz1*sig1[ii,jj])
-	}#end fir jj
-	indx<-0
-        if (indy==0){
-            v1<-tempx
-            indy<-1}
-        else v1<-rbind(v1,tempx)
-	} #end for ii
-
-    sig2<-t(e2)%*%e2/nrow(e2)
+    if (indy==0){
+      v1<-tempx
+      indy<-1}
+    else v1<-rbind(v1,tempx)
+  } #end for ii
+  
+  sig2<-t(e2)%*%e2/nrow(e2)
+  indx<-0
+  indy<-0
+  for (ii in 1:nrow(sig2)){
+    for (jj in 1:ncol(sig2)){
+      if (indx==0){
+        tempx<-zz2*sig2[ii,jj]
+        indx<-2}
+      else tempx<-cbind(tempx,zz2*sig2[ii,jj])
+    } #end for jj
     indx<-0
-    indy<-0
-    for (ii in 1:nrow(sig2)){
-        for (jj in 1:ncol(sig2)){
-            if (indx==0){
-                tempx<-zz2*sig2[ii,jj]
-                indx<-2}
-            else tempx<-cbind(tempx,zz2*sig2[ii,jj])
-	} #end for jj
-	indx<-0
-        if (indy==0){
-            v2<-tempx
-            indy<-2}
-        else v2<-rbind(v2,tempx)
-	} #end for ii
-} #end else
+    if (indy==0){
+      v2<-tempx
+      indy<-2}
+    else v2<-rbind(v2,tempx)
+  } #end for ii
+} #end else, cov=0
 
 
 se1<-sqrt(diag(v1))	#v1: residuals?
@@ -341,13 +344,13 @@ print(se2print)
 #############
 ###Wald tests
 ##############
-# bb<<-bb
-# rb<<-rb
+# bb<-bb
+# rb<-rb
 if (k>0){
-	bw<-matrix(c(bb[-c(1,2),]), ncol=1)		#Vectorization of the lags parameters
-	vr<-matrix(c(c(3:rb),c((rb+3):(2*rb))), ncol=1)
-	vv<-v1[vr,vr]+v2[vr,vr]
-	ww<-t(bw)%*%solve(vv)%*%bw
+  bw<-matrix(c(bb[-c(1,2),]), ncol=1)		#Vectorization of the lags parameters
+  vr<-matrix(c(c(3:rb),c((rb+3):(2*rb))), ncol=1)
+  vv<-v1[vr,vr]+v2[vr,vr]
+  ww<-t(bw)%*%solve(vv)%*%bw
 } #end if k<0
 
 bbx<-matrix(c(bb[1,]), ncol=2)
@@ -355,16 +358,16 @@ wecm<-bbx%*%solve(v1[c(1, rb+1), c(1,rb+1)]+v2[c(1, rb+1), c(1,rb+1)])%*%t(bbx)
 ###########
 ###Lm Test
 ###########
-y<<-y
-gn<<-gn
-x<<-x
-w0<<-w0
-k<<-k
-trim<<-0.05
-beta0<<-beta0
-b0<<-b0
+y<-y
+gn<-gn
+x<-x
+w0<-w0
+k<-k
+trim<-0.05
+beta0<-beta0
+b0<-b0
 t<-length(y[,1])
-#gamma1<<-gamma1
+#gamma1<-gamma1
 #gammas<-gamma1
 
 lmtest01<-function(y,x,w0,gammas){
@@ -387,18 +390,18 @@ e2<-e[,2]
 store<-rep(0, gn)
 j<-1
 while (j<=gn){
-    d1<-ifelse(w0<=gammas[j],1,0)	#d1: dummy variable		#=w0<=gammas(j);
-    n1<-sum(d1)
-    if (min(c(n1,(t-n1)))/t>trim){
-        z1<-z0*(d1%*%matrix(c(rep(1,ncol(z0))), ncol=ncol(z0)))		#All regressors but only with obs where w0<g
-        z11<-z1-z0zz%*%(t(z0)%*%z1)		#residuals from regression of z1 on z0; z11 of dim 479x6
-	zea<-z11*(e1%*%matrix(c(rep(1, ncol(z11))), ncol=ncol(z11)))	#  479x6 (479x1 1x6)
-	zeb<-z11*(e2%*%matrix(c(rep(1, ncol(z11))), ncol=ncol(z11)))
-        ze<-cbind(zea,zeb) #	[(z11.*(e1*ones(1,length(z11(1,:))))),(z11.*(e2*ones(1,length(z11(1,:)))))];
-        v<-t(ze)%*%ze
-        z11y<-t(z11)%*%y
+  d1<-ifelse(w0<=gammas[j],1,0)	#d1: dummy variable		#=w0<=gammas(j);
+  n1<-sum(d1)
+  if (min(c(n1,(t-n1)))/t>trim){
+    z1<-z0*(d1%*%matrix(c(rep(1,ncol(z0))), ncol=ncol(z0)))		#All regressors but only with obs where w0<g
+    z11<-z1-z0zz%*%(t(z0)%*%z1)		#residuals from regression of z1 on z0; z11 of dim 479x6
+    zea<-z11*(e1%*%matrix(c(rep(1, ncol(z11))), ncol=ncol(z11)))	#  479x6 (479x1 1x6)
+    zeb<-z11*(e2%*%matrix(c(rep(1, ncol(z11))), ncol=ncol(z11)))
+    ze<-cbind(zea,zeb) #	[(z11.*(e1*ones(1,length(z11(1,:))))),(z11.*(e2*ones(1,length(z11(1,:)))))];
+    v<-t(ze)%*%ze
+    z11y<-t(z11)%*%y
 
-        s<-matrix(c(z11y), ncol=1)				#vectorization of the parameter matrix z11y
+    s<-matrix(c(z11y), ncol=1)				#vectorization of the parameter matrix z11y
 
 #warning off;
         #lastwarn(' ');
@@ -409,9 +412,9 @@ while (j<=gn){
         #if (1-mw==' ')
         #     sv=pinv(v)*s;
         #end;
-        store[j]<-t(s)%*%solve(t(v)%*%v)%*%t(v)%*%s 	
-    } #end of the if	
-    j<-j+1
+    store[j]<-t(s)%*%solve(t(v)%*%v)%*%t(v)%*%s 	
+  } #end of the if	
+  j<-j+1
 } #end of the whole loop
 lm01<-max(store)
 lm01
@@ -428,81 +431,85 @@ lm01<-lmtest01(y,x,w0,gamma1)
 ### Fixed Regressor Bootstrap %
 ##################################
 if (boot>0){
-boot<<-boot
-e<<-e
+  if(boot.type=="FixedReg"){
+    boot<-boot
+    e<-e
     fix01<-rep(0,boot);
     r<-1
     while (r<=boot){
-        yr<-rnorm(n=t*2,0,1)*e
-    fix01[r]<-lmtest01(yr,x,w0,gamma1)
-    r<-r+1
+      yr<-rnorm(n=t*2,0,1)*e
+      fix01[r]<-lmtest01(yr,x,w0,gamma1)
+      r<-r+1
     }#end while
-
-
-pfix01a<-ifelse(fix01>lm01,1,0)
-pfix01<-sum(pfix01a)/length(fix01)#pfix01<-mean(fix01>lm01)
-fix01<-sort(fix01)
-cfix01<-fix01[round(.95*boot)]
-
-
+    
+    pfix01a<-ifelse(fix01>lm01,1,0)
+    pfix01<-sum(pfix01a)/length(fix01)#pfix01<-mean(fix01>lm01)
+    fix01<-sort(fix01)
+    cfix01<-fix01[round(.95*boot)]
+  
+##################################
 ###Parametric Bootstrap %
+##################################
+} else{
     x0<-dat[1:(1+k),] #k first observations of the data 
     mu<-beta0[2,] #Intercept parameters of the linear VECM
     ab<-c(1,-b0)%*%beta0[1,] 		###a A VOIR * ou %*% ????
     boot01<-rep(0,boot)
     if (k>0){
-        capgamma<-beta0[3:(2+2*k),] 	#Parameters of the lags in the linear VECM
-        temp<-x0[k+1,]-x0[k,]		#First left side delta(x)
-	if(k>1){
-        	for (ii in k:2){
-            temp<-rbind(temp,x0[ii,]-x0[ii-1,])
-        	} #end for		#Next left side delta(x) if k>1
-	}#end if k>1
+      capgamma<-beta0[3:(2+2*k),] 	#Parameters of the lags in the linear VECM
+      temp<-x0[k+1,]-x0[k,]		#First left side delta(x)
+      if(k>1){
+        for (ii in k:2){
+          temp<-rbind(temp,x0[ii,]-x0[ii-1,])
+        } #end for		#Next left side delta(x) if k>1
+      }#end if k>1
         #ind<-0 for (ii in 1:nrow(temp)){ for (jj in 1:ncol(temp)){if (ind==0){ dx0<-temp[ii,jj] ind<-1} else dx0<-rbind(dx0,temp[ii,jj])}}
 
-dx0<-matrix(c(t(as.matrix(temp))), ncol=1, byrow=TRUE) #vectorization of k the first values
+      dx0<-matrix(c(t(as.matrix(temp))), ncol=1, byrow=TRUE) #vectorization of k the first values
     } #End if k>0
-r<-1
-  while (r<=boot){
-        datb<-x0
-        if (k>0){dx<-dx0}
-        datbi<-datb[k+1,]
-        ei<-ceiling(runif(n=t,min=0,max=1)*t)
-        eb<-e[ei,]			#Bootstraping the original residuals of linear VECM
-        i<-k+2
-        while (i<=n){
-print(i)
-            u<-mu+eb[i-k-1,]+datbi*ab
-            if (k>0){u<-u+t(dx)%*%capgamma}
-            datbi<-datbi+u
-            datb<-rbind(datb,datbi)
-            if (k==1){dx<-t(u)}
-            if (k>1){dx<-rbind(t(u),matrix(dx[1:2*k-2], ncol=1))}
-            i<-i+1
-        } #end while i<n
-        yr<-datb[2+k:n,]-datb[1+k:n-1,]
-        xlagr<-datb[1+k:n-1,]
-        xr<-rep(1,t)
-        j<-1
-        while (j<=k){
-            xr<-cbind(xr,(datb[2+k-j:n-j,]-datb[1+k-j:n-1-j,]))
-            j<-j+1
-        }#end while j<k
-        if (is.null(UserSpecified_beta)==TRUE){
-            xxr<-solve(t(xr)%*%xr)
-            u<-yr-xr%*%xxr%*%(t(xr)%*%xlagr)
-            v<-xlagr-xr%*%xxr%*%(t(xr)%*%xlagr)
-            m<-solve(t(v)%*%v)%*%(t(v)%*%u)%*%solve(t(u)%*%u)%*%(t(u)%*%v)
-            ve<-eigen(m)$vectors
-	    va<-eigen(m)$values			#[ve,va]=eig(m);
-
-            maxindva<-which(va==max, arr.ind=TRUE)		#[temp,maxindva]=max(va);
-
-            h<-ve[,maxindva]
-            wr<-xlagr%*%c(1,(h[2]/h[1]))
-	}#end if coint==1
-        else{ wr<-xlagr%*%c(1-UserSpecified_beta)}
-        boot01[r]<-lmtest01(yr,xr,wr,gamma1)
+    r<-1
+    while (r<=boot){
+      datb<-x0
+      if (k>0){dx<-dx0}
+      datbi<-datb[k+1,]
+      ei<-ceiling(runif(n=t,min=0,max=1)*t)
+      eb<-e[ei,]			#Bootstraping the original residuals of linear VECM
+      i<-k+2
+      while (i<=n){
+        print(i)
+        browser()
+        u<-mu+eb[i-k-1,]+datbi*ab
+        if (k>0){u<-u+t(dx)%*%capgamma}
+        datbi<-datbi+u
+        datb<-rbind(datb,datbi)
+        if (k==1){dx<-t(u)}
+        if (k>1){dx<-rbind(t(u),matrix(dx[1:2*k-2], ncol=1))}
+        i<-i+1
+      } #end while i<n
+      yr<-datb[2+k:n,]-datb[1+k:n-1,]
+      xlagr<-datb[1+k:n-1,]
+      xr<-rep(1,t)
+      j<-1
+      while (j<=k){
+        xr<-cbind(xr,(datb[2+k-j:n-j,]-datb[1+k-j:n-1-j,]))
+        j<-j+1
+      }#end while j<k
+      if (is.null(UserSpecified_beta)==TRUE){
+        xxr<-solve(t(xr)%*%xr)
+        u<-yr-xr%*%xxr%*%(t(xr)%*%xlagr)
+        v<-xlagr-xr%*%xxr%*%(t(xr)%*%xlagr)
+        m<-solve(t(v)%*%v)%*%(t(v)%*%u)%*%solve(t(u)%*%u)%*%(t(u)%*%v)
+        ve<-eigen(m)$vectors
+        va<-eigen(m)$values			#[ve,va]=eig(m);
+        
+        maxindva<-which(va==max, arr.ind=TRUE)		#[temp,maxindva]=max(va);
+        
+        h<-ve[,maxindva]
+        wr<-xlagr%*%c(1,(h[2]/h[1]))
+      }#end if coint==1
+      else{ wr<-xlagr%*%c(1-UserSpecified_beta)}
+      boot01[r]<-lmtest01(yr,xr,wr,gamma1)
+      
 #cat("wr")
 #print(wr)
 #cat("xr")
@@ -516,24 +523,32 @@ print(i)
     cb01<-boot01[round(.95*boot)]
     pb01a<-ifelse(boot01>lm01,1,0)				#pb01=mean(boot01>lm01);
     pb01<-sum(pb01a)/length(boot01)
+  }#end if boot= ResBoot
 }#end if boot>0
-
-###Output
+###########
+###Output test
 
 if (k>0){cat("\nWald Test for Equality of Dynamic Coefs: \t")
-	print(round(c(ww,1-pchisq(ww,(rb-2)*2)),6))}
+         print(round(c(ww,1-pchisq(ww,(rb-2)*2)),6))}
 cat("\nWald Test for Equality of ECM Coef: \t")
 print(round(c(wecm,1-pchisq(wecm,2)),6))
 
 cat("\n###Lm Test", lm01)
 
 if(boot>0){
-	cat("\n Fixed Regressor (Asymptotic) .05 Critical Value\t", cfix01)
-	cat("\n Bootstrap .05 Critical Value:\t", cb01)
-	cat("\n Fixed Regressor (Asymptotic) P-Value:\t", pfix01)
-	cat("\n Bootstrap P-Value: \t", pb01)}
+  if(boot.type=="FixedReg"){
+    cat("\n Fixed Regressor (Asymptotic) .05 Critical Value\t", cfix01)
+    cat("\n Fixed Regressor (Asymptotic) P-Value:\t", pfix01, "\n")
+  }else{
+    cat("\n Bootstrap .05 Critical Value:\t", cb01)
+    cat("\n Bootstrap P-Value: \t", pb01, "\n")
+  }
+} #end if boot
 }#End of the whole function
 
+###########################
+### ENd of function
+###########################
 if(FALSE) {#usage example
 ###Test
 
