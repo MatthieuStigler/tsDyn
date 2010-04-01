@@ -1,5 +1,5 @@
 \documentclass[english]{article}
-%\VignetteIndexEntry{Threshold cointegration: overview and implemntation in R}
+%\VignetteIndexEntry{Threshold cointegration: overview and implementation in R}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
