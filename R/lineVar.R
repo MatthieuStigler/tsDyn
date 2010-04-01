@@ -200,6 +200,9 @@ attr(z, "model")<-model
 return(z)
 }
 
+VECM<-function(data, lag, include = c( "const", "trend","none", "both"), beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
+lineVar(data, lag, include = include, model="VAR" ,beta=NULL, estim=estim,LRinclude=LRinclude)
+
 
 if(FALSE) { #usage example
 ###Hansen Seo data
