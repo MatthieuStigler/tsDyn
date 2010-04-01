@@ -195,6 +195,11 @@ res<-round(Yb, ndig)
 return(res)
 }
 
+
+VAR.sim<-function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE){
+ TVAR.sim(B=B, nthresh=0, type="simul", n=n, lag=lag, include = include, thVar=NULL, mTh=1, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, round=FALSE)
+}
+
 if(FALSE){
 library(tsDyn)
 environment(TVAR.sim)<-environment(star)
