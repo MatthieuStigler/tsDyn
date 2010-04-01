@@ -36,7 +36,7 @@ if(!missing(B)){
     stop("Matrix B bad specified")
   y<-matrix(0,ncol=nB, nrow=n)
   if(!is.null(starting)){
-    if(all(dim(as.matrix(starting))==c(nB,p)))
+    if(all(dim(as.matrix(starting))==c(p,nB)))
       y[seq_len(p),]<-starting
     else
       stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables")
