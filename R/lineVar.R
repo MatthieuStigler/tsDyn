@@ -17,12 +17,12 @@ else{
 
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
-if(!r%in%c(1:(k-1))) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1")
 t<-T-p			#Size of end sample
 ndig<-getndp(y)
 if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 
+###Check args
 include<-match.arg(include)
 LRinclude<-match.arg(LRinclude)
 if(LRinclude=="const")  include<-"none"
@@ -30,6 +30,12 @@ ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
 model<-match.arg(model)
 estim<-match.arg(estim)
 I<-match.arg(I)
+if(!r%in%1:(k-1)) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1")
+if(model=="VECM"&estim=="2OLS"&r>1){
+  warning("Estimation of more than 1 coint relationship is not possible with estim '2OLS'. Switched to Johansen 'ML'")
+  estim<-"ML"
+}
+###Construct variables
 Y <- y[(p+1):T,] #
 X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 
@@ -83,28 +89,20 @@ if(model=="VECM"&estim=="2OLS"){
       LRplusplus<-as.matrix(LRplus)%*%coint$coef[-1]
     }
     
-    betaLT<-coint$coef[[1]]
-    betaLT_std <- sqrt(diag(summary(coint)$sigma*summary(coint)$cov))
+    betaLT<-matrix(c(1,-coint$coef[1:(k-1)]), nrow=k, dimnames=list(colnames(data),"r1"))
+    betaLT_std <- c(1,summary(coint)$coef[1:(k-1),2])
+    names(betaLT_std)<-colnames(data)
   }
 	#beta is given by user
   else{
     if(LRinclude!="none")
       warning("Arg LRinclude not taken into account when beta is given by user")
     coint<-c(1, -beta)
-    betaLT<-beta
+    betaLT<-c(1,-beta)
   }
 
-# ECT<-y%*%c(1,-betaLT)
-# ECT<-round(ECT,ndig)
-#ECTminus1<-ECT[-c(1:p,T)]
-
-	#ECTminus1<-Xminus1%*%c(1,-betaLT)
-  ECTminus1<-residuals(coint)[-c(seq_len(p), T)]
+  ECTminus1<-Xminus1%*%betaLT
   Z<-cbind(ECTminus1,Z)
-
-#check if other way works
-#print(cbind(residuals(coint)[-c(seq_len(p),T)], (y%*%c(1,-betaLT)-(LRplusplus))[-c(seq_len(p),T),]))
-#print(all.equal(residuals(coint)[-c(seq_len(p),T)], (y%*%c(1,-betaLT)-(LRplusplus))[-c(seq_len(p),T),]))
 }
 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
@@ -147,7 +145,7 @@ else if(model=="VECM"&estim=="ML"){
       ECTminus1<-Xminus1%*%ve_4
     }
     Z<-cbind(ECTminus1,Z)
-    dimnames(ve_4)<-list(c(colnames(data), if(LRinclude=="const") "const" else NULL), paste("r", 1:r))
+    dimnames(ve_4)<-list(c(colnames(data), if(LRinclude=="const") "const" else NULL), paste("r", 1:r, sep=""))
     betaLT<-ve_4
   }else{  #end beta to be estimated
     betaLT<-beta
@@ -167,7 +165,7 @@ res<-Y-fitted
 npar<-ncol(B)*nrow(B)
 rownames(B)<-paste("Equation",colnames(data))
 LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
-ECT<- if(model=="VECM") paste("ECT", 1:r, sep="") else NULL
+ECT<- if(model=="VECM") paste("ECT", if(r>1) 1:r else NULL, sep="") else NULL
 BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
 Bnames<-c(ECT,BnamesInter, LagNames)
 colnames(B)<-Bnames
@@ -186,8 +184,10 @@ model.specific$nthresh<-0
 
 if(model=="VECM"){
   model.specific$beta<- betaLT
+  model.specific$r<-r
+  model.specific$estim<-estim
+  model.specific$LRinclude<-LRinclude
   if(estim=="ML"){
-    model.specific$r<-r
     model.specific$S00<-S00
     model.specific$lambda<-eig$values
     model.specific$coint<-ve_4
@@ -291,8 +291,10 @@ print.summary.VAR<-function(x,...){
   cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
   cat("\nNumber of variables:", x$k,"\tNumber of estimated slope parameters", x$npar)
   cat("\nAIC",x$aic , "\tBIC", x$bic, "\tSSR", x$SSR)
-  if(attr(x,"model")=="VECM")
-    cat("\nCointegrating vector: (1, -", x$model.specific$beta, ")")
+  if(attr(x,"model")=="VECM"){
+    cat("\nCointegrating vector (estimated by", x$model.specific$estim, "):\n", sep="")
+    print(t(x$model.specific$beta))
+  }
   cat("\n\n")
   print(noquote(x$bigcoefficients))
 
@@ -310,7 +312,7 @@ vcov.VAR<-function(object, ...){
 
 toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
   x<-object
-  if(attr(x,"model")=="VECM"&&x$model.specific$r>1) stop("toLatex not implemented now for models with more than 1 coint rel") 
+  if(attr(x,"model")=="VECM"&&x$model.specific$LRinclude!="none") stop("toLatex not implemented now for models with arg 'LRinclude' different from 'none'") 
   parenthese<-match.arg(parenthese)
   if(inherits(x,"summary.VAR")){
     a<-myformat(x$coefficients,digits, toLatex=TRUE)
@@ -333,6 +335,7 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
   res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
   res[5]<-"\\begin{equation}"
   res[6]<- "\\begin{smatrix} %explained vector"
+
 ###explained vector
   if(attr(x, "varsLevel")=="diff")
     res[7]<-TeXVec(paste("slashDelta X_{t}^{",seq(1, x$k),"}", sep=""))
@@ -342,15 +345,22 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 ###ECT
   ninc<-switch(x$include, "const"=1, "trend"=1,"none"=0, "both"=2)
   if(attr(x,"model")=="VECM"){
+    r<-x$model.specific$r
     len<-length(res)
-    res[len+1]<-"+\\begin{smatrix}  %ECT"
-    res[len+2]<-TeXVec(coeftoprint[,1]) #see nlVar-methods.R
-    res[len+3]<-"\\end{smatrix}ECT_{-1}"
+    if(r==1){
+      res[len+1]<-"+\\begin{smatrix}  %ECT"
+      res[len+2]<-TeXVec(coeftoprint[,1]) #see nlVar-methods.R
+      res[len+3]<-"\\end{smatrix}ECT_{-1}"
+    }else{
+      res[len+1]<-"+\\begin{smatrix}  %ECT"
+      res[(len+2):(len+x$k+1)]<-TeXMat(coeftoprint[,1:r]) #see nlVar-methods.R
+      res[len+x$k+2]<-"\\end{smatrix}ECT_{-1}"
+    }
   }
 ###Const
-  res<-include(x, res, coeftoprint)	#nlVar-methods.R
+  a<-if(attr(x,"model")=="VECM") r else 0
+  res<-include(x, res, coeftoprint, skip=a)	#nlVar-methods.R
 ###Lags
-  a<-if(attr(x,"model")=="VECM") 1 else 0
   res<-LagTeX(res, x, coeftoprint, ninc+a)	#nlVar-methods.R
   res[length(res)+1]<-"\\end{equation}"
   res<-gsub("slash", "\\", res, fixed=TRUE)
