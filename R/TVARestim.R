@@ -42,6 +42,7 @@ if (!missing(thVar)) {
         else
 		z <- thVar
 	z<-embed(z,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+combin<-NULL
 } ###Combination (or single value indicating position) of contemporaneous variables
 else {
 	if (!length(mTh)%in%c(1,k))
