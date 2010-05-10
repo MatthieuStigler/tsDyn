@@ -366,14 +366,16 @@ pooled_info_Thresh<-c(pooled_aicbest, pooled_bicbest)
 ###naming and dividing B
 rownames(Bbest) <- paste("Equation", colnames(data))
 LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
-if(include=="const")
-	Bnames<-c("Intercept",LagNames)
-else if(include=="trend")
-	Bnames<-c("Trend",LagNames)
-else if(include=="both")
-	Bnames<-c("Intercept","Trend",LagNames)
-else 
-	Bnames<-c(LagNames)
+
+Bnames<-c(switch(include, const="Intercept", trend="Trend", both=c("Intercept","Trend"), none=NULL),LagNames)
+# if(include=="const")
+# 	Bnames<-c("Intercept",LagNames)
+# else if(include=="trend")
+# 	Bnames<-c("Trend",LagNames)
+# else if(include=="both")
+# 	Bnames<-c("Intercept","Trend",LagNames)
+# else 
+# 	Bnames<-c(LagNames)
 
 Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
 BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
@@ -626,60 +628,59 @@ toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 
 
 nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All"){
-	model<-match.arg(model)
-	if(model=="TVAR")
-		sBnames<-Bnames[-which(Bnames=="Intercept")]
-	else if(model=="TVECM")
-		sBnames<-Bnames[-which(Bnames=="ECT")]
-	if(nthresh==1){
-		if(commonInter){
-			if(model=="TVAR")
-				colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Up",sBnames))
-			else if(model=="TVECM")
-				colnames(mat)<-c("ECT-","ECT+", sBnames)
-			Blist<-mat}
-		else{
-			colnames(mat) <- rep(Bnames,2)
-			Bdown <- mat[,c(1:npar)]
-			Bup <- mat[,-c(1:npar)]
-			Blist <- list(Bdown=Bdown, Bup=Bup)}
-	}
-	else{
-		if(commonInter){
-			if(model=="TVAR")
-				colnames(mat)<-c("Intercept",paste("Dn",sBnames), paste("Mi",sBnames), paste("Up",sBnames))
-			else if(model=="TVECM")
-				colnames(Bbest)<-c("ECT-","ECT+", sBnames)
-			Blist<-mat}
-		else{
-			colnames(mat)<-rep(Bnames,3)
-			Bdown <- mat[,c(1:npar)]
-			Bmiddle <- mat[,c(1:npar)+npar]
-			Bup <- mat[,c(1:npar)+2*npar]		
-			colnames(Bmiddle) <- Bnames
-			Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)}
-	}
-	return(Blist)
+  model<-match.arg(model)
+  if(model=="TVAR")
+    sBnames<-Bnames[-which(Bnames=="Intercept")]
+  else if(model=="TVECM")
+    sBnames<-Bnames[-which(Bnames=="ECT")]
+  if(nthresh==1){
+    if(commonInter){
+      if(model=="TVAR")
+        colnames(mat)<-c("Intercept",rep(sBnames,2))
+      else if(model=="TVECM")
+        colnames(mat)<-c("ECT-","ECT+", sBnames)
+      Blist<-mat}
+    else{
+      colnames(mat) <- rep(Bnames,2)
+      Bdown <- mat[,c(1:npar)]
+      Bup <- mat[,-c(1:npar)]
+      Blist <- list(Bdown=Bdown, Bup=Bup)}
+  } else{ ##2 thresholds
+    if(commonInter){
+      if(model=="TVAR")
+        colnames(mat)<-c("Intercept",rep(sBnames,3))
+      else if(model=="TVECM")
+        colnames(Bbest)<-c("ECT-","ECT+", sBnames)
+      Blist<-mat}
+    else{
+      colnames(mat)<-rep(Bnames,3)
+      Bdown <- mat[,c(1:npar)]
+      Bmiddle <- mat[,c(1:npar)+npar]
+      Bup <- mat[,c(1:npar)+2*npar]		
+      colnames(Bmiddle) <- Bnames
+      Blist <- list(Bdown=Bdown, Bmiddle=Bmiddle,Bup=Bup)}
+  }
+  return(Blist)
 }
 
 onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){
-	grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
-	store<-mapply(fun,thDelay=grid1[,1],gam1=grid1[,2])
-	posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
-
-	if(trace)
-		cat("Best unique threshold", grid1[posBestThresh,2],"\n")
-	if(length(thDelay)>1&trace)
-		cat("Best Delay", grid1[posBestThresh,1],"\n")
-	res<-list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1], allres=cbind(grid1,store))
-        return(res)
+  grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
+  store<-mapply(fun,thDelay=grid1[,1],gam1=grid1[,2])
+  posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
+  
+  if(trace)
+    cat("Best unique threshold", grid1[posBestThresh,2],"\n")
+  if(length(thDelay)>1&trace)
+    cat("Best Delay", grid1[posBestThresh,1],"\n")
+  res<-list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1], allres=cbind(grid1,store))
+  return(res)
 }#end of function one search
 
 condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL){
   allThUniq <- unique(allTh)
   ng <- length(allTh)
   down<-ceiling(trim*ng)
-
+  
    #correction for case with few unique values
   if(allTh[down]==allTh[down+1]){
     sames<-which(allTh==allTh[down])
