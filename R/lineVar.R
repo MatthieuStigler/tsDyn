@@ -17,7 +17,7 @@ else{
 
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
-if(r!%in%1:(k-1)) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1")
+if(!r%in%c(1:(k-1))) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1")
 t<-T-p			#Size of end sample
 ndig<-getndp(y)
 if(is.null(colnames(data)))
