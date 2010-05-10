@@ -191,6 +191,11 @@ if(model=="VECM"){
     model.specific$S00<-S00
     model.specific$lambda<-eig$values
     model.specific$coint<-ve_4
+    model.specific$estim<-"ML"
+  } else {
+    model.specific$r<-1
+    model.specific$coint<-coint
+    model.specific$estim<-"OLS"
   }
 }
 
@@ -305,16 +310,13 @@ vcov.VAR<-function(object, ...){
 
 toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
   x<-object
-  if(attr(x,"model")=="VECM"&x$model.specific$r>1) stop("toLatex not implemented now for models with more than 1 coint rel") 
+  if(attr(x,"model")=="VECM"&&x$model.specific$r>1) stop("toLatex not implemented now for models with more than 1 coint rel") 
   parenthese<-match.arg(parenthese)
   if(inherits(x,"summary.VAR")){
     a<-myformat(x$coefficients,digits, toLatex=TRUE)
-    if(parenthese=="StDev")
-      b<-myformat(x$StDev,digits,toLatex=TRUE)
-    else if(parenthese=="Pvalue")
-      b<-myformat(x$Pvalues,digits,toLatex=TRUE)
-    if(getOption("show.signif.stars"))
-      
+    inp<-switch(parenthese, "StDev"= x$StDev, "Pvalue"= x$Pvalues )
+    b<-myformat(inp ,digits,toLatex=TRUE)
+    if(getOption("show.signif.stars"))    
       stars<-paste("^{",x$stars,"}", sep="")
     else
       stars<-NULL
