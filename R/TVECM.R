@@ -519,16 +519,7 @@ rownames(Pval) <- paste("Equation", colnames(data))
 
 
 DeltaXnames<-c(paste(rep(colnames(data),p), "t",-rep(1:p, each=k)))
-
-
-if(include=="const")
-  Bcolnames <- c("ECT","Const", DeltaXnames)
-else if(include=="trend")
-  Bcolnames <- c("ECT","Trend", DeltaXnames)
-else if(include=="both")
-  Bcolnames <- c("ECT","Const","Trend", DeltaXnames)
-else if(include=="none")
-  Bcolnames <- c("ECT",DeltaXnames)
+Bcolnames <- c("ECT",switch(include, const="Const", trend="Trend", both=c("Const","Trend"), none=NULL), DeltaXnames)
 
 #partitionning the matrix following the regimes, and naming it
 Blist<-nameB(Bbest,commonInter=ifelse(model=="All",FALSE,TRUE), Bnames=Bcolnames,nthresh=nthresh,npar=npar, model="TVECM", TVECMmodel=model)
