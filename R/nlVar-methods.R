@@ -73,55 +73,6 @@ toMlm.nlVar<-function(x){
   return(mlm)
   }
 
-
-summary.nlVar2<-function(x, ...){
-	r<-4
-	t<-x$t
-	k<-x$k
-
-	Sigma<-matrix(1/t*crossprod(x$residuals),ncol=k)
-	VarCovB<-solve(crossprod(x$model.x))%x%Sigma
-	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
-
-	Tvalue<-x$coefficients/StDevB
-
-	Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
-	Pval<-round(Pval,4)
-	symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
-	stars<-matrix(symp, nrow=nrow(Pval))
-	ab<-matrix(paste(round(x$coefficients,r),"(", round(StDevB,r),")",stars,sep=""), nrow=nrow(Pval))
-	dimnames(ab)<-dimnames(x$coefficients)		
-
-print(ab)
-cat("\n",attributes(symp)$legend)
-# return(Sigma=Sigma, StDevB=StDevB, Pval=Pval)
-}
-
-
-summary.nlVar2<-function(x, ...){
-	r<-4
-	t<-x$t
-	k<-x$k
-
-	Sigma<-matrix(1/t*crossprod(x$residuals),ncol=k)
-	VarCovB<-solve(crossprod(x$model.x))%x%Sigma
-	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
-
-	Tvalue<-x$coefficients/StDevB
-
-	Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
-	Pval<-round(Pval,4)
-	symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","**","*","."," "))
-	stars<-matrix(symp, nrow=nrow(Pval))
-	ab<-matrix(paste(round(x$coefficients,r),"(", round(StDevB,r),")",stars,sep=""), nrow=nrow(Pval))
-	dimnames(ab)<-dimnames(x$coefficients)		
-
-print(ab)
-cat("\n",attributes(symp)$legend)
-# return(Sigma=Sigma, StDevB=StDevB, Pval=Pval)
-}
-
-
 ###Tolatex preliminary###
 #########################
 ###Latex vector
