@@ -14,15 +14,20 @@ logLik.nlVar<-function(object,...){
 }
 
 logLik.VECM<-function(object,r=1,...){
-  if(object$model.specific$estim!="ML") stop("LL not provided for models estimated with OLS")
-  T<-object$t
+  t<-object$t
   k<-object$k
-  S00<-object$model.specific$S00
-  lambda<-object$model.specific$lambda
-  seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (numer of variables")
-
-  -(T*k/2)*log(2*pi) - T*k/2 -(T/2)*log(det(S00))-(T/2)*sum(log(1-lambda[seq]))
-
+  
+  if(object$model.specific$estim=="ML"){
+    S00<-object$model.specific$S00
+    lambda<-object$model.specific$lambda
+    seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (numer of variables")
+    
+    res <- -(t*k/2)*log(2*pi) - t*k/2 -(t/2)*log(det(S00))-(t/2)*sum(log(1-lambda[seq]))
+  } else {
+    Sigmabest<-matrix(1/t*crossprod(object$residuals),ncol=k)
+    res <- log(det(Sigmabest))
+  }
+  return(res)
 }
 
 AIC.nlVar<-function(object,..., k=2){
@@ -30,11 +35,23 @@ AIC.nlVar<-function(object,..., k=2){
 	t*logLik.nlVar(object)+k*(object$npar+object$model.specific$nthresh)
 }
 
-
+AIC.VECM<-function(object,..., k=2,r){
+	kVar<-object$k
+	Rank<-if(missing(r)) object$model.specific$r else r
+	t<-object$t
+	t*logLik.VECM(object,r=Rank)+k*(object$npar+kVar*Rank)
+}
 
 BIC.nlVar<-function(object,..., k=log(object$t)){
 	t<-object$t
 	t*logLik.nlVar(object)+k*(object$nparB+object$model.specific$nthresh)
+}
+
+BIC.VECM<-function(object,..., k=log(object$t),r){
+	kVar<-object$k
+	Rank<-if(missing(r)) object$model.specific$r else r
+	t<-object$t
+	t*logLik.VECM(object,r=Rank)+k*(object$npar+kVar*Rank)
 }
 
 deviance.nlVar<-function(object,...){
