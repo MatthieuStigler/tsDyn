@@ -13,6 +13,18 @@ logLik.nlVar<-function(object,...){
 	log(det(Sigmabest))
 }
 
+logLik.VECM<-function(object,r=1,...){
+  if(object$model.specific$estim!="ML") stop("LL not provided for models estimated with OLS")
+  T<-object$t
+  k<-object$k
+  S00<-object$model.specific$S00
+  lambda<-object$model.specific$lambda
+  seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (numer of variables")
+
+  -(T*k/2)*log(2*pi) - T*k/2 -(T/2)*log(det(S00))-(T/2)*sum(log(1-lambda[seq]))
+
+}
+
 AIC.nlVar<-function(object,..., k=2){
 	t<-object$t
 	t*logLik.nlVar(object)+k*(object$npar+object$model.specific$nthresh)
