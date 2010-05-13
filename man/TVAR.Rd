@@ -41,7 +41,8 @@ nthresh=2: estimation of two thresholds model (three regimes) Conditional on the
 nthresh=3: DOES NOT estimate a 3 thresholds model, but a 2 thresholds model with a whole grid over the threholds parameters (so is realy slow) with a given delay, is there rather to check the consistency of the method nthresh=2
 }
 \seealso{
-TODO
+\code{\link{lineVar}} for the linear VAR/VECM, \code{\link{TVAR.LRtest}} to test for TVAR, \code{\link{TVAR.sim}} to simulate/bootstrap a TVAR. 
+
 }
 \author{Matthieu Stigler}
 \examples{
@@ -55,6 +56,6 @@ TVAR(data, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=TRUE)
 }
 \keyword{ ts }
 \references{
-TODO
+Lo and Zivot (2001) "Threshold Cointegration and Nonlinear Adjustment to the Law of One Price," Macroeconomic Dynamics, Cambridge University Press, vol. 5(4), pages 533-76, September.
 }
 

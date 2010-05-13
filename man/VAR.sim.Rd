@@ -27,7 +27,7 @@ Bootstrap a VAR model. K, the number of variables, is determined by the number o
 
 }
 \seealso{
-TODO
+\code{\link{lineVar}} to estimate a VAR/VECM, \code{\link{TVAR.sim}} to simulate/bootstrap a TVAR.
 }
 \author{Matthieu Stigler}
 \examples{
@@ -37,7 +37,4 @@ var1<-VAR.sim(B=B1,n=100,include="none")
 ts.plot(var1, type="l", col=c(1,2))
 }
 \keyword{ ts }
-\references{
-TODO
-}
 

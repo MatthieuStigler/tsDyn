@@ -39,7 +39,7 @@ nthresh=2: estimation of two thresholds model (three regimes) Conditional on the
 The model can be either with a threshold effect on all variables ("All") or only on the error correction term (ECT) (argument "only ECT"). In the second case, the value for the middle threshold is taken a null, as in Balke and Fomby (1997). 
 }
 \seealso{
-TODO
+\code{\link{VECM}} for the linear VECM, \code{\link{TVAR}} for the threshold VAR, \code{\link{TVECM.SeoTest}} to test for TVECM, \code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
 }
 \author{Matthieu Stigler}
 \examples{
@@ -47,11 +47,27 @@ TODO
 data(zeroyld)
 data<-zeroyld
 
+##Estimate a TVECM (we use here minimal grid, it should be usually much bigger!)
 
-TVECM(data, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common	="All")
+tv<-TVECM(data, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common="All")
+
+print(tv)
+summary(tv)
+
+#Obtain diverse infos:
+AIC(tv)
+BIC(tv)
+
+res.tv<-residuals(tv)
+
+#export the equations as Latex:
+toLatex(tv)
 }
 \keyword{ ts }
 \references{
-TODO
+Hansen, B. and Seo, B. (2002), Testing for two-regime threshold cointegration in vector error-correction models, Journal of Econometrics, 110, pages 293 - 318
+
+Seo, M. H. (2009) Estimation of non linear error-correction models, Working paper
+
 }
 

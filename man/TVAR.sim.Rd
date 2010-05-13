@@ -40,7 +40,7 @@ The second possibility is to bootstrap the series. This is done on a object gene
 
 }
 \seealso{
-TODO
+\code{\link{TVAR}} to estimate a TVAR, \code{\link{VAR.sim}} to simulate/bootstrap a VAR. 
 }
 \author{Matthieu Stigler}
 \examples{
@@ -72,7 +72,4 @@ TVAR.sim(data=serie,nthresh=2, type="boot",mTh=1, Thresh=c(7,9))
 cbind(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, Thresh=c(7,9)),serie)
 }
 \keyword{ ts }
-\references{
-TODO
-}
 

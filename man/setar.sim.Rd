@@ -31,7 +31,7 @@ This function offers the possibility to generate series following a TAR from two
 When the parameter matrix is given, there is only the possibility to simulate series. The starting values (of length equal to the number of lags) can be given. The user should take care for the choice of the starting values and parameters values, since it is not sure that the simulated values will cross the threshold even once.
 }
 \seealso{
-TODO
+\code{\link{SETAR}} to estimate a SETAR, \code{\link{arima.sim}} to simulate an ARMA.
 }
 \author{Matthieu Stigler}
 \examples{
@@ -50,7 +50,5 @@ setar.sim(data=sun,nthresh=2,n=500, type="boot", Thresh=c(6,9))$serie
 cbind(setar.sim(data=sun,nthresh=2,n=500, type="check", Thresh=c(6,9))$serie,sun)
 }
 \keyword{ ts }
-\references{
-TODO
-}
+
 

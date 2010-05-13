@@ -32,9 +32,27 @@ The model used is one where the threshold effect concerns only the cointegrating
 Due to the presence of parameters unidentified under the null hypothesis, the test employed is a Sup-Wald test, that means that for each combination of the thresholds, a Wald Test is computed and the supremum of all tests is taken. 
 For each bootstrap replication, this approach is taken, so that the test is really slow. 
 }
+\seealso{
+\code{\link{TVECM}} for estimating a TVECM, \code{\link{TVECM.sim}} for simulating/bootstrap a TVECM, 
+}
+
 \author{Matthieu Stigler}
 \keyword{ ts }
 \references{
 Seo, Myunghwan, 2006. "Bootstrap testing for the null of no cointegration in a threshold vector error correction model," Journal of Econometrics, vol. 127(1), pages 129-150, September.
 }
+\examples{
+# As the function takes long long time to be executed, we show in in don't run environement
+\dontrun{
+data(zeroyld)
+
+#can be useful to check whether the bootstrap is working: sithout sampling, results of boot should be same as original
+#this is indeed not always the case duye to floating point algorithm
+TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=2, plot=FALSE,check=TRUE)
+
+#then run the function:
+TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=100, plot=FALSE,check=FALSE)
+}
+}
+
 
