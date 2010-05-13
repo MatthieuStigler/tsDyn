@@ -1,0 +1,169 @@
+
+R version 2.11.0 (2010-04-22)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+REvolution R enhancements not installed.  For improved
+performance and other extensions: apt-get install revolution-r
+
+> library(tsDyn)
+Le chargement a nécessité le package : mgcv
+This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+
+Attachement du package : 'Matrix'
+
+The following object(s) are masked from 'package:base':
+
+    det
+
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+> data(zeroyld)
+> 
+> 
+> 
+> 
+> ## Test a few VECM models
+> myVECM1<-VECM(zeroyld, lag=1)
+> myVECM2<-VECM(zeroyld, lag=3, include="const")
+> myVECM3<-VECM(zeroyld, lag=1, estim="ML")
+> myVECM4<-VECM(zeroyld, lag=3, estim="ML")
+> myVECM4<-VECM(zeroyld, lag=3, estim="ML")
+> 
+> summary(myVECM1)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 480
+Number of variables: 2 	Number of estimated slope parameters 8
+AIC -2157.303 	BIC -2148.607 	SSR 176.1575
+Cointegrating vector (estimated byOLS):
+   short.run  long.run
+r1         1 -1.059351
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0082(0.0145)     0.0135(0.0145)      0.0475(0.0682)    
+Equation long.run  0.0875(0.0249)***   -0.0161(0.0248)     0.3271(0.1169)**  
+                   long.run -1       
+Equation short.run 0.0130(0.0392)    
+Equation long.run  0.0508(0.0671)    
+> summary(myVECM2)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 478
+Number of variables: 2 	Number of estimated slope parameters 16
+AIC -2135.868 	BIC -2118.511 	SSR 174.3576
+Cointegrating vector (estimated byOLS):
+   short.run  long.run
+r1         1 -1.059351
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0211(0.0156)     0.0182(0.0147)      0.0396(0.0688)    
+Equation long.run  0.0692(0.0267)**    -0.0093(0.0251)     0.3108(0.1181)**  
+                   long.run -1        short.run -2        long.run -2        
+Equation short.run 0.0144(0.0403)     -0.0549(0.0696)     -0.0113(0.0399)    
+Equation long.run  0.0593(0.0692)     -0.0431(0.1195)     -0.0549(0.0686)    
+                   short.run -3        long.run -3        
+Equation short.run -0.0551(0.0692)     -0.0194(0.0393)    
+Equation long.run  -0.1078(0.1188)     0.0082(0.0674)     
+> summary(myVECM3)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 480
+Number of variables: 2 	Number of estimated slope parameters 8
+AIC -2157.763 	BIC -2149.068 	SSR 176.3897
+Cointegrating vector (estimated byML):
+   short.run  long.run
+r1         1 -1.022065
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0116(0.0153)     0.0169(0.0158)      0.0480(0.0682)    
+Equation long.run  0.0888(0.0262)***   -0.0362(0.0271)     0.3254(0.1171)**  
+                   long.run -1       
+Equation short.run 0.0116(0.0392)    
+Equation long.run  0.0506(0.0673)    
+> summary(myVECM4)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 478
+Number of variables: 2 	Number of estimated slope parameters 16
+AIC -2136.724 	BIC -2119.367 	SSR 174.5642
+Cointegrating vector (estimated byML):
+   short.run long.run
+r1         1  -1.0096
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0272(0.0167)     0.0278(0.0169).     0.0405(0.0688)    
+Equation long.run  0.0684(0.0287)*     -0.0293(0.0290)     0.3087(0.1183)**  
+                   long.run -1        short.run -2        long.run -2        
+Equation short.run 0.0121(0.0404)     -0.0549(0.0695)     -0.0132(0.0400)    
+Equation long.run  0.0586(0.0694)     -0.0464(0.1196)     -0.0554(0.0687)    
+                   short.run -3        long.run -3        
+Equation short.run -0.0550(0.0691)     -0.0215(0.0393)    
+Equation long.run  -0.1105(0.1189)     0.0073(0.0676)     
+> 
+> 
+> 
+> ###Check Johansen MLE: comparing with vars package
+> if(require(vars)){
++ data(Canada)
++ 
++ myVECM<-VECM(Canada, lag=1, include="const", estim="ML")
++ VECM_vars<-cajorls(ca.jo(Canada, spec="trans"))
++ all.equal(VECM_vars$beta, myVECM$model.specific$coint, check.attributes=FALSE)
++ 
++ 
++ ## Check LL
++ l1<-2*(logLik(myVECM,r=4)-logLik(myVECM,r=3))
++ l2<-2*(logLik(myVECM,r=3)-logLik(myVECM,r=2))
++ l3<-2*(logLik(myVECM,r=2)-logLik(myVECM,r=1))
++ l4<-2*(logLik(myVECM,r=1)-logLik(myVECM,r=0))
++ l1;l2;l3;l4
++ ca.jo(Canada, spec="trans")
++ all.equal(c(l1, l2, l3, l4),ca.jo(Canada, spec="trans")@teststat)
++ logLik(myVECM,r=5)
++ 
++ AIC(myVECM,r=0, k=2*log(log(myVECM$t)))
++ AIC(myVECM,r=1, k=2*log(log(myVECM$t)))
++ AIC(myVECM,r=2, k=2*log(log(myVECM$t)))
++ AIC(myVECM,r=3, k=2*log(log(myVECM$t)))
++ AIC(myVECM,r=4, k=2*log(log(myVECM$t)))
++ 
++ 
++ }
+Le chargement a nécessité le package : vars
+Le chargement a nécessité le package : MASS
+Le chargement a nécessité le package : strucchange
+Le chargement a nécessité le package : zoo
+Le chargement a nécessité le package : sandwich
+Le chargement a nécessité le package : urca
+Le chargement a nécessité le package : lmtest
+[1] -73560.03
+Message d'avis :
+In logLik.VECM(myVECM, r = 5) :
+  r cann't be greater than k (numer of variables
+> 
+> proc.time()
+utilisateur     système      écoulé 
+      3.748       0.076       3.553 
