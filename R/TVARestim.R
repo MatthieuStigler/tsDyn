@@ -359,7 +359,9 @@ else if (nthresh==2)
 tZbest<-t(Zbest)
 naX<-rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
 YnaX<-cbind(data, naX)
-colnames(YnaX)<-c(colnames(data),BnamesVec)
+BlistMod<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar,sameName=FALSE )
+BnamesVecMod<-if(class(BlistMod)=="list") c(sapply(BlistMod, colnames)) else colnames(BlistMod)
+colnames(YnaX)<-c(colnames(data),BnamesVecMod)
 
 ###elements to return
 specific<-list()
