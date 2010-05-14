@@ -618,7 +618,7 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"),
         colnames(mat)<-c("ECT-","ECT+", sBnames)
       Blist<-mat
     }else{
-      colnames(mat) <- paste(rep(addRegLetter, each=length(sBnames)),rep(Bnames,2),sep="")
+      colnames(mat) <- paste(rep(addRegLetter, each=length(Bnames)),rep(Bnames,2),sep="")
       Bdown <- mat[,c(1:npar)]
       Bup <- mat[,-c(1:npar)]
       Blist <- list(Bdown=Bdown, Bup=Bup)}
@@ -631,7 +631,7 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"),
         colnames(Bbest)<-c("ECT-","ECT+", sBnames)
       Blist<-mat}
     else{
-      colnames(mat)<-paste(rep(addRegLetter, each=length(sBnames)),rep(Bnames,3),sep="")
+      colnames(mat)<-paste(rep(addRegLetter, each=length(Bnames)),rep(Bnames,3),sep="")
       Bdown <- mat[,c(1:npar)]
       Bmiddle <- mat[,c(1:npar)+npar]
       Bup <- mat[,c(1:npar)+2*npar]		
