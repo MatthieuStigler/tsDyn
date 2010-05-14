@@ -340,47 +340,13 @@ nparbest<-nrow(Bbest)*ncol(Bbest)
 Sigmabest<-matrix(1/t*crossprod(resbest),ncol=k,dimnames=list(colnames(data), colnames(data)))
 SigmabestOls<-Sigmabest*(t/(t-ncol(Bbest)))
 
-###Y and regressors matrix
-tZbest<-t(Zbest)
-naX<-rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
-YnaX<-cbind(data, naX)
-
-
-
-###Pooled AIC
-nobsdown<-sum(dummydown)
-nobsup<-length(dummydown)-nobsdown
-
-SigmabestUnder<-matrix(1/nobsdown*crossprod(resbest*dummydown),ncol=k)
-SigmabestOver<-matrix(1/nobsup*crossprod(resbest*(1-dummydown)),ncol=k)
-
-
-nlikebest<-nobsdown*log(det(SigmabestUnder))+nobsup*log(det(SigmabestOver))
-pooled_aicbest<-nlikebest+2*(nparbest)
-pooled_bicbest<-nlikebest+(log(nobsup)+log(nobsdown))*(nparbest)	#bic #=nlike+log10(t)*4*(1+k); ###BIC
-pooled_info_Thresh<-c(pooled_aicbest, pooled_bicbest)
-
-
-
-
 ###naming and dividing B
 rownames(Bbest) <- paste("Equation", colnames(data))
 LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
 
 Bnames<-c(switch(include, const="Intercept", trend="Trend", both=c("Intercept","Trend"), none=NULL),LagNames)
-# if(include=="const")
-# 	Bnames<-c("Intercept",LagNames)
-# else if(include=="trend")
-# 	Bnames<-c("Trend",LagNames)
-# else if(include=="both")
-# 	Bnames<-c("Intercept","Trend",LagNames)
-# else 
-# 	Bnames<-c(LagNames)
-
 Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
 BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
-
-colnames(YnaX)<-c(colnames(data),BnamesVec)
 colnames(Bbest)<-BnamesVec
 
 ##number of obs in each regime
@@ -388,6 +354,12 @@ if(nthresh==1)
 	nobs <- c(ndown=ndown, nup=1-ndown)
 else if (nthresh==2)
 	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
+
+###Y and regressors matrix
+tZbest<-t(Zbest)
+naX<-rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
+YnaX<-cbind(data, naX)
+colnames(YnaX)<-c(colnames(data),BnamesVec)
 
 ###elements to return
 specific<-list()
@@ -627,33 +599,37 @@ toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 }
 
 
-nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All"){
+nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All", sameName=TRUE){
   model<-match.arg(model)
+  addRegLetter<-if(sameName) NULL else  c("L ", if(nthresh==1) NULL else "M ", "H ")
   if(model=="TVAR")
     sBnames<-Bnames[-which(Bnames=="Intercept")]
   else if(model=="TVECM")
     sBnames<-Bnames[-which(Bnames=="ECT")]
+
+##1 threshold
   if(nthresh==1){
     if(commonInter){
       if(model=="TVAR")
-        colnames(mat)<-c("Intercept",rep(sBnames,2))
+        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,2)),sep="")
       else if(model=="TVECM")
         colnames(mat)<-c("ECT-","ECT+", sBnames)
-      Blist<-mat}
-    else{
-      colnames(mat) <- rep(Bnames,2)
+      Blist<-mat
+    }else{
+      colnames(mat) <- paste(rep(addRegLetter, each=length(sBnames)),rep(Bnames,2),sep="")
       Bdown <- mat[,c(1:npar)]
       Bup <- mat[,-c(1:npar)]
       Blist <- list(Bdown=Bdown, Bup=Bup)}
-  } else{ ##2 thresholds
+##2 thresholds
+  } else{ 
     if(commonInter){
       if(model=="TVAR")
-        colnames(mat)<-c("Intercept",rep(sBnames,3))
+        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,3)),sep="")
       else if(model=="TVECM")
         colnames(Bbest)<-c("ECT-","ECT+", sBnames)
       Blist<-mat}
     else{
-      colnames(mat)<-rep(Bnames,3)
+      colnames(mat)<-paste(rep(addRegLetter, each=length(sBnames)),rep(Bnames,3),sep="")
       Bdown <- mat[,c(1:npar)]
       Bmiddle <- mat[,c(1:npar)+npar]
       Bup <- mat[,c(1:npar)+2*npar]		
