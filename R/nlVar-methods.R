@@ -39,7 +39,9 @@ AIC.VECM<-function(object,..., k=2,r){
 	kVar<-object$k
 	Rank<-if(missing(r)) object$model.specific$r else r
 	t<-object$t
-	t*logLik.VECM(object,r=Rank)+k*(object$npar+kVar*Rank)
+#formula from Gonzalo pitarakis is p^2(k-1) +2pr -r^2+constan, here npar already contains pr
+	nParFree<- object$npar+kVar*Rank- Rank^2
+	t*logLik.VECM(object,r=Rank)+k*nParFree 
 }
 
 BIC.nlVar<-function(object,..., k=log(object$t)){
@@ -51,7 +53,9 @@ BIC.VECM<-function(object,..., k=log(object$t),r){
 	kVar<-object$k
 	Rank<-if(missing(r)) object$model.specific$r else r
 	t<-object$t
-	t*logLik.VECM(object,r=Rank)+k*(object$npar+kVar*Rank)
+	#formula from Gonzalo pitarakis is p^2(k-1) +2pr -r^2+constan, here npar already contains pr
+	nParFree<- object$npar+kVar*Rank- Rank^2
+	t*logLik.VECM(object,r=Rank)+k*nParFree 
 }
 
 deviance.nlVar<-function(object,...){
