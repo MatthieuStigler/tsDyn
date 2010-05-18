@@ -200,13 +200,13 @@ oneSearch<-function(betas, gammas){
 #m<-min(store, na.rm=TRUE)
     na<-sum(ifelse(is.na(store),1,0))
     if(na>0) {
-      if(trace) {cat("\n",na,"(", percent(na/(nrow(store)*ncol(store)),3,by100=TRUE), ") points of the grid lead to regimes with percentage of observations < trim and were not computed\n")}
+      if(trace) {cat(na,"(", percent(na/(nrow(store)*ncol(store)),3,by100=TRUE), ") points of the grid lead to regimes with percentage of observations < trim and were not computed\n", sep="")}
     }
     
     pos<-which(store==min(store, na.rm=TRUE), arr.ind=TRUE) #Best gamma
     if(nrow(pos)>1) {
       if(trace){
-        cat("\n\tThere were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken") }
+        cat("There were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken\n") }
       pos<-pos[1,]
     }
     
@@ -222,7 +222,7 @@ oneSearch<-function(betas, gammas){
     storemap<-mapply(oneThreshTemp, betai=grid[,1], gam=grid[,2])
     bests<-which(storemap==min(storemap, na.rm=TRUE))
     if(length(bests)>1) {
-      if(trace){ cat("\n\tThere were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken")}
+      if(trace){ cat("There were ",length(bests), " thresholds values which minimize the SSR in the first search, the first one was taken\n")}
       bests<-bests[1]}
     beta_grid<-grid[bests,1]
     bestGamma1<-grid[bests,2]
@@ -373,7 +373,7 @@ if(nthresh==2){
     
     positionSecond <- which(store2==min(store2, na.rm=TRUE))
     if(length(positionSecond)>1) {
-      if(trace) cat("\n\tThere were ",length(positionSecond), " thresholds values which minimize the SSR in the conditional step, the first one was taken")
+      if(trace) cat("There were ",length(positionSecond), " thresholds values which minimize the SSR in the conditional step, the first one was taken\n")
     }
     positionSecond<-positionSecond[1]
     if(positionSecond<=length(storeMinus)){
@@ -382,7 +382,7 @@ if(nthresh==2){
       secondBestThresh<-gammaPlus[positionSecond-length(storeMinus)]}
     
     if(trace)
-      cat("\nSecond best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE))
+      cat("Second best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE), "\n")
   }#end if ...many conditions
   
   
@@ -430,7 +430,7 @@ if(nthresh==2){
   positionIter <- which(storeIter==min(storeIter, na.rm=TRUE), arr.ind=TRUE)
   if(nrow(positionIter)>1) {
     if(trace)
-      { cat("\n\tThere were ",length(positionIter), " thresholds values which minimize the SSR in the iterative step, the first one was taken")
+      { cat("There were ",length(positionIter), " thresholds values which minimize the SSR in the iterative step, the first one was taken\n")
         positionIter<-positionIter[1,]}
   }
   rIter <- positionIter[1]
@@ -442,7 +442,7 @@ if(nthresh==2){
   bestThresh <- c(bestThresh1Iter, bestThresh2Iter)
   
   if(trace)
-    cat("\nSecond step best thresholds", bestThresh, "\t\t\t SSR", min(storeIter, na.rm=TRUE))
+    cat("Second step best thresholds", bestThresh, "\t\t\t SSR", min(storeIter, na.rm=TRUE), "\n")
 }#end if nthresh=2
 
 
