@@ -2,7 +2,7 @@ Package: tsDyn
 Type: Package
 Title: Nonlinear time series models with regime switching
 Version: 0.7-23
-Date: 01/04/2010
+Date: 19/05/2010
 Depends: mgcv, Matrix, snow,mnormt
 Imports: nnet, tseriesChaos, tseries, utils
 Suggests: tcltk, sm, scatterplot3d, rgl
