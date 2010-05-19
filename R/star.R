@@ -1,8 +1,8 @@
-## Copyright (C) 2005, 2006, 2007, 2008/2006  Antonio, Fabio Di Narzo
+## Copyright (C) 2005, 2006, 2007, 2008/2006, 2010  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation; either version 2, or (at your option)
+## the Free Software Foundation; either version 3, or (at your option)
 ## any later version.
 ##
 ## This program is distributed in the hope that it will be useful, but
@@ -496,9 +496,6 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
   # 1. Build the nlar object and associated variables.
   if(missing(series))   series <- deparse(substitute(x))
 
-  # Normalize the series.
-  x <- (x - mean(x)) / sd(x);
-  
   str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 
   xx <- str$xx
