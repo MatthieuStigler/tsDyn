@@ -34,7 +34,7 @@ star(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
 TODO
 }
 \seealso{\code{\link{addRegime}}}
-\author{ J. L. Aznarte }
+\author{ J. L. Aznarte M. }
 \examples{
 mod.star <- star(log10(lynx), m=2, mTh=c(0,1), control=list(maxit=3000))
 mod.star
