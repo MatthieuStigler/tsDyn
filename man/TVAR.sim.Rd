@@ -58,7 +58,7 @@ ts.plot(var2, type="l", col=c(1,2))
 
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
-sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5))
+sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=matrix(c(5.2, 5.5), nrow=1))
 
 #estimate the new serie
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)

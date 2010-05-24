@@ -34,7 +34,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   
 
 ###setarTest 2: search best thresholds: call selectSETAR
-  search<-selectSETAR(x, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model="TAR",nthresh=2,trim=trim,criterion = "SSR",thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
+  search<-selectSETAR(x, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model="TAR",nthresh=2,trim=trim,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3) 
 
   firstBests<-search$firstBests
   bests<-search$bests
@@ -75,7 +75,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
     SSR<-deviance(linearBoot)
     
   ###setarTest 2: search best thresholds: call selectSETAR
-    searchBoot<-selectSETAR(bootLin, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
+    searchBoot<-selectSETAR(bootLin, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,  plot=FALSE,max.iter=3) 
     
     firstBests<-searchBoot$firstBests
     bests<-searchBoot$bests
@@ -98,7 +98,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   
   
   ###setarTest 2: search best thresholds: call selectSETAR
-    searchBoot<-selectSETAR(bootSet, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,ngrid="ALL",  plot=FALSE,max.iter=3) 
+    searchBoot<-selectSETAR(bootSet, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,  plot=FALSE,max.iter=3) 
     
     firstBests<-searchBoot$firstBests
     bests<-searchBoot$bests

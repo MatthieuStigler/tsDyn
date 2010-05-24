@@ -190,6 +190,35 @@ The summary command returns asymptotics standard errors for the estimated coeffi
 
 Note that in R there are plenty of functions for AR (and, more generally, ARMA) models estimation, with different estimation methods, such as ML, CLS, Yule-Walker, $\ldots$. If you really need to fit linear models, use these methods directly.
 
+A interesting reparametrization of the model can be done using differences, as in the ADF test for unit roots:
+
+\begin{equation}\label{eq:linearADF}
+\Delta X_{t+s} = \phi + \rho X_t + \zeta_1 \Delta X_{t-d} + \ldots + \zeta_{m-1} \Delta X_{t-(m-2)d} + \epsilon_{t+s}
+\end{equation}
+
+We have (see Hamilton~\cite{Hamilton1994}): 
+\begin{itemize}
+ \item $\rho=\phi_0+\phi_1+\ldots+\phi_m$
+\item $\zeta_i =-(\phi_{j+1}+ \phi_{j+2}+\ldots+\phi_{m}) \qquad \text{for } j=1,2, \ldots, m-1$
+\end{itemize}
+
+It has the major advantage that the stationarity condition that all the roots of the polynomial in (\ref{eq:linear}) lying in the unit root circle is in the ADF representation simply that $-1<\rho<0$. 
+
+This can be set in \tsDyn using the argument \texttt{type} to \texttt{ADF} and using one lag less in \texttt{m}:
+\begin{Scode}
+usual <- linear(lynx, m=3)
+adf<- linear(lynx, m=2, type="ADF")
+\end{Scode}
+
+Note that it is only a reparametrization, the model estimated being the same:
+
+\begin{Scode}
+ all.equal(deviance(adf), deviance(usual))
+all.equal(residuals(usual), residuals(adf))
+\end{Scode}
+
+
+
 \subsection{SETAR models}
 \begin{equation}
 X_{t+s} = \left\{
@@ -224,18 +253,37 @@ obj <- setar(x, m=, d=, steps=, thVar= )
 \end{Scode}
 where \texttt{thVar} is the vector containing the threshold variable values.
 
-The threshold variable isn't the only additional parameter governing the SETAR model. One can specify the \emph{low} and \emph{high} regime autoregressive orders $L$ and $H$. These can be specified with the arguments \texttt{mL} and \texttt{mH}, respectively:
+
+Models with two thresholds and hence three regime are aslo availabe through the argument \texttt{nthresh}, its default value being 1. 
 \begin{Scode}{eval=FALSE}
-obj <- setar(x, m=, d=, steps=, thDelay = , mL =, mH =)
+obj <- setar(x, m=, d=, steps=, thDelay=, nthresh=2)
 \end{Scode}
-If not specified, \texttt{mL} and \texttt{mH} defaults to \texttt{m}.
 
 Another hyper-parameter one can specify is the threshold value $\text{th}$, via the additional argument \texttt{th}.
-If not specified, this is estimated by fitting the model for a grid of different, reasonable values of $\text{th}$, and taking the best fit as the final $\text{th}$ estimate.
+If not specified, this is estimated by fitting the model for a grid of different, by default all values of $\text{th}$, and taking the best fit as the final $\text{th}$ estimate. This is done calling internally selectSETAR() with \texttt{criterion="SSR"}. 
 
 Note that, conditional on $\{Z_t\leq \text{th}\}$, the model is linear. So, for a fixed threshold value, the CLS estimation is straightforward.
 
 The summary command for this model returns asymptotic standard errors for the estimated $\phi$ coefficients, based on the assumption that $\epsilon_t$ are normally distributed.
+
+
+The threshold variable isn't the only additional parameter governing the TAR model. One can specify the \emph{low} and \emph{high} regime autoregressive orders $L$ and $H$. These can be specified with the arguments \texttt{mL} and \texttt{mH}, respectively:
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay = , mL =, mH =)
+\end{Scode}
+If not specified, \texttt{mL} and \texttt{mH} defaults to \texttt{m}.
+One can decide also only to select a few values between \texttt{1:mL} and \texttt{1:mH}. This is possible using \texttt{ML} and \texttt{MH}. Hence to have a first regime with lag 1 and 3, the second with all 3, would be: \texttt{ML=c(1,3)} and \texttt{MH=1:3}. 
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay = , ML =, MH =)
+\end{Scode}
+
+
+As suggested in Enders and Granger (1997)\cite{EndersGranger1998}, the threshold variable can be in differences, leading to the so-called Momentum-TAR (M-TAR). In this case, the regime switching depends not on the position of the variable at time $t-1$ but on its signs at $t-1$. Hence, on can estimate whethera variable behaves differently whether it was previously increasing or decreasing. A M-TAR can be specified setting the argument \texttt{model="MTAR"}. Note that when the number of lags \texttt{m} is equal to the delay \texttt{d}, there is one less observation in the series\footnote{This is for now handled not so properly and may result in failures in the different methods}.
+
+An interesting specification of the model in terms of another representation is possible with \texttt{type = c("level", "diff", "ADF")}. This will either set all variables in levels, in difference or as in the specification of the ADF test:
+
+Note that using \texttt{type=level} or \texttt{ADF} results in the same model fit but is a convenient way to test for a unit root, as the value of the variable in levels should be smaller than one. 
+
 
 \subsection{LSTAR models}
 The LSTAR model can be viewed as a generalization of the above defined SETAR model:
@@ -552,6 +600,126 @@ At this point a natural question can be:
 \emph{why not use directly the original time series as input to \texttt{lyap\_k} instead of model-generated observations}?
 The answer here is that we have a too short time series for succesfully applying the Kantz algorithm, 
 so a preliminary modelling for generating more observations is necessary.
+
+\section{Annex A: Implementation details}
+
+This section is devoted to document some points in the the implementation and is intended rather for developers. Users will hopefully not need it. 
+
+\subsection{nlar.struct}
+Until Version 0.6 the building of data was organized as follows:
+\begin{itemize}
+ \item \texttt{setar}, \texttt{star} and others all called \texttt{nlar.struct}
+\item \texttt{nlar.struct} calls \texttt{embedd} from package \texttt{tseriesChaos}, and stores it, returning xx, yy, m and d after some checks. 
+
+\begin{verbatim}
+xxyy <- embedd(x, lags=c((0:(m-1))*(-d), steps) )
+
+  extend(list(), "nlar.struct",
+         x=x, m=m, d=d, steps=steps, series=series,
+         xx=xxyy[,1:m,drop=FALSE], yy=xxyy[,m+1], n.used=length(x))
+ 
+\end{verbatim}
+\item But to use xx and yy the values are recomputed with new function \texttt{getXX(str)} used on str instead of using the returned value \texttt{str\$xx}. It has been implemented as a class:
+\begin{verbatim}
+ getXXYY <- function(obj, ...) UseMethod("getXXYY")
+
+getXXYY.nlar.struct <- function(obj, ...) {
+	x <- obj$x
+	m <- obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getXX <- function(obj, ...)
+	getXXYY(obj,...)[ , 1:obj$m , drop=FALSE]
+
+getYY <- function(obj, ...)
+	getXXYY(obj, ...)[ , obj$m+1]
+
+\end{verbatim}
+\end{itemize}
+
+\paragraph{Extension to MTAR models and ADF specification}
+
+Extension to MTAR and ADF required use of both levels and lags in the same specification. That means, one needs also to obtain the differenced series. This will affect the end sample size.
+
+In the usual case, end sample size $t$ with be equal to $t=T-m$. It would be different (T-m-thDelay) with $thDelay>m$ but it is excluded. 
+In some cases, the MTAR and ADF specification will lead to reduce the size of the end sample with 1 less observation, if
+\begin{itemize}
+ \item MTAR: the lag of the transition delay in the MTAR is: $thDelay==(m-1)$
+\item ADF and diff model: allways
+\end{itemize}
+
+To do this, some workarounds were needed, that are for now rather unsatisfactory. Similar functions as \texttt{getXX} and \texttt{getYY }have been created for the lags, see:
+\begin{verbatim}
+ getdXXYY <- function(obj, ...) UseMethod("getdXXYY")
+
+getdXXYY.nlar.struct <- function(obj,same.dim=FALSE, ...) {
+	x <- obj$x
+	m<-if(same.dim) obj$m-1 else obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getdXX <- function(obj, ...)
+	diff(getdXXYY(obj,...))[ , 1:obj$m , drop=FALSE]
+
+getdYY <- function(obj, ...)
+	diff(getdXXYY(obj, ...))[ , obj$m+1]
+
+getdX1 <- function(obj, ...)
+	getdXXYY(obj,...)[ -1, 1, drop=FALSE]
+\end{verbatim}
+
+But when there is one less observation (see cases above), problems arise. So setar looks like:
+\begin{verbatim}
+   SeqmaxTh<-seq_len(maxTh+1)
+
+if(model=="TAR"){
+      if(type =="level")
+	z <- getXX(str)[,SeqmaxTh]
+      else
+	z<-getXX(str)[-1,SeqmaxTh]
+    }
+    else{
+      if(max(thDelay)==m-1){
+	if(type =="level"){
+	  z<-getdXX(str)[, SeqmaxTh]
+	  xx<-xx[-1,, drop=FALSE]
+	  yy<-yy[-1]
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	else 
+	  z<-getdXX(str)[, SeqmaxTh]
+      }
+      else{
+	if(type =="level")
+	  z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
+	else
+	  z<-getdXX(str)[,SeqmaxTh]
+      }
+    }
+\end{verbatim}
+
+The biggest problem is that sometimes the xx vector need to be cut...
+\begin{verbatim}
+ 	z<-getXX(str)[-1,SeqmaxTh]
+\end{verbatim}
+
+And so there are currently some bugs arising:
+\begin{Scode}{eval=FALSE}
+plot(setar(lynx, m=1, model="MTAR"))
+plot(setar(lynx, m=3, type="ADF"))
+ #both won't work
+\end{Scode}
+
+
+\paragraph{Adding arguments ML, MM}
+Args \texttt{ML}, \texttt{MH} (and \texttt{MM} when \texttt{nthresh}$=2$) have been added to allow to have holes in the lag structure. They are surely conflicting with arg \texttt{d}, that is, if arg \texttt{d} is not 1. 
+
 \nocite{*}
 \bibliographystyle{amsplain}
 

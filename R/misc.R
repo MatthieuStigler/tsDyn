@@ -1,6 +1,6 @@
-.onAttach <- function(...) { 
-	cat("Version 0.7 of package tsDyn will have probably a few minor revisions rapidly.\n User should update the package often.\n Minor revisions will be announced only on the tsdyn mailing list: tsdyn@googlegroups.com\n")
-}
+#.onAttach <- function(...) { 
+#	cat("Version 0.7 of package tsDyn will have probably a few minor revisions rapidly.\n User should #update the package often.\n Minor revisions will be announced only on the tsdyn mailing list: #tsdyn@googlegroups.com\n")
+#}
 
 extend <- function(...)
 	UseMethod("extend")

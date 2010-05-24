@@ -57,11 +57,11 @@ b<-TVECM.sim(B=rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0)), nthresh=0, n=100,beta=1
 ##Bootstrap a TVAR with 1 threshold (two regimes)
 data(zeroyld)
 dat<-zeroyld
-TVECMobject<-TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE)
+TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE)
 TVECM.sim(TVECMobject=TVECMobject,type="boot")
 
 ##Check the bootstrap
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
 }
 \keyword{ ts }
 \references{

@@ -36,7 +36,7 @@ if(!missing(B)){
     stop("Matrix B bad specified")
   y<-matrix(0,ncol=nB, nrow=n)
   if(!is.null(starting)){
-    if(all(dim(as.matrix(starting))==c(nB,p)))
+    if(all(dim(as.matrix(starting))==c(p,nB)))
       y[seq_len(p),]<-starting
     else
       stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables")
@@ -193,6 +193,11 @@ if(show.parMat)
   print(Bmat)
 res<-round(Yb, ndig)
 return(res)
+}
+
+
+VAR.sim<-function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE){
+ TVAR.sim(B=B, nthresh=0, type="simul", n=n, lag=lag, include = include, thVar=NULL, mTh=1, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, round=FALSE)
 }
 
 if(FALSE){

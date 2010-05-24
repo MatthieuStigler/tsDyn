@@ -199,8 +199,7 @@ z<-as.matrix(z)
 #if nthresh==1, try over a reasonable grid (30), if nthresh==2, whole values
 #call the function selectSETAR
   if (missing(th)|length(thDelay)>1) { 
-    ngrid<-ifelse(nthresh==1,30,"ALL") #if 1 thresh grid with 30 values, if 2 th all values
-    search<-selectSETAR(x, m, d=d, steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR",ngrid=ngrid, plot=FALSE,max.iter=2, type=type, restriction=restriction)
+    search<-selectSETAR(x, m, d=d, th=list(ngrid="All"), steps=d, series, mL=mL, mH=mH,mM=mM, thDelay=thDelay, mTh, thVar, trace=trace, include = include, common=common, model=model, ML=ML,MH=MH, MM=MM,nthresh=nthresh,trim=trim,criterion = "SSR", plot=FALSE,max.iter=2, type=type, restriction=restriction)
     thDelay<-search$bests[1]
     th<-search$bests[2:(nthresh+1)]
     nested<-TRUE
@@ -329,6 +328,7 @@ if(type=="level"){
 	res$common<-common  	#wheter arg common was given by user
 	res$nthresh<-nthresh 	#n of threshold
 	res$model<-model
+	res$type<-type
 	res$restriction<-restriction
 	res$trim<-trim
 	res$regime<-regime
@@ -358,18 +358,11 @@ if(type=="level"){
 getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
 	regime <- match.arg(regime)
 	x <- x$coef
-	x1 <- x[grep(paste("^phi", regime, "\\.", sep=""), names(x))]
+	x1 <- x[grep(paste("phi", regime, "\\.", sep=""), names(x))]
 	x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
 	x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
 	  return(c(x1, x2, x3))
 }
-
-getTh<-function(x){
-	allth<-x[grep("th",names(x))]
-	if(length(grep("thD",names(allth)))!=0)
-	  allth<-allth[-grep("thD",names(allth))]
-	return(allth)
-	}
 
 
 #gets a vector with names of the arg inc
@@ -614,19 +607,23 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
 
 toLatex.setar <- function(object, digits=3, ...) {
   obj <- object
-  if(obj$model.specific$nthresh > 1)
-    stop("not implemented")
+  mod<-obj$model.specific
+  if(mod$nthresh > 1 & mod$common!="none")
+    stop("currently not implemented")
+  model<-mod$model
+  type<-mod$type
   res <- character()
-  ML <- obj$model.specific$ML
-  MH <- obj$model.specific$MH
+  ML <- if(type=="ADF") c(mod$ML, max(mod$ML)+1) else mod$ML #workaround...
+  MH <- if(type=="ADF") c(mod$MH, max(mod$MH)+1) else mod$MH #workaround...
   steps <- obj$str$steps
   d <- obj$str$d
   betaL <- formatSignedNum(getSetarXRegimeCoefs(obj, "L"), digits=digits, ...)
   betaH <- formatSignedNum(getSetarXRegimeCoefs(obj, "H"), digits=digits, ...)
   th <- formatSignedNum(getTh(coefficients(obj)), digits=digits, ...)
   res[1] <- "\\["
-  res[2] <- paste("X_{t+",steps,"} = \\left\\{\\begin{array}{lr}",sep="")
-  translateCoefs <- function(coefs, lags) {
+  Xt<-if(type=="level") " X_{t-" else " \\Delta X_{t-"
+  res[2] <- paste(Xt,steps,"} = \\left\\{\\begin{array}{lr}",sep="")
+  translateCoefs <- function(coefs, lags, type=c("level", "diff", "ADF")) {
     ans <- ""
     if(length(lags) == (length(coefs) - 1)) { #there is a constant term
       iconst <- grep("const", names(coefs))
@@ -634,30 +631,36 @@ toLatex.setar <- function(object, digits=3, ...) {
       ans <- paste(ans, coefs[iconst], " ", sep="")
       coefs <- coefs[-iconst]
     }
+    m<-length(coefs)
+    a<-switch(match.arg(type), "level"=m, "diff"=0, "ADF"=1)
+    b<-switch(match.arg(type), "level"=0, "diff"=m, "ADF"=m-1)
+    Xtt<-c(rep(" X_{t-",a), rep(" \\Delta X_{t-", b))
     for(j in seq_along(coefs)) {
       lag <- (lags[j] - 1) * d
-      ans <- paste(ans, coefs[j], " X_{t-", lag, "}", sep="")
+      ans <- paste(ans, coefs[j], Xtt[j], lag, "}", sep="")
     }
     return(ans)
   }
-  res[3] <- translateCoefs(betaL, ML)
+  res[3] <- translateCoefs(betaL, ML, type=type)
   res[3] <- paste(res[3], "& Z_t \\leq ", th, "\\\\", sep="")
-  res[4] <- translateCoefs(betaH, MH)
+  res[4] <- translateCoefs(betaH, MH, type=type)
   res[4] <- paste(res[4], "& Z_t > ", th, "\\\\", sep="")
   res[5] <- "\\end{array}\\right."
   res[6] <- "\\]"
   res[7] <- ""
 
-  if(!obj$model.specific$externThVar) {
-    mTh <- formatSignedNum(obj$model.specific$mTh)
+  if(!mod$externThVar) {
+    mTh <- formatSignedNum(mod$mTh)
     m <- obj$str$m
     res[8] <- "\\["
     res[9] <- "Z_t = "
+    thXt<-if(model=="TAR") " X_{t-" else " \\Delta X_{t-"
     for(j in seq_len(m)) {
-      if(obj$model.specific$mTh[j]==1)
-        res[9] <- paste(res[9],"X_{t-",(j-1)*d,"} ",sep="")
-      else if(obj$model.specific$mTh[j]!=0)
-        res[9] <- paste(res[9], obj$model.specific$mTh[j]," X_{t-",(j-1)*d,"} ",sep="")
+      if(mod$mTh[j]==1){
+        res[9] <- paste(res[9],thXt,(j-1)*d,"} ",sep="")
+      }
+      else if(mod$mTh[j]!=0)
+        res[9] <- paste(res[9], mod$mTh[j],thXt,(j-1)*d,"} ",sep="")
     }
     res[10] <- "\\]"
     res[11] <- ""

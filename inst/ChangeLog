@@ -1,3 +1,23 @@
+-version 0.7-23
+-correct bug TVAR.sim
+-export function VAR.sim, simpler wrapper for TVAR.sim
+
+-version 0.7-22
+-correct bug in HanSeo_TVECM, which can now be used (but still not exported)
+
+-version 0.7-2
+-Correct degrees of freedom for VAR covariance matrix
+-Standardize output of lineVar with lm
+-update slightly vignette
+-add specific vignette on threshold cointegration
+
+-version 0.7-1
+-Change args of TVECM from nn to ngridBeta, from ngridG to ngridTh, model to common
+-Add functions regime to extract variabl indicating state regime
+-Add function getTh to extract threshold values
+-Adapt toLatex.setar to handle MTAR models. Still needs improvement
+-Fix bugs in TVECM, in HansSeo_TVECM and in setar
+
 -version 0.7-0
 -added possibilty to have two thresolds and hence three regimes in setar and selectSETAR (arg nthresh)
 -created new functions for unit roots tests: KapShinTest() and BBCTest()

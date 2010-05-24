@@ -12,8 +12,8 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
 	setar, lstar, star, availableModels,
        nlarDialog, linear, isLinear, nnetTs, aar,
 	star, 
-       TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, TVECM.SeoTest, lineVar, setarTest,
-	BIC, MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim)
+       TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
+	BIC, MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime, getTh)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
@@ -77,6 +77,11 @@ S3method(coef, nlVar)
 S3method(AIC, nlVar)
 S3method(BIC, nlVar)
 S3method(BIC, lm)
+S3method(regime, setar)
+S3method(getTh, default)
+S3method(getTh, setar)
+S3method(getTh, summary.setar)
+S3method(getTh, nlVar)
 S3method(logLik, nlVar)
 S3method(residuals, nlVar)
 S3method(deviance, nlVar)
@@ -84,6 +89,7 @@ S3method(fitted, nlVar)
 S3method(print, llar)
 S3method(plot, llar)
 S3method(as.data.frame, llar)
+S3method(vcov, VAR)
 
 
 useDynLib(tsDyn)

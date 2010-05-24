@@ -1,4 +1,9 @@
-TVECM<-function(data,lag=1, bn=50, ngridG=50, trim=0.05, nthresh=1,plot=TRUE, dummyToBothRegimes=TRUE, methodMapply=FALSE, gamma1=list(exact=NULL, int=c("from","to"), around="val"),gamma2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), model=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),beta0=0,trace=TRUE ) {
+TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=TRUE,  th1=list(exact=NULL, int=c("from","to"), around="val"), th2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), common=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),dummyToBothRegimes=TRUE,beta0=0,methodMapply=FALSE, trace=TRUE ) {
+bn<-ngridBeta
+ngridG<-ngridTh
+gamma1<-th1
+gamma2<-th2
+
 y<-as.matrix(data)
 T<-nrow(y) #T: number of observations
 p<-lag #p: Number of lags
@@ -11,7 +16,7 @@ if(is.null(colnames(data))==TRUE)
 ndig<-getndp(y)
 restr<-match.arg(restr)
 include<-match.arg(include)
-model<-match.arg(model)
+model<-match.arg(common)
 model<-switch(model, "All"="All", "only_ECT"="only_ECT")
 
 ysmall<-y[(p+1):T,]
@@ -224,8 +229,8 @@ oneSearch<-function(betas, gammas){
     }
 
 
-  gammaMLE<-0.02321329
-  betaMLE<-0.8916303
+  #gammaMLE<-0.02321329
+  #betaMLE<-0.8916303
 
 #bestGamma1<-gammaMLE
 #beta_grid<-betaMLE
@@ -234,12 +239,15 @@ oneSearch<-function(betas, gammas){
   if(is.null(gamma1$exact)==FALSE&is.null(beta$exact)==FALSE){plot<-FALSE}
 
   if(plot==TRUE){
-    if(is.null(beta$exact)==FALSE&is.null(gamma1$exact)==TRUE){
-      plot(gammas,store, type="l", xlab="Threshold parameter gamma", ylab="Residual Sum of Squares", main="Grid Search")}
-    if(is.null(beta$exact)==TRUE&is.null(gamma1$exact)==FALSE){
-      plot(betas,store, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares", main="Grid Search")}
-    if(is.null(beta$exact)==TRUE&is.null(gamma1$exact)==TRUE){
-                                        #mat[!is.na(apply(mat,1,sum)),]
+    if(!is.null(beta$exact)&is.null(gamma1$exact)){ #only gamma estimated
+      plot(gammas,store, type="l", xlab="Threshold parameter gamma", ylab="Residual Sum of Squares", main="Grid Search")
+      points(x=bestGamma1, y=min(store, na.rm=TRUE), col=2, cex=2)
+    }
+    if(is.null(beta$exact)&!is.null(gamma1$exact)){ #only beta estimated
+      plot(betas,store, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares", main="Grid Search")
+      points(x=beta_grid, y=min(store, na.rm=TRUE), col=2, cex=2)
+    }
+    if(is.null(beta$exact)&is.null(gamma1$exact)){ #both estimated #mat[!is.na(apply(mat,1,sum)),]                  
       options(warn=-1)
       betaRSS<-apply(store,2,FUN=min, na.rm=TRUE)
       gammaRSS<-apply(store,1,FUN=min, na.rm=TRUE)
@@ -251,7 +259,9 @@ oneSearch<-function(betas, gammas){
       points(x=bestGamma1, y=min(store, na.rm=TRUE), col=2, cex=2)
       plot(betas,betaRSS, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares")
       abline(v=betaLT, lty=3)
-      legend("topright", "OLS estimate from linear VECM", lty=3)}
+      points(x=beta_grid, y=min(store, na.rm=TRUE), col=2, cex=2)
+      legend("topright", "OLS estimate from linear VECM", lty=3)
+    }
   }#end of the plot
   
 #result of the whole function to search for one threshold
@@ -571,15 +581,16 @@ environment(TVECM)<-environment(star)
 summary(lm(zeroyld[,1]~zeroyld[,2]-1))
 summary(lm(zeroyld[,1]~zeroyld[,2]))
 
-TVECM(dat, nthresh=1,lag=1, bn=80, ngridG=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
+TVECM(dat, nthresh=1,lag=1, ngridBeta=80, ngridTh=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
 beta0<-rep(1.12,480)
-TVECM(dat, nthresh=1,lag=1, bn=20, ngridG=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
+TVECM(dat, nthresh=1,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
 
 
-tvecm<-TVECM(dat, nthresh=1,lag=2, bn=10, ngridG=10, plot=FALSE,trim=0.05, model="All")
-
+tvecm<-TVECM(dat, nthresh=1,lag=2, ngridBeta=10, ngridTh=10, plot=FALSE,trim=0.05, model="All")
+#example in working paper 
+tvecm <- TVECM(zeroyld, nthresh = 2, lag = 1, ngridBeta = 60, ngridTh = 30,plot = TRUE, trim = 0.05, model = "All", beta = list(int = c(0.7, 1.1)))
 ###To FIX:
-tvecm2<-TVECM(dat, nthresh=2,lag=1, bn=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridG=20, plot=FALSE,trim=0.05, model="All")
+tvecm2<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridTh=20, plot=FALSE,trim=0.05, model="All")
 class(tvecm)
 tvecm
 print(tvecm)
@@ -640,7 +651,7 @@ summary.TVECM<-function(object,digits=4,...){
   x$aic<-AIC.nlVar(x)
   x$bic<-BIC.nlVar(x)
   x$SSR<-deviance.nlVar(x)
-  class(x)<-c("summary.TVECM", "TVECM")
+  class(x)<-c("summary.TVECM", "TVECM", "nlVar")
   return(x)
   
 }
