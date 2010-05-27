@@ -30,11 +30,15 @@ ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
 model<-match.arg(model)
 estim<-match.arg(estim)
 I<-match.arg(I)
-if(!r%in%1:(k-1)) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1")
+if(!r%in%1:(k-1)) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1\n")
 if(model=="VECM"&estim=="2OLS"&r>1){
-  warning("Estimation of more than 1 coint relationship is not possible with estim '2OLS'. Switched to Johansen 'ML'")
+  warning("Estimation of more than 1 coint relationship is not possible with estim '2OLS'. Switched to Johansen 'ML'\n")
   estim<-"ML"
 }
+
+minPara<-p*k+ninclude
+if(!t>minPara) stop("Not enough observations. Try reducing lag number\n")
+
 ###Construct variables
 Y <- y[(p+1):T,] #
 X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
