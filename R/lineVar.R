@@ -125,8 +125,8 @@ else if(model=="VECM"&estim=="ML"){
     S01<-crossprod(u,v)
     SSSS<-solve(S11)%*%t(S01)%*%solve(S00)%*%S01
     eig<-eigen(SSSS)
-    ve<-eig$vectors
-    va<-eig$values
+    ve<-Re(eig$vectors)
+    va<-Re(eig$values)
     #normalize eigenvectors
     ve_no<-apply(ve,2, function(x) x/sqrt(t(x)%*%S11%*%x))
     ve_2<-t(t(ve_no)/diag(ve_no)) 
@@ -189,7 +189,7 @@ if(model=="VECM"){
   model.specific$LRinclude<-LRinclude
   if(estim=="ML"){
     model.specific$S00<-S00
-    model.specific$lambda<-eig$values
+    model.specific$lambda<-va
     model.specific$coint<-ve_4
     model.specific$estim<-"ML"
   } else {
