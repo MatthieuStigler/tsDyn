@@ -18,7 +18,7 @@ else{
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
 t<-T-p			#Size of end sample
-ndig<-getndp(y)
+
 if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 
