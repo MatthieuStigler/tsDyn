@@ -97,8 +97,7 @@ if(model=="VECM"&estim=="2OLS"){
     betaLT_std <- c(1,summary(cointLM)$coef[1:(k-1),2])
     names(betaLT_std)<-colnames(data)
   }
-	#beta is given by user
-  else{
+else{
     if(LRinclude!="none")
       warning("Arg LRinclude not taken into account when beta is given by user")
     coint<-c(1, -beta)
@@ -222,7 +221,7 @@ return(z)
 
 #### VECM function: wrapper to lineVar
 VECM<-function(data, lag,r=1, include = c( "const", "trend","none", "both"), beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
-  lineVar(data, lag, r=r,include = include, model="VECM" ,beta=NULL, estim=estim,LRinclude=LRinclude)
+  lineVar(data, lag, r=r,include = include, model="VECM" ,beta=beta, estim=estim,LRinclude=LRinclude)
 
 
 
