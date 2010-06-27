@@ -531,6 +531,7 @@ specific$threshEstim<-ifelse(is.null(gamma1), TRUE, FALSE) #whether the threshol
 specific$nthresh<-nthresh	#number of thresholds
 specific$nreg<-nthresh+1	#num of regimes
 specific$beta<-bestBeta	#beta value
+specific$coint<-matrix(c(1,-bestBeta), nrow=k, dimnames=list(colnames(data),"r1"))	#beta value
 specific$nrowB<-npar		#number of parameters
 specific$nobs<-nobs		#percent of observations in each regime
 specific$model<-model
