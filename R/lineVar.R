@@ -200,7 +200,7 @@ if(model=="VECM"){
     model.specific$estim<-"ML"
   } else {
     model.specific$r<-1
-    model.specific$coint<-coint.export
+    model.specific$coint<-coint_export
     model.specific$estim<-"OLS"
   }
 }
