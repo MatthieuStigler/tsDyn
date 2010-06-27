@@ -1,5 +1,5 @@
 
-R version 2.11.0 (2010-04-22)
+R version 2.11.1 (2010-05-31)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -40,9 +40,10 @@ Le chargement a nécessité le package : mnormt
 > ## Test a few VECM models
 > myVECM1<-VECM(zeroyld, lag=1)
 > myVECM2<-VECM(zeroyld, lag=3, include="const")
+> myVECM2a<-VECM(zeroyld, lag=3, include="const", beta=-1)
 > myVECM3<-VECM(zeroyld, lag=1, estim="ML")
 > myVECM4<-VECM(zeroyld, lag=3, estim="ML")
-> myVECM4<-VECM(zeroyld, lag=3, estim="ML")
+> 
 > 
 > summary(myVECM1)
 #############
@@ -63,6 +64,27 @@ Equation long.run  0.0875(0.0249)***   -0.0161(0.0248)     0.3271(0.1169)**
 Equation short.run 0.0130(0.0392)    
 Equation long.run  0.0508(0.0671)    
 > summary(myVECM2)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 478
+Number of variables: 2 	Number of estimated slope parameters 16
+AIC -2135.868 	BIC -2118.511 	SSR 174.3576
+Cointegrating vector (estimated byOLS):
+   short.run  long.run
+r1         1 -1.059351
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0211(0.0156)     0.0182(0.0147)      0.0396(0.0688)    
+Equation long.run  0.0692(0.0267)**    -0.0093(0.0251)     0.3108(0.1181)**  
+                   long.run -1        short.run -2        long.run -2        
+Equation short.run 0.0144(0.0403)     -0.0549(0.0696)     -0.0113(0.0399)    
+Equation long.run  0.0593(0.0692)     -0.0431(0.1195)     -0.0549(0.0686)    
+                   short.run -3        long.run -3        
+Equation short.run -0.0551(0.0692)     -0.0194(0.0393)    
+Equation long.run  -0.1078(0.1188)     0.0082(0.0674)     
+> summary(myVECM2a)
 #############
 ###Model VECM 
 #############
@@ -123,6 +145,32 @@ Equation long.run  0.0586(0.0694)     -0.0464(0.1196)     -0.0554(0.0687)
 Equation short.run -0.0550(0.0691)     -0.0215(0.0393)    
 Equation long.run  -0.1105(0.1189)     0.0073(0.0676)     
 > 
+> myVECM1$model.specific$coint
+                 r1
+short.run  1.000000
+long.run  -1.059351
+> myVECM1$model.specific$beta
+                 r1
+short.run  1.000000
+long.run  -1.059351
+> 
+> myVECM2a$model.specific$coint
+                 r1
+short.run  1.000000
+long.run  -1.059351
+> myVECM2a$model.specific$beta
+                 r1
+short.run  1.000000
+long.run  -1.059351
+> 
+> myVECM3$model.specific$coint
+                 r1
+short.run  1.000000
+long.run  -1.022065
+> myVECM3$model.specific$beta
+                 r1
+short.run  1.000000
+long.run  -1.022065
 > 
 > 
 > ###Check Johansen MLE: comparing with vars package
@@ -166,4 +214,4 @@ In logLik.VECM(myVECM, r = 5) :
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      3.748       0.076       3.553 
+      2.650       0.070       2.705 
