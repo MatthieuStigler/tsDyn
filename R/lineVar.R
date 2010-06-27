@@ -82,19 +82,19 @@ if(model=="VECM"&estim=="2OLS"){
     if(class(LRinclude)=="character") {
       if(LRinclude=="none"){
         LRplusplus<-matrix(0, nrow=T, ncol=1)
-        coint<-lm(y[,1] ~  y[,-1]-1)
+        cointLM<-lm(y[,1] ~  y[,-1]-1)
       } else{
-        coint<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-        LRplusplus<-as.matrix(LRplus)%*%coint$coef[-1]
+        cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
+        LRplusplus<-as.matrix(LRplus)%*%cointLM$coef[-1]
       }
     }
     else{
-      coint<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-      LRplusplus<-as.matrix(LRplus)%*%coint$coef[-1]
+      cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
+      LRplusplus<-as.matrix(LRplus)%*%cointLM$coef[-1]
     }
     
-    betaLT<-matrix(c(1,-coint$coef[1:(k-1)]), nrow=k, dimnames=list(colnames(data),"r1"))
-    betaLT_std <- c(1,summary(coint)$coef[1:(k-1),2])
+    betaLT<-coint<-c(1,-cointLM$coef[1:(k-1)])
+    betaLT_std <- c(1,summary(cointLM)$coef[1:(k-1),2])
     names(betaLT_std)<-colnames(data)
   }
 	#beta is given by user
@@ -105,6 +105,8 @@ if(model=="VECM"&estim=="2OLS"){
     betaLT<-c(1,-beta)
   }
 
+  coint_export<-matrix(coint, nrow=k, dimnames=list(colnames(data),"r1"))
+  betaLT<-matrix(betaLT, nrow=k, dimnames=list(colnames(data),"r1"))
   ECTminus1<-Xminus1%*%betaLT
   Z<-cbind(ECTminus1,Z)
 }
@@ -198,7 +200,7 @@ if(model=="VECM"){
     model.specific$estim<-"ML"
   } else {
     model.specific$r<-1
-    model.specific$coint<-coint
+    model.specific$coint<-coint.export
     model.specific$estim<-"OLS"
   }
 }
