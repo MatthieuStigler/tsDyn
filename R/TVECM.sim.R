@@ -55,10 +55,15 @@ else if(!missing(data)){
     TVECMobject<-lineVar(data, lag=p, include=include, model="VECM")
   }
   else{ 
-    if(!missing(Thresh))
-      TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=Thresh)
-    else
+    if(!missing(Thresh)){
+      if(nthresh==1) {
+	TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=list(exact=Thresh))
+      } else if(nthresh==2){
+      TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=list(exact=Thresh[1]),th2=list(exact=Thresh[2]))
+      }
+    } else{
       TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
+    }
   }
 }
 ### possibility 3: setarobject is given by user (or by poss 2)
@@ -70,7 +75,7 @@ if(!missing(TVECMobject)){
   if(include %in% c("trend", "both"))
     warning(paste("Accuracy of function (tested with arg type=check) is not good when arg include=",include," is given\n"))
   modSpe<-TVECMobject$model.specific
-  beta<-modSpe$beta
+  beta<- -modSpe$coint[2,1]
   res<-residuals(TVECMobject)
   Bmat<-coefMat(TVECMobject)
   y<-as.matrix(TVECMobject$model)[,1:k]
@@ -167,7 +172,8 @@ library(tsDyn)
 environment(TVECM.sim)<-environment(star)
 
 ##Simulation of a TVAR with 1 threshold
-a<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1, lag=1,include="none", starting=c(2,2))
+B<-rbind(c(-0.2, 0,0), c(0.2, 0,0))
+a<-TVECM.sim(B=B, nthresh=0, beta=1, lag=1,include="none", starting=c(2,2))
 ECT<-a[,1]-a[,2]
 
 layout(matrix(1:2, ncol=1))
@@ -175,16 +181,18 @@ plot(a[,1], type="l", xlab="", ylab="", ylim=range(a, ECT))
 lines(a[,2], col=2, type="l")
 
 plot(ECT, type="l")
-  
+
+B<-rbind(c(0.2, 0.11928245, 1.00880447, -0.009974585, 0.3, -0.089316, 0.95425564, 0.02592617),c( -0.1, 0.25283578, 0.09182279,  0.914763741, 0.35,-0.0530613, 0.02248586, 0.94309347))
 sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.2, 5.5))
-
-
 #estimate the new serie
 TVECM(sim, lag=1)
 
 ##Bootstrap a TVAR with two threshold (three regimes)
 data(zeroyld)
 dat<-zeroyld
+TVECMobject<-TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1),th2=list(exact=1))
+TVECMobject<-TVECM(dat, lag=1, nthresh=2)#, plot=FALSE, trace=FALSE, th1=list(exact=7),th2=list(exact=9))
+
 TVECM.sim(data=dat,nthresh=2, type="boot", Thresh=c(7,9))
 
 ##Check the bootstrap
@@ -197,26 +205,26 @@ all(TVECM.sim(TVECMobject=lineVar(dat, lag=1, model="VECM", include="trend"),typ
 all(TVECM.sim(TVECMobject=lineVar(dat, lag=1, model="VECM", include="both"),type="check")==dat)
 
 #nthresh=1
-TVECMobject<-TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE)
+TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE)
 all(TVECM.sim(TVECMobject=TVECMobject,type="check")==dat)
 
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE),type="check")==dat)
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=1, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
 
 #nthresh=2
-TVECMobject2<-TVECM(dat, nthresh=2, lag=1, bn=20, ngridG=20, plot=FALSE)
+TVECMobject2<-TVECM(dat, nthresh=2, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE)
 all(TVECM.sim(TVECMobject=TVECMobject2,type="check")==dat)
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE),type="check")==dat)
 
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=1, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat) 
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat) 
 #famous rounding problem...
-all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE, include="none"),type="check")==dat)
+all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=2, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
 
 ###TODO:
 #improve trend/both case
 #TVECM: possibility to give args!
-TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, gamma1=list(exact=-1.4),include="none")
-TVECM(dat, nthresh=1, lag=2, bn=20, ngridG=20, plot=FALSE, gamma1=list(exact=-1.4),beta=list(exact=1),include="none")
-TVECM(dat, nthresh=2, lag=2, bn=20, ngridG=20, plot=FALSE, gamma1=list(exact=-1.4),gamma2=list(exact=0.5),include="none")
+TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, th1=list(exact=-1.4),include="none")
+TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, th1=list(exact=-1.4),beta=list(exact=1),include="none")
+TVECM(dat, nthresh=2, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, th1=list(exact=-1.4),th2=list(exact=0.5),include="none")
 }
