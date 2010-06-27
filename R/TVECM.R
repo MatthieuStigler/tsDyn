@@ -11,6 +11,10 @@ ngridG<-ngridTh
 gamma1<-th1
 gamma2<-th2
 
+if(!missing(gamma1) &&!is.list(gamma1)) gamma1<-list(exact=gamma1)
+if(!missing(gamma2) &&!is.list(gamma2)) gamma2<-list(exact=gamma2)
+
+
 ##create variables
 y<-as.matrix(data)
 T<-nrow(y) #T: number of observations
@@ -111,6 +115,7 @@ ng<-length(allgammas)
 #Default method: grid from lower to higher point
 gammas<-allgammas[round(seq(from=trim, to=1-trim, length.out=ngridG)*ng)]
 #gamma pre-specified
+
 if(is.null(gamma1$exact)==FALSE){
   if(any(allgammas==gamma1$exact)==FALSE)
     warning("The value you gave for gamma does not correspond to an existing value. This causes problems currently")
@@ -563,16 +568,16 @@ environment(TVECM)<-environment(star)
 summary(lm(zeroyld[,1]~zeroyld[,2]-1))
 summary(lm(zeroyld[,1]~zeroyld[,2]))
 
-TVECM(dat, nthresh=1,lag=1, ngridBeta=80, ngridTh=300, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7,1.2)))
-beta0<-rep(1.12,480)
-TVECM(dat, nthresh=1,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, model="only_ECT", beta0=beta0)
+TVECM(dat, nthresh=1,lag=1, ngridBeta=80, ngridTh=300, plot=TRUE,trim=0.05, common="All", beta=list(int=c(0.7,1.2)))
+beta0<-rep(1.12,482)
+TVECM(dat, nthresh=1,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="only_ECT", beta0=beta0)
 
 
-tvecm<-TVECM(dat, nthresh=1,lag=2, ngridBeta=10, ngridTh=10, plot=FALSE,trim=0.05, model="All")
+tvecm<-TVECM(dat, nthresh=1,lag=2, ngridBeta=10, ngridTh=10, plot=FALSE,trim=0.05, common="All")
 #example in working paper 
-tvecm <- TVECM(zeroyld, nthresh = 2, lag = 1, ngridBeta = 60, ngridTh = 30,plot = TRUE, trim = 0.05, model = "All", beta = list(int = c(0.7, 1.1)))
+tvecm <- TVECM(zeroyld, nthresh = 2, lag = 1, ngridBeta = 60, ngridTh = 30,plot = TRUE, trim = 0.05,common= "All", beta = list(int = c(0.7, 1.1)))
 ###To FIX:
-tvecm2<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20,gamma1=list(exact=-1.414),  beta=list(exact=1.05), ngridTh=20, plot=FALSE,trim=0.05, model="All")
+tvecm2<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20,th1=list(exact=-1.414),  beta=list(exact=1.05), ngridTh=20, plot=FALSE,trim=0.05, common="All")
 class(tvecm)
 tvecm
 print(tvecm)
