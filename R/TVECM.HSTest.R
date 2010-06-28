@@ -1,4 +1,4 @@
-TVECM.HSTest <- function(data, lag=1, ngridTh=300, trim=0.05, nboot=1000, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot")) {
+TVECM.HSTest <- function(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot")) {
 
 
 ## Check args:
@@ -166,7 +166,7 @@ if(nboot==0){
     boots.reps<-replicate(nboot, lmtest_withBoot(e=residuals(ve)))
     
 ##################################
-###Parametric Bootstrap %
+### Residual Bootstrap
 ##################################
   } else{
       lmtest_with_resBoot<-function(ve){
@@ -180,8 +180,9 @@ if(nboot==0){
 	}
       # extract w0, y and x
 	ect.boot<-ve.boot$model[,"ECT"]
-	w0.boot<-matrix(ect.boot[!is.na(ect.boot)], ncol=1)
-	x.boot<-ve.boot$model[,-c(1:3)]
+	which.nas<-1:(p+1)
+	w0.boot<-matrix(ect.boot[-which.nas], ncol=1)
+	x.boot<-ve.boot$model[-which.nas,-c(1:3)]
 	y.boot<-ve.boot$model[,c(1:2)]
 	y.boot<-diff(y.boot)[(p+1):(T-1),]
       # set-up grid
@@ -189,7 +190,7 @@ if(nboot==0){
 	gamma2.boot<-w0.ord.boot[round(seq(from=trim*T, to=(1-trim)*T,length.out=ngridTh))] 
 	gamma2.boot<-unique(gamma2.boot)
 	ngridTh.boot<-length(gamma2.boot)
-	test.boot<-lmtest02(y.boot,x-boot,w0.boot,gamma2.boot,dir=dir)
+	test.boot<-lmtest02(y.boot,x.boot,w0.boot,gamma2.boot,dir=dir)
 	return(max(test.boot, na.rm=TRUE))
       }
     boots.reps<-replicate(nboot, lmtest_with_resBoot(ve))
@@ -223,7 +224,7 @@ ret$CriticalValBoot<-CriticalValBoot
 ret$allBoots<-boots.reps
 
 
-class(ret)<-"HanSeoTest"
+class(ret)<-"TVECMHanSeo02Test"
 return(ret)
 
 }#End of the whole function
@@ -233,7 +234,7 @@ return(ret)
 
 
 ### Print method
-print.HanSeoTest<-function(x,...){
+print.TVECMHanSeo02Test<-function(x,...){
   cat("## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##\n\n", sep="")
   cat("Test Statistic:\t", x$stat)
   cat("\t(Maximized for threshold value:", x$maxTh, ")\n")
@@ -246,7 +247,7 @@ print.HanSeoTest<-function(x,...){
 }
 
 ### Summary method
-summary.HanSeoTest<-function(object,...){
+summary.TVECMHanSeo02Test<-function(object,...){
   print(object)
 
   if(object$args$nboot>0){
@@ -257,7 +258,7 @@ summary.HanSeoTest<-function(object,...){
 }
 
 ### Plot method
-plot.HanSeoTest<-function(x,which=c("LM values","Density"),...){
+plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){
   
   if(x$args$nboot==0) which<- "LM values"
 # set graphic parameters
@@ -298,27 +299,27 @@ data(zeroyld)
 data<-zeroyld
 
 ## Test against paper:
-all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, boot=0)$stat,4),20.5994)
-all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, boot=0)$stat,4),28.2562 )
-all.equal(round(TVECM.HSTest(data, lag=3, intercept=TRUE, boot=0)$stat,4), 29.9405 )
+all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)$stat,4),20.5994)
+all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0)$stat,4),28.2562 )
+all.equal(round(TVECM.HSTest(data, lag=3, intercept=TRUE, nboot=0)$stat,4), 29.9405 )
 
 
 ## prob:
-all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, boot=0, fixed.beta=1)$stat,4),29.5295)
-all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, boot=0, fixed.beta=1)$stat,4),21.5586 )
+all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),29.5295)
+all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),21.5586 )
   
 ## Test: no boot
-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, boot=0)
-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, boot=0)
+TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
+TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
 TVECM.HSTest(data, lag=1, intercept=TRUE, boot=0)
 TVECM.HSTest(data, lag=1, intercept=FALSE, boot=0)
 
 
 ## Test: boot
-t1<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, boot=5)
-t2<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, boot=5)
-t3<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, boot=5, boot.type="ResBoot")
-t4<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, boot=5, boot.type="ResBoot")
+t1<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
+t2<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
+t3<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
+t4<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
 
 ## Test: methodst1
 summary(t1)
