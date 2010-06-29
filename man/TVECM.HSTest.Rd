@@ -5,7 +5,7 @@
 Tests the null of linear cointegration against threshold cointegration following Hansen and Seo (2002). Fixed regressor anfd residual bootstrap are available. 
 }
 \usage{
-TVECM.SeoTest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot"))
+TVECM.HSTest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot"), hpc=c("none", "foreach"))
 }
 
 \arguments{
@@ -14,8 +14,10 @@ TVECM.SeoTest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  
 \item{ngridTh}{Number of threshold points to estimate}
 \item{trim}{Trimming parameter indicating the minimal percentage of observations in each regime}
 \item{nboot}{Number of bootstrap replications}
+\item{fixed.beta}{Numeric. User pre-specified cointegrating value. When NULL (default), the value is estimated from the linear VECM.}
 \item{intercept}{Logical. Whether an intercept has to be included in the VECM}
 \item{boot.type}{Character. Type of bootstrap simulation (only if nboot>0)}
+\item{hpc}{Possibility to run the bootstrap on parallel core. See details}
 }
 
 \details{
@@ -23,7 +25,9 @@ This test follows the implementation done by Hansen and Seo (2002). The cointegr
 
 Two bootstrap are available: a fixed regressor, as well as a usual residual bootstrap (using the function TVECM.sim). 
 
-Available methods are code{print()}, code{summary()} and code{plot()}. 
+Available methods are \code{print()}, \code{summary()} and \code{plot()}. 
+
+With the argument \code{hpc}, the burdensome bootstrap replication can be run on parallel cores, thus alleviating the time of computation. The user needs simply to choose a package (among doMC, doMPI, doSNOW or doRedis) and register the backend. See the vignette for more details. 
 }
 
 \value{A list cointaining diverse values:
@@ -51,14 +55,14 @@ Hansen, B. and Seo, B. (2002), Testing for two-regime threshold cointegration in
 \examples{
 #Use original data from paper:
 data(zeroyld)
-
+dataPaper<-zeroyld
 # Test: nboot, number of bootstrap replications, should be high 
 \dontrun{
-test1<-TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=1000)
+test1<-TVECM.HSTest(dataPaper, lag=1, intercept=TRUE, nboot=1000)
 }
 
 #we use here for the example a much smaller number of bootstrap:
-test1<-TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=10)
+test1<-TVECM.HSTest(dataPaper, lag=1, intercept=TRUE, nboot=10)
 
 test1
 summary(test1)
@@ -67,6 +71,14 @@ plot(test1)
 #can have only specific plots:
 plot(test1, which="LM values")
 plot(test1, which="Density")
+
+## Run the function in parallel:
+\dontrun{
+#we show here the use with package doMC
+library(doMC)
+registerDoMC(2) #Number of cores
+test1<-TVECM.HSTest(dataPaper, lag=1, intercept=TRUE, nboot=1000, hpc="foreach")
+}
 
 }
 
