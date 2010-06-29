@@ -3,7 +3,7 @@ Type: Package
 Title: Nonlinear time series models with regime switching
 Version: 0.7-23
 Date: 19/05/2010
-Depends: mgcv, Matrix, snow,mnormt
+Depends: mgcv, Matrix, snow,mnormt,foreach
 Imports: nnet, tseriesChaos, tseries, utils
 Suggests: tcltk, sm, scatterplot3d, rgl
 Author: Antonio Fabio Di Narzo, Jose Luis Aznarte, Matthieu Stigler

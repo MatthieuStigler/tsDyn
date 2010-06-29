@@ -1,8 +1,9 @@
-TVECM.HSTest <- function(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot")) {
+TVECM.HSTest <- function(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot"), hpc=c("none", "foreach")) {
 
 
 ## Check args:
 boot.type<-match.arg(boot.type)
+hpc<-match.arg(hpc)
 dir=FALSE #internal value, was used to try different implementation of lmtest
 
 
@@ -146,6 +147,7 @@ if(nboot==0){
   CriticalValBoot<-NULL
   PvalBoot<-NULL
   boots.reps<-NULL
+  if(hpc=="foreach") warning("hpc='foreach' used only when nboot>0\n")
 }else if (nboot>0){			
 ##################################
 ### Fixed Regressor Bootstrap %
@@ -163,7 +165,7 @@ if(nboot==0){
       yr<-rnorm(n=t,0,1)*e
       return(lmtest02_boot(yr,x,w0,gamma2,dir=dir))
     }
-    boots.reps<-replicate(nboot, lmtest_withBoot(e=residuals(ve)))
+    boots.reps<- if(hpc=="none") replicate(nboot, lmtest_withBoot(e=residuals(ve))) else foreach(i=1:nboot, .export="lmtest_withBoot", .combine="c") %dopar% lmtest_withBoot(e=residuals(ve))
     
 ##################################
 ### Residual Bootstrap
@@ -193,7 +195,7 @@ if(nboot==0){
 	test.boot<-lmtest02(y.boot,x.boot,w0.boot,gamma2.boot,dir=dir)
 	return(max(test.boot, na.rm=TRUE))
       }
-    boots.reps<-replicate(nboot, lmtest_with_resBoot(ve))
+      boots.reps<- if(hpc=="none") replicate(nboot, lmtest_with_resBoot(ve)) else foreach(i=1:nboot,.export="lmtest_with_resBoot", .combine="c") %dopar% lmtest_with_resBoot
   }#end if boot= ResBoot
 
 
@@ -201,9 +203,6 @@ if(nboot==0){
    PvalBoot<-mean(ifelse(boots.reps>teststat,1,0))
    CriticalValBoot<-quantile(boots.reps, probs= c(0.9, 0.95,0.99))
 }#end if boot>0
-
-
-
 
 
 
