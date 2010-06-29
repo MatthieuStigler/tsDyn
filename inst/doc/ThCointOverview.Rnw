@@ -6,7 +6,11 @@
 \usepackage{graphicx}
 \usepackage[authoryear]{natbib}
 \usepackage{Sweave}
-\newcommand{\tsDyn}{\texttt{tsDyn} }
+\usepackage{url}
+\usepackage[unicode=true, pdfusetitle, backref=false,colorlinks=false, pdfborder={0 0 0}]{hyperref}
+\newcommand{\tsDyn}{\texttt{tsDyn}}
+\newcommand{\pkg}[1]{\emph{#1}}
+\newcommand{\Rarg}[1]{\texttt{#1}}
 \linespread{1.3}
 
 \makeatletter
@@ -31,32 +35,29 @@ options(prompt=" ", encoding="LATIN-9")
 
 \maketitle
 \begin{center}
-(Revision 3)
+(Revision 4)
 \par\end{center}
 \begin{abstract}
 Purpose of this paper is twofold. It is first to offer a rough overview
 on the field of threshold cointegration, from the seminal paper of
 Balke and Fomby (1997) to the recent developments. Simultaneously,
 it is to describe the implementation of the main functionalities for
-the modelling in the open-source package \tsDyn. It provides hence
+the modeling in the open-source package \tsDyn. It provides hence
 a unique way to get an introduction on the threshold cointegration
 field allowing in the same time to conduct its own analysis. 
 
 Introduced by Engle and Granger (1987), the concept of cointegration
-became a indisensable step in the analysis of non stationary time
+became a indispensable step in the analysis of non stationary time
 series. The underlying idea is that even if two variables (or more)
 are non-stationary, there can exist a combination of them which is
-stationary. The interpretation of this definition is richefull as
-it means that the variables have a stable relationship (a long-run
-equilibrium), can be represented in an vector error-correction model,
-and share a common stochastic trend. 
+stationary. This definition leads to interesting interpretations as the variables can then be interepreted to have a stable relationship (a long-run equilibrium), can be represented in an vector error-correction model, and share a common stochastic trend. 
 
 However, implicit in the definition is the idea that every small deviation
-from the long-run equilibrium will lead to error correction mechanisms.
+from the long-run equilibrium will lead instantaneously to error correction mechanisms.
 Threshold cointegration extends the linear cointegration case by allowing
 the adjustment to occur only after the deviation exceed some critical
 threshold , thus taking into account possibly transaction costs or
-stickiness of the prices. Furthermore, it allows to capture asymetries
+stickiness of the prices. Furthermore, it allows to capture asymmetries
 in the adjustment, where positive or negative deviations won't be
 corrected in the same manner. 
 \end{abstract}
@@ -75,7 +76,7 @@ time-invariance of the expectation, variance and auto-covariance of
 a series. However, there are considerable theoretical (Samuelson \citeyear{Samuelson1965})
 and empirical (Nelson and Plosser\citeyear{NelsonPlosser1982}) arguments
 in favor of non-stationarity of economic series, especially for the
-difference-stationnary type. A difference-stationnary (or \emph{integrated})
+difference-stationary type. A difference-stationary (or \emph{integrated})
 series is defined as a series that is non-stationary, but whose difference
 is stationary, as the random walk is. Great care should be taken
 when analyzing such series as they follow a different asymptotic behavior
@@ -144,7 +145,7 @@ When the cointegrating vector is known, usual unit root tests can
 be applied, whereas in case it is unknown, different critical values
 need to be used. Philipps and Ouliaris \citeyearpar{PhillipsOuliaris1990}
 developed a test that is invariant to the normalization available
-in the software R in package \texttt{urca} (\citealt{PfaffBook2008}). 
+in the software R in package \pkg{urca} (\citealt{PfaffBook2008}). 
 
 
 \paragraph{Estimation and testing}
@@ -158,7 +159,7 @@ and testing can be done using classical Wald tests (Horvath and Watson
 reduced-rank approach adopted by Johansen (1998, 1995) is able to
 estimate the potential cointegrating vectors and to test for their
 significance, allowing to determine the number of cointegration relationships.
-This is available in R with the ca.jo() function from package \texttt{vars}
+This is available in R with the ca.jo() function from package \pkg{vars}
 (\citealt{Pfaff2008vars}). 
 
 
@@ -240,7 +241,7 @@ along with $\rho_{H}=\rho_{L}$).
 While the work of Balke and Fomby (1997) focused on the long-run relationship
 representation, extension to a threshold VECM (TVECM) has been made
 by several authors, the threshold effect being applied the anticipation
-by the agents of interventionnary policy only to the error-correction
+by the agents of interventionary policy only to the error-correction
 term (Granger and Lee \citeyear{GrangerLee1989}, Seo \citeyear{Seo2006})
 or to the lags and the intercept as well (Hansen and Seo \citeyear{HanSeo2002},
 Lo and Zivot \citeyear{LoZivot2001} ). 
@@ -277,7 +278,7 @@ a multivariate SETAR process with one lag in each regime. When the
 residuals follow a multivariate SETAR process with p >1 lags, the
 lags in the TVECM do also have regime-specific components.
 
-Several other model specifications have been used in the litterature.
+Several other model specifications have been used in the literature.
 Gonzalo and Pittarakis\citeyearpar{GonzaloPitarakis2005} and Krischnakumar
 and Netto (2009) use as transition variable not the deviations itself,
 but an external variable (that is, a TAR model, as we will see later).
@@ -296,7 +297,7 @@ is linear, whereas the adjustment process exhibits threshold effects.
 Gonzalo and Pittarakis (\citeyear{GonzaloPitarakis2006}) take an
 opposite direction where the cointegrating relationship exhibits threshold
 effects whereas the adjustment is linear%
-\footnote{For an analogous case in the structural break litterature, see Gregory
+\footnote{For an analogous case in the structural break literature, see Gregory
 and Hansen \citeyearpar{GreHan}%
 }. That is, $y_{t}$ is I(1) and $x_{t}$ follows a SETAR process,
 but there exists a linear combination of them which is stationary.
@@ -395,7 +396,7 @@ that the condition for the AR(1) process $|\rho|<1$ is relaxed as
 the autoregressive coefficients have only to be strictly inferior
 to 1.
 
-Condition (1) corresponds to a case where the stationnarity of the
+Condition (1) corresponds to a case where the stationarity of the
 whole process is due to the stationarity of the outer regimes. It
 corresponds to the previously described case where adjustment occurs
 only after some threshold has been reached. This is the case being
@@ -405,7 +406,7 @@ under the weaker condition of weakly dependent innovations.
 
 Conditions (2) and (3) are less restrictive as they allow the presence
 of a unit root in an outer regime. The process is though stationary
-provided the drift in the unit root regime pushs towards the stationary
+provided the drift in the unit root regime pushes towards the stationary
 regime. 
 
 Conditions (4) is still less restrictive as then the outer regimes
@@ -492,7 +493,7 @@ values of the variable are sorted, a certain percentage of the first
 and last values is excluded to ensure a minimal number of observations
 in each regime, the SSR is estimated for each selected value and the
 one that minimize the SSR is taken as the estimator. This method has
-received different name in the litterature such as \emph{concentrated
+received different name in the literature such as \emph{concentrated
 LS}, \emph{conditional LS}. 
 
 This is implemented in package \tsDyn through the function \texttt{selectSETAR}.
@@ -540,7 +541,7 @@ summary(set)
 \end{Scode}
 
 It produces an object of class \texttt{setar} with specific methods
-such as \texttt{print()}, \texttt{summary(), plot()} and \texttt{toLatext()}
+such as \texttt{print()}, \texttt{summary(), plot()} and \texttt{toLatex()}
 and inherits from the class \texttt{nlar} with general methods for
 \texttt{AIC()}, \texttt{BIC()}, \texttt{coef()}, \texttt{deviance()},
 \texttt{fitted()}, \texttt{logLik()}, residuals(), \texttt{MAPE()},
@@ -596,7 +597,7 @@ by Chan (\citeyear{Chan1993}). He established that the estimator
 of the threshold, $\hat{\theta}$, was super-convergent, whereas the
 estimator of the slope coefficients, $\hat{\beta}$, was convergent.
 He furthermore found that the distribution of $\hat{\theta}$ is a
-compound poisson process with nuisance parameters, which can't be
+compound Poisson process with nuisance parameters, which can't be
 computed easily. Superconvergence of $\hat{\theta}$ allows asymptotically
 to take the estimated value as given and conduct usual inference on
 the $\hat{\beta}$. Indeed, the distribution of $\hat{\beta}$ is
@@ -642,7 +643,7 @@ modify the objective function by replacing the indicator function
 by a smoothing function%
 \footnote{This can be a distribution function as it needs to be bounded between
 0 and 1.%
-}. This so called smoothed least sqaure estiamtor has a smaller rate
+}. This so called smoothed least square estimator has a smaller rate
 of convergence but is normally distributed and still independent of
 the slope parameter estimator. They furthermore establish the validity
 of a regressor-based bootstrap to obtain small-sample refinements.
@@ -650,9 +651,9 @@ None of those methods is currently implemented in package \tsDyn, but
 the inclusion of Hansen method is under project.
 
 Even if the estimators of the slope parameters are asymptotically
-normally distributed and indepednant of the threshold estimatir, this
+normally distributed and independant of the threshold estimator, this
 may not hold in small sample. Hansen (2000), and Seo and Linton (2006),
-both suggest methods to take into account the variability of the treshold
+both suggest methods to take into account the variability of the threshold
 parameter when building confidence intervals for the slope coefficients.
 Hansen's method requires lot of computations as it implies to estimate
 the confidence interval of $\hat{\beta}(\hat{\theta})$ for all $\theta_{i}$
@@ -664,13 +665,13 @@ for $\hat{\beta}$.
 
 \paragraph{	-Carlo Studies}
 
-Globally, Monte carlo studies of the estimators in the previous papers
+Globally, Monte Carlo studies of the estimators in the previous papers
 (Hansen 2000, Gonzalo and Wolf 2005, Seo and Linton 2006) find that
 the threshold parameters exhibit a large variability, higher than
 is predicted by the asymptotical theory: super-convergence of the
 estimator does not seem to be effective in small samples. Consequently,
 the slope estimators exhibit a large variability. Without surprise,
-the authours remark that the variability decrease with the sample
+the authors remark that the variability decrease with the sample
 size as well as with the effect threshold: the bigger the difference
 in the parameters in each regime, the better the estimation of the
 threshold. Gonzalo and Pittarakis (2002) find another interesting
@@ -728,7 +729,7 @@ lags in each regime.
 Estimation of the threshold and cointegrating parameters could be
 done in the long-run relationship and those estimates plugged into
 the TVECM, as the Engle-Granger advocates for the linear case. To
-my knowledge,tt the validity of that method has not been investigated
+my knowledge,the the validity of that method has not been investigated
 in theoretically. BF mention that the super-convergence of the OLS
 estimator in the LR (Watson 1987) still hold when the residuals follow
 a SETAR process under the condition (1). 
@@ -743,11 +744,11 @@ For $\theta$, the grid is restricted to the existing values of the
 ECT, with exclusion of the upper and lower ranges. For the cointegrating
 value, HS suggest to conduct the search based on a confidence interval
 obtained in the linear model. When the two values are give, the slope
-and speed adjustment prameters can be concentrated out and the estimator
+and speed adjustment parameters can be concentrated out and the estimator
 is simply OLS (though HS depict it as MLE, it is only MLE as starting
 values for the algorithm are based on the linear MLE estimate). This
 method can be done in a simple bivariate model without intercept in
-the cointegrated relatinship, but becomes intractable with more than
+the cointegrated relationship, but becomes intractable with more than
 two cointegrating relationships. 
 
 Note that in what I called the cointegration with threshold effect
@@ -809,7 +810,7 @@ tvecm<-TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=60, ngridTh=30, plot=TRUE,trim=
 
 
 It produces an object of class \texttt{TVECM} with specific methods
-such as \texttt{print()}, \texttt{summary()} and \texttt{toLatext()}
+such as \texttt{print()}, \texttt{summary()} and \texttt{toLatex()}
 and inherits from the class \texttt{nlVar} with general methods for
 \texttt{AIC()}, \texttt{BIC()}, \texttt{coef()}, \texttt{deviance()},
 \texttt{fitted()}, \texttt{logLik()}, \texttt{residuals()}. 
@@ -832,7 +833,7 @@ Hence, one may have four different cases:
 \item No cointegration and no threshold effects
 \item No cointegration and threshold effects
 \end{itemize}
-Hence, a test with threhsold cointegration may have as null hypothesis
+Hence, a test with threshold cointegration may have as null hypothesis
 either cointegration or no cointegration. This distinction is of major
 importance as this implies a different distribution under the null.
 The distribution is also different whenever the test is done based
@@ -841,7 +842,7 @@ on the LR or the VECM representation%
 }. Some of the tests also allow to estimate the cointegrating vector,
 whereas the majority requires pre-specified ones. Finally, the number
 of regime differ in the different specifications, some taking two,
-some three regimes, or symetric outer regimes. To my knowledge, only
+some three regimes, or symmetric outer regimes. To my knowledge, only
 one test (Hansen 1999) is able to determine the number of regimes,
 through a test of one against two thresholds. As a result, there exist
 many different tests for all the possible cases. 
@@ -926,7 +927,7 @@ values, they simply show that one may apply a functional to the test
 that is bounded. 
 
 The decision rule from their bound is easy as the model under the
-null (alternative) should be choosen when the bound is below (above)
+null (alternative) should be chosen when the bound is below (above)
 one. They show that this procedure leads to type I and type II errors
 approaching zero asymptotically. This result is of great importance
 as it allows to reduce substantially the number of computation, as
@@ -941,8 +942,8 @@ critical values don't need to be tabulated.
 As discussed above, the idea for the testing procedure if to test
 first for cointegration and in the case when cointegration is not
 rejected, test for threshold cointegration, taking cointegration as
-a null. In our view, implicetely assumed in that methodology is that
-the threshold model will be also stationnary. Whereas the fact that
+a null. In our view, implicetly assumed in that methodology is that
+the threshold model will be also stationary. Whereas the fact that
 a unit root may appear in a three-regime SETAR model, the question
 is never asked in a two regimes-model. This is an important gap as
 indeed splitting the sample may create a unit root in one of the regime.
@@ -966,7 +967,7 @@ of the sup-LM test for a SETAR model with one unknown threshold. The
 test follows a complicated empirical distribution process with nuisance
 parameters and hence critical values for a general case can't be tabulated.
 Hansen nevertheless shows a simulation procedure which allows to generate
-asymptotic p-values. In this procedure, heteroskedasticty can also
+asymptotic p-values. In this procedure, heteroskedasticity can also
 be taken into account by slight modifications. In a later article,
 Hansen (\citeyear{Hansen1999}) studies an alternative way to obtain
 the p-values through a residual bootstrap, whose validity is nevertheless
@@ -987,7 +988,7 @@ Hansen.Test<-setarTest(lynx, m=1, nboot=1000)
 
 Available methods are \texttt{print()}, \texttt{summary()} and \texttt{plot()},
 as well as an \texttt{extendBoot()} function to run new bootstrap
-replications andmerge the result with the old ones. This can be usefull
+replications and merge the result with the old ones. This can be useful
 for a preliminary test and to check how the result is influenced by
 new runs. 
 
@@ -1004,9 +1005,9 @@ distributed by Lo and Zivot (2002). %
 }
 
 BF suggested to extend the approach of Tsay using several other structural
-change tests, using techniques as in Hansen (1996). Appropriatness
+change tests, using techniques as in Hansen (1996). Appropriateness
 of this method has been nevertheless discussed by Hansen (2000) as
-the the ordering of the variable fot the arranged autoregression may
+the the ordering of the variable for the arranged autoregression may
 induce a trend, in case the structural tests are not consistent. 
 
 
@@ -1014,7 +1015,7 @@ induce a trend, in case the structural tests are not consistent.
 
 Differing from a pure testing procedure, model selection procedures
 based on information criteria (IC) have gained much interest in the
-litterature and their use has been sometimes adovacted rather than
+literature and their use has been sometimes advocated rather than
 formal testing procedure (see for example Lètkephol\citeyear{Luetkepohl2007}).
 This is the case in the well-known selection of lags in time series
 models, but also for estimating the cointegrating rank (Gonzalo and
@@ -1024,7 +1025,7 @@ This has been also applied for the determination of the number of
 regimes in a SETAR model by Gonzalo and Pittarakis (\citeyear{GonzaloPitarakis2002}).
 They show indeed that this works well in practice using a modified
 BIC. This result is of great interest in practice as it avoids the
-use of boostrap replications and hence significanty disminishes the
+use of bootstrap replications and hence significantly diminishes the
 number of computations required. The authors remark in simulations
 studies that the AIC has big type one error compared to other BIC,
 while it has a smaller type II error. 
@@ -1074,26 +1075,20 @@ a_{YH}\end{bmatrix}ECT_{H,t-1}+B_{1H}\begin{bmatrix}\Delta X_{t-1}\\
 \Delta Y_{t-p}\end{bmatrix}\end{array}\right.\label{eq:TVECMHanSeo}\end{equation}
 
 
-Stacking the various parameters into $A_{L}={C_{L},a_{L},B_{L}}$and
+Collecting the various parameters into $A_{L}={C_{L},a_{L},B_{L}}$and
 similarly for $A_{H}$, the $H_{0}$ of a linear model $A_{H}=A_{L}$is
 rejected when $A_{H}\neq A_{L}$. The distribution of the sup-LM test
-is found to be the same as in the univariate case as in Hansen (1996)
-and hence a p-value simulation as well as a bootstrap replication.
-This is then highly computer burdensome as eah bootstrap replication
-needs a two-dimensional search. 
+is found to be the same as in the univariate case as in Hansen (1996). This 
+distribution can't be tabulated due to the presence of nuisance parameters and hence 
+the authors suggest two bootstrap approaches, with either a fixed-regressor or a residual bootstrap. While in the paper the sup-LM tests is conditional on both the cointegrating and threshold value, the implementation of this test done by the authors takes the cointegrating vector as given, based on the value estimated from the linear VECM.  
 
-This is available in package \tsDyn using the function%
-\footnote{it is currently not exported as its object-orientation implementation
-was not completed. It can nevertheless still be computed. %
-} tsDyn:::HanSeo\_TVECM(). %
-
-
+This is available in package \tsDyn using the function \texttt{TVECM.HSTest()}. 
 
 \subsection{No cointegration vs. threshold cointegration tests}
 
 Numerous tests for the null of no cointegration may be used, either
 from the L-R or the TVECM representation. They generally suffer from
-two major drawback which merit on my opinion more attention. 
+two major drawbacks which merit on my opinion more attention. 
 
 The first is that unit roots tests with a stationary SETAR as alternative
 which developed recently may be used in the case of a known cointegrating
@@ -1114,7 +1109,7 @@ pricing models with stable risk premia imply corresponding stable
 differences in spot and forward prices, long- and short-term interest
 rates, and the logarithms of stock prices and dividends. Most theories
 of international trade imply long-run purchasing power parity, so
-that long-run movements in nominal exchange rates are matched by countries'
+that long-run movements in nominal exchange rates are matched by countries
 relative price levels. Certain monetarist propositions are centered
 around the stability of velocity, implying cointegration among the
 logarithms of money, prices, and income. 
@@ -1142,7 +1137,7 @@ under the null, the series (which is also, remember, the transition
 variable) is non-stationary, which affects the distribution of the
 tests. Analogously as in the linear case, when the cointegrating vector
 is known, usual unit root tests can be used, whereas estimation of
-the cointegrating vector affect the distribution of the test, whch
+the cointegrating vector affect the distribution of the test, which
 require use of different tests/critical values. Hence, when the cointegrating
 vector is known, unit root tests with a stationary SETAR as alternative
 can be used, whereas the case of unknown cointegrating vector needs
@@ -1154,7 +1149,7 @@ correction.
 
 \paragraph{Bec, Ben Salem and Carrasco (BBC)}
 
-Bec, Ben Salem and Carrasco (\citeyear{BecSalemEtAl2004}) (refered
+Bec, Ben Salem and Carrasco (\citeyear{BecSalemEtAl2004}) (referred
 as to BBC), test for unit root against a symmetric three regime SETAR
 model. The model specification is very general as intercepts as well
 as lags are included in each regime, and hence corresponds to the
@@ -1169,9 +1164,9 @@ The null hypothesis of unit root is $H_{0}$: $\rho_{L}=\rho_{H}=\rho_{M}=0$
 with the alternative $H_{A}$: $\rho_{L}<1$, $\rho_{H}<0$ and $\rho_{M}\leq1$.
 That is, a unit root is allowed in the middle regime, but an explosive
 behavior is ruled out. BBC find that the distribution of sup-Wald,
-sup-LM and sup-LR are free ofnuisance parameters and provide critical
+sup-LM and sup-LR are free of nuisance parameters and provide critical
 values. The authors suggest that the extension to a SETAR with non
-symetric thresholds should not lead to further complications. 
+symmetric thresholds should not lead to further complications. 
 
 
 \paragraph{Kapetanios and Shin (KS)}
@@ -1191,7 +1186,7 @@ with the alternative $H_{A}$: $\rho_{L}<1$, $\rho_{H}<0$. The grid
 for the thresholds is selected such that the probability of being
 in the middle regime decreases as the sample size increases, converging
 to zero asymptotically. Under this specification, the authors derive
-statistics (the sup-Wald, exp Wald and ave Wald) wich are obtain nuisance
+statistics (the sup-Wald, exp Wald and ave Wald) which are obtain nuisance
 parameter free and provide critical values. 
 
 
@@ -1211,25 +1206,25 @@ based on the AD test.
 Seo (\citeyear{Seo2008}) derive a test with a two-regime SETAR as
 alternative, allowing for non linear and serial correlated errors.
 Under those weaker assumptions, the asymptotical distribution of the
-sup-Wald seelcting the values as in KS depends on nuisance parameters
+sup-Wald selecting the values as in KS depends on nuisance parameters
 and critical values can't be tabulated. Seo hence suggests a residual
 based block bootstrap, shown to be asymptotically consistent. Extension
-of the boostrap for a three regime model is meant to be easy.
+of the bootstrap for a three regime model is meant to be easy.
 
 
 \paragraph{Monte Carlo comparisons}
 
-Maki (\citeyear{Maki2009}) provides a Monte carlo simulation for
+Maki (\citeyear{Maki2009}) provides a Monte Carlo simulation for
 the size and power of the BBC (using sup-Wald) and KS (sup-Wald, ave
 and exp-Wald) tests, along with the traditional ADF. Size of the test
 is definitely better for the ADF test, with the ave-Wald being close,
 the sup- and exp-Wald of KS showing size distorsion, while the sup-wald
 of BBC is seen to be too conservative. Power of the tests is investigated
-based on an alternative model with three regimes, a symetric threshold,
+based on an alternative model with three regimes, a symmetric threshold,
 a unit root in the middle regime and no lags. Different values of
 the thresholds are tested. With a threshold value of zero (i.e. no
 thresholds effects), the ADF test has without surprise the best power.
-More suprisingly, this is still the case with small thresholds, with
+More surprisingly, this is still the case with small thresholds, with
 values 1 and 2, the ADF test having the best power for models with
 an inner regime counting 40\% of the observations. When the thresholds
 increase (and hence the number of observations in the unit root regime),
@@ -1243,14 +1238,14 @@ When the mean-reversion of the outer regime is increased (which has
 the effect to have more observations in the inner regime), all the
 tests have power near to 1 unless the threshold are high (value of
 6), where power of ADF test falls. The BBC test has in those cases
-a much better power than the KS, as the latter is based on a disminishing
+a much better power than the KS, as the latter is based on a diminishing
 threshold effect. 
 
 
 \paragraph{Implementation in R}
 
 BBC and KS have been implemented in package \tsDyn. They are nevertheless
-for now in an experimental version and may contain errors. Practitionners
+for now in an experimental version and may contain errors. Practitioners
 should use them with care as the results could not be compared to
 those of the authors as the data sets are not publicly available. 
 
@@ -1290,10 +1285,10 @@ a_{H}ECT_{H,t-1}\end{array}\right.+C_{1}\Delta X_{t-1}+\ldots+C_{p}\Delta X_{t-p
 
 The idea of the test is based on results as in \citet{HorvathWatson1995},
 who show that when the cointegrating vector is known, a test of cointegration
-can be simply done on testiong whether coefficents from the ECT are
+can be simply done on testing whether coefficients from the ECT are
 significant. In the TVECM framework, the null hypothesis of no cointegration
 becomes: $H_{0}$: $a_{L}=a_{H}=0$ and the alternative that either
-$a_{L}$ or $a_{H}$ is dfferent from zero. The sup-Wald test suggested
+$a_{L}$ or $a_{H}$ is different from zero. The sup-Wald test suggested
 does not depend on nuisance parameter and critical values can be obtained.
 As the asymptotical distribution is seen to perform badly in small
 samples, Seo provide a residual based bootstrap and shows its asymptotic
@@ -1325,7 +1320,7 @@ search could be applied. This is currently under implementation. %
 \subsection{Conclusion for the test}
 
 I reviewed here some of the most popular and applied tests in the
-litterature. This is definitely not exhaustive and there exist many
+literature. This is definitely not exhaustive and there exist many
 different tests, especially for the univariate case. Despite of this
 great amount of different tests and model specification, some points 
 
@@ -1334,9 +1329,9 @@ great amount of different tests and model specification, some points
 
 Once threshold cointegration have been indicated by the different
 tests and estimation made, there remain interesting questions on the
-interpretation of themodel obtained. A first one concerns the type
+interpretation of the model obtained. A first one concerns the type
 of adjustment and the presence of an attractor. A second one concerns
-stability of the system and its treactions to exogeneous shocks. 
+stability of the system and its reactions to exogeneous shocks. 
 
 
 \subsection{Types of adjustment\label{sub:Types-of-adjustment}}
@@ -1345,7 +1340,7 @@ As was presented earlier, a SETAR model may be stationary under diverse
 conditions. Nevertheless, almost the only one to have been investigated
 empirically, and for which there exist some tests, is that described
 by the condition (1). Within this type, there are nevertheless different
-degrees of adjustment, where adjustment pushs back either to an equilibrium
+degrees of adjustment, where adjustment pushes back either to an equilibrium
 (EQ-SETAR) or to a band (BAND-SETAR). This distinction is best shown
 in a case of perfectly symmetric SETAR with three regimes but same
 (of opposed signs) thresholds, same outer coefficients, no lags and
@@ -1387,9 +1382,9 @@ Whereas the adjustment seems to be faster in a EQ-SETAR than in a
 BAND-SETAR, it could be that a SETAR described by condition (4) (denoted
 by returning-drift, RD-SETAR, by BF) has a faster adjustment. Effectively,
 the outer regimes are unit root process with drift that may have much
-faster dynamics than simple AR processes. Despite of this potentally
-interesting feature, RD-SETAR models dont seem to have been used much
-in the litterature, probably because of the unavailabiliy of tests
+faster dynamics than simple AR processes. Despite of this potentially
+interesting feature, RD-SETAR models don't seem to have been used much
+in the literature, probably because of the unavailability of tests
 as we discussed below and also because of the more complicated distribution
 of the parameters. 
 
@@ -1426,13 +1421,36 @@ small negative deviations but differently from big ones.
 \subsection{Non linear impulse response functions}
 
 To be done. 
+\section{Running the functions on parallel CPUs}
+A major drawback of the threshold cointegration tools is that those, due to the probem of the unidentified parameter or the need of bootstrap replications, are heavily computer intensive. The test of Seo (2006) takes indeed a very long time to run. 
+
+To alleviate these problems, a possibility is to run the functions on parallel, ie. either on a unique computer with multiple-CPUs processor or on more complex computer clusters. Nowadays, it is quite common to find even laptops equiped with processors like Intel Dual-Core, and hence parallel functionalities can be used by practically everyone. Furthermore, it has become quite easy to do it in R thanks to packages like \pkg{foreach} which offer a great level of abstraction, requiring the user to do a minimal number of steps to get it running. Indeed, this package will function as a wrapper for other parallel packages, and allows the user to run it either on the protocol \texttt{MPI}, \texttt{nws} and \texttt{pvm}, or using the R internal \texttt{socket} system, as well as the \pkg{multicore}\footnote{For a review on R facilities for high performance computing, see \citet{SchmidbergerMorganEtAl2009}. There exist also a dedicated R mailing list, as well as a \emph{task view} \url{http://stat.ethz.ch/CRAN/web/views/HighPerformanceComputing.html} }. 
+
+Furthermore, parallel computation is quite easy in the context of threshold cointegration as the grid search or the bootstrap replications are independant of each other and can easily be run on different nodes. 
+
+Parallel facilities are for now only available for the function \texttt{TVECM.HSTest()}, through the argument \Rarg{hpc} (standing for high performance computing). When set to \Rarg{foreach}, the package will run the \pkg{foreach} package. It is then up to the user to choose a paralellisation protocol, the current choice being now between \pkg{doMC}, \pkg{doSNOW} (MPI, pvm and nws, as well as internal R sockets), \pkg{doMPI} and \pkg{doRedis}. We illustrate here with the easiest package, \pkg{multicore}, wich proved to be quite powerful, with the disadvantage nerverthless that it can pose problems when R is used within a GUI. 
+\begin{Scode}{eval=FALSE}
+system.time(test1<-TVECM.HSTest(dat, lag=1, nboot=200))
+
+library(doMC)
+registerDoMC(2) #Number of cores
+system.time(test1<-TVECM.HSTest(dat, lag=1, nboot=200, hpc="foreach"))
+\end{Scode}
+
+Results are quite impressive, as they show that by simply adding a second core the execution time is divided by two, while using 4 cores will divide the time by three, as shown in figure \ref{Flo:plotCluster}\footnote{It should be mentioned that the relationship between the number of CPUs and the reduction in execution time is decreasing with the number of CPUs: the more the CPUs, the less their additional effect is.}. 
+
+\begin{figure}
+\caption{Execution time of function TVECM.HSTest using multiple cores}
+\label{Flo:plotCluster}
+\includegraphics{ClusterTime}
+\end{figure}
 
 
 \section{Conclusion}
 
 In this paper, I showed the interest of threshold cointegration towards
-traditional cointegration as being a better framework to modelize
-real world adjustment process with stickiness and asymetries. Indeed,
+traditional cointegration as being a better framework to model
+real world adjustment process with stickiness and asymmetries. Indeed,
 a great number of empirical studies applied this model, and an evenly
 great number of theoretical results have been obtained. I presented
 also how one can use those developments using the package \tsDyn, offering
@@ -1444,11 +1462,11 @@ specifications, and estimating those models.
 
 Whereas great developments occured since the seminal work in 1997,
 many questions remain unanswered . The complexity of the SETAR model
-is actually so high that simple aspects such the distribution or the
+is actually so high that simple aspects such its distribution or its
 moments are still only known in restricted cases. Estimation of more
 than one threshold stills create problems, and actual tests of stationary
 consider only a small amount of the possible features of a SETAR.
-There is up to now no framwork allowing to test the stationarity with
+There is up to now no framework allowing to test the stationarity with
 an unknown cointegrating vector, and test discriminating 2 against
 3 regimes only work in a restricted case.
 
