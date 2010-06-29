@@ -1,0 +1,141 @@
+
+R version 2.11.1 (2010-05-31)
+Copyright (C) 2010 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+REvolution R enhancements not installed.  For improved
+performance and other extensions: apt-get install revolution-r
+
+[Sauvegarde de la session précédente restaurée]
+
+> library(tsDyn)
+Le chargement a nécessité le package : mgcv
+This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+
+Attachement du package : 'Matrix'
+
+The following object(s) are masked from 'package:base':
+
+    det
+
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : iterators
+Le chargement a nécessité le package : codetools
+> data(zeroyld)
+> data<-zeroyld
+> 
+> ## Test against paper:
+> all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)$stat,4),20.5994)
+[1] TRUE
+> all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0)$stat,4),28.2562 )
+[1] TRUE
+> all.equal(round(TVECM.HSTest(data, lag=3, intercept=TRUE, nboot=0)$stat,4), 29.9405 )
+[1] "Mean relative difference: 0.01292669"
+> 
+> 
+> ## prob:
+> all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),29.5295)
+[1] "Mean relative difference: 0.005730698"
+> all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),21.5586 )
+[1] "Mean relative difference: 0.02895189"
+>   
+> ## Test: no boot
+> TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+> TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+> TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 20.59942	(Maximized for threshold value: -0.04805437 )
+> TVECM.HSTest(data, lag=1, intercept=FALSE, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+> 
+> 
+> ## Test: boot
+> t1<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
+> t2<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
+> t3<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
+> t4<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
+> 
+> ## Test: methodst1
+> summary(t1)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+P-Value:	 0.2 		( Fixed regressor bootstrap )
+
+Critical values:
+    0.90%    0.95%    0.99%
+ 18.50599 19.52945 20.34822
+Number of bootstrap replications:	 5> plot(t1)
+> plot(t1, which="Density")
+> plot(t1, which="LM values")
+> t2
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0 		( Fixed regressor bootstrap )
+> summary(t2)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0 		( Fixed regressor bootstrap )
+
+Critical values:
+    0.90%    0.95% 0.99%
+ 12.91734 13.70771 14.34
+Number of bootstrap replications:	 5> t3
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+P-Value:	 0.2 		( Residual Bootstrap )
+> summary(t3)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+P-Value:	 0.2 		( Residual Bootstrap )
+
+Critical values:
+    0.90%    0.95%    0.99%
+ 17.61689 18.05737 18.40975
+Number of bootstrap replications:	 5> t4
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0.2 		( Residual Bootstrap )
+> summary(t4)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0.2 		( Residual Bootstrap )
+
+Critical values:
+    0.90%  0.95%    0.99%
+ 18.31317 19.833 21.04886
+Number of bootstrap replications:	 5> 
+> proc.time()
+utilisateur     système      écoulé 
+      5.850       0.070       6.111 

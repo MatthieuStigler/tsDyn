@@ -1,0 +1,38 @@
+library(tsDyn)
+data(zeroyld)
+data<-zeroyld
+
+## Test against paper:
+all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)$stat,4),20.5994)
+all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0)$stat,4),28.2562 )
+all.equal(round(TVECM.HSTest(data, lag=3, intercept=TRUE, nboot=0)$stat,4), 29.9405 )
+
+
+## prob:
+all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),29.5295)
+all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),21.5586 )
+  
+## Test: no boot
+TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
+TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
+TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)
+TVECM.HSTest(data, lag=1, intercept=FALSE, nboot=0)
+
+
+## Test: boot
+t1<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
+t2<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
+t3<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
+t4<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
+
+## Test: methodst1
+summary(t1)
+plot(t1)
+plot(t1, which="Density")
+plot(t1, which="LM values")
+t2
+summary(t2)
+t3
+summary(t3)
+t4
+summary(t4)
