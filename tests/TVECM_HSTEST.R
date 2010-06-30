@@ -20,9 +20,13 @@ TVECM.HSTest(data, lag=1, intercept=FALSE, nboot=0)
 
 
 ## Test: boot
+set.seed(123)
 t1<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
+set.seed(123)
 t2<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
+set.seed(123)
 t3<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
+set.seed(123)
 t4<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
 
 ## Test: methodst1
