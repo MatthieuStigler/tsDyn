@@ -1,8 +1,15 @@
--version 0.7-23
+Version 0.7-3
+-Add function TVECM.HStest (before was HanSeo_TVECM). Has new argument hpc for parallel computing.
+-Add function VECM(), simple wrapper for lineVar(..., model="VECM")
+-Add Johansen estimator for VECM()
+-Add methods AIC, BIC, logLik for class VECM
+-Correct numerous bugs
+
+Version 0.7-23
 -correct bug TVAR.sim
 -export function VAR.sim, simpler wrapper for TVAR.sim
 
--version 0.7-22
+Version 0.7-22
 -correct bug in HanSeo_TVECM, which can now be used (but still not exported)
 
 -version 0.7-2
