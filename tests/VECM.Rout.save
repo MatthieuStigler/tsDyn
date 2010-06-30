@@ -18,6 +18,8 @@ Tapez 'q()' pour quitter R.
 REvolution R enhancements not installed.  For improved
 performance and other extensions: apt-get install revolution-r
 
+[Sauvegarde de la session précédente restaurée]
+
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
 This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
@@ -32,6 +34,9 @@ The following object(s) are masked from 'package:base':
 
 Le chargement a nécessité le package : snow
 Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : iterators
+Le chargement a nécessité le package : codetools
 > data(zeroyld)
 > 
 > 
@@ -90,21 +95,21 @@ Equation long.run  -0.1078(0.1188)     0.0082(0.0674)
 #############
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
-AIC -2135.868 	BIC -2118.511 	SSR 174.3576
+AIC -2107.432 	BIC -2090.075 	SSR 175.3061
 Cointegrating vector (estimated byOLS):
-   short.run  long.run
-r1         1 -1.059351
+   short.run long.run
+r1         1        1
 
 
-                   ECT                 Intercept           short.run -1      
-Equation short.run -0.0211(0.0156)     0.0182(0.0147)      0.0396(0.0688)    
-Equation long.run  0.0692(0.0267)**    -0.0093(0.0251)     0.3108(0.1181)**  
+                   ECT                 Intercept          short.run -1      
+Equation short.run -0.0027(0.0023)     0.0469(0.0320)     0.0427(0.0689)    
+Equation long.run  -0.0073(0.0039).    0.1001(0.0551).    0.3215(0.1186)**  
                    long.run -1        short.run -2        long.run -2        
-Equation short.run 0.0144(0.0403)     -0.0549(0.0696)     -0.0113(0.0399)    
-Equation long.run  0.0593(0.0692)     -0.0431(0.1195)     -0.0549(0.0686)    
+Equation short.run 0.0224(0.0399)     -0.0461(0.0697)     -0.0051(0.0396)    
+Equation long.run  0.0303(0.0686)     -0.0447(0.1200)     -0.0789(0.0683)    
                    short.run -3        long.run -3        
-Equation short.run -0.0551(0.0692)     -0.0194(0.0393)    
-Equation long.run  -0.1078(0.1188)     0.0082(0.0674)     
+Equation short.run -0.0483(0.0693)     -0.0115(0.0388)    
+Equation long.run  -0.1072(0.1192)     -0.0190(0.0668)    
 > summary(myVECM3)
 #############
 ###Model VECM 
@@ -155,13 +160,13 @@ short.run  1.000000
 long.run  -1.059351
 > 
 > myVECM2a$model.specific$coint
-                 r1
-short.run  1.000000
-long.run  -1.059351
+          r1
+short.run  1
+long.run   1
 > myVECM2a$model.specific$beta
-                 r1
-short.run  1.000000
-long.run  -1.059351
+          r1
+short.run  1
+long.run   1
 > 
 > myVECM3$model.specific$coint
                  r1
@@ -207,11 +212,11 @@ Le chargement a nécessité le package : zoo
 Le chargement a nécessité le package : sandwich
 Le chargement a nécessité le package : urca
 Le chargement a nécessité le package : lmtest
-[1] -73560.03
+[1] -73607.5
 Message d'avis :
 In logLik.VECM(myVECM, r = 5) :
   r cann't be greater than k (numer of variables
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      2.650       0.070       2.705 
+      2.540       0.090       2.705 
