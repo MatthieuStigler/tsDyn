@@ -1,6 +1,19 @@
 TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
 
+##Check args
+test<-match.arg(test)
+model<-match.arg(model)
 if (missing(series))  series <- deparse(substitute(data))
+
+if(is.null(colnames(data)))
+	colnames(data)<-paste("Var", seq_len(k), sep="")
+m<-lag			#keep consistent with nlar
+if(max(thDelay)>m)
+	stop("Max of thDelay should be smaller or equal to the number of lags")
+if(m<1)
+	stop("m should be at least 1")
+
+## Set-up variables
 y <- as.matrix(data) 
 ndig<-getndp(y)
 y<-round(y,ndig)
@@ -10,15 +23,8 @@ T <- nrow(y) 		#Size of start sample
 t <- T-lag 		#Size of end sample
 k <- ncol(y) 		#Number of variables
 p<-lag
-m<-lag			#keep consistent with nlar
 d<-1			#seems to be useless for nlVar...
-model<-match.arg(model)
-if(is.null(colnames(data)))
-	colnames(data)<-paste("Var", seq_len(k), sep="")
-if(max(thDelay)>m)
-	stop("Max of thDelay should be smaller or equal to the number of lags")
-if(m<1)
-	stop("m should be at least 1")
+
 ndig<-getndp(y)
 Y <- y[(m+1):T,] #
 Z <- embed(y, m+1)[, -seq_len(k)]	#Lags matrix
@@ -303,7 +309,6 @@ return(Yb2)
 }#end boot1thresh
 
 #####Bootstrap loop
-test<-match.arg(test)
 test<-switch(test, "1vs"="1vs", "2vs3"="2vs3")
 if(model=="TAR")
 	bootThresh<-boot1thresh
