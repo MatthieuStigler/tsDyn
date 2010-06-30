@@ -332,3 +332,8 @@ t4
 summary(t4)
 }
 
+
+HanSeo_TVECM <- function(dat, lag=1, gn=300, bn=300, trim=0.05, boot=1000, UserSpecified_beta=NULL, cov=1, p_ests=1, intercept=TRUE, UserSpecified_gamma=NULL, boot.type=c("FixedReg", "ResBoot")) {
+stop("This function is now called TVECM.HSTest() and is directly accessible\n")
+}
+
