@@ -5,7 +5,7 @@ TVECM.HSTest <- function(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.b
 boot.type<-match.arg(boot.type)
 hpc<-match.arg(hpc)
 dir=FALSE #internal value, was used to try different implementation of lmtest
-
+if(inherits(data, "ts")) warning("There are currently problems when the data is of class ts. Try converting it as data.frame")
 
 ### Organize Data
 data<-as.matrix(data)
@@ -27,7 +27,7 @@ if(is.null(fixed.beta)){
   ve<-VECM(data, lag=lag, include="const",  beta=fixed.beta, estim="2OLS")
 }
 
-ect<-ve$model[,"ECT"]
+ect<-ve$model[,grep("ECT", colnames(ve$model))]
 w0<-matrix(ect[!is.na(ect)], ncol=1)
 
 ### Deprecated: Standard error
