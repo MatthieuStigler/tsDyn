@@ -20,7 +20,7 @@ logLik.VECM<-function(object,r=1,...){
   if(object$model.specific$estim=="ML"){
     S00<-object$model.specific$S00
     lambda<-object$model.specific$lambda
-    seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (numer of variables")
+    seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (number of variables)")
     
     res <- -(t*k/2)*log(2*pi) - t*k/2 -(t/2)*log(det(S00))-(t/2)*sum(log(1-lambda[seq]))
   } else {
