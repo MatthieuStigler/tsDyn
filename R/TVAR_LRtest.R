@@ -1,4 +1,4 @@
-TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), model=c("TAR", "MTAR"), hpc=c("none", "foreach"), check=FALSE) {
+TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), model=c("TAR", "MTAR"), hpc=c("none", "foreach"), trace=FALSE, check=FALSE) {
 
 ##Check args
 test<-match.arg(test)
@@ -176,7 +176,7 @@ posBest<-which(result==min(result, na.rm=TRUE))
 bestDelay<-IDS[posBest,1]
 bestThresh<-IDS[posBest,2]
 
-cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result, na.rm=TRUE), "\n")
+if(trace) cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result, na.rm=TRUE), "\n")
 
 Sigma_mod1thresh<-Sigma_1thresh(gam1=bestThresh, d=bestDelay,Z=Z,Y=Y, trans=z)
 ##################
@@ -228,8 +228,10 @@ Thresh3<-condiStep(allgammas, Thresh2, fun=SSR_2thresh, MoreArgs=More)
 smallThresh<-min(Thresh2, Thresh3$newThresh)
 bigThresh<-max(Thresh2, Thresh3$newThresh)
 
-cat("Second best: ",Thresh2, " (conditionnal on ",bestThresh, ")\n")
-cat("Iterative best: ",Thresh3$newThresh, " (conditionnal on ",Thresh2, ")\n")
+if(trace){
+  cat("Second best: ",Thresh2, " (conditionnal on ",bestThresh, ")\n")
+  cat("Iterative best: ",Thresh3$newThresh, " (conditionnal on ",Thresh2, ")\n")
+}
 
 Sigma_mod2thresh<-Sigma_2thresh(gam1=smallThresh,gam2=bigThresh,d=bestDelay, Z=Z, Y=Y,trans=z)
 
