@@ -18,25 +18,24 @@ Tapez 'q()' pour quitter R.
 REvolution R enhancements not installed.  For improved
 performance and other extensions: apt-get install revolution-r
 
-[Sauvegarde de la session précédente restaurée]
-
 > library(tsDyn)
-Le chargement a nécessité le package : mgcv
+Loading required package: mgcv
 This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
-Le chargement a nécessité le package : Matrix
-Le chargement a nécessité le package : lattice
+Loading required package: Matrix
+Loading required package: lattice
 
-Attachement du package : 'Matrix'
+Attaching package: 'Matrix'
 
 The following object(s) are masked from 'package:base':
 
     det
 
-Le chargement a nécessité le package : snow
-Le chargement a nécessité le package : mnormt
-Le chargement a nécessité le package : foreach
-Le chargement a nécessité le package : iterators
-Le chargement a nécessité le package : codetools
+Loading required package: snow
+Loading required package: mnormt
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: codetools
+Loading required package: MASS
 > data(zeroyld)
 > data<-zeroyld
 > 
@@ -141,5 +140,5 @@ Critical values:
  15.1108 15.12440 15.13527
 Number of bootstrap replications:	 5> 
 > proc.time()
-utilisateur     système      écoulé 
-      5.610       0.050       5.641 
+   user  system elapsed 
+  6.310   0.050   6.378 

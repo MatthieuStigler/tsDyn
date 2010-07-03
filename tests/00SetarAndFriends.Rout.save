@@ -18,25 +18,24 @@ Tapez 'q()' pour quitter R.
 REvolution R enhancements not installed.  For improved
 performance and other extensions: apt-get install revolution-r
 
-[Sauvegarde de la session précédente restaurée]
-
 > library(tsDyn)
-Le chargement a nécessité le package : mgcv
+Loading required package: mgcv
 This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
-Le chargement a nécessité le package : Matrix
-Le chargement a nécessité le package : lattice
+Loading required package: Matrix
+Loading required package: lattice
 
-Attachement du package : 'Matrix'
+Attaching package: 'Matrix'
 
 The following object(s) are masked from 'package:base':
 
     det
 
-Le chargement a nécessité le package : snow
-Le chargement a nécessité le package : mnormt
-Le chargement a nécessité le package : foreach
-Le chargement a nécessité le package : iterators
-Le chargement a nécessité le package : codetools
+Loading required package: snow
+Loading required package: mnormt
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: codetools
+Loading required package: MASS
 > 
 > data(zeroyld)
 > dat<-zeroyld
@@ -44,7 +43,7 @@ Le chargement a nécessité le package : codetools
 > ###SETAR
 > 
 > mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
-Message d'avis :
+Warning message:
 Possible unit root in the high  regime. Roots are: 0.8985 0.8985 
 > mod.setar
 
@@ -127,7 +126,7 @@ Threshold:
 -Variable: Z(t) = + (0) X(t)+ (1)X(t-1)
 -Value: 1426 (fixed)
 Proportion of points in low regime: 60.71% 	 High regime: 39.29% 
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.8477 2.7487 
 > setar(lynx,m=2, th=c(600,1426),trace=TRUE)
 Using maximum autoregressive order for low regime: mL = 2 
@@ -154,7 +153,7 @@ Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
 -Value:  600 1426 (fixed)
 Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
-Messages d'avis :
+Warning messages:
 1: Possible unit root in the low  regime. Roots are: 0.506 5.4704 
 2: Possible unit root in the medium  regime. Roots are: 0.508 3.9149 
 > setar(lynx,m=2, trace=TRUE,nthresh=1)
@@ -181,7 +180,7 @@ Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
 -Value: 1388
 Proportion of points in low regime: 58.93% 	 High regime: 41.07% 
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
 Using maximum autoregressive order for low regime: mL = 2 
@@ -216,10 +215,10 @@ Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
 -Value: 1388 3465
 Proportion of points in low regime: 58.93% 	 Middle regime: 28.57% 	 High regime: 12.5% 
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > a<-setar(lynx,m=2)
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > deviance(a)
          [,1]
@@ -1177,7 +1176,7 @@ Equation long.run   -0.02727195 -0.07024155
 Full sample size: 482 	End sample size: 479
 Number of variables: 2 	Number of estimated slope parameters 12
 AIC -2146.536 	BIC -2133.506 	SSR 175.0327
-Cointegrating vector (estimated byOLS):
+Cointegrating vector (estimated by OLS):
    short.run  long.run
 r1         1 -1.059351
 
@@ -1250,5 +1249,5 @@ Equation long.run  0.0667(0.0684)     -0.0273(0.1185)     -0.0702(0.0672)
 \end{equation}
 > 
 > proc.time()
-utilisateur     système      écoulé 
-      4.950       0.050       4.999 
+   user  system elapsed 
+  5.240   0.080   5.323 

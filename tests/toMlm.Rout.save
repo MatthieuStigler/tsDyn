@@ -1,5 +1,5 @@
 
-R version 2.11.0 (2010-04-22)
+R version 2.11.1 (2010-05-31)
 Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
@@ -18,20 +18,26 @@ Tapez 'q()' pour quitter R.
 REvolution R enhancements not installed.  For improved
 performance and other extensions: apt-get install revolution-r
 
-> library(tsDyn)
-Le chargement a nécessité le package : mgcv
-This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
-Le chargement a nécessité le package : Matrix
-Le chargement a nécessité le package : lattice
+[Previously saved workspace restored]
 
-Attachement du package : 'Matrix'
+> library(tsDyn)
+Loading required package: mgcv
+This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
+Loading required package: Matrix
+Loading required package: lattice
+
+Attaching package: 'Matrix'
 
 The following object(s) are masked from 'package:base':
 
     det
 
-Le chargement a nécessité le package : snow
-Le chargement a nécessité le package : mnormt
+Loading required package: snow
+Loading required package: mnormt
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: codetools
+Loading required package: MASS
 > 
 > data(zeroyld)
 > 
@@ -74,5 +80,5 @@ Best unique threshold 9.125
 > 
 > 
 > proc.time()
-utilisateur     système      écoulé 
-      2.884       0.072       2.933 
+   user  system elapsed 
+  2.450   0.040   2.464 
