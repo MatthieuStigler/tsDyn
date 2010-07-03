@@ -185,7 +185,7 @@ long.run  -1.022065
 + 
 + myVECM<-VECM(Canada, lag=1, include="const", estim="ML")
 + VECM_vars<-cajorls(ca.jo(Canada, spec="trans"))
-+ all.equal(VECM_vars$beta, myVECM$model.specific$coint, check.attributes=FALSE)
++ print(all.equal(VECM_vars$beta, myVECM$model.specific$coint, check.attributes=FALSE))
 + 
 + 
 + ## Check LL
@@ -193,16 +193,16 @@ long.run  -1.022065
 + l2<-2*(logLik(myVECM,r=3)-logLik(myVECM,r=2))
 + l3<-2*(logLik(myVECM,r=2)-logLik(myVECM,r=1))
 + l4<-2*(logLik(myVECM,r=1)-logLik(myVECM,r=0))
-+ l1;l2;l3;l4
-+ ca.jo(Canada, spec="trans")
-+ all.equal(c(l1, l2, l3, l4),ca.jo(Canada, spec="trans")@teststat)
++ print(c(l1,l2,l3,l4))
 + logLik(myVECM,r=5)
++ print(ca.jo(Canada, spec="trans"))
++ print(all.equal(c(l1, l2, l3, l4),ca.jo(Canada, spec="trans")@teststat))
 + 
-+ AIC(myVECM,r=0, k=2*log(log(myVECM$t)))
-+ AIC(myVECM,r=1, k=2*log(log(myVECM$t)))
-+ AIC(myVECM,r=2, k=2*log(log(myVECM$t)))
-+ AIC(myVECM,r=3, k=2*log(log(myVECM$t)))
-+ AIC(myVECM,r=4, k=2*log(log(myVECM$t)))
++ print(AIC(myVECM,r=0, k=2*log(log(myVECM$t))))
++ print(AIC(myVECM,r=1, k=2*log(log(myVECM$t))))
++ print(AIC(myVECM,r=2, k=2*log(log(myVECM$t))))
++ print(AIC(myVECM,r=3, k=2*log(log(myVECM$t))))
++ print(AIC(myVECM,r=4, k=2*log(log(myVECM$t))))
 + 
 + 
 + }
@@ -212,6 +212,20 @@ Loading required package: zoo
 Loading required package: sandwich
 Loading required package: urca
 Loading required package: lmtest
+[1] TRUE
+[1]  0.3227339  8.6483204 19.6241250 47.3369295
+
+##################################################### 
+# Johansen-Procedure Unit Root / Cointegration Test # 
+##################################################### 
+
+The value of the test statistic is: 0.3227 8.6483 19.6241 47.3369 
+
+[1] TRUE
+[1] -76720.71
+[1] -74771
+[1] -73963.44
+[1] -73611.83
 [1] -73607.5
 Warning message:
 In logLik.VECM(myVECM, r = 5) :
@@ -219,4 +233,4 @@ In logLik.VECM(myVECM, r = 5) :
 > 
 > proc.time()
    user  system elapsed 
-  2.800   0.060   3.199 
+  3.010   0.060   3.049 
