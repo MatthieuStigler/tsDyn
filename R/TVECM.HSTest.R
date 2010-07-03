@@ -96,7 +96,10 @@ lmtest02<-function(y,x,w0,gammas,dir=dir){
       v<-crossprod(ze)
       z11y<-crossprod(res_unrestr,y)
       s<-matrix(c(z11y), ncol=1)				#vectorization of the parameter matrix z11y
-      store[j]<-t(s)%*%solve(t(v)%*%v)%*%t(v)%*%s 	
+      VV<-crossprod(v)
+      VVinv<-try(solve(VV), silent=TRUE)
+      if(inherits(VVinv, "try-error")) VVinv<-ginv(VV)
+      store[j]<-t(s)%*%VVinv%*%t(v)%*%s 	
     } #end of the if	
   } #end of the whole loop
   return(store)
@@ -128,7 +131,10 @@ lmtest02_boot<-function(y,x,w0,gammas,dir=dir){
     v<-crossprod(ze)
     z11y<-crossprod(res_unrestr,y)
     s<-matrix(c(z11y), ncol=1)				#vectorization of the parameter matrix z11y
-    store[j]<-t(s)%*%solve(t(v)%*%v)%*%t(v)%*%s 	
+    VV<-crossprod(v)
+    VVinv<-try(solve(VV), silent=TRUE)
+    if(inherits(VVinv, "try-error")) VVinv<-ginv(VV)
+    store[j]<-t(s)%*%VVinv%*%t(v)%*%s 	
   } #end of the if	
 } #end of the whole loop
   lm01<-max(store, na.rm=TRUE)
