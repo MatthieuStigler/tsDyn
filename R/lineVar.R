@@ -71,7 +71,8 @@ else if(include=="both")
 ##VECM: Long-run relationship OLS estimation
 if(model=="VECM"&estim=="2OLS"){
 	#beta has to be estimated
-  if(is.null(beta) ){
+  beta.estimated<-if(is.null(beta)) TRUE else FALSE
+  if(is.null(beta) ){  
     if(class(LRinclude)=="character"){
       LRplus<-switch(LRinclude, "none"=rep(0,T),"const"=rep(1,T),"trend"=seq_len(T),"both"=rep(1,T),seq_len(T))
     }
@@ -112,6 +113,7 @@ else{
 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
 else if(model=="VECM"&estim=="ML"){
+beta.estimated<-if(is.null(beta)) TRUE else FALSE
   if (is.null(beta)){
     #Auxiliary regression 1
     reg_res1<-lm.fit(Z,Y)
@@ -192,6 +194,8 @@ if(model=="VECM"){
   model.specific$r<-r
   model.specific$estim<-estim
   model.specific$LRinclude<-LRinclude
+  model.specific$beta.estimated<-beta.estimated
+
   if(estim=="ML"){
     model.specific$S00<-S00
     model.specific$lambda<-va
@@ -297,7 +301,7 @@ print.summary.VAR<-function(x,...){
   cat("\nNumber of variables:", x$k,"\tNumber of estimated slope parameters", x$npar)
   cat("\nAIC",x$aic , "\tBIC", x$bic, "\tSSR", x$SSR)
   if(attr(x,"model")=="VECM"){
-    cat("\nCointegrating vector (estimated by", x$model.specific$estim, "):\n", sep="")
+    cat("\nCointegrating vector ", if(x$model.specific$beta.estimated) paste("(estimated by ", x$model.specific$estim, "):\n", sep="") else "(fixed by user):\n", sep="")
     print(t(x$model.specific$beta))
   }
   cat("\n\n")

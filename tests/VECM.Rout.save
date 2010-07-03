@@ -18,25 +18,26 @@ Tapez 'q()' pour quitter R.
 REvolution R enhancements not installed.  For improved
 performance and other extensions: apt-get install revolution-r
 
-[Sauvegarde de la session précédente restaurée]
+[Previously saved workspace restored]
 
 > library(tsDyn)
-Le chargement a nécessité le package : mgcv
+Loading required package: mgcv
 This is mgcv 1.6-2. For overview type 'help("mgcv-package")'.
-Le chargement a nécessité le package : Matrix
-Le chargement a nécessité le package : lattice
+Loading required package: Matrix
+Loading required package: lattice
 
-Attachement du package : 'Matrix'
+Attaching package: 'Matrix'
 
 The following object(s) are masked from 'package:base':
 
     det
 
-Le chargement a nécessité le package : snow
-Le chargement a nécessité le package : mnormt
-Le chargement a nécessité le package : foreach
-Le chargement a nécessité le package : iterators
-Le chargement a nécessité le package : codetools
+Loading required package: snow
+Loading required package: mnormt
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: codetools
+Loading required package: MASS
 > data(zeroyld)
 > 
 > 
@@ -57,7 +58,7 @@ Le chargement a nécessité le package : codetools
 Full sample size: 482 	End sample size: 480
 Number of variables: 2 	Number of estimated slope parameters 8
 AIC -2157.303 	BIC -2148.607 	SSR 176.1575
-Cointegrating vector (estimated byOLS):
+Cointegrating vector (estimated by OLS):
    short.run  long.run
 r1         1 -1.059351
 
@@ -75,7 +76,7 @@ Equation long.run  0.0508(0.0671)
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
 AIC -2135.868 	BIC -2118.511 	SSR 174.3576
-Cointegrating vector (estimated byOLS):
+Cointegrating vector (estimated by OLS):
    short.run  long.run
 r1         1 -1.059351
 
@@ -96,7 +97,7 @@ Equation long.run  -0.1078(0.1188)     0.0082(0.0674)
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
 AIC -2107.432 	BIC -2090.075 	SSR 175.3061
-Cointegrating vector (estimated byOLS):
+Cointegrating vector (fixed by user):
    short.run long.run
 r1         1        1
 
@@ -117,7 +118,7 @@ Equation long.run  -0.1072(0.1192)     -0.0190(0.0668)
 Full sample size: 482 	End sample size: 480
 Number of variables: 2 	Number of estimated slope parameters 8
 AIC -2157.763 	BIC -2149.068 	SSR 176.3897
-Cointegrating vector (estimated byML):
+Cointegrating vector (estimated by ML):
    short.run  long.run
 r1         1 -1.022065
 
@@ -135,7 +136,7 @@ Equation long.run  0.0506(0.0673)
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
 AIC -2136.724 	BIC -2119.367 	SSR 174.5642
-Cointegrating vector (estimated byML):
+Cointegrating vector (estimated by ML):
    short.run long.run
 r1         1  -1.0096
 
@@ -205,18 +206,17 @@ long.run  -1.022065
 + 
 + 
 + }
-Le chargement a nécessité le package : vars
-Le chargement a nécessité le package : MASS
-Le chargement a nécessité le package : strucchange
-Le chargement a nécessité le package : zoo
-Le chargement a nécessité le package : sandwich
-Le chargement a nécessité le package : urca
-Le chargement a nécessité le package : lmtest
+Loading required package: vars
+Loading required package: strucchange
+Loading required package: zoo
+Loading required package: sandwich
+Loading required package: urca
+Loading required package: lmtest
 [1] -73607.5
-Message d'avis :
+Warning message:
 In logLik.VECM(myVECM, r = 5) :
-  r cann't be greater than k (numer of variables
+  r cann't be greater than k (number of variables)
 > 
 > proc.time()
-utilisateur     système      écoulé 
-      2.540       0.090       2.705 
+   user  system elapsed 
+  2.800   0.060   3.199 
