@@ -5,7 +5,6 @@ TVECM.HSTest <- function(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.b
 boot.type<-match.arg(boot.type)
 hpc<-match.arg(hpc)
 dir=FALSE #internal value, was used to try different implementation of lmtest
-if(inherits(data, "ts")) warning("There are currently problems when the data is of class ts. Try converting it as data.frame")
 
 ### Organize Data
 data<-as.matrix(data)
