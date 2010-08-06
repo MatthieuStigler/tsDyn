@@ -131,20 +131,58 @@ residuals.nlar <- function(object, ...) {
 }
 
 #indicator of the regime of the obs
-regime <- function (object, ...)  
+regime <- function (object, initVal=TRUE,timeAttr=TRUE,...)  
   UseMethod("regime")
 
-regime.default <- function(object, ...)
+regime.default <- function(object, initVal=TRUE,timeAttr=TRUE,...)
   NULL
 
-regime.setar <- function(object, ...) {
-  str <- object$str
+
+regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
-  ans <- c(rep(NA, str$n.used - length(reg) ), reg)
-  tsp(ans) <- tsp(str$x)
-  ans <- as.ts(ans)
-  ans
+  str <- object$str
+  
+  if(timeAttr){
+    attributes(reg) <- object$model.specific$timeAttributes
+    if(initVal) {
+      ans <- reg
+    } else {
+      ans <- window(reg, start=time(reg)[length(str$x)-length(str$yy)+1])
+    }
+  } else {
+    if(initVal){
+      ans <- reg
+    } else {
+      ans <- reg[-c(1:(length(str$x)-length(str$yy)))]
+    }
+  }
+  
+  return(ans)
 }
+            
+           
+regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
+  reg<-object$model.specific$regime
+  
+  if(timeAttr){
+    attributes(reg) <- object$model.specific$timeAttributes
+    if(initVal) {
+      ans <- reg
+    } else {
+      ans <- window(reg, start=time(reg)[object$T-object$t+1])
+    }
+  } else {
+    if(initVal){
+      ans <- reg
+    } else {
+      ans <- reg[-c(1:(object$T-object$t))]
+    }
+  }
+  
+  return(ans)
+}
+
+
 
 #get the threshold for setar and nlVar
 getTh<- function (object, ...)  

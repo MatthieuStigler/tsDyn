@@ -21,6 +21,7 @@ T<-nrow(y) #T: number of observations
 p<-lag #p: Number of lags
 t <- T-p-1 #Size of end sample
 k<-ncol(y) #k: Number of equations
+
 if(k>2 & is.null(beta$exact))
   stop("Sorry, the search is only possible with 2 variables. If more, please provide pre-specified beta values")
 if(is.null(colnames(data))==TRUE)
@@ -496,6 +497,10 @@ if(nthresh==2){
   }
 }
 
+reg<-if(nthresh==1) d1+2*(1-d1) else d1+2*(1-d1-d2)+3*d2
+regime <- c(rep(NA,T-t), reg)
+
+
 
 ###Estimate parameters, fitted values, residuals
 Bbest<-t(Y)%*%Zbest%*%solve(t(Zbest)%*%Zbest)
@@ -542,7 +547,8 @@ specific$nobs<-nobs		#percent of observations in each regime
 specific$model<-model
 specific$oneMatrix<-ifelse(model=="only_ECT",TRUE, FALSE)
 specific$Bnames<-Bcolnames
-
+specific$regime<-regime
+specific$timeAttributes <- attributes(data[,1])
 
 # specific$commonInter<-commonInter
 

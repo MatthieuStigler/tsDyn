@@ -6,6 +6,8 @@ p <- lag
 t <- T-p 		#Size of end sample
 k <- ncol(y) 		#Number of variables
 t<-T-p			#Size of end sample
+
+
 if(is.null(colnames(data)))
 	colnames(data)<-paste("Var", c(1:k), sep="")
 if(max(thDelay)>p)
@@ -329,7 +331,9 @@ if(nthresh==2|nthresh==3){
 		Zbest <- t(cbind(regimedown,dummymid*Z, regimeup))	# dim k(p+1) x t
 }
 
-regime<-if(nthresh==1) dummydown+2*dummyup else dummydown+2*dummymid+3*dummyup
+reg<-if(nthresh==1) dummydown+2*dummyup else dummydown+2*dummymid+3*dummyup
+regime <- c(rep(NA, T-t), reg)
+
 
 Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
 fitted<-Bbest %*% Zbest
@@ -379,6 +383,7 @@ specific$oneMatrix<-commonInter
 specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
 specific$allThSSR<-allThSSR#SSR values for all the th computed
 specific$Bnames<-Bnames
+specific$timeAttributes <- attributes(data[,1])
 
 z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model=YnaX, nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, fitted.values=fitted, lag=lag, include=include,model.specific=specific, usedThVar=trans[,bestDelay], trim=trim)
 class(z)<-c("TVAR","nlVar")

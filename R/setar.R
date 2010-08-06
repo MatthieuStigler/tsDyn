@@ -238,8 +238,9 @@ z<-as.matrix(z)
       isM <- 1-isL-isH
    }
   
-  regime<-if(nthresh==1&restriction=="none") isL+2*isH else isL+2*isM+3*isH
-  
+  reg<-if(nthresh==1&restriction=="none") isL+2*isH else isL+2*isM+3*isH
+  regime <- c(rep(NA,length(x)-length(reg)), reg)
+    
   nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
   if(min(nobs)<trim-0.01){
     warning("\nWith the threshold you gave (", th, ") there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
@@ -333,7 +334,7 @@ z<-as.matrix(z)
   res$trim<-trim
   res$regime<-regime
   res$RegProp <- c(mean(isL),mean(isH))
-  
+  res$timeAttributes <- attributes(x)
 	
   if(nthresh==2|restriction=="OuterSymAll")
     res$RegProp <- c(mean(isL),mean(isM),mean(isH))
