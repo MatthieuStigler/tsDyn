@@ -42,40 +42,40 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(!missing(th)){
-		  if(length(th)==2)
-			  nthresh<-2
-	  }
-    if(missing(series))
+    if(length(th)==2)
+      nthresh<-2
+  }
+  if(missing(series))
     series <- deparse(substitute(x))
-    
-    if(common%in%c("both", "lags")&type!="ADF")
+  
+  if(common%in%c("both", "lags")&type!="ADF")
     stop("Arg common ==", common, " only for ADF specification\n")   
-    if(restriction=="OuterSymTh") 
+  if(restriction=="OuterSymTh") 
     stop("Currently not implemented")
-    if(restriction=="OuterSymAll"&nthresh==2){
-	warning("With restriction ='OuterSymAll', you can only have one th. Changed to nthresh=1\n")
-  	nthresh<-1}
+  if(restriction=="OuterSymAll"&nthresh==2){
+    warning("With restriction ='OuterSymAll', you can only have one th. Changed to nthresh=1\n")
+    nthresh<-1}
 ### SETAR 2:  Build the regressors matrix and Y vector
-	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	
-	if(type=="level"){
-	  xx <- getXX(str)
-	  yy <- getYY(str)
-	}
-	else{ 
-	  if(type=="diff"){
-	    xx <- getdXX(str)
-	    yy <- getdYY(str)
-	  }
-	  else if(type=="ADF"){
-	    xx <- cbind(getdX1(str),getdXX(str))
-	    yy <- getdYY(str)
-	  }
-	  str$xx<-xx
-	  str$yy<-yy
-	}
-	
-	externThVar <- FALSE #mmh should maybe be removed
+  str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
+  
+  if(type=="level"){
+    xx <- getXX(str)
+    yy <- getYY(str)
+  }
+  else{ 
+    if(type=="diff"){
+      xx <- getdXX(str)
+      yy <- getdYY(str)
+    }
+    else if(type=="ADF"){
+      xx <- cbind(getdX1(str),getdXX(str))
+      yy <- getdYY(str)
+    }
+    str$xx<-xx
+    str$yy<-yy
+  }
+  
+  externThVar <- FALSE #mmh should maybe be removed
 ##Lags selection
   ###ML
   if(missing(ML)) {		#ML: different lags
@@ -89,25 +89,25 @@ setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, t
     }
     ML <- seq_len(mL)
   }
-
+  
   ###MH
   if(missing(MH)) {
     if (missing(mH)) {
-    mH <- m
-    if (trace) 
-      cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
+      mH <- m
+      if (trace) 
+        cat("Using maximum autoregressive order for high regime: mH =", m,"\n")
     }
-  MH <- seq_len(mH)
+    MH <- seq_len(mH)
   }
   
   ###MM
   if(missing(MM)) {
     if (missing(mM)) {
-    mM <- m
-    if (trace&nthresh==2) 
-      cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
+      mM <- m
+      if (trace&nthresh==2) 
+        cat("Using maximum autoregressive order for middle regime: mM =", m,"\n")
     }
-  MM <- seq_len(mM)
+    MM <- seq_len(mM)
   }
 
 
@@ -241,111 +241,111 @@ z<-as.matrix(z)
   regime<-if(nthresh==1&restriction=="none") isL+2*isH else isL+2*isM+3*isH
   
   nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
-	if(min(nobs)<trim-0.01){
-	warning("\nWith the threshold you gave (", th, ") there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
-	}
-	if(min(nobs)==0)
-		stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
+  if(min(nobs)<trim-0.01){
+    warning("\nWith the threshold you gave (", th, ") there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
+  }
+  if(min(nobs)==0)
+    stop("With the threshold you gave, there is a regime with no observations!", call=FALSE)
 		
 	#build the X matrix
-	if(type=="ADF"){
-	  exML<-c(1, ML+1)
-	  exMH<-c(1, MH+1)
-	  exMM<-if(nthresh==2) c(1, MM+1) else NULL
-	}
-	else{
-	  exML<-ML
-	  exMH<-MH
-	  exMM<-if(nthresh==2) MM else NULL
-	 }
+  if(type=="ADF"){
+    exML<-c(1, ML+1)
+    exMH<-c(1, MH+1)
+    exMM<-if(nthresh==2) c(1, MM+1) else NULL
+  }
+  else{
+    exML<-ML
+    exMH<-MH
+    exMM<-if(nthresh==2) MM else NULL
+  }
 
 	 
-	if(nthresh==1){
-	funBuild1<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
-	    xxLH<-funBuild1(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const, trim=trim)
-	    }
-	else{
-		funBuild2<-switch(common, "include"=buildXth2Common, "none"=buildXth2NoCommon, "both"=buildXth2LagsIncCommon, "lags"=buildXth2LagsCommon)
-	    xxLH<-funBuild2(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
-	}
+  if(nthresh==1){
+    funBuild1<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
+    xxLH<-funBuild1(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const, trim=trim)
+  } else{
+    funBuild2<-switch(common, "include"=buildXth2Common, "none"=buildXth2NoCommon, "both"=buildXth2LagsIncCommon, "lags"=buildXth2LagsCommon)
+    xxLH<-funBuild2(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
+  }
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
-	res <- lm.fit(xxLH, yy)
-if(any(is.na(res$coefficients)))
-  warning("Problem with the regression, it may arrive if there is only one unique value in the middle regime")
+  res <- lm.fit(xxLH, yy)
+  if(any(is.na(res$coefficients)))
+    warning("Problem with the regression, it may arrive if there is only one unique value in the middle regime")
 #Coefficients and names
-	res$coefficients <- c(res$coefficients, th)
+  res$coefficients <- c(res$coefficients, th)
 
-t<-type #just shorter
-if(common=="none"){
-  if(nthresh==1)
-    co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MH), getArNames(MH,t),"th")
-  else
-    co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MM), getArNames(MM,t), getIncNames(incNames,MH), getArNames(MH,t),"th1","th2")
-}
-else if(common=="include"){
-  if(nthresh==1)
-    co<-c(incNames, getArNames(ML,t), getArNames(MH,t),"th")
-  else 
-    co<-c(incNames, getArNames(ML,t), getArNames(MM,t), getArNames(MH,t),"th1","th2")
-}
-else if(common=="both"){
-  if(nthresh==1)
-    co<-c(incNames, "phiL.1", "phiH.1", paste("Dphi.", ML),"th")
-  else 
-    co<-c(incNames, "phiL.1", "phiM.1","phiH.1", paste("Dphi.", ML),"th1","th2")
-}
-else if(common=="lags"){ #const*isL,xx[,1]*isL,xx[,1]*(1-isL),const*isH, xx[,-1]
-  if(nthresh==1)
-    co<-c(getIncNames(incNames,ML), "phiL.1", "phiH.1", getIncNames(incNames,ML), paste("Dphi.", ML),"th")
-  else 
-	co<-c(getIncNames(incNames,ML), "phiL.1", getIncNames(incNames,MM), "phiM.1", getIncNames(incNames,MM), "phiH.1",paste("Dphi.", ML),"th")
-}
-
+  t<-type #just shorter
+  if(common=="none"){
+    if(nthresh==1){
+      co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MH), getArNames(MH,t),"th")
+    }else{
+      co<-c(getIncNames(incNames,ML), getArNames(ML,t), getIncNames(incNames,MM), getArNames(MM,t), getIncNames(incNames,MH), getArNames(MH,t),"th1","th2")
+    }
+  } else if(common=="include"){
+    if(nthresh==1){
+      co<-c(incNames, getArNames(ML,t), getArNames(MH,t),"th")
+    } else {
+      co<-c(incNames, getArNames(ML,t), getArNames(MM,t), getArNames(MH,t),"th1","th2")
+    }
+  } else if(common=="both"){
+    if(nthresh==1){
+      co<-c(incNames, "phiL.1", "phiH.1", paste("Dphi.", ML),"th")
+    } else {
+      co<-c(incNames, "phiL.1", "phiM.1","phiH.1", paste("Dphi.", ML),"th1","th2")
+    }
+  } else if(common=="lags"){ #const*isL,xx[,1]*isL,xx[,1]*(1-isL),const*isH, xx[,-1]
+    if(nthresh==1){
+      co<-c(getIncNames(incNames,ML), "phiL.1", "phiH.1", getIncNames(incNames,ML), paste("Dphi.", ML),"th")
+    } else {
+      co<-c(getIncNames(incNames,ML), "phiL.1", getIncNames(incNames,MM), "phiM.1", getIncNames(incNames,MM), "phiH.1",paste("Dphi.", ML),"th")
+    }
+  }
+  
   names(res$coefficients) <- na.omit(co)
 
 ###check for unit roots
-if(type=="level"){
-   isRootH<-isRoot(res$coefficients, regime="H", lags=MH)
-   isRootL<-isRoot(res$coefficients, regime="L", lags=ML)
-   if(nthresh==2)
-     isRootM<-isRoot(res$coefficients, regime="M", lags=MM)
-}
+  if(type=="level"){
+    isRootH<-isRoot(res$coefficients, regime="H", lags=MH)
+    isRootL<-isRoot(res$coefficients, regime="L", lags=ML)
+    if(nthresh==2)
+      isRootM<-isRoot(res$coefficients, regime="M", lags=MM)
+  }
 
 ### SETAR 7: return the infos
-	res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1/2 more fitted parameter: th
-	res$thDelay<-thDelay
-	res$fixedTh <- if(nested) FALSE else TRUE
-	res$mL <- max(ML)
-	res$mH <- max(MH)
-	res$mM <- if(nthresh==2) max(MH) else NULL
-	res$ML <- ML
-	res$MH <- MH
-	res$MM <- if(nthresh==2)  MM else NULL
-	res$externThVar <- externThVar
-	res$thVar <- z
-	res$incNames<-incNames
-	res$common<-common  	#wheter arg common was given by user
-	res$nthresh<-nthresh 	#n of threshold
-	res$model<-model
-	res$type<-type
-	res$restriction<-restriction
-	res$trim<-trim
-	res$regime<-regime
-	res$RegProp <- c(mean(isL),mean(isH))
-
+  res$k <- if(nested) (res$rank+nthresh) else res$rank	#If nested, 1/2 more fitted parameter: th
+  res$thDelay<-thDelay
+  res$fixedTh <- if(nested) FALSE else TRUE
+  res$mL <- max(ML)
+  res$mH <- max(MH)
+  res$mM <- if(nthresh==2) max(MH) else NULL
+  res$ML <- ML
+  res$MH <- MH
+  res$MM <- if(nthresh==2)  MM else NULL
+  res$externThVar <- externThVar
+  res$thVar <- z
+  res$incNames<-incNames
+  res$common<-common  	#wheter arg common was given by user
+  res$nthresh<-nthresh 	#n of threshold
+  res$model<-model
+  res$type<-type
+  res$restriction<-restriction
+  res$trim<-trim
+  res$regime<-regime
+  res$RegProp <- c(mean(isL),mean(isH))
+  
 	
-	if(nthresh==2|restriction=="OuterSymAll")
-		res$RegProp <- c(mean(isL),mean(isM),mean(isH))
-	res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
-	if(!externThVar) {
-		if(missing(mTh)) {
-			mTh <- rep(0,m)
-			mTh[thDelay+1] <- 1
-		}
-		res$mTh <- mTh
-	}
-	return(extend(nlar(str,	
+  if(nthresh==2|restriction=="OuterSymAll")
+    res$RegProp <- c(mean(isL),mean(isM),mean(isH))
+  res$VAR<-as.numeric(crossprod(na.omit(res$residuals))/(nrow(xxLH)))*solve(crossprod(xxLH))
+  if(!externThVar) {
+    if(missing(mTh)) {
+      mTh <- rep(0,m)
+      mTh[thDelay+1] <- 1
+    }
+    res$mTh <- mTh
+  }
+  return(extend(nlar(str,	
 	  coef=res$coef,
 	  fit=res$fitted.values,
 	  res=res$residuals,
@@ -356,29 +356,29 @@ if(type=="level"){
 }
 
 getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
-	regime <- match.arg(regime)
-	x <- x$coef
-	x1 <- x[grep(paste("phi", regime, "\\.", sep=""), names(x))]
-	x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
-	x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
-	  return(c(x1, x2, x3))
+  regime <- match.arg(regime)
+  x <- x$coef
+  x1 <- x[grep(paste("phi", regime, "\\.", sep=""), names(x))]
+  x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
+  x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
+  return(c(x1, x2, x3))
 }
 
 
 #gets a vector with names of the arg inc
 getIncNames<-function(inc,ML){
   ninc<-length(inc)
-    letter<-deparse(substitute(ML))
-    letter<-sub("M","",letter)
-    paste(inc, rep(letter,ninc))
+  letter<-deparse(substitute(ML))
+  letter<-sub("M","",letter)
+  paste(inc, rep(letter,ninc))
 }
 
 #get a vector with names of the coefficients
 getArNames<-function(ML, type=c("level", "diff", "ADF")){
   phi<-ifelse(type=="level", "phi", "Dphi")
-  if(any(ML==0))
+  if(any(ML==0)){
     return(NA)
-  else{
+  } else{
     letter<-deparse(substitute(ML))
     letter<-sub("M","",letter)
     dX1<- if(type=="ADF") paste("phi", letter, ".1", sep="") else NULL
@@ -387,92 +387,93 @@ getArNames<-function(ML, type=c("level", "diff", "ADF")){
 }
 
 print.setar <- function(x, ...) {
-	NextMethod(...)
-	x.old <- x
-	x <- x$model.specific
-	order.L <- x$mL
-	order2.L <- length(x$ML)
-	order.H <- x$mH
-	order2.H <- length(x$MH)
-	common <- x$common
-	nthresh<-x$nthresh
-	externThVar <- x$externThVar
-	cat("\nSETAR model (",nthresh+1,"regimes)\n")
-	cat("Coefficients:\n")
-	if(common=="none"){
-		lowCoef <- getSetarXRegimeCoefs(x.old, "L")
-		highCoef<- getSetarXRegimeCoefs(x.old, "H")
-		cat("Low regime:\n")
-		print(lowCoef, ...)
-		if(nthresh==2){
-			midCoef<- getSetarXRegimeCoefs(x.old, "M")
-			cat("\nMid regime:\n")
-			print(midCoef, ...)}
-		cat("\nHigh regime:\n")
-		print(highCoef, ...)
-	} else {
-		print(x.old$coeff[-length(x.old$coeff)], ...)
-	}
-	thCoef<-getTh(coef(x.old))
-	cat("\nThreshold:")
-	if(x$model=="MTAR"){
-		cat("\nMomentum Threshold (MTAR) Adjustment")
-		D<-"D"}
-	else
-		D<-NULL
-	cat("\n-Variable: ")
-        if(externThVar)
-          cat("external")
-        else {
-          cat('Z(t) = ')
-          cat('+ (',format(x$mTh[1], digits=2), paste(")",D," X(t)", sep=""), sep="")
-          if(length(x$mTh)>1)
-            for(j in 1:(length(x$mTh) - nthresh)) {
-              cat('+ (', format(x$mTh[j+1], digits=2), paste(")",D,"X(t-", j, ")", sep=""), sep="")
-            }
-          cat('\n')
-        }
-	cat("-Value:", format(thCoef, digits=4))
-	if(x$fixedTh) cat(" (fixed)")
-	cat("\n")
-	cat("Proportion of points in ")
-	if(nthresh==1&x$restriction=="none")
-		cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
-	else
-		cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
-	invisible(x)
+  NextMethod(...)
+  x.old <- x
+  x <- x$model.specific
+  order.L <- x$mL
+  order2.L <- length(x$ML)
+  order.H <- x$mH
+  order2.H <- length(x$MH)
+  common <- x$common
+  nthresh<-x$nthresh
+  externThVar <- x$externThVar
+  cat("\nSETAR model (",nthresh+1,"regimes)\n")
+  cat("Coefficients:\n")
+  if(common=="none"){
+    lowCoef <- getSetarXRegimeCoefs(x.old, "L")
+    highCoef<- getSetarXRegimeCoefs(x.old, "H")
+    cat("Low regime:\n")
+    print(lowCoef, ...)
+    if(nthresh==2){
+      midCoef<- getSetarXRegimeCoefs(x.old, "M")
+      cat("\nMid regime:\n")
+      print(midCoef, ...)}
+    cat("\nHigh regime:\n")
+    print(highCoef, ...)
+  } else {
+    print(x.old$coeff[-length(x.old$coeff)], ...)
+  }
+  thCoef<-getTh(coef(x.old))
+  cat("\nThreshold:")
+  if(x$model=="MTAR"){
+    cat("\nMomentum Threshold (MTAR) Adjustment")
+    D<-"D"
+  }  else{
+    D<-NULL
+  }
+  cat("\n-Variable: ")
+  if(externThVar){
+    cat("external")
+  } else {
+    cat('Z(t) = ')
+    cat('+ (',format(x$mTh[1], digits=2), paste(")",D," X(t)", sep=""), sep="")
+    if(length(x$mTh)>1)
+      for(j in 1:(length(x$mTh) - nthresh)) {
+        cat('+ (', format(x$mTh[j+1], digits=2), paste(")",D,"X(t-", j, ")", sep=""), sep="")
+      }
+    cat('\n')
+  }
+  cat("-Value:", format(thCoef, digits=4))
+  if(x$fixedTh) cat(" (fixed)")
+  cat("\n")
+  cat("Proportion of points in ")
+  if(nthresh==1&x$restriction=="none")
+    cat(paste(c("low regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
+  else
+    cat(paste(c("low regime:","\t Middle regime:","\t High regime:"), percent(x$RegProp, digits=4,by100=TRUE)), "\n")
+  invisible(x)
 }
 
 summary.setar <- function(object, ...) {
-	ans <- list()
-	mod <- object$model.specific
-	order.L <- mod$mL
-	order2.L <- length(mod$ML)
-	order.H <- mod$mH
-	order2.H <- length(mod$MH)
-	nthresh<-mod$nthresh		#number of thresholds
-	common<-mod$common
-	ans$lowCoef <- getSetarXRegimeCoefs(object, "L")
-	ans$highCoef<- getSetarXRegimeCoefs(object, "H")
-	ans$thCoef <- getTh(coef(object))
-	ans$fixedTh <- mod$fixedTh
-	ans$externThVar <- mod$externThVar
-	ans$lowRegProp <- mod$lowRegProp
-	n <- getNUsed(object$str)
-	coef <- object$coef[seq_len(length(object$coef)-nthresh)] #all coeffients except of the threshold
- 	p <- length(coef)			#Number of slope coefficients
-	resvar <- mse(object) * n / (n-p)
-	Qr <- mod$qr
-	p1 <- 1:p
-	est <- coef[Qr$pivot[p1]]
-	R <- chol2inv(Qr$qr[p1, p1, drop = FALSE]) #compute (X'X)^(-1) from the (R part) of the QR decomposition of X.
-	se <- sqrt(diag(R) * resvar) #standard errors
-	tval <- est/se			# t values
-	coef <- cbind(est, se, tval, 2*pt(abs(tval), n-p, lower.tail = FALSE))
-	dimnames(coef) <- list(names(est), c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
-	ans$coef <- coef
-	ans$mTh <- mod$mTh
-	extend(summary.nlar(object), "summary.setar", listV=ans)
+  ans <- list()
+  mod <- object$model.specific
+  order.L <- mod$mL
+  order2.L <- length(mod$ML)
+  order.H <- mod$mH
+  order2.H <- length(mod$MH)
+  nthresh<-mod$nthresh		#number of thresholds
+  common<-mod$common
+  ans$lowCoef <- getSetarXRegimeCoefs(object, "L")
+  ans$highCoef<- getSetarXRegimeCoefs(object, "H")
+  ans$thCoef <- getTh(coef(object))
+  ans$fixedTh <- mod$fixedTh
+  ans$externThVar <- mod$externThVar
+  ans$lowRegProp <- mod$lowRegProp
+  n <- getNUsed(object$str)
+  coef <- object$coef[seq_len(length(object$coef)-nthresh)] #all coeffients except of the threshold
+  p <- length(coef)			#Number of slope coefficients
+  resvar <- mse(object) * n / (n-p)
+  Qr <- mod$qr
+  p1 <- 1:p
+  est <- coef[Qr$pivot[p1]]
+  R <- chol2inv(Qr$qr[p1, p1, drop = FALSE]) #compute (X'X)^(-1) from the (R part) of the QR decomposition of X.
+  se <- sqrt(diag(R) * resvar) #standard errors
+  tval <- est/se			# t values
+  coef <- cbind(est, se, tval, 2*pt(abs(tval), n-p, lower.tail = FALSE))
+  dimnames(coef) <- list(names(est), c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
+  ans$coef <- coef
+  ans$mTh <- mod$mTh
+  extend(summary.nlar(object), "summary.setar", listV=ans)
 }
 
 print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
@@ -581,28 +582,27 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
 
 
 oneStep.setar <- function(object, newdata, itime, thVar, ...){
-	mL <- object$model.specific$mL
-	mH <- object$model.specific$mH
-	phi1 <- object$coefficients[1:(mL+1)]
-	phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
-	th <- object$coefficients[mL+mH+3]
-	ext <- object$model.specific$externThVar
-	if(ext)	{
-		z <- thVar[itime]
-	}
-	else {
-		z <- newdata %*% object$model.specific$mTh
-		dim(z) <- NULL
-	}
-	z <- (z<=th)+0
-	if(nrow(newdata)>1) {
-	xL <- cbind(1,newdata[,1:mL])
-	xH <- cbind(1,newdata[,1:mH])
-	} else {
-	xL <- c(1,newdata[,1:mL])
-	xH <- c(1,newdata[,1:mH])
-	}
-	(xL %*% phi1) * z + (xH %*% phi2) * (1-z)
+  mL <- object$model.specific$mL
+  mH <- object$model.specific$mH
+  phi1 <- object$coefficients[1:(mL+1)]
+  phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
+  th <- object$coefficients[mL+mH+3]
+  ext <- object$model.specific$externThVar
+  if(ext)	{
+    z <- thVar[itime]
+  } else {
+    z <- newdata %*% object$model.specific$mTh
+    dim(z) <- NULL
+  }
+  z <- (z<=th)+0
+  if(nrow(newdata)>1) {
+    xL <- cbind(1,newdata[,1:mL])
+    xH <- cbind(1,newdata[,1:mH])
+  } else {
+    xL <- c(1,newdata[,1:mL])
+    xH <- c(1,newdata[,1:mH])
+  }
+  (xL %*% phi1) * z + (xH %*% phi2) * (1-z)
 }
 
 toLatex.setar <- function(object, digits=3, ...) {
