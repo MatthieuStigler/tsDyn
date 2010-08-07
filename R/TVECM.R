@@ -270,7 +270,7 @@ oneSearch<-function(betas, gammas){
       plot(betas,betaRSS, type="l", xlab="Cointegrating parameter beta", ylab="Residual Sum of Squares")
       abline(v=betaLT, lty=3)
       points(x=beta_grid, y=min(store, na.rm=TRUE), col=2, cex=2)
-      legend("topright", "OLS estimate from linear VECM", lty=3)
+      legend("topright", "OLS estimate from linear VECM", lty=3, bg="white")
     }
   }#end of the plot
   
