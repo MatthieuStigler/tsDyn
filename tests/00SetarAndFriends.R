@@ -13,8 +13,18 @@ setar(lynx,m=2, th=1426,trace=TRUE,thDelay=1)
 setar(lynx,m=2, th=c(600,1426),trace=TRUE)
 setar(lynx,m=2, trace=TRUE,nthresh=1)
 setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
-a<-setar(lynx,m=2)
-deviance(a)
+
+mod.set<-setar(lynx,m=2)
+deviance(mod.set)
+AIC(mod.set)
+residuals(mod.set)
+fitted(mod.set)
+coef(mod.set)
+regime(mod.set)
+regime(mod.set, initVal=FALSE)
+regime(mod.set, time=FALSE)
+regime(mod.set, time=FALSE, initVal=FALSE)
+
 
 ###SelectSetar
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
@@ -49,6 +59,11 @@ head(residuals(tvar))
 tail(residuals(tvar))
 head(fitted(tvar))
 tail(fitted(tvar))
+
+regime(tvar)
+regime(tvar, initVal=FALSE)
+regime(tvar, time=FALSE)
+regime(tvar, time=FALSE, initVal=FALSE)
 
 
 ##FIXME
@@ -85,6 +100,13 @@ tail(residuals(tvecm))
 head(fitted(tvecm))
 tail(fitted(tvecm))
 summary(tvecm)
+
+regime(tvecm)
+regime(tvecm, initVal=FALSE)
+regime(tvecm, time=FALSE)
+regime(tvecm, time=FALSE, initVal=FALSE)
+
+
 
 toLatex(tvecm)
 options(show.signif.stars=FALSE)
