@@ -1,4 +1,5 @@
 
+
 ###tests
 #SSR of linear
  # check for stationarty
@@ -21,9 +22,10 @@
 #replicate()
 
 
-setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
+setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), hpc=c("none", "foreach"), check=FALSE)
 {
   test<-match.arg(test)
+  hpc<-match.arg(hpc)
   
   include<-"const" #other types not implemented in setar.sim
   if(missing(series))
@@ -122,7 +124,11 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   
   probs<-c(0.9, 0.95, 0.975,0.99)
   if(test=="1vs"){
-    Ftestboot<-replicate(nboot, bootHoAr(linear, type))
+    Ftestboot<-if(hpc=="none"){
+      replicate(nboot, bootHoAr(linear, type))
+    } else {
+      foreach(i=1:nboot, .export="bootHoAr", .combine="rbind") %dopar% bootHoAr(linear, type)
+    }
     Ftestboot12<-Ftestboot[1,]
     Ftestboot13<-Ftestboot[2,]
     PvalBoot12<-mean(ifelse(Ftestboot12>Ftest12,1,0))
@@ -134,6 +140,11 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   }
   else{
     Ftestboot<-replicate(nboot, bootHoSetar1(set1, type))
+    Ftestboot<-if(hpc=="none"){
+      replicate(nboot, bootHoSetar1(set1, type))
+    } else {
+      foreach(i=1:nboot, .export="bootHoSetar1", .combine="rbind") %dopar% bootHoSetar1(set1, type)
+    }
     Ftestboot23<-Ftestboot
     PvalBoot23<-mean(ifelse(Ftestboot23>Ftest23,1,0))
     CriticalValBoot23<-quantile(Ftestboot23, probs=probs)

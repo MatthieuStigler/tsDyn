@@ -5,7 +5,7 @@
 \description{Test of linearity against threshold of Hansen (1999) with bootstrap distribution
 }
 \usage{
-setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), check=FALSE)
+setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), hpc=c("none", "foreach"),check=FALSE)
 }
 
 \value{A object of class "Hansen99Test" containing:
@@ -28,6 +28,8 @@ setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=
 \item{nboot}{numer of bootstrap replications}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{test}{Type of test. See details}
+\item{hpc}{Possibility to run the bootstrap on parallel core. See
+  details in \code{\link{TVECM.HSTest}}}
 \item{check}{Possibility to check if the bootstrap is correct by not sampling the residuals. The result given should be the same as in the original data}
 }
 \details{
@@ -49,7 +51,7 @@ Test \bold{2vs3}: 1 threshold TAR versus 2 threshold2 TAR
 
 The both first are computed together and avalaible with test="1vs". The third test is avalaible with test="2vs3". 
 
-The homoskedastik bootstrap distribution is based on resampling the residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3), estimating the threshold parameter and then computing the Ftest, so it involves many computations and is pretty slow. 
+The homoskedastic bootstrap distribution is based on resampling the residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3), estimating the threshold parameter and then computing the Ftest, so it involves many computations and is pretty slow. 
 }
 \seealso{
 \code{\link{TVAR.LRtest}} for the multivariate version. \code{\link{SETAR}} for estimation of the model.
