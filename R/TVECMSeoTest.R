@@ -1,4 +1,7 @@
-TVECM.SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, check=FALSE) {
+TVECM.SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, hpc=c("none", "foreach"), check=FALSE) {
+
+hpc<-match.arg(hpc)
+                 
 y<-as.matrix(data)
 T<-nrow(y)
 k<-ncol(y)
@@ -100,7 +103,7 @@ gamma1<-gammas[row]
 gamma2<-gammas[col]
 
 resultw<-loop(gamma1,gamma2,ECT=ECT, DeltaX=DeltaX,Y=Y,M=M)
-cat("SupWald Model \n Wald", resultw$Wald, "Sigma",resultw$detSigma,"\n")
+#cat("SupWald Model \n Wald", resultw$Wald, "Sigma",resultw$detSigma,"\n")
 
 ##################
 ###Bootstrap test
@@ -126,7 +129,7 @@ resSig<-t(Y-Bsig%*%Zsig)
 
 resultSig<-loop(gamma1Sigma, gamma2Sigma,ECT=ECT, DeltaX=DeltaX,Y=Y,M=M)
 
-cat("Min Sigma Model\n Wald", resultSig$Wald, "Sigma",resultSig$detSigma,"\n")
+#cat("Min Sigma Model\n Wald", resultSig$Wald, "Sigma",resultSig$detSigma,"\n")
 
 colnames(Bsig)<-c("ECTunder","ECTover","Trend",c(paste(rep(colnames(data),p), -rep(1:p, each=k))))
 rownames(Bsig)<-colnames(data)
@@ -141,22 +144,21 @@ ECTtminus1<-matrix(0,nrow=nrow(y), ncol=1)		#ECT term
 
 ###Boostrap the residuals
 bootstraploop<-function(vec_beta){
-
-
-resb<-rbind(matrix(0,nrow=lag, ncol=k),apply(resSig,2,sample, replace=TRUE))
-if(check)
-	resb<-rbind(matrix(0,nrow=lag, ncol=k),resSig)		#uncomment this line to check the adequacy
-for(i in (lag+2):(nrow(y)-1)){
-	Xminus1[i,]<-Xminus1[i-1,]+Yb[i-1,]
-	ECTtminus1[i]<-Xminus1[i,]%*%vec_beta
-	Yb[i,]<-apply(cbind(Bsig[,3], Bsig[,-c(1:3)]%*%matrix(t(Yb[i-c(1:lag),]),ncol=1),resb[i,]),1,sum)
-	if(ECTtminus1[i]<gamma1Sigma) {
-		Yb[i,]<-apply(cbind(Bsig[,1]*ECTtminus1[i,],Yb[i,]),1,sum)}
-	if(ECTtminus1[i]>gamma2Sigma) {
-		Yb[i,]<-apply(cbind(Bsig[,2]*ECTtminus1[i,],Yb[i,]),1,sum)}
+  
+  resb<-rbind(matrix(0,nrow=lag, ncol=k),apply(resSig,2,sample, replace=TRUE))
+  if(check)
+    resb<-rbind(matrix(0,nrow=lag, ncol=k),resSig)		#uncomment this line to check the adequacy
+  for(i in (lag+2):(nrow(y)-1)){
+    Xminus1[i,]<-Xminus1[i-1,]+Yb[i-1,]
+    ECTtminus1[i]<-Xminus1[i,]%*%vec_beta
+    Yb[i,]<-apply(cbind(Bsig[,3], Bsig[,-c(1:3)]%*%matrix(t(Yb[i-c(1:lag),]),ncol=1),resb[i,]),1,sum)
+    if(ECTtminus1[i]<gamma1Sigma) {
+      Yb[i,]<-apply(cbind(Bsig[,1]*ECTtminus1[i,],Yb[i,]),1,sum)}
+    if(ECTtminus1[i]>gamma2Sigma) {
+      Yb[i,]<-apply(cbind(Bsig[,2]*ECTtminus1[i,],Yb[i,]),1,sum)}
 }
-
-yboot<-apply(rbind(y[1,],Yb),2,cumsum)			#same as diffinv but it did not work
+  
+  yboot<-apply(rbind(y[1,],Yb),2,cumsum)			#same as diffinv but it did not work
 
 ### Regression on the new series
 
@@ -170,30 +172,37 @@ storeb<-matrix(0, nrow=ng,ncol=ng)
 
 ###Loop for values of the grid
 
-for(i in 1:length(gammasb)){
-	gam1<-gammasb[i]
-	for (j in 1:length(gammasb)){
-		if(j>i+ninter){		
-			gam2<-gammasb[j]
-			res<-loop(gam1,gam2,ECT=ECTboot, DeltaX=DeltaXboot,Y=DeltaYboot,M=Mboot)
-			storeb[i,j]<-res$Wald
-		} #End if
-	}	#End for j
-}		#end for i
+  for(i in 1:length(gammasb)){
+    gam1<-gammasb[i]
+    for (j in 1:length(gammasb)){
+      if(j>i+ninter){		
+        gam2<-gammasb[j]
+        res<-loop(gam1,gam2,ECT=ECTboot, DeltaX=DeltaXboot,Y=DeltaYboot,M=Mboot)
+        storeb[i,j]<-res$Wald
+      } #End if
+    }	#End for j
+  }		#end for i
 
 supWaldboot<-max(storeb)
 return(supWaldboot)
 }#end of the bootstrap loop
 
-Waldboots<-replicate(nboot,bootstraploop(c(1,-beta)))
+
+Waldboots<-if(hpc=="none"){
+  replicate(nboot,bootstraploop(c(1,-beta)))
+} else {
+  foreach(i=1:nboot, .export="bootstraploop", .combine="c") %dopar% bootstraploop(c(1,-beta))
+}
+
+#Walboots<-replicate(nboot,bootstraploop(c(1,-beta)))
 PvalBoot<-mean(ifelse(Waldboots>supWald,1,0))
 CriticalValBoot<-quantile(Waldboots, probs=c(0.9, 0.95, 0.975,0.99))
 
 ###Graphical output
 if(plot==TRUE){
-	plot(density(Waldboots))
-	abline(v=c(supWald, CriticalValBoot[c(1,2)]), lty=c(1,2,3), col=c(2,3,4))
-	legend("topright", legend=c("SupWald", "Boot 10%", "Boot 5%"), col=c(2,3,4), lty=c(1,2,3))
+  plot(density(Waldboots))
+  abline(v=c(supWald, CriticalValBoot[c(1,2)]), lty=c(1,2,3), col=c(2,3,4))
+  legend("topright", legend=c("SupWald", "Boot 10%", "Boot 5%"), col=c(2,3,4), lty=c(1,2,3))
 }
 
 
