@@ -1,8 +1,10 @@
-TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), check=FALSE, model=c("TAR", "MTAR")) {
+TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=10, plot=FALSE, trim=0.1, test=c("1vs", "2vs3"), model=c("TAR", "MTAR"), hpc=c("none", "foreach"), check=FALSE) {
 
 ##Check args
 test<-match.arg(test)
 model<-match.arg(model)
+hpc<-match.arg(hpc)
+
 if (missing(series))  series <- deparse(substitute(data))
 
 if(is.null(colnames(data)))
@@ -386,7 +388,12 @@ bootstraploop<-function(y, thVar=NULL){
 
 
 
-LRtestboot<-replicate(n=nboot,bootstraploop(y=resids))
+LRtestboot<-if(hpc=="none"){
+  replicate(n=nboot,bootstraploop(y=resids))
+} else {
+  foreach(i=1:nboot, .export="bootstraploop", .combine="rbind") %dopar% bootstraploop(y=resids)
+}
+
 LRtestboot12<-unlist(LRtestboot[1,])
 LRtestboot13<-unlist(LRtestboot[2,])
 LRtestboot23<-unlist(LRtestboot[3,])
