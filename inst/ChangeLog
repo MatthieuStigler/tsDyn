@@ -1,4 +1,10 @@
-Version 0.7-3
+Version 0.7-40
+-Add paralell option for TVAR.LRtest(), setarTest(), TVECM.Seotest()
+-regime() works also for nlVar, also add arguments initVal and timeAttr
+-RENAME function TVECM.HSTest in TVECM.HStest
+-correct bug in TVECM.HSTest
+
+Version 0.7-30
 -Add function TVECM.HStest (before was HanSeo_TVECM). Has new argument hpc for parallel computing.
 -Add function VECM(), simple wrapper for lineVar(..., model="VECM")
 -Add Johansen estimator for VECM()
