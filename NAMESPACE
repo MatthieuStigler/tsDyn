@@ -14,7 +14,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
 	star, 
        TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
 	BIC, MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime, getTh,
-	TVECM.HSTest)
+	TVECM.HStest)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)

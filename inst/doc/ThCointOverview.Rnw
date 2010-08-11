@@ -1082,7 +1082,7 @@ is found to be the same as in the univariate case as in Hansen (1996). This
 distribution can't be tabulated due to the presence of nuisance parameters and hence 
 the authors suggest two bootstrap approaches, with either a fixed-regressor or a residual bootstrap. While in the paper the sup-LM tests is conditional on both the cointegrating and threshold value, the implementation of this test done by the authors takes the cointegrating vector as given, based on the value estimated from the linear VECM.  
 
-This is available in package \tsDyn using the function \texttt{TVECM.HSTest()}. 
+This is available in package \tsDyn using the function \texttt{TVECM.HStest()}. 
 
 \subsection{No cointegration vs. threshold cointegration tests}
 
@@ -1428,19 +1428,19 @@ To alleviate these problems, a possibility is to run the functions on parallel, 
 
 Furthermore, parallel computation is quite easy in the context of threshold cointegration as the grid search or the bootstrap replications are independant of each other and can easily be run on different nodes. 
 
-Parallel facilities are for now only available for the function \texttt{TVECM.HSTest()}, through the argument \Rarg{hpc} (standing for high performance computing). When set to \Rarg{foreach}, the package will run the \pkg{foreach} package. It is then up to the user to choose a paralellisation protocol, the current choice being now between \pkg{doMC}, \pkg{doSNOW} (MPI, pvm and nws, as well as internal R sockets), \pkg{doMPI} and \pkg{doRedis}. We illustrate here with the easiest package, \pkg{multicore}, wich proved to be quite powerful, with the disadvantage nerverthless that it can pose problems when R is used within a GUI. 
+Parallel facilities are for now only available for the function \texttt{TVECM.HStest()}, through the argument \Rarg{hpc} (standing for high performance computing). When set to \Rarg{foreach}, the package will run the \pkg{foreach} package. It is then up to the user to choose a paralellisation protocol, the current choice being now between \pkg{doMC}, \pkg{doSNOW} (MPI, pvm and nws, as well as internal R sockets), \pkg{doMPI} and \pkg{doRedis}. We illustrate here with the easiest package, \pkg{multicore}, wich proved to be quite powerful, with the disadvantage nerverthless that it can pose problems when R is used within a GUI. 
 \begin{Scode}{eval=FALSE}
-system.time(test1<-TVECM.HSTest(dat, lag=1, nboot=200))
+system.time(test1<-TVECM.HStest(dat, lag=1, nboot=200))
 
 library(doMC)
 registerDoMC(2) #Number of cores
-system.time(test1<-TVECM.HSTest(dat, lag=1, nboot=200, hpc="foreach"))
+system.time(test1<-TVECM.HStest(dat, lag=1, nboot=200, hpc="foreach"))
 \end{Scode}
 
 Results are quite impressive, as they show that by simply adding a second core the execution time is divided by two, while using 4 cores will divide the time by three, as shown in figure \ref{Flo:plotCluster}\footnote{It should be mentioned that the relationship between the number of CPUs and the reduction in execution time is decreasing with the number of CPUs: the more the CPUs, the less their additional effect is.}. 
 
 \begin{figure}
-\caption{Execution time of function TVECM.HSTest using multiple cores}
+\caption{Execution time of function TVECM.HStest using multiple cores}
 \label{Flo:plotCluster}
 \includegraphics{ClusterTime}
 \end{figure}

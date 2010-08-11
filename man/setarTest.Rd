@@ -29,7 +29,7 @@ setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{test}{Type of test. See details}
 \item{hpc}{Possibility to run the bootstrap on parallel core. See
-  details in \code{\link{TVECM.HSTest}}}
+  details in \code{\link{TVECM.HStest}}}
 \item{check}{Possibility to check if the bootstrap is correct by not sampling the residuals. The result given should be the same as in the original data}
 }
 \details{

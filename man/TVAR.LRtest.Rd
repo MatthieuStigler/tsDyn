@@ -29,7 +29,7 @@ TVAR.LRtest(data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, thVar, nboot=
 \item{model}{Whether the threshold variable is taken in level (TAR) or
   difference (MTAR)}
 \item{hpc}{Possibility to run the bootstrap on parallel core. See
-  details in \code{\link{TVECM.HSTest}}}
+  details in \code{\link{TVECM.HStest}}}
 \item{check}{Possiblity to check the function by no sampling: the test value should be the sme as in the original data}
 
 }

@@ -24,7 +24,7 @@ Critical and Pvalue from bootstrap distribution.
 \item{plot}{Whether a grid with the SSR of each threshold should be
   printed}
 \item{hpc}{Possibility to run the bootstrap on parallel core. See
-  details in \code{\link{TVECM.HSTest}}}
+  details in \code{\link{TVECM.HStest}}}
 \item{check}{Possiblity to check the function by no sampling: the test value should be the sme as in the original data}
 }
 \details{

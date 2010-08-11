@@ -1,11 +1,11 @@
-\name{TVECM.HSTest }
-\alias{TVECM.HSTest }
+\name{TVECM.HStest }
+\alias{TVECM.HStest }
 \title{Test of linear cointegration vs threshold cointegration}
 \description{
 Tests the null of linear cointegration against threshold cointegration following Hansen and Seo (2002). Fixed regressor anfd residual bootstrap are available. 
 }
 \usage{
-TVECM.HSTest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot"), hpc=c("none", "foreach"))
+TVECM.HStest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot"), hpc=c("none", "foreach"))
 }
 
 \arguments{
@@ -58,11 +58,11 @@ data(zeroyld)
 dataPaper<-zeroyld
 # Test: nboot, number of bootstrap replications, should be high 
 \dontrun{
-test1<-TVECM.HSTest(dataPaper, lag=1, intercept=TRUE, nboot=1000)
+test1<-TVECM.HStest(dataPaper, lag=1, intercept=TRUE, nboot=1000)
 }
 
 #we use here for the example a much smaller number of bootstrap:
-test1<-TVECM.HSTest(dataPaper, lag=1, intercept=TRUE, nboot=10)
+test1<-TVECM.HStest(dataPaper, lag=1, intercept=TRUE, nboot=10)
 
 test1
 summary(test1)
@@ -77,7 +77,7 @@ plot(test1, which="Density")
 #we show here the use with package doMC
 library(doMC)
 registerDoMC(2) #Number of cores
-test1<-TVECM.HSTest(dataPaper, lag=1, intercept=TRUE, nboot=1000, hpc="foreach")
+test1<-TVECM.HStest(dataPaper, lag=1, intercept=TRUE, nboot=1000, hpc="foreach")
 }
 
 }

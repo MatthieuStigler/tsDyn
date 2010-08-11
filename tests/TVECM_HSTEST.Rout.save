@@ -40,34 +40,34 @@ Loading required package: MASS
 > data<-zeroyld
 > 
 > ## Test against paper:
-> all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)$stat,4),20.5994)
+> all.equal(round(TVECM.HStest(data, lag=1, intercept=TRUE, nboot=0)$stat,4),20.5994)
 [1] TRUE
-> all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0)$stat,4),28.2562 )
+> all.equal(round(TVECM.HStest(data, lag=2, intercept=TRUE, nboot=0)$stat,4),28.2562 )
 [1] TRUE
-> all.equal(round(TVECM.HSTest(data, lag=3, intercept=TRUE, nboot=0)$stat,4), 29.9405 )
+> all.equal(round(TVECM.HStest(data, lag=3, intercept=TRUE, nboot=0)$stat,4), 29.9405 )
 [1] "Mean relative difference: 0.01292669"
 > 
 > 
 > ## prob:
-> all.equal(round(TVECM.HSTest(data, lag=2, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),29.5295)
+> all.equal(round(TVECM.HStest(data, lag=2, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),29.5295)
 [1] "Mean relative difference: 0.005730698"
-> all.equal(round(TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),21.5586 )
+> all.equal(round(TVECM.HStest(data, lag=1, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),21.5586 )
 [1] "Mean relative difference: 0.02895189"
 >   
 > ## Test: no boot
-> TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
+> TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
 Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
-> TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
+> TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
 Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
-> TVECM.HSTest(data, lag=1, intercept=TRUE, nboot=0)
+> TVECM.HStest(data, lag=1, intercept=TRUE, nboot=0)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
 Test Statistic:	 20.59942	(Maximized for threshold value: -0.04805437 )
-> TVECM.HSTest(data, lag=1, intercept=FALSE, nboot=0)
+> TVECM.HStest(data, lag=1, intercept=FALSE, nboot=0)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
 Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
@@ -75,13 +75,13 @@ Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
 > 
 > ## Test: boot
 > set.seed(123)
-> t1<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
+> t1<-TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
 > set.seed(123)
-> t2<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
+> t2<-TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
 > set.seed(123)
-> t3<-TVECM.HSTest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
+> t3<-TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
 > set.seed(123)
-> t4<-TVECM.HSTest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
+> t4<-TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
 > 
 > ## Test: methodst1
 > summary(t1)
