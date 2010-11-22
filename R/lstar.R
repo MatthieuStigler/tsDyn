@@ -21,8 +21,10 @@
 #	trace: should infos be printed?
 #	control: 'control' options to be passed to optim
 lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
-                  thVar, th, gamma, trace=TRUE, control=list())
+                  thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), control=list())
 {
+
+  include<-match.arg(include)
 
   if(missing(m))
     m <- max(mL, mH, thDelay+1)
@@ -74,9 +76,14 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     z <- xx[,1]
     thDelay = 0
   }
-  
-  xxL <- cbind(1,xx[,1:mL])
-  xxH <- cbind(1,xx[,1:mH])
+  ## Build regressors matrix
+  constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
+  incNames<-constMatrix$incNames #vector of names
+  const<-constMatrix$const #matrix of none, const, trend, both
+  ninc<-constMatrix$ninc #number of terms (0,1, or 2)
+
+  xxL <- cbind(const,xx[,1:mL])
+  xxH <- cbind(const,xx[,1:mH])
 
   #Fitted values, given parameters
   #phi1: vector of 'low regime' parameters
@@ -141,8 +148,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       gamma <- p[1]  #Extract parms from vector p
       th    <- p[2] 	     #Extract parms from vector p
       new_phi<- lm.fit(cbind(xxL, xxH * G(z, gamma, th)), yy)$coefficients
-      phi1 <- new_phi[1:(mL+1)]
-      phi2 <- new_phi[(mL+2):(mL + mH + 2)]
+      phi1 <- new_phi[1:(mL+ninc)]
+      phi2 <- new_phi[(mL+ninc+1):(mL + mH + 2*ninc)]
 
       y.hat <- F(phi1, phi2, gamma, th)
       e.hat <- yy - y.hat
@@ -197,6 +204,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   coefs <- res$par
   names(coefs) <- c(paste("phi1", 0:mL, sep="."),
                                paste("phi2", 0:mH, sep="."),
+  names(res$coefficients) <- c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
+                               if(ninc>0) paste(incNames,"2",sep=""), paste("phi2", 1:mH, sep="."),
                                "gamma", "th")
   gamma <- coefs["gamma"]
   th  <- coefs["th"]
@@ -220,6 +229,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
+  res$ninc<-ninc
+  res$include<-include
   
 ################################
 
@@ -247,12 +258,13 @@ print.lstar <- function(x, ...) {
   NextMethod(...)
   cat("\nLSTAR model\n")
   x <- x$model.specific
+  ninc<-x$ninc
   order.L <- x$mL
   order.H <- x$mH
-  lowCoef <- x$coef[1:(order.L+1)]
-  highCoef<- x$coef[(order.L + 2):(order.L + order.H + 2)]
-  gammaCoef <- x$coef[order.L + order.H + 3]
-  thCoef <- x$coef[order.L + order.H + 4]
+  lowCoef <- x$coef[1:(order.L+ninc)]
+  highCoef<- x$coef[(order.L + ninc+1):(order.L + order.H + 2*ninc)]
+  gammaCoef <- x$coef["gamma"]
+  thCoef <- x$coef["th"]
   externThVar <- x$externThVar
   
   cat("Coefficients:\n")
@@ -313,12 +325,12 @@ summary.lstar <- function(object, ...) {
   ans$nlTest.pval  <- a[["Pr(>F)"]][2]
   
 ###############################
-
+  ninc    <- object$model.specific$ninc
   order.L <- object$model.specific$mL
   order.H <- object$model.specific$mH
-  ans$lowCoef <- object$coef[1:(order.L+1)]
-  ans$highCoef<- object$coef[(order.L+1)+1:(order.H+1)]
-  ans$thCoef <- object$coef[order.L+order.H+3]
+  ans$lowCoef <- object$coef[1:(order.L+ninc)]
+  ans$highCoef<- object$coef[(order.L+1+ninc):(order.H+2*ninc)]
+  ans$thCoef <- object$coef["th"]
   ans$externThVar <- object$model.specific$externThVar
   ans$mTh <- object$model.specific$mTh
   return(extend(summary.nlar(object), "summary.lstar", listV=ans))
@@ -411,10 +423,12 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
 }
 
 oneStep.lstar <- function(object, newdata, itime, thVar, ...){
+  if(include!="const") stop("oneStep currently only implemented for include==const\n")
+  ninc<-object$model.specific$ninc
   mL <- object$model.specific$mL
   mH <- object$model.specific$mH
-  phi1 <- object$coefficients[1:(mL+1)]
-  phi2 <- object$coefficients[mL+1+ 1:(mH+1)]
+  phi1 <- object$coefficients[1:(mL+ninc)]
+  phi2 <- object$coefficients[(mL+1+ ninc):(mH+2*ninc)]
   gamma <- object$coefficients["gamma"]
   c <- object$coefficients["th"]
   ext <- object$model.specific$externThVar
