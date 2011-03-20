@@ -1,6 +1,6 @@
 \name{UsUnemp} 
 \alias{UsUnemp}
-\docType{UsUnemp}
+\docType{data}
 \title{US unemployment series used in Caner and Hansen (2001)}
 \description{
   This data, used as example in Caner and Hansen (2001), contains the montly US adult male unemployment from 1956 to 1999.
