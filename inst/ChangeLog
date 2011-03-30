@@ -1,5 +1,6 @@
 Version 0.7-50
--fix bug in 'autopairs': a bogus option was passed to the 'scale' widget
+-fix bug in 'autopairs' and 'autotriples': bogus 'showvalue' option was passed to the 'scale' widget
+ (bugreport by Budi Hari Priyanto)
 
 Version 0.7-40
 -Add paralell option for TVAR.LRtest(), setarTest(), TVECM.Seotest()

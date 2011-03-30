@@ -64,7 +64,7 @@ autotriples <- function(x, lags=1:2, h, type=c("levels","persp","image", "lines"
     h.start <- log(h) - 2
     h.end <- log(h) + 2
     hScale <- Widget(opts=list(type="scale", command=replot, from=h.start, to=h.end, 
-                       showvalue=F, variable=th, resolution=(h.start-h.end)/100, orient="horiz"))
+                       variable=th, resolution=(h.start-h.end)/100, orient="horiz"))
     add(frRight, Widget(opts=list(type="label", text="kernel window:")), hScale)
 
     buildDialog(title="plot options", frRoot)
