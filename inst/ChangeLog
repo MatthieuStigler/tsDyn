@@ -1,3 +1,6 @@
+Version 0.7-50
+-fix bug in 'autopairs': a bogus option was passed to the 'scale' widget
+
 Version 0.7-40
 -Add paralell option for TVAR.LRtest(), setarTest(), TVECM.Seotest()
 -regime() works also for nlVar, also add arguments initVal and timeAttr
