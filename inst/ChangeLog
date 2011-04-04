@@ -1,4 +1,6 @@
 Version 0.7-50
+-remove own BIC function and use that of pkg nlme, as recommend by Prof Ripley
+-fix bug in Rd files, and description (missing suggest packages)
 -fix bug in 'autopairs' and 'autotriples': bogus 'showvalue' option was passed to the 'scale' widget
  (bugreport by Budi Hari Priyanto)
 
