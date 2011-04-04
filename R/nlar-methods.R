@@ -237,7 +237,7 @@ AIC.nlar <- function(object,k=2, ...){
 
 
 #BIC for the fitted nlar model
-BIC.nlar <- function(object)
+BIC.nlar <- function(object, ...)
 	AIC.nlar(object, k=log(getNUsed(object)))
 
 
