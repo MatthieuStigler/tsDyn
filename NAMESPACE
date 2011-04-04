@@ -5,6 +5,8 @@ importFrom(tseriesChaos, d2)
 importFrom(nnet, nnet)
 importFrom(tseries, na.remove)
 importFrom(Matrix, norm)
+importFrom(nlme, BIC)
+
 export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        autopairs, autotriples, autotriples.rgl,
        delta, delta.test, delta.lin, delta.lin.test,
@@ -13,7 +15,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        nlarDialog, linear, isLinear, nnetTs, aar,
 	star, 
        TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
-	BIC, MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime, getTh,
+	MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime, getTh,
 	TVECM.HStest)
 S3method(extend, list)
 S3method(isLinear, lstar)
@@ -81,7 +83,6 @@ S3method(coef, nlVar)
 S3method(AIC, nlVar)
 S3method(AIC, VECM)
 S3method(BIC, nlVar)
-S3method(BIC, lm)
 S3method(BIC, VECM)
 S3method(regime, setar)
 S3method(regime, nlVar)

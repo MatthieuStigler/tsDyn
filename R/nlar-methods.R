@@ -236,16 +236,8 @@ AIC.nlar <- function(object,k=2, ...){
 }
 
 
-BIC <- function(object, ...,k) UseMethod("BIC")
-
-BIC.default<-function(object, ...,k)
-	NULL
-
-BIC.lm<-function(object, ...,k)
-	AIC(object,...,k=log(length(object$residuals)))
-
 #BIC for the fitted nlar model
-BIC.nlar <- function(object, ...,k)
+BIC.nlar <- function(object)
 	AIC.nlar(object, k=log(getNUsed(object)))
 
 
