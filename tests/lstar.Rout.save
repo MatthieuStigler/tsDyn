@@ -52,7 +52,7 @@ Using maximum autoregressive order for high regime: mH = 2
 Performing grid search for starting values...
 Starting values fixed: gamma =  11 , th =  3.338679 ; SSE =  4.337657 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  11.00002 , th =  3.340093 
+Optimized values fixed for regime 2  : gamma =  11.00003 , th =  3.340087 
 > mod.lstar
 
 Non linear autoregressive model
@@ -61,11 +61,11 @@ LSTAR model
 Coefficients:
 Low regime:
     phi1.0     phi1.1     phi1.2 
- 0.4870673  1.2465799 -0.3655721 
+ 0.4870648  1.2465789 -0.3655700 
 
 High regime:
     phi2.0     phi2.1     phi2.2 
--1.0514786  0.4243230 -0.2488072 
+-1.0513795  0.4243203 -0.2488318 
 
 Smoothing parameter: gamma = 11 
 
@@ -84,7 +84,7 @@ Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  40 , th =  2.890765 ; SSE =  12.71672 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  40.00373 , th =  2.887884 
+Optimized values fixed for regime 2  : gamma =  47.95085 , th =  2.880858 
 > mod.lstar2
 
 Non linear autoregressive model
@@ -93,22 +93,22 @@ LSTAR model
 Coefficients:
 Low regime:
    phi1.0    phi1.1 
-0.6657996 0.7595355 
+0.6786487 0.7536072 
 
 High regime:
     phi2.0     phi2.1 
- 1.0278994 -0.2814446 
+ 1.0155275 -0.2756807 
 
-Smoothing parameter: gamma = 40 
+Smoothing parameter: gamma = 47.95 
 
 Threshold
 Variable: Z(t) = + (1) X(t) 
 
-Value: 2.888 
+Value: 2.881 
 > deviance(mod.lstar2)
          [,1]
-[1,] 12.71625
+[1,] 12.69489
 > 
 > proc.time()
    user  system elapsed 
-  8.240   0.060   8.353 
+  7.430   0.070   7.478 
