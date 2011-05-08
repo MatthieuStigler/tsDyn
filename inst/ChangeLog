@@ -1,3 +1,8 @@
+Version 0.7-51
+-update NAMESPACE as previous (0.7-50) did not work
+-add VECM.Rout
+-add econometrica .bst and amsplain.bst
+
 Version 0.7-50
 -remove own BIC function and use that of pkg nlme, as recommend by Prof Ripley
 -fix bug in Rd files, and description (missing suggest packages)
