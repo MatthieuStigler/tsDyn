@@ -1,0 +1,107 @@
+
+R version 2.13.0 (2011-04-13)
+Copyright (C) 2011 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+REvolution R enhancements not installed.  For improved
+performance and other extensions: apt-get install revolution-r
+
+> library(tsDyn)
+Loading required package: mgcv
+This is mgcv 1.7-6. For overview type 'help("mgcv-package")'.
+Loading required package: Matrix
+Loading required package: lattice
+
+Attaching package: 'Matrix'
+
+The following object(s) are masked from 'package:base':
+
+    det
+
+Loading required package: snow
+
+Attaching package: 'snow'
+
+The following object(s) are masked from 'package:base':
+
+    enquote
+
+Loading required package: mnormt
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: codetools
+Loading required package: MASS
+> 
+> mod.lstar <- lstar(log10(lynx), m=2, mTh=c(0,1), control=list(maxit=3000))
+Using maximum autoregressive order for low regime: mL = 2 
+Using maximum autoregressive order for high regime: mH = 2 
+Performing grid search for starting values...
+Starting values fixed: gamma =  11 , th =  3.338679 ; SSE =  4.337657 
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  11.00002 , th =  3.340093 
+> mod.lstar
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+    phi1.0     phi1.1     phi1.2 
+ 0.4870673  1.2465799 -0.3655721 
+
+High regime:
+    phi2.0     phi2.1     phi2.2 
+-1.0514786  0.4243230 -0.2488072 
+
+Smoothing parameter: gamma = 11 
+
+Threshold
+Variable: Z(t) = + (0) X(t) + (1) X(t-1)
+
+Value: 3.34 
+> 
+> mod.lstar2 <- lstar(log10(lynx), m=1, control=list(maxit=3000))
+Using maximum autoregressive order for low regime: mL = 1 
+Using maximum autoregressive order for high regime: mH = 1 
+Using default threshold variable: thDelay=0
+Performing grid search for starting values...
+Starting values fixed: gamma =  40 , th =  2.890765 ; SSE =  12.71672 
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  40.00373 , th =  2.887884 
+> mod.lstar2
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+   phi1.0    phi1.1 
+0.6657996 0.7595355 
+
+High regime:
+    phi2.0     phi2.1 
+ 1.0278994 -0.2814446 
+
+Smoothing parameter: gamma = 40 
+
+Threshold
+Variable: Z(t) = + (1) X(t) 
+
+Value: 2.888 
+> 
+> proc.time()
+   user  system elapsed 
+  7.630   0.070   7.725 
