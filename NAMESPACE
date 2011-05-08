@@ -5,7 +5,13 @@ importFrom(tseriesChaos, d2)
 importFrom(nnet, nnet)
 importFrom(tseries, na.remove)
 importFrom(Matrix, norm)
-importFrom(nlme, BIC)
+
+
+if (exists("BIC", envir=asNamespace("stats"), inherits=FALSE)) {
+    importFrom(stats, BIC)
+} else {
+     importFrom(nlme, BIC)
+} 
 
 export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        autopairs, autotriples, autotriples.rgl,
