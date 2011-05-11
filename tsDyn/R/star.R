@@ -18,6 +18,13 @@
 ## This program is a translation of Prof. Marcelo Medeiros's Matlab codes
 ##    and is indebted to him.
 
+calculateLinearCoefficients <- function(A, b){
+  #x <- lm.fit(x = A, y = b)$coefficients
+  #x <- lm(b ~ . -1, data = data.frame(A))$coefficients  
+  x <- as.vector(ginv(A) %*% b)
+  x
+}
+
 #Logistic transition function
 # z: variable
 # gamma: smoothing parameter
@@ -231,7 +238,7 @@ addRegime.star <- function(object)
   
   object$model.specific$phi2 <- cbind(gamma, th);
 
-  object$model.specific$phi1 <- rbind(object$model.specific$phi1, rnorm(3));
+  object$model.specific$phi1 <- rbind(object$model.specific$phi1, rnorm(NCOL(object$str$xx) + 1));
 
   object$model.specific$coefficients <-
                                           c(object$model.specific$phi1, cbind(gamma, th));
@@ -286,7 +293,9 @@ startingValues.star <- function(object, trace=TRUE, ...)
 
       tmp <- cbind(x_t, matrix(apply(G(s_t, gamma, th), 2, "*",x_t), 
                                nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
-      newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
+      #newPhi1 <- lm(yy ~ . - 1, data.frame(tmp))$coefficients;
+      newPhi1 <- calculateLinearCoefficients(tmp, yy)
+
       dim(newPhi1) <- c(NCOL(x_t), noRegimes);
       newPhi1 <- t(newPhi1);
 
@@ -312,7 +321,9 @@ startingValues.star <- function(object, trace=TRUE, ...)
     # reestimate phi's
     tmp <- cbind(x_t, matrix(apply(G(s_t, gamma, th), 2, "*",x_t), 
                              nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
-    phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    #phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    phi1 <- calculateLinearCoefficients(tmp, yy)
+
     dim(phi1) <- c(NCOL(xx) + 1, noRegimes)
     phi1 <- t(phi1)
   }
@@ -415,7 +426,9 @@ estimateParams.star <- function(object, trace=TRUE, control=list(), ...)
                  matrix(apply(G(s_t, gamma = phi2[,1], th = phi2[,2]), 2, "*", x_t),
                              nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
 
-    newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    #newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    newPhi1 <- calculateLinearCoefficients(tmp, yy)
+
     dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
     newPhi1 <- t(newPhi1);
 
@@ -453,7 +466,9 @@ estimateParams.star <- function(object, trace=TRUE, control=list(), ...)
   tmp <- cbind(x_t, matrix(apply(G(s_t, gamma = gamma, th = th), 2, "*", x_t),
                            nrow = n.used, ncol = (noRegimes - 1) * NCOL(x_t)))
   
-  newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+  #newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+  newPhi1 <- calculateLinearCoefficients(tmp, yy)
+
   dim(newPhi1) <- c(NCOL(xx) + 1, noRegimes)
   newPhi1 <- t(newPhi1)
 
@@ -796,7 +811,9 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     if(rtmp < NCOL(tmp))
       stop("Multicollinearity problem. Aborting.\n")
       
-    newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    #newPhi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    newPhi1 <- calculateLinearCoefficients(tmp, yy)
+
     dim(newPhi1) <- c(noRegimes, m + 1)
 
     # Return the sum of squares
@@ -844,7 +861,9 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
     for (i in 2:noRegimes) 
       tmp[,,i] <- tmp[,,i] * G(z, gamma = phi2[i - 1,1], th = phi2[i - 1,2])
 
-    phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    #phi1<- lm(yy ~ . - 1, as.data.frame(tmp))$coefficients
+    phi1 <- calculateLinearCoefficients(tmp, yy)
+
     dim(phi1) <- c(noRegimes, m + 1)
 
     if(trace) 
