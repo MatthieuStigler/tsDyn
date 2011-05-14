@@ -562,8 +562,8 @@ star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
 
   if(trace) cat("p-Value = ", pValue,"\n")
   if(!increase) {
-    if(trace) cat("The series is linear. Use linear model instead.\n")
-    return(str);
+    if(trace) cat("The series is linear. Using linear model instead.\n")
+    return(linear(x, m=m));
   }
   else {
     if(trace) cat("The series is nonlinear. Incremental building procedure:\n")
