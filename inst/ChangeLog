@@ -1,3 +1,7 @@
+Version 0.7-6
+-correct bug in star (bugreport by Petri H) by Christoph B
+-change return value of star() in case of no star regime detected: returns linear object instead of series itself
+
 Version 0.7-52
 -add tests for lstar
 -correct lstar so that optim function re-evaluate each time linear parameters
