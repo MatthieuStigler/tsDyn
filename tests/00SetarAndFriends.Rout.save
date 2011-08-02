@@ -1014,7 +1014,8 @@ Number of variables: 2 	Number of estimated parameters 24
 AIC -2220.684 	BIC -2112.165 	SSR 155.6996 
 
 
-Cointegrating vector: (1, - 1.057203 )$Bdown
+Cointegrating vector: (1, - 1.057203 )
+$Bdown
                    ECT                Const              short.run t -1  
 Equation short.run 0.2226(0.0221)*    0.5699(0.0046)**   0.2244(0.1984)  
 Equation long.run  1.0936(1.6e-11)*** 1.9832(2.6e-09)*** 0.8186(0.0042)**
@@ -1041,7 +1042,8 @@ Equation long.run  -0.0316(0.7878)
 
 Threshold
 Values: -1.414 0.643
-Percentage of Observations in each regime 6.7% 52.9% 40.4%> 
+Percentage of Observations in each regime 6.7% 52.9% 40.4% 
+> 
 > regime(tvecm)
   [1] NA NA  2  2  2  3  2  2  2  2  2  3  2  2  3  3  2  2  2  2  2  2  2  2  2
  [26]  2  2  2  2  2  2  2  3  2  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3  3
