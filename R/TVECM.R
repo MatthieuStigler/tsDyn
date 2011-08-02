@@ -43,20 +43,30 @@ else if(include=="both")
 
 
 ##Long-run relationship OLS estimation
-beta0<-as.matrix(beta0)
+beta0<-as.matrix(beta0) ##additional regressors in coint
 
-if(beta0[1]!=0){
-  if(nrow(beta0)!=nrow(y))
-    stop("Length of beta0 should be ", nrow(y), "\n")
-  coint<-lm(y[,1]~ y[,2]+beta0-1) #OLS estimation of long-term relation
-  beta0<-(beta0%*%coint$coef[-1])[-c(1:p,T),]}
-else{
-  coint<-lm(y[,1]~ y[,2]-1) 	#OLS estimation of long-term relation
-  beta0<-rep(0, t)}
+if(is.null(beta$exact)){
+  if(beta0[1]!=0){
+    if(nrow(beta0)!=nrow(y))
+      stop("Length of beta0 should be ", nrow(y), "\n")
+    coint<-lm(y[,1]~ y[,2]+beta0-1) #OLS estimation of long-term relation
+    beta0<-(beta0%*%coint$coef[-1])[-c(1:p,T),]}
+  else{
+    coint<-lm(y[,1]~ y[,2]-1) 	#OLS estimation of long-term relation
+    beta0<-rep(0, t)}
 
-betaLT<-coint$coef[1]
-betaLT_std <- sqrt(diag(summary(coint)$sigma*summary(coint)$cov))[1]
-
+  betaLT<-coint$coef[1]
+  betaLT_std <- sqrt(diag(summary(coint)$sigma*summary(coint)$cov))[1]
+} else {
+  betaLT<-beta$exact
+  if(length(betaLT)!=k-1)
+    warning("beta$exact should be of same size as cols of y -1\n")
+  if(beta0[1]!=0){
+    stop("Sorry, use of beta0 and beta$exact currently not supported simultaneously\n")
+  } else{
+  beta0<-rep(0, t)
+  }
+}
 
 ECT<-y%*%c(1,-betaLT)
 ECT<-round(ECT,ndig)
@@ -135,18 +145,20 @@ if(is.numeric(gamma1$around))
 gammas<-round(gammas, ndig)
 
 ###Grid for beta
-#Default method: interval to search based on confidnce interval from linear model
-betas<- seq(from=betaLT -2*betaLT_std, to=betaLT +2*betaLT_std, length.out=bn)
 #beta pre-specified
-if(is.null(beta$exact)==FALSE)
-  {betas<-beta$exact; bn<-1}
+if(is.null(beta$exact)==FALSE) {
+  betas<-matrix(beta$exact, nrow=1)
+  bn<-1
+} else if(is.numeric(beta$int)) {
 #interval to search between given by user
-if(is.numeric(beta$int))
-  betas<-seq(from=beta$int[1], to=beta$int[2], length.out=bn)
+  betas<-matrix(seq(from=beta$int[1], to=beta$int[2], length.out=bn), ncol=1)
+} else if(is.numeric(beta$around)){ 
 #value to search around given by user
-if(is.numeric(beta$around)){
   by<-beta$around[2]
-  betas<-seq(from=beta$around[1]-bn*by/2, to=beta$around[1]+bn*by/2, by=by)
+  betas<-matrix(seq(from=beta$around[1]-bn*by/2, to=beta$around[1]+bn*by/2, by=by), ncol=1)
+} else {
+#Default method: interval to search based on confidnce interval from linear model
+  betas<- matrix(seq(from=betaLT -2*betaLT_std, to=betaLT +2*betaLT_std, length.out=bn), ncol=1)
 }
 
 ################
@@ -172,7 +184,11 @@ oneSearch<-function(betas, gammas){
       zigamma<-c(d1)*zi
       zi<-zi%a%c(1-d1) #new operator for choice between set up of first matrix
       Z<-cbind(zigamma,zi)
-      LS<-crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z)))))
+      LS<-try(crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z))))), silent=TRUE)
+      if(inherits(LS, "try-error")) {
+	warning("Error when solving for value: gamma=", gam, "and beta=", betai)
+	LS <- NA
+      }
     }
     else LS<-NA
     return(LS)
@@ -185,7 +201,11 @@ oneSearch<-function(betas, gammas){
     n1<-mean(d1) #Number of elements of the ECT under the threshold
     if (min(n1,1-n1)>trim) {
       Z<-cbind(ECTi*d1, ECTi*(1-d1),DeltaX)
-      LS<-crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z)))))
+      LS<-try(crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z))))), silent=TRUE)
+      if(inherits(LS, "try-error")) {
+	warning("Error when solving for value: gamma=", gam, "and beta=", betai)
+	LS <- NA
+      }
     }
     else LS<-NA
     return(LS)
@@ -198,12 +218,12 @@ oneSearch<-function(betas, gammas){
   func_onethresh<-switch(model, "All"=oneThresh, "only_ECT"=one_partial_Thresh)
   if(methodMapply==FALSE){
     
-    store<-matrix(NA,nrow=length(gammas), ncol=length(betas), dimnames=list(round(gammas,3), betas))
+    store<-matrix(NA,nrow=length(gammas), ncol=nrow(betas), dimnames=list(round(gammas,3), betas[,1]))
     
     for (i in seq_len(length(gammas))){
       gam<-gammas[i]
-      for (j in seq_len(length(betas))){
-        betai<-betas[j]
+      for (j in seq_len(nrow(betas))){
+        betai<-betas[j,]
         store[i,j]<-func_onethresh(betai=betai, gam=gam, DeltaX=DeltaX, Xminus1=Xminus1,Y=Y)
       }
     }
@@ -217,17 +237,20 @@ oneSearch<-function(betas, gammas){
     pos<-which(store==min(store, na.rm=TRUE), arr.ind=TRUE) #Best gamma
     if(nrow(pos)>1) {
       if(trace){
-        cat("There were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2]],", "), ") \nwhich minimize the SSR in the first search, the first one ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2]],ndig)," was taken\n") }
+        cat("There were ",nrow(pos), " thresholds/cointegrating combinations (",paste(gammas[pos[,1]],"/",betas[pos[,2],],", "), ") \nwhich minimize the SSR in the first search, the first one ", round(gammas[pos[1,1]],ndig), " ",round(betas[pos[1,2],],ndig)," was taken\n") }
       pos<-pos[1,]
     }
     
 
     bestGamma1<-gammas[pos[1]]
-    beta_grid<-betas[pos[2]]
+    beta_grid<-betas[pos[2],]
     
   } #end methodMapply false
 ###Method with mapply
   if(methodMapply==TRUE){
+    if(ncol(betas)>1){
+      stop("Method mapply does not work when there are more than 2 variables")
+    } 
     grid<-expand.grid(betas,gammas)
     oneThreshTemp<-function(betai,gam) func_onethresh(betai=betai, gam=gam, DeltaX=DeltaX,Xminus1=Xminus1, Y=Y)
     storemap<-mapply(oneThreshTemp, betai=grid[,1], gam=grid[,2])
@@ -306,7 +329,11 @@ if(nthresh==2){
       ziOver<-c(d2)*zi
       ziMiddle<-c(1-d1-d2)*zi
       Z<-cbind(ziUnder,ziMiddle,ziOver)
-      LS<-crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z)))))
+      LS<-try(crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z))))), silent=TRUE)
+      if(inherits(LS, "try-error")) {
+	warning("Error when solving for value: gammas=", gam1, gam2, "and beta=", betai)
+	LS <- NA
+      }
     }
     else LS<-NA
     
@@ -327,7 +354,11 @@ if(nthresh==2){
       ectUnder<-c(d1)*ECTi
       ectOver<-c(d2)*ECTi
       Z<-cbind(ectUnder,ectOver,DeltaX)
-      result<-crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z)))))
+      result<-try(crossprod(c(Y-tcrossprod(Z,crossprod(Y,Z)%*%solve(crossprod(Z))))), silent=TRUE)
+      if(inherits(result, "try-error")) {
+	warning("Error when solving for value: gammas=", gam1, gam2, "and beta=", betai)
+	result <- NA
+      }
     }
     else result<-NA
     
@@ -356,14 +387,18 @@ if(nthresh==2){
 #search for a second threshold smaller than the first
       if(wh.thresh>2*ninter){
         gammaMinus<-allgammas[seq(from=ninter, to=wh.thresh-ninter)]
-        storeMinus <- mapply(func,betai=bestBeta, gam1=gammaMinus,gam2=bestThresh)
+	if(k>2){ ### beta is pre-specified and > 1
+	  storeMinus <- mapply(func,gam1=gammaMinus,gam2=bestThresh, MoreArgs=list(betai=bestBeta))
+	} else {
+	  storeMinus <- mapply(func,betai=bestBeta, gam1=gammaMinus,gam2=bestThresh)
+	}
       }
       else storeMinus <- NA
       
 #search for a second threshold higher than the first
       if(length(wh.thresh<length(allgammas)-2*ninter)){
         gammaPlus<-allgammas[seq(from=wh.thresh+ninter, to=length(allgammas)-ninter)]
-        storePlus <- mapply(func,gam2=gammaPlus, MoreArgs=list(betai=bestBeta,gam1=bestThresh) )
+        storePlus <- mapply(func,gam2=gammaPlus, MoreArgs=list(betai=bestBeta,gam1=bestThresh) ) ### comment: why now beta and gam as moreArgs? Bug??
       }
       else storePlus <- NA
     }
@@ -372,11 +407,19 @@ if(nthresh==2){
       zero<-which.min(abs(allgammas))
       if(sign(bestThresh)>0){
         gammaMinus<-allgammas[seq(from=ninter, to=min(wh.thresh-ninter,zero))]
-        storeMinus <- mapply(func,betai=bestBeta, gam1=gammaMinus,gam2=bestThresh)
+      if(k>2){ ### beta is pre-specified and > 1
+	  storeMinus <- mapply(func,gam1=gammaMinus,gam2=bestThresh, MoreArgs=list(betai=bestBeta))
+	} else {
+	  storeMinus <- mapply(func,betai=bestBeta, gam1=gammaMinus,gam2=bestThresh)
+	}
         storePlus <- NA}
       else{
         gammaPlus<-allgammas[seq(from=max(wh.thresh+ninter,zero), to=length(allgammas)-ninter)]
-        storePlus <- mapply(func,betai=bestBeta, gam1=bestThresh,gam2=gammaPlus)
+	if(k>2){ ### beta is pre-specified and > 1
+	  storePlus <- mapply(func,gam1=bestThresh,gam2=gammaPlus, MoreArgs=list(betai=bestBeta))
+	} else {
+	  storePlus <- mapply(func,betai=bestBeta, gam1=bestThresh,gam2=gammaPlus)
+	}
         storeMinus<-NA}
     }
 #results
@@ -656,11 +699,11 @@ print.summary.TVECM<-function(x,...){
   cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
   cat("\nNumber of variables:", x$k,"\tNumber of estimated parameters", x$npar)
   cat("\nAIC",x$aic , "\tBIC", x$bic,"\tSSR", x$SSR,"\n\n")
-  cat("\nCointegrating vector: (1, -", x$model.specific$beta, ")")
+  cat("\nCointegrating vector: (1, -", x$model.specific$beta, ")\n")
   print(noquote(x$bigcoefficients))
   cat("\nThreshold")
   cat("\nValues:", x$model.specific$Thresh)
-  cat("\nPercentage of Observations in each regime", percent(x$model.specific$nobs,digits=3,by100=TRUE))
+  cat("\nPercentage of Observations in each regime", percent(x$model.specific$nobs,digits=3,by100=TRUE), "\n")
 }
 
 toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
