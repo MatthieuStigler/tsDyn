@@ -1,3 +1,7 @@
+Version 0.7-61
+-TVECM: allow for K>2 variables when the cointegrating vector is pre-specified
+-TVECM summary: change output, adding newlines after coint vector and percentage of observations
+
 Version 0.7-6
 -correct bug in star (bugreport by Petri H) by Christoph B
 -change return value of star() in case of no star regime detected: returns linear object instead of series itself
