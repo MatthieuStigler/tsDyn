@@ -276,7 +276,43 @@ print.lstar <- function(x, ...) {
 summary.lstar <- function(object, ...) {
   ans <- list()  
 ############################################
-  
+## SE for ML estimates (from optim), taken from 'arma.R' in package tseries
+  coef_ML <- object$coefficients[c("gamma", "th")]
+  n <- object$str$n.used
+  rank <- qr(object$model.specific$hessian, 1e-07)$rank
+  if(rank != 2) {
+    se <- rep(NA, length(coef))
+    warning("singular Hessian\n")
+  } else{
+    di <- diag(2*object$model.specific$value/n*solve(object$model.specific$hessian))
+    if(any(di < 0))
+      warning("Hessian negative-semidefinite\n")
+    se <- sqrt(di)
+  }
+
+  tval <- coef_ML / se
+  coefMat_ML <- cbind(coef_ML, se, tval, 2 * ( 1 - pnorm( abs(tval) ) ) )
+ 
+## SE for LS estimates: re-run lm.fit on output $model, copy then summary.lm
+  data.X <-as.matrix(object$model[,-grep("yy", colnames(object$model))])
+  data.y <- object$model[,"yy"]
+  reg <-lm.fit(data.X, data.y)
+  coef_LS <-reg$coefficients
+  Qr <- reg$qr
+  p1 <- 1:length(coef_LS)
+  resvar <- crossprod(reg$residuals)/n
+  est <- coef_LS[Qr$pivot[p1]]
+  R <- chol2inv(Qr$qr[p1, p1, drop = FALSE]) #compute (X'X)^(-1) from the (R part) of the QR decomposition of X.
+  se_LS <- sqrt(diag(R) * resvar) #standard errors
+  tval_LS <- est/se_LS			# t values
+
+## put toghether LS and ML se
+  coefMat_LS <- cbind(est, se_LS, tval_LS, 2 * ( 1 - pnorm( abs(tval_LS) ) ))
+  names_LS <- names(object$coefficients[-grep(c("gamma|th"), names(object$coefficients))])
+  dimnames(coefMat_LS) <- list(names_LS, c(" Estimate"," Std. Error"," t value","Pr(>|z|)"))
+
+  ans$coefficients<-rbind(coefMat_LS, coefMat_ML )
+
   #Non-linearity test############
   xx <- object$str$xx
   sX <- object$model.specific$thVar
@@ -305,6 +341,8 @@ print.summary.lstar <- function(x, digits=max(3, getOption("digits") - 2),
                        signif.stars = getOption("show.signif.stars"), ...)
 {
   NextMethod(digits=digits, signif.stars=signif.stars, ...)
+  cat("\nCoefficient(s):\n")
+  printCoefmat(x$coefficients, digits = digits, signif.stars = signif.stars, ...)
   cat("\nNon-linearity test of full-order LSTAR model against full-order AR model\n")
   cat(" F =", format(x$nlTest.value, digits=digits),"; p-value =", format(x$nlTest.pval, digits=digits),"\n")
   cat("\nThreshold ")
