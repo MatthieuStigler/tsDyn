@@ -473,7 +473,7 @@ print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.
 	cat("\nThreshold value:",x$model.specific$Thresh)
 	if(!x$model.specific$threshEstim)
 		cat(" (user specified)")
-	cat("\nPercentage of Observations in each regime:", percent(x$model.specific$nobs,3,TRUE))
+	cat("\nPercentage of Observations in each regime:", percent(x$model.specific$nobs,3,TRUE), "\n")
 }
 
 
