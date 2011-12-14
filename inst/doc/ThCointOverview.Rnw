@@ -783,7 +783,7 @@ except in the starting value, between the OLS and MLE estimator, as
 conditional on the threshold and the cointegrating value, the MLE
 estimator is simply LS. The model can be specified either with a \texttt{constant}
 a \texttt{trend}, or \texttt{none}, (arg \texttt{include}) and the
-lags can be regime specific or not (arg\texttt{ model). }
+lags can be regime specific or not (arg\texttt{ common). }
 
 Procedure for the \texttt{TVECM()} differ from that of \texttt{setar()}
 as there is no corresponding \texttt{selectSETAR()} function. As the
@@ -797,7 +797,7 @@ of the package.%
 
 \begin{Scode}{eval=FALSE}
 data(zeroyld)
-tvecm<-TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=60, ngridTh=30, plot=TRUE,trim=0.05, model="All", beta=list(int=c(0.7, 1.1))) 
+tvecm<-TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=60, ngridTh=30, plot=TRUE,trim=0.05, beta=list(int=c(0.7, 1.1))) 
 \end{Scode}
 
 %
@@ -1299,7 +1299,7 @@ This test is available in package \tsDyn as \texttt{TVECM.SeoTest()}.
 \begin{Scode}{eval=FALSE}
 data(zeroyld)
 dat<-zeroyld
-testSeo<-TVECM.SeoTest(dat, lags=1, beta=1, nboot=1000)
+testSeo<-TVECM.SeoTest(dat, lag=1, beta=1, nboot=1000)
 summary(testSeo)
 \end{Scode}
 
