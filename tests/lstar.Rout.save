@@ -101,6 +101,19 @@ Residuals:
 Fit:
 residuals variance = 0.03805,  AIC = -357, MAPE = 5.58%
 
+Coefficient(s):
+        Estimate  Std. Error  t value  Pr(>|z|)    
+phi1.0  0.487065    0.204274   2.3844 0.0171081 *  
+phi1.1  1.246579    0.067919  18.3538 < 2.2e-16 ***
+phi1.2 -0.365570    0.104005  -3.5149 0.0004399 ***
+phi2.0 -1.051380    2.448918  -0.4293 0.6676874    
+phi2.1  0.424320    0.173427   2.4467 0.0144177 *  
+phi2.2 -0.248832    0.589105  -0.4224 0.6727409    
+gamma  11.000030    9.664958   1.1381 0.2550640    
+th      3.340087    0.094470  35.3560 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
 Non-linearity test of full-order LSTAR model against full-order AR model
  F = 12.446 ; p-value = 1.3815e-05 
 
@@ -119,7 +132,7 @@ Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  40 , th =  2.890765 ; SSE =  12.71672 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  47.95085 , th =  2.880858 
+Optimized values fixed for regime 2  : gamma =  47.95087 , th =  2.880884 
 > mod.lstar2
 
 Non linear autoregressive model
@@ -163,10 +176,21 @@ Value: 2.881
 
 Residuals:
      Min       1Q   Median       3Q      Max 
--0.91970 -0.16476  0.10549  0.23744  0.71202 
+-0.91967 -0.16476  0.10553  0.23744  0.71202 
 
 Fit:
 residuals variance = 0.1114,  AIC = -238, MAPE = 10.09%
+
+Coefficient(s):
+        Estimate  Std. Error  t value  Pr(>|z|)    
+phi1.0  0.678649    0.345519   1.9641   0.04951 *  
+phi1.1  0.753607    0.143988   5.2338  1.66e-07 ***
+phi2.0  1.015527    0.745060   1.3630   0.17288    
+phi2.1 -0.275681    0.240428  -1.1466   0.25154    
+gamma  47.950869   61.803765   0.7759   0.43783    
+th      2.880884    0.057214  50.3531 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
 Non-linearity test of full-order LSTAR model against full-order AR model
  F = 0.76605 ; p-value = 0.38335 
