@@ -78,11 +78,15 @@ threshold variable.
 
 Estimation is done by analytically determining \var{phi1} and \var{phi2}
 (through linear regression) and then minimizing residuals sum of squares
-with respect to \var{th} and \var{gamma}. These two steps are repeated
-until convergence is achieved. For the nonlinear estimation of the
+with respect to \var{th} and \var{gamma}, as suggested in Leybourne et al. (1996). 
+These two steps of the concentrated Least Squares estimation are repeated
+until convergence is achieved. 
+For the nonlinear estimation of the
 parameters \var{th} and \var{gamma}, the program uses the
-\code{\link{optim}} function, with its default optimization method. You 
-can pass further arguments directly to the 'control' list argument of
+\code{\link{optim}} function, with optimization method BFGS using the analytical gradient. 
+For the estimation of standard values, \code{\link{optim}} is re-run
+using the complete Least Squares function, and the standard erros are obtained by inverting the hessian. 
+You can pass further arguments directly to the 'control' list argument of
 this function. For istance, the option \code{maxit} maybe useful when
 there are convergence issues (see examples).
 }
@@ -104,4 +108,7 @@ and Dick van Dijk, Cambridge: Cambridge University Press (2000).
 
 Non-Linear Time Series: A Dynamical Systems Approach, Tong, H., Oxford:
 Oxford University Press (1990). 
+
+Leybourne, S., Newbold, P., Vougas, D. (1998) Unit roots and smooth transitions, Journal of Time Series Analysis, 19: 83-97
+
 }
