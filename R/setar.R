@@ -347,9 +347,9 @@ z<-as.matrix(z)
     res$mTh <- mTh
   }
   return(extend(nlar(str,	
-	  coef=res$coef,
-	  fit=res$fitted.values,
-	  res=res$residuals,
+	  coefficients=res$coef,
+	  fitted.values=res$fitted.values,
+	  residuals=res$residuals,
 	  k=res$k,
 	  model=data.frame(yy,xxLH),
 	  model.specific=res), "setar"))

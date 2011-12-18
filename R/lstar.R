@@ -221,9 +221,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 ################################
 
   return(extend(nlar(str, 
-                     coef=res$coef,
+                     coefficients=res$coef,
                      fit =res$fitted,
-                     res =res$residuals,
+                     residuals =res$residuals,
                      k   =res$k,
 		     model = data.frame(yy,xxL, xxH * G(z, gamma, th)),
                      model.specific=res),

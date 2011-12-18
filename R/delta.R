@@ -38,7 +38,7 @@ delta.test <- function(x, m=2:3, d=1, eps = seq(0.5*sd(x),2*sd(x),length=4), B=4
 delta.lin <- function(x, m, d=1) {
 	V1 <- var(embedd(x, m=m+1, d=d))
 	V2 <- var(embedd(x, m=m, d=d))
-	tmp <- eigen(V1, sym=TRUE)$values[1] / eigen(V2,sym=TRUE)$values[1]
+	tmp <- eigen(V1, symmetric=TRUE)$values[1] / eigen(V2,symmetric=TRUE)$values[1]
 	return(1-tmp)
 }
 

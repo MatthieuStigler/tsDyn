@@ -18,7 +18,7 @@ MyEnv <- function(...) {
 	vars <- list(...)
 	nms <- names(vars)
 	if(length(nms)) for(i in 1:length(nms))
-		assign(nms[i], vars[[i]], env=this)
+		assign(nms[i], vars[[i]], envir=this)
 	structure(this, class=c("MyEnv",class(this)))
 }
 
@@ -26,7 +26,7 @@ extend.MyEnv <- function(this, subclass, ...) {
 	class(this) <- c(subclass, class(this))
 	newvars <- list(...)
 	if(length(names(newvars))) for(nm in names(newvars))
-		assign(nm, newvars[[nm]], env=this)
+		assign(nm, newvars[[nm]], envir=this)
 	return(this)
 }
 

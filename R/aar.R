@@ -26,7 +26,7 @@ aar <- function(x, m, d=1, steps=d, series){
   form <- as.formula(paste("y ~", predNames))
   model <- gam(form, data=dat)
 	return( extend(nlar(str,
-		coef = coef(model),
+		coefficients = coef(model),
 		fitted.values = model$fitted.values,
 		residuals = model$residuals,
 		k = model$rank,

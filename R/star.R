@@ -913,9 +913,9 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
   }
   
   return(extend(nlar(str, 
-                     coef= c(phi1, phi2),
-                     fit = fitted,
-                     res = residuals,
+                     coefficients= c(phi1, phi2),
+                     fitted.values = fitted,
+                     residuals = residuals,
                      k   = length(as.vector(phi1)) +
                                  length(as.vector(phi2)),
 		    model=NULL,

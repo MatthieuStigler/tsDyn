@@ -25,7 +25,7 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 	return(extend(nlar(str,
 		coefficients = res$wts,
 		residuals=res$residuals,
-		fitted=res$fitted,
+		fitted.values=res$fitted,
 		k=res$k,
 		model=NULL,
 		model.specific=res), "nnetTs"))
