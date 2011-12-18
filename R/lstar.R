@@ -174,17 +174,26 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     crossprod(lm.fit(xx, yy)$residuals)
   }
  
-  #Numerical minimization##########
+  ## Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
-  res <- optim(p, SS, gradEhat, hessian = TRUE, method="BFGS", control = control)
+  res <- optim(p, SS, gradEhat, hessian = FALSE, method="BFGS", control = control)
 
   if(trace)
     if(res$convergence!=0)
       cat("Convergence problem. Convergence code: ",res$convergence,"\n")
     else
       cat("Optimization algorithm converged\n")
-  ################################
-  
+  ## NOptimization: second quick step to get hessian for all parameters########
+  SS_2 <- function(p) {
+    phi1 <- p[1:(mL+1)]			#Extract parms from vector p
+    phi2 <- p[(mL+2):(mL + mH + 2)]	#Extract parms from vector p
+    y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p[mL + mH + 3], p[mL + mH + 4])
+    crossprod(yy - y.hat)
+  }
+  phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
+print(res$value)
+  res <- optim(c(phi_2,res$par), SS_2,  hessian = TRUE, method="BFGS", control = control)
+print(res$value)
   gamma <- res$par[1]
   th <- res$par[2]
 
@@ -229,6 +238,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
                      model.specific=res),
                 "lstar"))
 }
+
+	
 
 #############################################
   #Transition function
