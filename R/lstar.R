@@ -191,25 +191,19 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     crossprod(yy - y.hat)
   }
   phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
-print(res$value)
   res <- optim(c(phi_2,res$par), SS_2,  hessian = TRUE, method="BFGS", control = control)
-print(res$value)
-  gamma <- res$par[1]
-  th <- res$par[2]
-
+    
+  #Results storing################
+  coefs <- res$par
+  names(coefs) <- c(paste("phi1", 0:mL, sep="."),
+                               paste("phi2", 0:mH, sep="."),
+                               "gamma", "th")
+  gamma <- coefs["gamma"]
+  th  <- coefs["th"]
   if (trace) cat("Optimized values fixed for regime 2 ",
                  ": gamma = ", gamma, ", th = ", th,"\n");
   
-  # Fix the linear parameters one more time
-  new_phi<- lm.fit(cbind(xxL, xxH * G(z, gamma, th)), yy)$coefficients
-  phi1 <- new_phi[1:(mL+1)]
-  phi2 <- new_phi[(mL+2):(mL + mH + 2)]
-
-  #Results storing################
-  res$coefficients <- c(phi1, phi2, res$par[1], res$par[2])
-  names(res$coefficients) <- c(paste("phi1", 0:mL, sep="."),
-                               paste("phi2", 0:mH, sep="."),
-                               "gamma", "th")
+  res$coefficients <- coefs
   res$mL <- mL
   res$mH <- mH
   res$externThVar <- externThVar
@@ -222,7 +216,7 @@ print(res$value)
   }
 
   res$thVar <- z
-  res$fitted <- F(phi1, phi2, res$par[1], res$par[2])
+  res$fitted <- F(coefs[grep("phi1", names(coefs))], coefs[grep("phi2", names(coefs))], gamma, th)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
@@ -231,7 +225,7 @@ print(res$value)
 
   return(extend(nlar(str, 
                      coefficients=res$coef,
-                     fit =res$fitted,
+                     fitted.values =res$fitted,
                      residuals =res$residuals,
                      k   =res$k,
 		     model = data.frame(yy,xxL, xxH * G(z, gamma, th)),
@@ -286,12 +280,12 @@ print.lstar <- function(x, ...) {
 
 summary.lstar <- function(object, ...) {
   ans <- list()  
-############################################
-## SE for ML estimates (from optim), taken from 'arma.R' in package tseries
-  coef_ML <- object$coefficients[c("gamma", "th")]
+
+  ## SE for ML estimates (from optim), taken from 'arma.R' in package tseries
+  coef<- object$coefficients
   n <- object$str$n.used
   rank <- qr(object$model.specific$hessian, 1e-07)$rank
-  if(rank != 2) {
+  if(rank != length(coef)) {
     se <- rep(NA, length(coef))
     warning("singular Hessian\n")
   } else{
@@ -301,30 +295,12 @@ summary.lstar <- function(object, ...) {
     se <- sqrt(di)
   }
 
-  tval <- coef_ML / se
-  coefMat_ML <- cbind(coef_ML, se, tval, 2 * ( 1 - pnorm( abs(tval) ) ) )
- 
-## SE for LS estimates: re-run lm.fit on output $model, copy then summary.lm
-  data.X <-as.matrix(object$model[,-grep("yy", colnames(object$model))])
-  data.y <- object$model[,"yy"]
-  reg <-lm.fit(data.X, data.y)
-  coef_LS <-reg$coefficients
-  Qr <- reg$qr
-  p1 <- 1:length(coef_LS)
-  resvar <- crossprod(reg$residuals)/n
-  est <- coef_LS[Qr$pivot[p1]]
-  R <- chol2inv(Qr$qr[p1, p1, drop = FALSE]) #compute (X'X)^(-1) from the (R part) of the QR decomposition of X.
-  se_LS <- sqrt(diag(R) * resvar) #standard errors
-  tval_LS <- est/se_LS			# t values
+  tval <- coef/ se
+  coefMat<- cbind(coef, se, tval, 2 * ( 1 - pnorm( abs(tval) ) ) )
+  dimnames(coefMat) <- list(names(coef), c(" Estimate"," Std. Error"," t value","Pr(>|z|)"))
+  ans$coefficients<-coefMat
 
-## put toghether LS and ML se
-  coefMat_LS <- cbind(est, se_LS, tval_LS, 2 * ( 1 - pnorm( abs(tval_LS) ) ))
-  names_LS <- names(object$coefficients[-grep(c("gamma|th"), names(object$coefficients))])
-  dimnames(coefMat_LS) <- list(names_LS, c(" Estimate"," Std. Error"," t value","Pr(>|z|)"))
-
-  ans$coefficients<-rbind(coefMat_LS, coefMat_ML )
-
-  #Non-linearity test############
+  ## Non-linearity test############
   xx <- object$str$xx
   sX <- object$model.specific$thVar
   dim(sX) <- NULL
