@@ -186,7 +186,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 
   # Standarize the regressors
   nZ <- NCOL(Z);
-  sdZ <- sd(Z)
+  sdZ <- apply(Z,2,sd)
   dim(sdZ) <- c(1, nZ)
   sdZ <- kronecker(matrix(1, T, 1), sdZ) # repeat sdZ T rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]

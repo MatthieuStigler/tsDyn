@@ -407,7 +407,7 @@ linearityTest.star <- function(str, thVar, externThVar=FALSE,
   # Standarize the regressors
   Z <- cbind(xH0, xH1);
   nZ <- NCOL(Z);
-  sdZ <- sd(Z)
+  sdZ <- apply(Z,2,sd)
   dim(sdZ) <- c(1, nZ)
   sdZ <- kronecker(matrix(1,n.used,1), sdZ) # repeat sdZ n.used rows
   Z[,2:nZ] <- Z[,2:nZ] / sdZ[,2:nZ]
