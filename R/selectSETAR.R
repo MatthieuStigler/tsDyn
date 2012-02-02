@@ -17,7 +17,7 @@
 
 
 ###Exhaustive search over a grid of model parameters
-selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh") ) 
+selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC", "BIC","SSR"),thSteps = 7,  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh"),  hpc=c("none", "foreach") ) 
 #This internal function called by setar() makes a grid search over the values given by setar or user
 #1: Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )
 #2: establish the transition variable z (just copy paste of function setar() )
@@ -37,6 +37,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   criterion<-match.arg(criterion)
   common<-match.arg(common)
   restriction<-match.arg(restriction)
+  hpc<-match.arg(hpc)
   if(missing(m))
     m <- max(ML, MH, ifelse(nthresh==2, max(MM),0),thDelay+1)
   if(missing(series))
@@ -56,7 +57,7 @@ selectSETAR<- function (x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, t
   if(restriction=="OuterSymAll"&nthresh==2){
   	warning("With restriction ='OuterSymAll', you can only have one th. Changed to nthresh=1\n")
   	nthresh<-1}
-  
+  if(hpc=="foreach"&criterion!="SSR") warning("Argument hpc with foreach only implemented for criterion='SSR'")
   
   
 ### SelectSETAR 1:  Build the regressors matrix, cut Y to adequate (just copy paste of function setar() )    
@@ -302,18 +303,22 @@ pooledAIC <- function(parms) {
   }
 
 ###selectSETAR 6: Computation for 1 thresh
-funBuild<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
+  funBuild<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
 
   if (criterion == "pooled-AIC") {
       computedCriterion <- apply(IDS, 1, pooledAIC)
-  } 
-  else if(criterion%in%c("AIC","BIC")){
+  }  else if(criterion%in%c("AIC","BIC")){
     kaic<-switch(criterion, "AIC"=2, "BIC"=log(N))
     mHPos<-ifelse(same.lags, 2,3)
     computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=funBuild, k=kaic, T=N, temp=TRUE))	
-  } 
-  else if(criterion=="SSR"){
-    computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild))
+  } else if(criterion=="SSR"){
+    if(hpc=="none"){ 
+      computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild))
+    } else {
+      computedCriterion <- foreach(i = th, .combine="c") %:% foreach(j = thDelay, .combine="c") %dopar% {
+	 SSR_1thresh(gam1=i,thDelay=j,xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild)
+      }
+    }
   }
 
 ###selectSETAR 7: sorts the results to show the best values
