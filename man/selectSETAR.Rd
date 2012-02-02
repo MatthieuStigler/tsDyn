@@ -7,7 +7,7 @@
 Automatic selection of SETAR hyper-parameters
 }
 \usage{
-selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC","BIC", "SSR"),thSteps = 7,  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh"))
+selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=MakeThSpec(), trace=TRUE, include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MH=seq_len(mH), MM=seq_len(mM),nthresh=1,trim=0.15,criterion = c("pooled-AIC", "AIC","BIC", "SSR"),thSteps = 7,  plot=TRUE,max.iter=2, type=c("level", "diff", "ADF"), same.lags=FALSE, restriction=c("none","OuterSymAll","OuterSymTh"),  hpc=c("none", "foreach") )
 }
 
 \arguments{
@@ -33,6 +33,7 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=Mak
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
 \item{same.lags}{Logical. When AIC or pooled-AIC is used and arg m is given, should it search for same number of lags in each regime (TRUE) or allow for different (FALSE) lags in each regime. Different lags involves more computation}
 \item{restriction}{Restriction on the threshold. \code{OuterSymAll} will take a symmetric threshold and symmetric coefficients for outer regimes. OuterSymTh currently unavailable}
+\item{hpc}{Possibility to run the bootstrap on parallel core. See details}
 }
 \details{
   Routine for automatic selection of SETAR models hyper parameters.
@@ -49,6 +50,9 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar, th=Mak
 When two thresholds(\code{nthresh}=2) have to be computed, the search for the second is made conditional on results for first threshold as suggested in Gonzalo and Pittarakis (2002). Refinements can be obtained by using \code{max.iter} (first threshold being restimated based on the second one). If SSR is used, the number of lags in the inner regime is either the same if only arg m was given, otherwise it has to be pre-specified. Criterion AIC can be used to determine the number of lags in the nner regime, whereas pooled-aic is currently not implemented for nthresh=2. 
 
 By default, all threshold values excluding the upper and lower \code{trim} of the threshold values are taken as potential threshold. restriction can be made with arg \code{th}. See function \link{MakeThSpec}. 
+
+With the argument \code{hpc}, the heavy grid search can be run on parallel cores, thus alleviating the time of computation. Preliminary results 
+indicate however that the length of the series must be very considerable in order that the parallel code becomes advantageous. To use it, the user needs simply to choose a package (among doMC, doMPI, doSNOW or doRedis) and register the backend. See the vignette for more details.
 }
 \value{
 An object of class \code{selectSETAR} (print and plot methods) with: 
