@@ -60,11 +60,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-    phi1.0     phi1.1     phi1.2 
+    const1     phi1.1     phi1.2 
  0.4870648  1.2465789 -0.3655700 
 
 High regime:
-    phi2.0     phi2.1     phi2.2 
+    const2     phi2.1     phi2.2 
 -1.0513795  0.4243203 -0.2488318 
 
 Smoothing parameter: gamma = 11 
@@ -80,11 +80,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-    phi1.0     phi1.1     phi1.2 
+    const1     phi1.1     phi1.2 
  0.4870648  1.2465789 -0.3655700 
 
 High regime:
-    phi2.0     phi2.1     phi2.2 
+    const2     phi2.1     phi2.2 
 -1.0513795  0.4243203 -0.2488318 
 
 Smoothing parameter: gamma = 11 
@@ -103,10 +103,10 @@ residuals variance = 0.03805,  AIC = -357, MAPE = 5.58%
 
 Coefficient(s):
         Estimate  Std. Error  t value  Pr(>|z|)    
-phi1.0  0.487065    0.204274   2.3844 0.0171081 *  
+const1  0.487065    0.204274   2.3844 0.0171081 *  
 phi1.1  1.246579    0.067919  18.3538 < 2.2e-16 ***
 phi1.2 -0.365570    0.104005  -3.5149 0.0004399 ***
-phi2.0 -1.051380    2.448918  -0.4293 0.6676874    
+const2 -1.051380    2.448918  -0.4293 0.6676874    
 phi2.1  0.424320    0.173427   2.4467 0.0144177 *  
 phi2.2 -0.248832    0.589105  -0.4224 0.6727409    
 gamma  11.000030    9.664958   1.1381 0.2550640    
@@ -140,11 +140,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-   phi1.0    phi1.1 
+   const1    phi1.1 
 0.6786487 0.7536072 
 
 High regime:
-    phi2.0     phi2.1 
+    const2     phi2.1 
  1.0155275 -0.2756807 
 
 Smoothing parameter: gamma = 47.95 
@@ -160,11 +160,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-   phi1.0    phi1.1 
+   const1    phi1.1 
 0.6786487 0.7536072 
 
 High regime:
-    phi2.0     phi2.1 
+    const2     phi2.1 
  1.0155275 -0.2756807 
 
 Smoothing parameter: gamma = 47.95 
@@ -183,9 +183,9 @@ residuals variance = 0.1114,  AIC = -238, MAPE = 10.09%
 
 Coefficient(s):
         Estimate  Std. Error  t value  Pr(>|z|)    
-phi1.0  0.678649    0.345519   1.9641   0.04951 *  
+const1  0.678649    0.345519   1.9641   0.04951 *  
 phi1.1  0.753607    0.143988   5.2338  1.66e-07 ***
-phi2.0  1.015527    0.745060   1.3630   0.17288    
+const2  1.015527    0.745060   1.3630   0.17288    
 phi2.1 -0.275681    0.240428  -1.1466   0.25154    
 gamma  47.950869   61.803765   0.7759   0.43783    
 th      2.880884    0.057214  50.3531 < 2.2e-16 ***

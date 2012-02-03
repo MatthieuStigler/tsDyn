@@ -183,28 +183,29 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
  
   ## Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
-  res <- optim(p, SS, gradEhat, hessian = FALSE, method="BFGS", control = control)
-
+  res <- optim(p, SS, gradEhat, hessian = TRUE, method="BFGS", control = control)
   if(trace)
     if(res$convergence!=0)
       cat("Convergence problem. Convergence code: ",res$convergence,"\n")
     else
       cat("Optimization algorithm converged\n")
+  phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
+  coefnames<-c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
+                               if(ninc>0) paste(incNames,"2",sep=""), paste("phi2", 1:mH, sep="."))
+  names(phi_2) <-coefnames
+  names(res$par) <- c("gamma", "th")
+
   ## Optimization: second quick step to get hessian for all parameters########
   SS_2 <- function(p) {
-    phi1 <- p[1:(mL+1)]			#Extract parms from vector p
-    phi2 <- p[(mL+2):(mL + mH + 2)]	#Extract parms from vector p
-    y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p[mL + mH + 3], p[mL + mH + 4])
+    phi1 <- p[grep("const1|phi1|trend1",names(p))]	#Extract parms from vector p
+    phi2 <- p[grep("const2|phi2|trend2",names(p))]	#Extract parms from vector p
+    y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p["gamma"], p["th"])
     crossprod(yy - y.hat)
   }
-  phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
   res <- optim(c(phi_2,res$par), SS_2,  hessian = TRUE, method="BFGS", control = control)
-    
   #Results storing################
   coefs <- res$par
-  names(coefs) <- c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
-                               if(ninc>0) paste(incNames,"2",sep=""), paste("phi2", 1:mH, sep="."),
-                               "gamma", "th")
+  names(coefs) <- c(coefnames,"gamma", "th") 
   gamma <- coefs["gamma"]
   th  <- coefs["th"]
   if (trace) cat("Optimized values fixed for regime 2 ",
@@ -258,8 +259,8 @@ print.lstar <- function(x, ...) {
   ninc<-x$ninc
   order.L <- x$mL
   order.H <- x$mH
-  lowCoef <- x$coef[1:(order.L+ninc)]
-  highCoef<- x$coef[(order.L + ninc+1):(order.L + order.H + 2*ninc)]
+  lowCoef <- x$coef[grep("phi1|const1|trend1", names(x$coef))]
+  highCoef <- x$coef[grep("phi2|const2|trend2", names(x$coef))]
   gammaCoef <- x$coef["gamma"]
   thCoef <- x$coef["th"]
   externThVar <- x$externThVar
