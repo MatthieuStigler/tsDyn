@@ -190,7 +190,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       cat("Convergence problem. Convergence code: ",res$convergence,"\n")
     else
       cat("Optimization algorithm converged\n")
-  ## NOptimization: second quick step to get hessian for all parameters########
+  ## Optimization: second quick step to get hessian for all parameters########
   SS_2 <- function(p) {
     phi1 <- p[1:(mL+1)]			#Extract parms from vector p
     phi2 <- p[(mL+2):(mL + mH + 2)]	#Extract parms from vector p
@@ -202,9 +202,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     
   #Results storing################
   coefs <- res$par
-  names(coefs) <- c(paste("phi1", 0:mL, sep="."),
-                               paste("phi2", 0:mH, sep="."),
-  names(res$coefficients) <- c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
+  names(coefs) <- c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
                                if(ninc>0) paste(incNames,"2",sep=""), paste("phi2", 1:mH, sep="."),
                                "gamma", "th")
   gamma <- coefs["gamma"]
@@ -223,9 +221,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
     res$mTh <- mTh
   }
-
   res$thVar <- z
-  res$fitted <- F(coefs[grep("phi1", names(coefs))], coefs[grep("phi2", names(coefs))], gamma, th)
+  res$fitted <- F(coefs[grep("phi1|const1|trend1", names(coefs))], coefs[grep("phi2|const2|trend2", names(coefs))], gamma, th)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
@@ -423,14 +420,16 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
 }
 
 oneStep.lstar <- function(object, newdata, itime, thVar, ...){
-  if(include!="const") stop("oneStep currently only implemented for include==const\n")
+  include <- object$model.specific$include
+  if(!include %in%c("none","const")) stop("oneStep currently only implemented for include==const/none\n")
   ninc<-object$model.specific$ninc
   mL <- object$model.specific$mL
   mH <- object$model.specific$mH
-  phi1 <- object$coefficients[1:(mL+ninc)]
-  phi2 <- object$coefficients[(mL+1+ ninc):(mH+2*ninc)]
-  gamma <- object$coefficients["gamma"]
-  c <- object$coefficients["th"]
+  coefs<-object$coefficients
+  phi1 <- coefs[grep("const1|trend1|phi1", names(coefs))]
+  phi2 <- coefs[grep("const2|trend2|phi2", names(coefs))]
+  gamma <- coefs["gamma"]
+  c <- coefs["th"]
   ext <- object$model.specific$externThVar
 
   if(ext) {
@@ -443,12 +442,15 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   z <- plogis(z, c, 1/gamma)
 
   if(nrow(newdata)>1) {
-    xL <- cbind(1,newdata[,1:mL])
-    xH <- cbind(1,newdata[,1:mH])
+    reg<- switch(include,"const"=1, "none"=NULL)
+    xL <- cbind(reg,newdata[,1:mL])
+    xH <- cbind(reg,newdata[,1:mH])
   } else {
-    xL <- c(1,newdata[,1:mL])
-    xH <- c(1,newdata[,1:mH])
+    reg<- switch(include,"const"=1, "none"=NULL)
+    xL <- c(reg,newdata[,1:mL])
+    xH <- c(reg,newdata[,1:mH])
   }
+
   xL %*% phi1 + (xH %*% phi2) * z
 }
 
