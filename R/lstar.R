@@ -21,7 +21,7 @@
 #	trace: should infos be printed?
 #	control: 'control' options to be passed to optim
 lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
-                  thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), control=list())
+                  thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), control=list(), starting.control=list())
 {
 
   include<-match.arg(include)
@@ -103,18 +103,24 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     bestCost <- Inf;
 
-    # Maximum and minimum values for gamma
-    maxGamma <- 40;
-    minGamma <- 10;
-    rateGamma <- 1;
+    # Set list of defaults:
+    start.con<-list(
+		    nTh=200, 
+		    trim=0.1,
+		    nGamma=31,
+		    gammaInt=c(10,40)
+    )
+    # Add if user defined, check if names confirm (code taken from optim)
+    nmsC <- names(start.con)
+    start.con[(namc <- names(starting.control))] <- starting.control
+    if (length(noNms <- namc[!namc %in% nmsC])) 
+        warning("unknown names in starting.control: ", paste(noNms, collapse = ", "))
 
     # Maximum and minimum values for c
-    minTh <- quantile(as.ts(z), .1) # percentil 10 de z
-    maxTh <- quantile(as.ts(z), .9) # percentil 90 de z
-    rateTh <- (maxTh - minTh) / 200;
+    interv.Th <- quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) # percentil 10 de z
     
-    for(newGamma in seq(minGamma, maxGamma, rateGamma)) {
-      for(newTh in seq(minTh, maxTh, rateTh)) {
+    for(newGamma in seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)) {
+      for(newTh in seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh)) {
         
         # We fix the linear parameters.
         cost <- crossprod(lm.fit(cbind(xxL, xxH * G(z, newGamma, newTh)), yy)$residuals)
@@ -183,7 +189,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
  
   ## Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
-  res <- optim(p, SS, gradEhat, hessian = TRUE, method="BFGS", control = control)
+  res <- optim(p, SS, gradEhat, hessian = FALSE, method="BFGS", control = control)
   if(trace){
     if(res$convergence!=0){
       if(res$convergence==1) {
