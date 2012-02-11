@@ -52,7 +52,7 @@ Using maximum autoregressive order for high regime: mH = 2
 Performing grid search for starting values...
 Starting values fixed: gamma =  11 , th =  3.338679 ; SSE =  4.337657 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  11.00003 , th =  3.340087 
+Optimized values fixed for regime 2  : gamma =  11.00003 , th =  3.340087 ; SSE =  4.337643 
 > mod.lstar
 
 Non linear autoregressive model
@@ -132,7 +132,7 @@ Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  40 , th =  2.890765 ; SSE =  12.71672 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  47.95087 , th =  2.880884 
+Optimized values fixed for regime 2  : gamma =  47.95087 , th =  2.880884 ; SSE =  12.69489 
 > mod.lstar2
 
 Non linear autoregressive model
