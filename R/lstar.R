@@ -184,11 +184,17 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   ## Numerical minimization##########
   p <- c(gamma, th)   #pack parameters in one vector
   res <- optim(p, SS, gradEhat, hessian = TRUE, method="BFGS", control = control)
-  if(trace)
-    if(res$convergence!=0)
-      cat("Convergence problem. Convergence code: ",res$convergence,"\n")
-    else
+  if(trace){
+    if(res$convergence!=0){
+      if(res$convergence==1) {
+	cat("Convergence problem code 1. You might want to increase maximum number of iterations by setting 'control=list(maxit=1000)'\n")
+      } else {
+	cat("Convergence problem. Convergence code: ",res$convergence,"\n")
+      }
+    } else {
       cat("Optimization algorithm converged\n")
+    }
+  }
   phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
   coefnames<-c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
                                if(ninc>0) paste(incNames,"2",sep=""), paste("phi2", 1:mH, sep="."))
@@ -209,7 +215,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   gamma <- coefs["gamma"]
   th  <- coefs["th"]
   if (trace) cat("Optimized values fixed for regime 2 ",
-                 ": gamma = ", gamma, ", th = ", th,"\n");
+                 ": gamma = ", gamma, ", th = ", th,"; SSE = ", res$value, "\n");
   
   res$coefficients <- coefs
   res$mL <- mL
