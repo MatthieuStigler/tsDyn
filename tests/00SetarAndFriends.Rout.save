@@ -598,13 +598,13 @@ Equation long.run   1.890135 -0.008113763  0.633504924   -0.1262766 -0.01764579
 7 -0.141652551 -0.10341638
 8 -0.084140183  0.01981197
 > tail(residuals(tvar))
-     short.run    long.run
-95  -0.1326403  0.09671450
-96   0.1258271 -0.28920157
-97   0.1782376  0.04344887
-98  -0.1549201 -0.08167471
-99   0.0976071  0.15553665
-100  0.3188607  0.01232640
+      short.run    long.run
+95  -0.13264030  0.09671450
+96   0.12582712 -0.28920157
+97   0.17823756  0.04344887
+98  -0.15492010 -0.08167471
+99   0.09760711  0.15553665
+100  0.31886073  0.01232640
 > head(fitted(tvar))
               [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]
 short.run 2.312597 2.358166 2.459635 2.605243 2.537653 2.436140 2.398192
@@ -751,7 +751,8 @@ Equation long.run  -0.1263(0.3443)  -0.0176(0.1576)
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
 Threshold value: 3.091 3.405
-Percentage of Observations in each regime: 71.4% 10.2% 18.4%> 
+Percentage of Observations in each regime: 71.4% 10.2% 18.4% 
+> 
 > options(show.signif.stars=FALSE)
 > summary(tvar)
 Model TVAR with  2  thresholds
@@ -786,7 +787,8 @@ Equation long.run  -0.1263(0.3443) -0.0176(0.1576)
 
 
 Threshold value: 3.091 3.405
-Percentage of Observations in each regime: 71.4% 10.2% 18.4%> 
+Percentage of Observations in each regime: 71.4% 10.2% 18.4% 
+> 
 > print(summary(tvar), digits=3)
 Model TVAR with  2  thresholds
 
@@ -820,7 +822,8 @@ Equation long.run  -0.018(0.158)
 
 
 Threshold value: 3.091 3.405
-Percentage of Observations in each regime: 71.4% 10.2% 18.4%> 
+Percentage of Observations in each regime: 71.4% 10.2% 18.4% 
+> 
 > toLatex(tvar)
 %insert in the preamble and uncomment the line you want for usual /medium /small matrix
 %\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL

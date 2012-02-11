@@ -58,7 +58,7 @@ Loading required package: MASS
 > TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
-Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
 > TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
@@ -87,7 +87,7 @@ Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
 > summary(t1)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
-Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
 P-Value:	 0 		( Fixed regressor bootstrap )
 
 Critical values:
@@ -113,17 +113,17 @@ Critical values:
 Number of bootstrap replications:	 5> t3
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
-Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
 P-Value:	 0 		( Residual Bootstrap )
 > summary(t3)
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
-Test Statistic:	 18.23360	(Maximized for threshold value: -0.1002829 )
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
 P-Value:	 0 		( Residual Bootstrap )
 
 Critical values:
-   0.90%    0.95%    0.99%
- 15.1108 15.12440 15.13527
+   0.90%   0.95%    0.99%
+ 15.1108 15.1244 15.13527
 Number of bootstrap replications:	 5> t4
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
@@ -136,8 +136,8 @@ Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
 P-Value:	 0 		( Residual Bootstrap )
 
 Critical values:
-   0.90%    0.95%    0.99%
- 15.1108 15.12440 15.13527
+   0.90%   0.95%    0.99%
+ 15.1108 15.1244 15.13527
 Number of bootstrap replications:	 5> 
 > proc.time()
    user  system elapsed 
