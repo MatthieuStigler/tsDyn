@@ -7,11 +7,11 @@ Logistic Smooth Transition AutoRegressive model.
 }
 \synopsis{
 lstar(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay, 
-          thVar, th, gamma, trace=TRUE, control=list()) 
+          thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), control=list()) 
 }
 \usage{
 lstar(x, m, d=1, steps=d, series, mL, mH, thDelay, 
-          th, gamma, trace=TRUE, control=list())
+          th, gamma, trace=TRUE, include="const", control=list())
 
 lstar(series, m, d, steps, mL, mH, mTh,
     th, gamma, trace=TRUE, control=list())
@@ -46,6 +46,7 @@ lstar(series, m, d, steps, mL=m, mH=m, thVar,
 \item{thVar}{external threshold variable}
 \item{th, gamma}{starting values for coefficients in the LSTAR model. If missing, a grid search is performed}
 \item{trace}{should additional infos be printed? (logical)}
+\item{include}{Type of deterministic regressors to include}
 \item{control}{further arguments to be passed as \code{control} list to
   \code{\link{optim}}}
 }
