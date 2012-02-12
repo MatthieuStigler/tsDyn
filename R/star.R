@@ -223,7 +223,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 addRegime <- function(object, ...)
   UseMethod("addRegime")
 
-addRegime.star <- function(object)
+addRegime.star <- function(object, ...)
 {
 
   noRegimes <- object$model.specific$noRegimes;

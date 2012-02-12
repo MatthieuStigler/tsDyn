@@ -19,7 +19,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        llar, llar.predict, llar.fitted, sigmoid, dsigmoid,
 	setar, lstar, star, availableModels,
        nlarDialog, linear, isLinear, nnetTs, aar,
-	star, 
+	star, addRegime, 
        TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
 	MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime, getTh,
 	TVECM.HStest)
@@ -90,6 +90,7 @@ S3method(AIC, nlVar)
 S3method(AIC, VECM)
 S3method(BIC, nlVar)
 S3method(BIC, VECM)
+S3method(addRegime, star)
 S3method(regime, setar)
 S3method(regime, nlVar)
 S3method(getTh, default)
