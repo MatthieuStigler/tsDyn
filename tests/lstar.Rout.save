@@ -205,6 +205,332 @@ Variable: Z(t) = + (1) X(t)
 > c(AIC(mod.lstar2),BIC(mod.lstar2))
 [1] -239.1082 -222.6910
 > 
+> ## include: none
+> mod.lstar_noConst <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="none")
+Using maximum autoregressive order for low regime: mL = 2 
+Using maximum autoregressive order for high regime: mH = 2 
+Using default threshold variable: thDelay=0
+Performing grid search for starting values...
+Starting values fixed: gamma =  3.538462 , th =  2.717217 ; SSE =  4.933124 
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  2.474218 , th =  2.708203 ; SSE =  4.90745 
+> mod.lstar_noConst
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+    phi1.1     phi1.2 
+ 1.4019861 -0.2275385 
+
+High regime:
+    phi2.1     phi2.2 
+ 0.7632842 -1.0512554 
+
+Smoothing parameter: gamma = 2.474 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.708 
+> summary(mod.lstar_noConst)
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+    phi1.1     phi1.2 
+ 1.4019861 -0.2275385 
+
+High regime:
+    phi2.1     phi2.2 
+ 0.7632842 -1.0512554 
+
+Smoothing parameter: gamma = 2.474 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.708 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.577313 -0.134008  0.025054  0.146881  0.508190 
+
+Fit:
+residuals variance = 0.04305,  AIC = -347, MAPE = 6.175%
+
+Coefficient(s):
+        Estimate  Std. Error  t value  Pr(>|z|)    
+phi1.1   1.40199     0.17240   8.1320 4.441e-16 ***
+phi1.2  -0.22754     0.20992  -1.0839  0.278403    
+phi2.1   0.76328     0.31383   2.4321  0.015010 *  
+phi2.2  -1.05126     0.37833  -2.7787  0.005458 ** 
+gamma    2.47422     1.30664   1.8936  0.058282 .  
+th       2.70820     0.15698  17.2522 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Non-linearity test of full-order LSTAR model against full-order AR model
+ F = 8.529 ; p-value = 0.00036569 
+
+Threshold 
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+> deviance(mod.lstar_noConst)
+        [,1]
+[1,] 4.90745
+> c(AIC(mod.lstar_noConst),BIC(mod.lstar_noConst))
+[1] -346.5806 -330.1634
+> 
+> ## include: trend
+> mod.lstar_trend <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="trend")
+Using maximum autoregressive order for low regime: mL = 2 
+Using maximum autoregressive order for high regime: mH = 2 
+Using default threshold variable: thDelay=0
+Performing grid search for starting values...
+Starting values fixed: gamma =  3.538462 , th =  2.717217 ; SSE =  4.899765 
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  2.562222 , th =  2.697521 ; SSE =  4.8801 
+> mod.lstar_trend
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+       trend1        phi1.1        phi1.2 
+ 1.458266e-05  1.402670e+00 -2.317046e-01 
+
+High regime:
+      trend2       phi2.1       phi2.2 
+ 0.000697941  0.740846551 -1.033365399 
+
+Smoothing parameter: gamma = 2.562 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.698 
+> summary(mod.lstar_trend)
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+       trend1        phi1.1        phi1.2 
+ 1.458266e-05  1.402670e+00 -2.317046e-01 
+
+High regime:
+      trend2       phi2.1       phi2.2 
+ 0.000697941  0.740846551 -1.033365399 
+
+Smoothing parameter: gamma = 2.562 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.698 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.596556 -0.132002  0.023903  0.144016  0.521340 
+
+Fit:
+residuals variance = 0.04281,  AIC = -343, MAPE = 6.137%
+
+Coefficient(s):
+          Estimate  Std. Error  t value  Pr(>|z|)    
+trend1  1.4583e-05  1.6391e-03   0.0089  0.992902    
+phi1.1  1.4027e+00  1.6679e-01   8.4098 < 2.2e-16 ***
+phi1.2 -2.3170e-01  2.1245e-01  -1.0906  0.275445    
+trend2  6.9794e-04  2.3951e-03   0.2914  0.770745    
+phi2.1  7.4085e-01  2.9975e-01   2.4716  0.013453 *  
+phi2.2 -1.0334e+00  3.6366e-01  -2.8416  0.004489 ** 
+gamma   2.5622e+00  1.3528e+00   1.8940  0.058219 .  
+th      2.6975e+00  1.6752e-01  16.1027 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Non-linearity test of full-order LSTAR model against full-order AR model
+ F = 8.529 ; p-value = 0.00036569 
+
+Threshold 
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+> deviance(mod.lstar_trend)
+       [,1]
+[1,] 4.8801
+> c(AIC(mod.lstar_trend),BIC(mod.lstar_trend))
+[1] -343.2177 -321.3281
+> 
+> ## include: both
+> mod.lstar_both <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="both")
+Using maximum autoregressive order for low regime: mL = 2 
+Using maximum autoregressive order for high regime: mH = 2 
+Using default threshold variable: thDelay=0
+Performing grid search for starting values...
+Starting values fixed: gamma =  100 , th =  2.57058 ; SSE =  4.581802 
+Grid search selected lower/upper bound gamma (default [1,100]). 
+					  Might try to widen bound with arg: 'starting.control=list(gammaInt=c(1,200))'
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  100.0001 , th =  2.568066 ; SSE =  4.580635 
+> mod.lstar_both
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+       const1        trend1        phi1.1        phi1.2 
+ 0.3869414345  0.0002595805  1.2409824371 -0.3277023964 
+
+High regime:
+       const2        trend2        phi2.1        phi2.2 
+ 0.7981223405  0.0001995712  0.3034499272 -0.6346480539 
+
+Smoothing parameter: gamma = 100 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.568 
+> summary(mod.lstar_both)
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+       const1        trend1        phi1.1        phi1.2 
+ 0.3869414345  0.0002595805  1.2409824371 -0.3277023964 
+
+High regime:
+       const2        trend2        phi2.1        phi2.2 
+ 0.7981223405  0.0001995712  0.3034499272 -0.6346480539 
+
+Smoothing parameter: gamma = 100 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.568 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.587125 -0.120256  0.041373  0.132314  0.487811 
+
+Fit:
+residuals variance = 0.04018,  AIC = -346, MAPE = 5.915%
+
+Coefficient(s):
+          Estimate  Std. Error  t value  Pr(>|z|)    
+const1  3.8694e-01  3.1768e-01   1.2180 0.2232146    
+trend1  2.5958e-04  1.3092e-03   0.1983 0.8428249    
+phi1.1  1.2410e+00  1.5052e-01   8.2444 2.220e-16 ***
+phi1.2 -3.2770e-01  9.8629e-02  -3.3226 0.0008919 ***
+const2  7.9812e-01  3.7117e-01   2.1503 0.0315331 *  
+trend2  1.9957e-04  1.4824e-03   0.1346 0.8929087    
+phi2.1  3.0345e-01  1.7018e-01   1.7831 0.0745683 .  
+phi2.2 -6.3465e-01  1.2179e-01  -5.2110 1.879e-07 ***
+gamma   1.0000e+02  8.0618e+01   1.2404 0.2148216    
+th      2.5681e+00  1.4783e-02 173.7188 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Non-linearity test of full-order LSTAR model against full-order AR model
+ F = 8.529 ; p-value = 0.00036569 
+
+Threshold 
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+> deviance(mod.lstar_both)
+         [,1]
+[1,] 4.580635
+> c(AIC(mod.lstar_both),BIC(mod.lstar_both))
+[1] -346.4371 -319.0751
+> 
+> ## grid attributes
+> mod.lstar3 <- lstar(log10(lynx), m=2, control=list(maxit=3000), starting.control=list(gammaInt=c(1,1000), nTh=100))
+Using maximum autoregressive order for low regime: mL = 2 
+Using maximum autoregressive order for high regime: mH = 2 
+Using default threshold variable: thDelay=0
+Performing grid search for starting values...
+Starting values fixed: gamma =  871.9231 , th =  2.560424 ; SSE =  4.564989 
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  871.9231 , th =  2.560332 ; SSE =  4.564987 
+> mod.lstar3
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+    const1     phi1.1     phi1.2 
+ 0.3992404  1.2466373 -0.3316956 
+
+High regime:
+    const2     phi2.1     phi2.2 
+ 0.7821303  0.3009462 -0.6246129 
+
+Smoothing parameter: gamma = 871.9 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.56 
+> summary(mod.lstar3)
+
+Non linear autoregressive model
+
+LSTAR model
+Coefficients:
+Low regime:
+    const1     phi1.1     phi1.2 
+ 0.3992404  1.2466373 -0.3316956 
+
+High regime:
+    const2     phi2.1     phi2.2 
+ 0.7821303  0.3009462 -0.6246129 
+
+Smoothing parameter: gamma = 871.9 
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 2.56 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.596125 -0.126653  0.039972  0.118475  0.474407 
+
+Fit:
+residuals variance = 0.04004,  AIC = -351, MAPE = 5.88%
+
+Coefficient(s):
+          Estimate  Std. Error  t value  Pr(>|z|)    
+const1    0.399240    0.283183   1.4098 0.1585895    
+phi1.1    1.246637    0.144031   8.6553 < 2.2e-16 ***
+phi1.2   -0.331696    0.097428  -3.4045 0.0006628 ***
+const2    0.782130    0.346191   2.2592 0.0238681 *  
+phi2.1    0.300946    0.165911   1.8139 0.0696923 .  
+phi2.2   -0.624613    0.118978  -5.2498 1.523e-07 ***
+gamma   871.923077 3673.244447   0.2374 0.8123687    
+th        2.560332    0.010033 255.1885 < 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Non-linearity test of full-order LSTAR model against full-order AR model
+ F = 8.529 ; p-value = 0.00036569 
+
+Threshold 
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+> deviance(mod.lstar3)
+         [,1]
+[1,] 4.564987
+> c(AIC(mod.lstar3),BIC(mod.lstar3))
+[1] -350.8272 -328.9377
+> 
 > proc.time()
    user  system elapsed 
   7.850   0.070   7.906 

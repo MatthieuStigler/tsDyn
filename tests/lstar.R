@@ -11,3 +11,31 @@ mod.lstar2
 summary(mod.lstar2)
 deviance(mod.lstar2)
 c(AIC(mod.lstar2),BIC(mod.lstar2))
+
+## include: none
+mod.lstar_noConst <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="none")
+mod.lstar_noConst
+summary(mod.lstar_noConst)
+deviance(mod.lstar_noConst)
+c(AIC(mod.lstar_noConst),BIC(mod.lstar_noConst))
+
+## include: trend
+mod.lstar_trend <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="trend")
+mod.lstar_trend
+summary(mod.lstar_trend)
+deviance(mod.lstar_trend)
+c(AIC(mod.lstar_trend),BIC(mod.lstar_trend))
+
+## include: both
+mod.lstar_both <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="both")
+mod.lstar_both
+summary(mod.lstar_both)
+deviance(mod.lstar_both)
+c(AIC(mod.lstar_both),BIC(mod.lstar_both))
+
+## grid attributes
+mod.lstar3 <- lstar(log10(lynx), m=2, control=list(maxit=3000), starting.control=list(gammaInt=c(1,1000), nTh=100))
+mod.lstar3
+summary(mod.lstar3)
+deviance(mod.lstar3)
+c(AIC(mod.lstar3),BIC(mod.lstar3))
