@@ -7,11 +7,11 @@
 }
 \usage{data(IIPUs)}
 \format{
-  A monthly time series of class ts starting in january 1960 and ending in september 1997. Note that the series ends at 1997 and not 1998 as in the paper of Hansen, even if the data was taken from hi site and the graph is exactly the same. 
+  A monthly time series of class ts starting in January 1960 and ending in September 1997. Note that the series ends at 1997 and not 1998 as in the paper of Hansen, even if the data was taken from hi site and the graph is exactly the same. 
 }
 \source{
 Hansen (1999) Testing for linearity, Journal of Economic Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26)
-avalaible at: \url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
+available at: \url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 }
 \examples{
 data(IIPUs)

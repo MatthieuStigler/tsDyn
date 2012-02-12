@@ -1,6 +1,6 @@
 \name{TVAR.sim}
 \alias{TVAR.sim}
-\title{Simulation and bootstrap of multivariate Treshold Autoregressive model}
+\title{Simulation and bootstrap of multivariate Threshold Autoregressive model}
 \description{
 Estimate or bootstraps a multivariate Threshold VAR
 }
@@ -27,9 +27,9 @@ A matrix with the simulated/bootstraped series.
 \item{mTh}{combination of variables with same lag order for the transition variable. Either a single value (indicating which variable to take) or a combination}
 \item{starting}{Starting values when a simulation with given parameter matrix is made}
 \item{innov}{Innovations used for simulation. Should be matrix of dim nxk. By default multivariate normal.}
-\item{varcov}{Variance-covariance matrix for the inov when default multivariate normal is used.}
-\item{show.parMat}{Logical. Should the parameter matrix be shown? Usefull to understand how to give right input}
-\item{round}{Rounds the series created to have the same digits (hopefully) as original series. Useful when t}
+\item{varcov}{Variance-covariance matrix for the innovations. By default multivariate normal is used.}
+\item{show.parMat}{Logical. Should the parameter matrix be shown? Useful to understand how to give right input}
+\item{round}{Rounds the series created to have the same digits (hopefully) as original series. }
 }
 \details{
 This function offers the possibility to generate series following a TVAR from two approaches: bootstrap or simulation.

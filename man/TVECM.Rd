@@ -1,8 +1,8 @@
 \name{TVECM}
 \alias{TVECM}
-\title{Treshold Vector Error Correction model (VECM)}
+\title{Threshold Vector Error Correction model (VECM)}
 \description{
-Estimate a Treshold Vector Error Correction model (VECM)
+Estimate a Threshold Vector Error Correction model (VECM)
 }
 \usage{
 TVECM(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=TRUE,  th1=list(exact=NULL, int=c("from","to"), around="val"), th2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), common=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),dummyToBothRegimes=TRUE,beta0=0,methodMapply=FALSE, trace=TRUE )
@@ -26,11 +26,13 @@ Fitted model data
 \item{include}{Type of deterministic regressors to include}
 \item{dummyToBothRegimes}{Whether the dummy in the one threshold model is applied to each regime or not. }
 \item{beta0}{Additional regressors to include in the cointegrating relation}
-\item{methodMapply}{only for programming. Is to make the choice between a for loop or mapply implementation}
+\item{methodMapply}{only for programming. Is to make the choice between a for loop or \code{mapply} implementation}
 \item{trace}{should additional infos be printed? (logical)}
 }
 \details{
-For fixed threshold  and cointegrating vector, the model is linear, so estimation can be done directly by CLS (Conditional Least Squares). The search of the parameters values which minimize the residual sum of squares (SSR) is made upon a grid of potential values. The search on the threshold values is made upon existing ones, whereas the search for the cointegrating value is made by default based on a confidence interval around the estimate form linear model. 
+For fixed threshold  and cointegrating vector, the model is linear, so estimation of the regression parameters can be done directly by CLS (Conditional Least Squares). The search of the threshold and cointegrating parameters values which minimize the residual sum of squares (SSR) is made on a grid of potential values. Potential values of the threshold parameter are taken from the existing values of the error correction term, while the parameters of the grid for cointegrating value are taken from the confidence interval obtained in the linear VECM. 
+
+The function can estimate 1 as well as two threhsolds:
 
 nthresh=1: estimation of one threshold model (two regimes) upon a grid of \var{ngridTh} values (default to ALL) possible thresholds and delays values. 
 

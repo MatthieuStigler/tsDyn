@@ -38,7 +38,7 @@ type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh")
 %  }
 %  If the thresholding variable isn't external, there is an additional
 %  component \code{mTh}, containing coefficients for lagged time series
-%  used for obtaining the treshold variable. If \code{th} coefficient was estimated,
+%  used for obtaining the threshold variable. If \code{th} coefficient was estimated,
 %  there is also a \code{th} component, which is a vector containing all
 %  the tried threshold values.
 }
@@ -50,10 +50,10 @@ type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh")
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d)}
 \item{mTh}{coefficients for the lagged time series, to obtain the threshold variable}
 \item{thVar}{external threshold variable}
-\item{th}{threshold value (if missing, a search over a resonable grid is tried)}
+\item{th}{threshold value (if missing, a search over a reasonable grid is tried)}
 \item{trace}{should additional infos be printed? (logical)}
 \item{include}{Type of deterministic regressors to include}
-\item{common}{Indicates which elemenst are common to all regimes: no, only the \code{include} variables, the lags or both}
+\item{common}{Indicates which elements are common to all regimes: no, only the \code{include} variables, the lags or both}
 \item{ML,MH}{vector of lags for  order for \sQuote{low} (ML) \sQuote{middle} (MM, only useful if nthresh=2) and \sQuote{high} (MH)regime. Max must be <=m}
 \item{model}{Currently not implemented}
 \item{nthresh}{Number of threshold of the model}
@@ -75,7 +75,7 @@ Self Exciting Threshold AutoRegressive model.
   (mH-1)d] ) I( z[t] > th) + eps[t+steps]  
 }
 
-with \var{z} the treshold variable. The threshold variable can alternatively be specified by (in that order):
+with \var{z} the threshold variable. The threshold variable can alternatively be specified by (in that order):
 \describe{
 \item{thDelay}{ \code{z[t] = x[t - thDelay*d ]} }
 \item{mTh}{ \code{z[t] = x[t] mTh[1] + x[t-d] mTh[2] + \dots + x[t-(m-1)d] mTh[m]} }

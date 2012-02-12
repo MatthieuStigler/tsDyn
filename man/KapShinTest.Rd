@@ -13,7 +13,7 @@
 \item{x}{ time series }
 \item{m}{Number of lags under the alternative}
 \item{series}{ time series name (optional) }
-\item{include}{Whether data should be raw, de-menead or de-menead and de-trended}
+\item{include}{Whether data should be raw, de-meaned or de-meaned and de-trended}
 \item{c}{Argument for the grid search. See details}
 \item{delta}{Argument for the grid search. See details}
 \item{points}{Points for the grid search. See details}
@@ -22,7 +22,7 @@
 \item{trace}{should additional infos be printed? (logical)}
 }
 
-\value{A object of class "KapShin2006Test" containing:
+\value{A object of class \code{KapShin2006Test} containing:
 \item{statistic}{The three (SupW, AvgW, ExpW) test statistics computed}
 \item{case}{Whether the data was transformed, corresponds to input argument include}
 \item{series}{The name of the series}

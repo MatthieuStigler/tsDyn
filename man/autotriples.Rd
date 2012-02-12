@@ -13,13 +13,13 @@ GUI=interactive())
 \item{x}{ time series}
 \item{lags}{ vector of regressors lags }
 \item{h}{ kernel window }
-\item{type}{ type of plot: countour levels, perspective plots, image }
+\item{type}{ type of plot: contour levels, perspective plots, image }
 \item{GUI}{ should a GUI be displayed? }
 }
 \details{
   This function displays trivariate time series plots, i.e. kernel
   regression of \eqn{x[t-lags[1]], x[t-lags[2]]}{x_{t-l_1}, x_{t-l_2}}
-  against \eqn{x[t]}{x_t} using functions in the package 'sm'.
+  against \eqn{x[t]}{x_t} using functions in the package \pkg{sm}.
   In particular, \code{\link[sm]{sm.regression}} is used, with smoothing
   parameter  defaulting to \code{\link[sm]{hnorm}(x)}.
   If requested, a simple GUI is displayed, to change interactively
@@ -36,5 +36,5 @@ autotriples(log(lynx))
 autotriples(log(lynx), type="persp")
 autotriples(log(lynx), type="image")
 }
-\author{ Wrappers to 'sm' and GUI by Antonio, Fabio Di Narzo  }
+\author{ Wrappers to \pkg{sm} and GUI by Antonio, Fabio Di Narzo  }
 \keyword{ ts }

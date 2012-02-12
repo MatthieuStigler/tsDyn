@@ -30,13 +30,13 @@ lstar(series, m, d, steps, mL=m, mH=m, thVar,
 %  }
 %  If the thresholding variable isn't external, there is an additional
 %  component \code{mTh}, containing coefficients for lagged time series
-%  used for obtaining the treshold variable.
+%  used for obtaining the threshold variable.
 }
 \arguments{
 \item{x}{ time series }
 \item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 \item{series}{ time series name (optional) }
-\item{mL}{autoregressive order for 'low' regime (dafult: m). Must be <=m}
+\item{mL}{autoregressive order for 'low' regime (default: m). Must be <=m}
 \item{mH}{autoregressive order for 'high' regime (default: m). Must be
   <=m}
 \item{thDelay}{'time delay' for the threshold variable (as multiple of
@@ -61,7 +61,7 @@ lstar(series, m, d, steps, mL=m, mH=m, thVar,
   + ( phi2[0] + phi2[1] x[t] + phi2[2] x[t-d] + \dots + phi2[mH] x[t -
   (mH-1)d] ) (1 - G( z[t], th, gamma ) ) + eps[t+steps]
   }
-with \var{z} the treshold variable, and \eqn{G} the logistic function,
+with \var{z} the threshold variable, and \eqn{G} the logistic function,
 computed as \code{plogis(q, location = th, scale = 1/gamma)}, so see
 \code{\link{plogis}} documentation for details on the logistic function
 formulation and parameters meanings.  
@@ -74,12 +74,12 @@ The threshold variable can alternatively be specified by:
 }
 
 Note that if starting values for phi1 and phi2 are provided, isn't
-necessary to specify mL and mH. Further, the user has to specify only
-one parameter between mTh, thDelay and thVar for indicating the
+necessary to specify \code{mL} and \code{mH}. Further, the user has to specify only
+one parameter between \code{mTh}, \code{thDelay} and \code{thVar} for indicating the
 threshold variable. 
 
 Estimation of the transition parameters \var{th} and \var{gamma}, as well as the regression parameters 
-\var{phi1} and \var{phi2}, is done using concentrated least squares, as suggested in Leybourne et al. (1996). 
+\var{phi1} and \var{phi2}, is done using concentrated least squares, as suggested in \cite{Leybourne et al. (1996)}. 
 
 Given \var{th} and \var{gamma}, the model is linear, so regression coefficients
 can be obtained as usual by OLS. So the nonlinear numerical search needs only to be done for \var{th} and \var{gamma}; 
@@ -89,8 +89,8 @@ For the nonlinear estimation of the
 parameters \var{th} and \var{gamma}, the program uses the
 \code{\link{optim}} function, with optimization method BFGS using the analytical gradient. 
 For the estimation of standard values, \code{\link{optim}} is re-run
-using the complete Least Squares objective function, and the standard erros are obtained by inverting the hessian. 
-You can pass further arguments to \link{optim} directly with the \code{control} list argument. For istance, the option \code{maxit} maybe useful when
+using the complete Least Squares objective function, and the standard errors are obtained by inverting the hessian. 
+You can pass further arguments to \link{optim} directly with the \code{control} list argument. For instance, the option \code{maxit} maybe useful when
 there are convergence issues (see examples).
 
 Starting parameters are obtained doing a simple two-dimensional grid-search over \var{th} and \var{gamma}. 
@@ -99,8 +99,8 @@ Parameters of the grid (interval for the values, dimension of the grid) can be p
   \describe{
     \item{\code{nTh}}{The number of threshold values (\var{th}) in the grid. Defaults to 200}
     \item{\code{nGamma}}{The number of smoothing values (\var{gamma}) in the grid. Defaults to 40}
-    \item{\code{trim}}{The minimal perecentage of observations in each regime. Defaults to 10\% (possible threshold values are betwwen the 0.1 and 0.9 quantile)}
-    \item{\code{gammaInt}}{The lower ad higher smoothign values of the grid. Defaults to c(1,40)}
+    \item{\code{trim}}{The minimal percentage of observations in each regime. Defaults to 10\% (possible threshold values are between the 0.1 and 0.9 quantile)}
+    \item{\code{gammaInt}}{The lower ad higher smoothing values of the grid. Defaults to c(1,40)}
   }
 }
 

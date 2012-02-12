@@ -2,7 +2,7 @@
 \alias{plot-methods}
 \alias{plot.setar}
 \alias{plot.lstar}
-\title{Plotting methods for setar and lstar subclasses}
+\title{Plotting methods for SETAR and LSTAR subclasses}
 \description{
 Plotting methods \sQuote{setar} and \sQuote{lstar} subclasses
 }
@@ -39,7 +39,7 @@ which links subsequent fitted values.
 
 Finally, a new time series plot is produced, with lines segments
 coloured depending on the regime (colors meanings are the same of those
-in the preceedings scatterplots). Optionally, you can specify a starting
+in the preceding scatterplots). Optionally, you can specify a starting
 and ending time indices, for zooming on a particular segment of the
 time series.
 }

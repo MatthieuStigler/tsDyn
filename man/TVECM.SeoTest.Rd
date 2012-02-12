@@ -25,7 +25,7 @@ Critical and Pvalue from bootstrap distribution.
   printed}
 \item{hpc}{Possibility to run the bootstrap on parallel core. See
   details in \code{\link{TVECM.HStest}}}
-\item{check}{Possiblity to check the function by no sampling: the test value should be the sme as in the original data}
+\item{check}{Possibility to check the function by no sampling: the test value should be the same as in the original data}
 }
 \details{
 For this test, the cointegrating value has to be specified by the user. 

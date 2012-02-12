@@ -10,7 +10,7 @@ autotriples.rgl(x, lags=1:2, type=c("lines", "points"))
 \arguments{
 \item{x}{ time series}
 \item{lags}{ vector of regressors lags }
-\item{type}{ type of plot: countour levels, perspective plots, image }
+\item{type}{ type of plot: contour levels, perspective plots, image }
 }
 \details{
 This function displays interactive trivariate time series plots 

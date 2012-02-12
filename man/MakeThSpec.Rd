@@ -19,9 +19,9 @@ MakeThSpec(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int=c("from",
 The input values are given as output after checking for consistency (only one of exact/int/around should be given). 
 }
 \details{
-This function is just to check the inputs for the specification of the grid search. If not provided, the search will be in the biggest interval (ngrid ="All") between the minimum and maximum values. The user can reduce it by giving setting "Half" (only every two points is taken) and so on, or setting a number. 
+This function is just to check the inputs for the specification of the grid search. If not provided, the search will be in the biggest interval (\verb{ngrid ="All"}) between the minimum and maximum values. The user can reduce it by giving setting "Half" (only every two points is taken) and so on, or setting a number. 
 
-The search can also be made around a point, or between two points. When between a point, the argument ngrid is still used, whereas for around, a value of 30 is taken as default value if ngrid is not specified by user. 
+The search can also be made around a point, or between two points. When between a point, the argument \code{ngrid} is still used, whereas for around, a value of 30 is taken as default value if \code{ngrid} is not specified by user. 
 }
 \seealso{\code{\link{selectSETAR}}}
 \author{ Matthieu Stigler }

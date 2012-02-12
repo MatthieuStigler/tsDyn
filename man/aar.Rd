@@ -28,7 +28,7 @@ aar(x, m, d=1, steps=d, series)
   where \eqn{s_j} are nonparametric univariate functions of lagged time
   series values. They are represented by cubic regression splines.
   \eqn{s_j} are estimated together with their level of
-  smoothing using routines in the \code{mgcv} package (see references).
+  smoothing using routines in the \pkg{mgcv} package (see references).
 }
 \value{
   An object of class \code{nlar}, subclass \code{aar}, i.e. a list

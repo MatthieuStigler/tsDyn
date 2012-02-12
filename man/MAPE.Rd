@@ -16,7 +16,7 @@ MAPE(object, ...)
   \item{\dots}{ additional arguments to \code{MAPE} }
 }
 \value{
-  Computed MAPE for the fitted model.
+  Computed Mean Absolute Percent Error for the fitted model.
 }
 \author{Antonio, Fabio Di Narzo}
 \keyword{ ts }

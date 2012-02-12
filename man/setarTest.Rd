@@ -10,22 +10,22 @@ setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=
 
 \value{A object of class "Hansen99Test" containing:
 
--The residual Sum of squares of model AR, 1 threshold TAR and 2 thresholds TAR (SSRs)
+\item{SSRs}{The residual Sum of squares of model AR, 1 threshold TAR and 2 thresholds TAR}
 
--The Ftest statistic for the test (Ftests)
+\item{Ftests}{The Ftest statistic for the test}
 
--The bootstrap Pvalues (PvalBoot) and critical values (CriticalValBoot) for the test selected, and all Ftest computed (Ftestboot)
-
--The thresholds for the original series, obtained from search for 1 thresh (firstBests) and conditional search for 2 thresh (secBests)
-
--The number of bootstrap replications (nboot), the lags used (m) and the type of test (type)
+\item{PvalBoot}{The bootstrap p-values for the test selected}
+\item{CriticalValBoot}{The critical values for the test selected}
+\item{Ftestboot}{All the F-test computed}
+\item{firstBests, secBests}{The thresholds for the original series, obtained from search for 1 thresh (firstBests) and conditional search for 2 thresh (secBests)}
+\item{nboot,m,type}{The number of bootstrap replications (\code{nboot}), the lags used (\code{m}) and the type of test (\code{type)}}
 }
 \arguments{
 \item{x}{ time series }
 \item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 \item{series}{ time series name (optional) }
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d)}
-\item{nboot}{numer of bootstrap replications}
+\item{nboot}{number of bootstrap replications}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{test}{Type of test. See details}
 \item{hpc}{Possibility to run the bootstrap on parallel core. See

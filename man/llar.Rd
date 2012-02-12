@@ -25,11 +25,11 @@ llar.fitted(x, m, d=1, steps=d, series, eps, trace=0)
 	\item{m, d, steps}{ embedding dimension, time delay, forecasting steps }
 	\item{series}{time series name (optional)}
   \item{n.ahead}{ n. of steps ahead to forecast }
-  \item{eps.min, eps.max}{ min and max neighborhood size }
-  \item{neps}{number of neghborhood levels along which iterate}
-  \item{eps}{neighborhood size }
-  \item{onvoid}{what to do in case of an isolated point: stop or enlarge neghborhood size by an r\%}
-  \item{r}{if an isolated point is found, enlarge neighborhood window by r\%}
+  \item{eps.min, eps.max}{ min and max neighbourhood size }
+  \item{neps}{number of neighbourhood levels along which iterate}
+  \item{eps}{neighbourhood size }
+  \item{onvoid}{what to do in case of an isolated point: stop or enlarge neighbourhood size by an r\%}
+  \item{r}{if an isolated point is found, enlarge neighbourhood window by r\%}
   \item{trace}{tracing level: 0, 1 or more than 1 for \code{llar}, 0 or
     1 for \code{llar.forecast}}
 }
@@ -41,7 +41,7 @@ This was suggested by Casdagli(1991) as a test for non-linearity.
 \code{llar.predict} tries to extend the given time series by
 \code{n.ahead} points by iteratively 
 fitting locally (in the embedding space of dimension m and time delay d)
-a linear model. If the spatial neighborhood window is too small, your
+a linear model. If the spatial neighbourhood window is too small, your
 time series last point would be probably isolated. You can ask to
 automatically enlarge the window \code{eps} by a factor of r\%
 sequentially, until enough neighbours are found for fitting the linear
@@ -54,25 +54,23 @@ models.
 The C implementation was re-adapted from that in the TISEAN package ("ll-ar" routine, see references). However, here the euclidean norm is used, in place of the max-norm.
 }
 \section{Warning}{
-For long time series, this can be slow, especially for relatively big neighborhood sizes.
+For long time series, this can be slow, especially for relatively big neighbourhood sizes.
 }
 \value{
 \code{llar} gives an object of class 'llar'. I.e., a list of components: 
-\tabular{ll}{
- RMSE \tab vector of relative errors \cr
- eps \tab vector of neighborhood sizes (in the same order of RMSE) \cr
- frac \tab vector of fractions of the time series used for RMSE computation \cr
- avfound \tab vector of average number of neighbours for each point in the time series
-}
+\item{RMSE}{vector of relative errors}
+\item{eps}{vector of neighbourhood sizes (in the same order of RMSE)}
+\item{frac}{vector of fractions of the time series used for RMSE computation}
+\item{avfound}{vector of average number of neighbours for each point in the time series 
+which can be plotted using the \code{plot} method, and transformed to a regular \code{data.frame} with the \code{\link{as.data.frame}} function.}
 
-which can be plotted using the \code{plot} method, and transformed to a regular 
-\code{data.frame} with the \code{\link{as.data.frame}} function.
-
-\code{llar.forecast} gives the vector of n steps ahead locally linear iterated
+Function \code{llar.forecast} gives the vector of n steps ahead locally linear iterated
 forecasts.
 
-\code{llar.fitted} gives out-of-sample fitted values from locally linear
+Function \code{llar.fitted} gives out-of-sample fitted values from locally linear
 models.
+
+
 }
 
 \author{ Antonio, Fabio Di Narzo }

@@ -38,7 +38,7 @@ With the argument \code{hpc}, the burdensome bootstrap replication can be run on
 \item{allBoots}{The boot sup-LM values}
 \item{args}{Some user given args (nboot, boot.type)}
 }
-\section{Reproducibility}{Comparison with original paper is made difficult as values of the test are not shown in the paper, only their critical values, whihc depend on random bootstrap. 
+\section{Reproducibility}{Comparison with original paper is made difficult as values of the test are not shown in the paper, only their critical values, which depend on random bootstrap. 
 
 Comparison is done with the GAUSS code available on the page of Bruce Hansen. Running tar_ci, we have the same sup-LM value when lags=1 and lags=2, a higher value with lag=3. When the test is run with pre-specified beta values, we have different results, sometimes higher but also smaller sup-LM value. 
 }

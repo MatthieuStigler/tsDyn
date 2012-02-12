@@ -19,8 +19,8 @@ A matrix with the simulated/bootstraped series.
 \item{include}{Type of deterministic regressors to include. NOT WORKING PROPERLY CURRENTLY if not const}
 \item{starting}{Starting values when a simulation with given parameter matrix is made}
 \item{innov}{Innovations used for simulation. Should be matrix of dim nxk. By default multivariate normal.}
-\item{varcov}{Variance-covariance matrix for the inov when default multivariate normal is used.}
-\item{show.parMat}{Logical. Should the parameter matrix be shown? Usefull to understand how to give right input}
+\item{varcov}{Variance-covariance matrix for the innovations. By default multivariate normal is used.}
+\item{show.parMat}{Logical. Should the parameter matrix be shown? Useful to understand how to give right input}
 }
 \details{
 Bootstrap a VAR model. K, the number of variables, is determined by the number of rows of B matrix.

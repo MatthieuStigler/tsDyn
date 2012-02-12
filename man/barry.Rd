@@ -1,8 +1,8 @@
 \name{barry}
 \alias{barry}
-\title{Time series of PPI used as example in Bierens and Martins (2010)}
+\title{Time series of PPI used as example in \cite{Bierens and Martins (2010)}}
 \description{
-  This data set contains the series used by Bierens and Martins 
+  This data set contains the series used by \cite{Bierens and Martins}
   for testing for PPI between Canada and US.
 }
 \usage{data(barry)}
