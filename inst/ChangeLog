@@ -1,3 +1,11 @@
+Version 0.8
+-New feature: Add argument include in lstar: possibility to estimate lstar with constant, none, trend or both.
+-New feature: Add argument starting.control in lstar: possibility to specify grid search parameters
+-New feature: Add argument hpc in selectSETAR to run on parallel cores. 
+-Minor: add explicit warning in lstar when grid search select bound. 
+-Minor: add explicit warning in lstar when optim code is 1, referencing argument maxit. 
+-Minor: Cleaning of help files, correcting many typos. 
+
 Version 0.7-62
 -Add standard errors for lstar()
 -Minor: change sd(matrix) to apply(matrix,2,sd) (chage in R 2.14)
