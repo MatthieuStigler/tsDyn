@@ -107,8 +107,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     start.con<-list(
 		    nTh=200, 
 		    trim=0.1,
-		    nGamma=31,
-		    gammaInt=c(10,40)
+		    nGamma=40,
+		    gammaInt=c(1,100)
     )
     # Add if user defined, check if names confirm (code taken from optim)
     nmsC <- names(start.con)
@@ -137,7 +137,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     if (trace) {
       cat("Starting values fixed: gamma = ", gamma,", th = ", th, 
-          "; SSE = ", bestCost, "\n");
+          "; SSE = ", bestCost, "\n")
+      if(gamma%in%start.con$gammaInt) cat("Grid search selected lower/upper bound gamma (default [1,100]). 
+					  Might try to widen bound with arg: 'starting.control=list(gammaInt=c(1,200))'\n")
     }
   }
 
