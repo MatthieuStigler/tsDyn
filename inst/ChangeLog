@@ -1,4 +1,9 @@
-Version 0.8: Matthieu Stigler (2012-02-12)
+Version 0.8-1: Matthieu Stigler (13/02/2012)
+-minor: avoid partial matching in call to legend() in TVECM.HStest
+-minor: re-run tests with newest R 2.14 in english
+-minor: move vignettes from /inst/doc to new folder vignettes/
+
+Version 0.8: Matthieu Stigler (12/02/2012)
 -New feature: Add argument include in lstar: possibility to estimate lstar with constant, none, trend or both.
 -New feature: Add argument starting.control in lstar: possibility to specify grid search parameters
 -New feature: Add argument hpc in selectSETAR to run on parallel cores. 
@@ -6,7 +11,7 @@ Version 0.8: Matthieu Stigler (2012-02-12)
 -Minor: add explicit warning in lstar when optim code is 1, referencing argument maxit. 
 -Minor: Cleaning of help files, correcting many typos. 
 
-Version 0.7-62: Matthieu Stigler (2011-12-19)
+Version 0.7-62: Matthieu Stigler (19/12/2011)
 -Add standard errors for lstar()
 -Minor: change sd(matrix) to apply(matrix,2,sd) (chage in R 2.14)
 -Minor: change partial argument matching in a few calls
