@@ -1,4 +1,4 @@
-Version 0.8
+Version 0.8: Matthieu Stigler (2012-02-12)
 -New feature: Add argument include in lstar: possibility to estimate lstar with constant, none, trend or both.
 -New feature: Add argument starting.control in lstar: possibility to specify grid search parameters
 -New feature: Add argument hpc in selectSETAR to run on parallel cores. 
@@ -6,70 +6,70 @@ Version 0.8
 -Minor: add explicit warning in lstar when optim code is 1, referencing argument maxit. 
 -Minor: Cleaning of help files, correcting many typos. 
 
-Version 0.7-62
+Version 0.7-62: Matthieu Stigler (2011-12-19)
 -Add standard errors for lstar()
 -Minor: change sd(matrix) to apply(matrix,2,sd) (chage in R 2.14)
 -Minor: change partial argument matching in a few calls
 -Minor: correct vignette ThCointegration
 
-Version 0.7-61
+Version 0.7-61: Matthieu Stigler (02/08/2011)
 -TVECM: allow for K>2 variables when the cointegrating vector is pre-specified
 -TVECM summary: change output, adding newlines after coint vector and percentage of observations
 
-Version 0.7-6
+Version 0.7-6: Matthieu Stigler (14/05/2011)
 -correct bug in star (bugreport by Petri H) by Christoph B
 -change return value of star() in case of no star regime detected: returns linear object instead of series itself
 
-Version 0.7-52
+Version 0.7-52: Matthieu Stigler (08/05/2011)
 -add tests for lstar
 -correct lstar so that optim function re-evaluate each time linear parameters
 -remove VECM.Rout as useless
 
-Version 0.7-51
+Version 0.7-51: Matthieu Stigler 
 -update NAMESPACE as previous (0.7-50) did not work
 -add VECM.Rout
 -add econometrica .bst and amsplain.bst
 
-Version 0.7-50
+Version 0.7-50: Matthieu Stigler (30/03/2011)
 -remove own BIC function and use that of pkg nlme, as recommend by Prof Ripley
 -fix bug in Rd files, and description (missing suggest packages)
 -fix bug in 'autopairs' and 'autotriples': bogus 'showvalue' option was passed to the 'scale' widget
  (bugreport by Budi Hari Priyanto)
 
-Version 0.7-40
+Version 0.7-40: Matthieu Stigler (11/08/2010)
 -Add paralell option for TVAR.LRtest(), setarTest(), TVECM.Seotest()
 -regime() works also for nlVar, also add arguments initVal and timeAttr
 -RENAME function TVECM.HSTest in TVECM.HStest
 -correct bug in TVECM.HSTest
 
-Version 0.7-30
+Version 0.7-30: Matthieu Stigler (30/06/2010)
 -Add function TVECM.HStest (before was HanSeo_TVECM). Has new argument hpc for parallel computing.
 -Add function VECM(), simple wrapper for lineVar(..., model="VECM")
 -Add Johansen estimator for VECM()
 -Add methods AIC, BIC, logLik for class VECM
 -Correct numerous bugs
 
-Version 0.7-23
+Version 0.7-23: Matthieu Stigler (01/04/2010)
 -correct bug TVAR.sim
 -export function VAR.sim, simpler wrapper for TVAR.sim
 
-Version 0.7-22
+Version 0.7-22: Matthieu Stigler (22/02/2010)
 -correct bug in HanSeo_TVECM, which can now be used (but still not exported)
 
--version 0.7-2
+-version 0.7-2: Matthieu Stigler (20/02/2010)
 -Correct degrees of freedom for VAR covariance matrix
 -Standardize output of lineVar with lm
 -update slightly vignette
 -add specific vignette on threshold cointegration
 
--version 0.7-1
+-version 0.7-1: Matthieu Stigler (04/09/2009)
 -Change args of TVECM from nn to ngridBeta, from ngridG to ngridTh, model to common
 -Add functions regime to extract variabl indicating state regime
 -Add function getTh to extract threshold values
 -Adapt toLatex.setar to handle MTAR models. Still needs improvement
 -Fix bugs in TVECM, in HansSeo_TVECM and in setar
 
--version 0.7-0
+-version 0.7-0: Matthieu Stigler (02/07/2009)
 -added possibilty to have two thresolds and hence three regimes in setar and selectSETAR (arg nthresh)
 -created new functions for unit roots tests: KapShinTest() and BBCTest()
 -created new functions for estimating VAR and VECM: lineVar
@@ -94,13 +94,13 @@ Version 0.7-22
 -standardized license naming in description
 -fixed typo in print.star
 
--version 0.6-1
+-version 0.6-1: Antonio Fabio di Narzo
 -fixed CITATION file to the new R format
 -fixed bug in nnetTs: control args were not passed to 'nnet' fitter
 	reported by prof. Joachim Zietz
 -fixed bug in llar.predict (spotted by Markus Gross)
 
--version 0.6-0
+-version 0.6-0: Antonio Fabio di Narzo
 -fixed Matrix dependency in DESCRIPTION
 -added minimal docs for newly created internal objects
 -added STAR model option to the tcltk GUI
@@ -109,7 +109,7 @@ Version 0.7-22
 -fixed bugs in some internal functions
 -added google codebase project URL to DESCRIPTION
 
--version 0.5-6
+-version 0.5-6: Antonio Fabio di Narzo
 -fixed bug in setar model when mL and/or mH=0
 
 -version 0.5-5 released
