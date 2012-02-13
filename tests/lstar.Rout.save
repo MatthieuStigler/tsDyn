@@ -1,44 +1,36 @@
 
-R version 2.14.1 (2011-12-22)
-Copyright (C) 2011 The R Foundation for Statistical Computing
+R Under development (unstable) (2012-02-01 r58249)
+Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: x86_64-pc-linux-gnu (64-bit)
+Platform: x86_64-unknown-linux-gnu (64-bit)
 
-R est un logiciel libre livré sans AUCUNE GARANTIE.
-Vous pouvez le redistribuer sous certaines conditions.
-Tapez 'license()' ou 'licence()' pour plus de détails.
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
 
-R est un projet collaboratif avec de nombreux contributeurs.
-Tapez 'contributors()' pour plus d'information et
-'citation()' pour la façon de le citer dans les publications.
+  Natural language support but running in an English locale
 
-Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
-en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
-Tapez 'q()' pour quitter R.
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
 
-REvolution R enhancements not installed.  For improved
-performance and other extensions: apt-get install revolution-r
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
 
 > library(tsDyn)
 Loading required package: mgcv
-This is mgcv 1.7-6. For overview type 'help("mgcv-package")'.
+This is mgcv 1.7-13. For overview type 'help("mgcv-package")'.
 Loading required package: Matrix
 Loading required package: lattice
 
-Attaching package: 'Matrix'
+Attaching package: ‘Matrix’
 
-The following object(s) are masked from 'package:base':
+The following object(s) are masked from ‘package:base’:
 
     det
 
 Loading required package: snow
-
-Attaching package: 'snow'
-
-The following object(s) are masked from 'package:base':
-
-    enquote
-
 Loading required package: mnormt
 Loading required package: foreach
 Loading required package: iterators
@@ -293,9 +285,9 @@ Performing grid search for starting values...
 Starting values fixed: gamma =  3.538462 , th =  2.712901 ; SSE =  4.899802 
 Optimization algorithm converged
 Optimized values fixed for regime 2  : gamma =  2.575169 , th =  2.697943 ; SSE =  4.880102 
-Messages d'avis :
-1: In plogis(q, location, scale, lower.tail, log.p) : production de NaN
-2: In plogis(q, location, scale, lower.tail, log.p) : production de NaN
+Warning messages:
+1: In plogis(q, location, scale, lower.tail, log.p) : NaNs produced
+2: In plogis(q, location, scale, lower.tail, log.p) : NaNs produced
 > mod.lstar_trend
 
 Non linear autoregressive model
