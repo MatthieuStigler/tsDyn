@@ -279,7 +279,7 @@ plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){
       abline(h=x$CriticalValBoot, lty=2, col=3:5)
       boot.name<-switch(x$args$boot.type, "FixedReg"="Fixed regressor bootstrap", "ResBoot"="Residual Bootstrap")
       tit<-paste("Critical Values (", boot.name, ")")
-      legend("bottomleft", lty=2, col=3:5, leg=c("0.90%", "0.95%", "0.99%"), horiz=TRUE, title=tit, bty="n")
+      legend("bottomleft", lty=2, col=3:5, legend=c("0.90%", "0.95%", "0.99%"), horiz=TRUE, title=tit, bty="n")
     }
   }
 # plot of density
@@ -287,7 +287,7 @@ plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){
     plot(density(na.omit(x$allBoots)), main="Density of bootstrap distribution")
     abline(v=x$stat, col=2)
     abline(v=x$CriticalValBoot, col=3:5, lty=2)
-      legend("topleft", lty=c(1,2,2,2), col=2:5, leg=c("Test value", "0.90% cv", "0.95% cv", "0.99% cv"), bty="n")
+      legend("topleft", lty=c(1,2,2,2), col=2:5, legend=c("Test value", "0.90% cv", "0.95% cv", "0.99% cv"), bty="n")
   }
 }
 
