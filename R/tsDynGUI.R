@@ -73,6 +73,6 @@ outputDialog <- function(oC) {
     cl <- oC$cl #nlar function call
     res <- eval(cl)
     res$call <- NULL
-    assign("nlarModel", res, env=.GlobalEnv)
+    assign("nlarModel", res, envir=.GlobalEnv)
     return( invisible( NULL ) )
 }
