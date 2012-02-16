@@ -217,7 +217,25 @@ The following object(s) are masked from ‘package:base’:
 
 Loading required package: sandwich
 Loading required package: urca
-Failed with error:  ‘package ‘lmtest’ required by ‘vars’ could not be found’
+Loading required package: lmtest
+[1] TRUE
+[1]  0.3227339  8.6483204 19.6241250 47.3369295
+
+##################################################### 
+# Johansen-Procedure Unit Root / Cointegration Test # 
+##################################################### 
+
+The value of the test statistic is: 0.3227 8.6483 19.6241 47.3369 
+
+[1] TRUE
+[1] -76720.71
+[1] -74771
+[1] -73963.44
+[1] -73611.83
+[1] -73607.49
+Warning message:
+In logLik.VECM(myVECM, r = 5) :
+  r cann't be greater than k (number of variables)
 > 
 > proc.time()
    user  system elapsed 
