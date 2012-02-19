@@ -292,13 +292,18 @@ getTh.default <- function(object, ...){
   }
   if(length(allth)==0) allth <- NULL
   # remove thD if there
-  if(length(grep("thD",names(allth)))!=0)
+  if(any(grepl("thD",names(allth))))
     allth<-allth[-grep("thD",names(allth))]
   return(allth)
 }
 
 getTh.setar<-function(object,...){
-  object<-object$coef
+  object<-object$coefficients
+  getTh.default(object)
+}
+
+getTh.lstar<-function(object,...){
+  object<-object$coefficients
   getTh.default(object)
 }
 
