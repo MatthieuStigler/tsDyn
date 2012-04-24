@@ -15,6 +15,8 @@ if(max(thDelay)>m)
 if(m<1)
 	stop("m should be at least 1")
 
+hasExternThVar <-ifelse(missing(thVar), FALSE, TRUE)
+
 ## Set-up variables
 y <- as.matrix(data) 
 ndig<-getndp(y)
@@ -53,19 +55,17 @@ Y<-t(Y)
 ########################
 
 ###External threshold variable
-if (!missing(thVar)) {		
-        if (length(thVar) > Torigin) {
+if (hasExternThVar ) {		
+        if (length(thVar) != Torigin) {
 		z <- thVar[seq_len(Torigin)]
 		warning("The external threshold variable is not of same length as the original variable")
-        }
-        else
+        } else{
 		z <- thVar
+	}
 	z<-embed(z,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
-} 
+} else {
 
 ###Combination (or single value indicating position) of contemporaneous variables
-
-else {
 	if (length(mTh) > k)
 		stop("length of 'mTh' should be equal to the number of variables, or just one")
 	if(length(mTh)==1) {
@@ -279,19 +279,23 @@ B1tUp<-B1thresh[,-seq_len(k*m+1)]
 Yb2<-matrix(0, nrow=nrow(y), ncol=k)		#Delta Y term
 Yb2[1:m,]<-y[1:m,]			
 z2<-vector("numeric", length=nrow(y))
-z2[1:m]<-y[1:m,]%*%combin			
+z2[1:m] <- if(hasExternThVar) thVar[1:m] else y[1:m,]%*%combin	## fill first values of transition variable
 
 boot1thresh<-function(res){	#res=res_thresh
-	resiT<-rbind(matrix(0,nrow=m, ncol=k),res[sample(seq_len(nrow(res)), replace=TRUE),])
+	sampledNumbers<- sample(seq_len(nrow(res)), replace=TRUE)
+	resiT<-rbind(matrix(0,nrow=m, ncol=k),res[sampledNumbers,])
+	if(hasExternThVar) thVarBoot<-thVar[sampledNumbers] ## sample also the thVar!
+
 	if(check)
 		resiT<-rbind(matrix(0,nrow=m, ncol=k),res)
 
 	for(i in (m+1):(nrow(y))){
-		if(round(z2[i-bestDelay],ndig)<= bestThresh) 
-			Yb2[i,]<-rowSums(cbind(B1tDown[,1], B1tDown[,-1]%*%matrix(t(Yb2[i-c(1:m),]), 	ncol=1),resiT[i,]))
-		else
-			Yb2[i,]<-rowSums(cbind(B1tUp[,1], B1tUp[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
-	z2[i]<-Yb2[i,]%*%combin
+	  if(round(z2[i-bestDelay],ndig)<= bestThresh) {
+	    Yb2[i,]<-rowSums(cbind(B1tDown[,1], B1tDown[,-1]%*%matrix(t(Yb2[i-c(1:m),]), 	ncol=1),resiT[i,]))
+	  } else {
+	    Yb2[i,]<-rowSums(cbind(B1tUp[,1], B1tUp[,-1]%*%matrix(t(Yb2[i-c(1:m),]), ncol=1),resiT[i,]))
+	  }
+	  z2[i]<-if(hasExternThVar) thVarBoot[i+(m+1)] else Yb2[i,]%*%combin
 	}
 # print(cbind(data,z2))
 	return(Yb2)
@@ -322,7 +326,7 @@ else
 bootModel<-switch(test, "1vs"=bootlinear, "2vs3"=bootThresh)
 resids<-switch(test, "1vs"=res_lin, "2vs3"=res_thresh)
 
-bootstraploop<-function(y, thVar=NULL){
+bootstraploop<-function(y){
   
   xboot<-round(bootModel(res=y),ndig)
   
@@ -339,19 +343,21 @@ bootstraploop<-function(y, thVar=NULL){
   
 #grid for threshold boot model
   
-  if(!missing(thVar)) 
-    {stop("thVar currently badly implemented"); zcombin<-thVar}
-  else 
-    zcombin<-xboot%*%combin
-  if(model=="MTAR"){
-    if(max(thDelay)<p)
-      zb<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
-    else if(max(thDelay)==p){
-      zb<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
-      zb<-rbind(0,as.matrix(zb))}
+  if(hasExternThVar) {
+    zcombin<-thVar
+    zb<-embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
+  } else {
+    zcombin<-  xboot%*%combin
+    if(model=="MTAR"){
+      if(max(thDelay)<p)
+	zb<-embed(diff(zcombin),p)[,seq_len(max(thDelay))+1]
+      else if(max(thDelay)==p){
+	zb<-embed(diff(zcombin),p+1)[,seq_len(max(thDelay))+1]
+	zb<-rbind(0,as.matrix(zb))}
+    }
+    else
+      zb <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
   }
-  else
-    zb <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]
   zb<-as.matrix(zb)
   
 #  print(cbind(z,zb))
@@ -422,26 +428,23 @@ else{
 #needs: LRtestboot12, LRtest12, m, k
 if(plot==TRUE&nboot>0){
 	if(test=="1vs"){
-	layout(c(1,2))
-	plot(density(LRtestboot12), xlab="LRtest12", xlim=c(0,max(LRtest12+1,max(LRtestboot12))),ylim=c(0,max(density(LRtestboot12)$y,dchisq(0:LRtest12, df=1+m))), main="Test linear VAR vs 1 threshold TVAR")
-	abline(v=LRtest12, lty=2, col=2)
-	curve(function(x) dchisq(x, df=1+k*m, ncp=0),
-              from=0, n=LRtest12+5, add=TRUE, col=3)
-	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+	  layout(c(1,2))
+	  plot(density(LRtestboot12), xlab="LRtest12", xlim=c(0,max(LRtest12+1,max(LRtestboot12))),ylim=c(0,max(density(LRtestboot12)$y,dchisq(0:LRtest12, df=1+m))), main="Test linear VAR vs 1 threshold TVAR")
+	  abline(v=LRtest12, lty=2, col=2)
+	  curve(dchisq(x, df=1+k*m, ncp=0), from=0, n=LRtest12+5, add=TRUE, col=3)
+	  legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 
-
-	plot(density(LRtestboot13), xlab="LRtest13", xlim=c(0,max(LRtest13+1,max(LRtestboot13))),ylim=c(0,max(density(LRtestboot13)$y,dchisq(0:LRtest12, df=2*(1+m)))),main="Test linear VAR vs 2 thresholds TVAR")
-	abline(v=LRtest13, lty=2, col=2)
-	curve(function(x) dchisq(x, df=2*(1+k*m), ncp=0),
-              from=0, n=LRtest13+5, add=TRUE, col=3)
-	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+	  plot(density(LRtestboot13), xlab="LRtest13", xlim=c(0,max(LRtest13+1,max(LRtestboot13))),ylim=c(0,max(density(LRtestboot13)$y,dchisq(0:LRtest12, df=2*(1+m)))),main="Test linear VAR vs 2 thresholds TVAR")
+	  abline(v=LRtest13, lty=2, col=2)
+	  curve(dchisq(x, df=2*(1+k*m), ncp=0),from=0, n=LRtest13+5, add=TRUE, col=3)
+	  legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+	  layout(1)
 	}
 	else {
-	plot(density(LRtestboot23), xlab="LRtest23", xlim=c(0,max(LRtest23+1,LRtestboot23)), ylim=c(0,max(density(LRtestboot23)$y,dchisq(0:LRtest12, df=1+m))), main="Test 1 threshold TVAR vs 2 thresholds TVAR")
-	abline(v=LRtest23, lty=2, col=2)
-	curve(function(x) dchisq(x, df=1+k*m, ncp=0),
-              from=0, n=LRtest23+5, add=TRUE, col=3)
-	legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
+	  plot(density(LRtestboot23), xlab="LRtest23", xlim=c(0,max(LRtest23+1,LRtestboot23)), ylim=c(0,max(density(LRtestboot23)$y,dchisq(0:LRtest12, df=1+m))), main="Test 1 threshold TVAR vs 2 thresholds TVAR")
+	  abline(v=LRtest23, lty=2, col=2)
+	  curve(dchisq(x, df=1+k*m, ncp=0), from=0, n=LRtest23+5, add=TRUE, col=3)
+	  legend("topright", legend=c("Asymptotic Chi 2", "Bootstrap", "Test value"), col=c(3,1,2), lty=c(1,1,2))
 	}
 }
 
@@ -454,14 +457,14 @@ return(res)
 }#End of thw whole function
 
 print.TVARtest<-function(x,...){
-  cat("Test of linear AR against TAR(1) and TAR(2)\n\nLR test:\n")
+  cat("Test of linear VAR against TVAR(1) and TVAR(2)\n\nLR test:\n")
   LR<-rbind(x$LRtest.val,x$Pvalueboot)
   rownames(LR)<-c("Test", "P-Val")
   print(LR)
 }
 
 summary.TVARtest<-function(object,...){
-  cat("Test of linear AR against TAR(1) and TAR(2)\n\nLR test:\n")
+  cat("Test of linear VAR against TVAR(1) and TVAR(2)\n\nLR test:\n")
   LR<-rbind(object$LRtest.val,object$Pvalueboot)
   rownames(LR)<-c("Test", "P-Val")
   print(LR)
@@ -482,8 +485,14 @@ class(test)
 print(test)
 summary(test)
 ###Todo
-#does not work TVAR.LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
-#TVAR.LRtest(data, m=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="2vs3", check=TRUE, model="MTAR")
+environment(TVAR.LRtest)<-environment(star)
+test<-TVAR.LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, thVar=data[,1], plot=FALSE, trim=0.1, test="1vs", model="TAR")
+
+
+#does not work TVAR.LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="1vs", check=TRUE, model="MTAR")
+#
+environment(TVAR.LRtest)<-environment(star)
+TVAR.LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=TRUE, trim=0.1, test="2vs3", check=TRUE, model="MTAR")
 }
 
 
