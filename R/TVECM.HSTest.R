@@ -55,6 +55,7 @@ if(ngridTh>(1-2*trim)*T) {
 
 gamma2<-q[round(seq(from=trim*T, to=(1-trim)*T,length.out=ngridTh))] 
 gamma2<-unique(gamma2)
+gammas_range<-range(q, na.rm=TRUE)
 ngridTh<-length(gamma2)
 
 
@@ -223,6 +224,7 @@ ret$args<-args
 ret$stat<-teststat
 ret$values<-lm01
 ret$ths<-gamma2
+ret$ths_range<-gammas_range
 ret$maxTh<-gamma2[which(lm01==ret$stat)]
 ret$PvalBoot<-PvalBoot
 ret$CriticalValBoot<-CriticalValBoot
@@ -271,26 +273,31 @@ plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){
 # set graphic parameters
   oldpar <- par(no.readonly=TRUE)
   on.exit(par(oldpar))
-  par(mfrow=c(length(which),1))
+  if(length(which)>1) layout(mat=matrix(c(1,2)),  heights = c(0.6, 0.4))
 
 # plot of LM values
   if("LM values"%in% which){
-    plot(x$ths,x$values, type="l", ylab="LM stats", xlab="ECT values")
-    title("Hansen and Seo test of linear versus threshold cointegration")
+    if(length(which)>1)   par(mar=c(4,4,2,2)+0.1)
+    ra<-range(x$values, na.rm=TRUE)
+    plot(x$ths,x$values, type="l", ylab="LM stats", xlab="ECT values", ylim=c(0.6*ra[1], ra[2]), xlim=x$ths_range)
+    title("Test of linear versus threshold cointegration")
     points(x$maxTh,x$stat, col=2)
+    segments(x$ths_range[1], na.omit(x$values)[1], x$ths[1] ,na.omit(x$values)[1], lty=2)
+    segments(x$ths_range[2], tail(na.omit(x$values),1), tail(x$ths,1), tail(na.omit(x$values),1), lty=2)
     if(x$args$nboot>0){
       abline(h=x$CriticalValBoot, lty=2, col=3:5)
       boot.name<-switch(x$args$boot.type, "FixedReg"="Fixed regressor bootstrap", "ResBoot"="Residual Bootstrap")
       tit<-paste("Critical Values (", boot.name, ")")
-      legend("bottomleft", lty=2, col=3:5, legend=c("0.90%", "0.95%", "0.99%"), horiz=TRUE, title=tit, bty="n")
+      legend("bottomleft", lty=2, col=3:5, legend=c("90%", "95%", "99%"), horiz=TRUE, title=tit, bty="n")
     }
   }
 # plot of density
   if("Density"%in%which){
+    if(length(which)>1)   par(mar=c(2,4,1.5,2)+0.1)
     plot(density(na.omit(x$allBoots)), main="Density of bootstrap distribution")
     abline(v=x$stat, col=2)
     abline(v=x$CriticalValBoot, col=3:5, lty=2)
-      legend("topleft", lty=c(1,2,2,2), col=2:5, legend=c("Test value", "0.90% cv", "0.95% cv", "0.99% cv"), bty="n")
+      legend("topleft", lty=c(1,2,2,2), col=2:5, legend=c("Test value", "90% cv", "95% cv", "99% cv"), bty="n")
   }
 }
 
