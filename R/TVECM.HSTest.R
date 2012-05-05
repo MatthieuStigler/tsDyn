@@ -25,6 +25,7 @@ if(is.null(fixed.beta)){
 }else{
   ve<-VECM(data, lag=lag, include="const",  beta=fixed.beta, estim="2OLS")
 }
+beta<-ve$model.specific$coint[2,1]
 
 ect<-ve$model[,grep("ECT", colnames(ve$model))]
 w0<-matrix(ect[!is.na(ect)], ncol=1)
@@ -226,7 +227,7 @@ ret$maxTh<-gamma2[which(lm01==ret$stat)]
 ret$PvalBoot<-PvalBoot
 ret$CriticalValBoot<-CriticalValBoot
 ret$allBoots<-boots.reps
-
+ret$beta<-ve$model.specific$coint[2,1]
 
 class(ret)<-"TVECMHanSeo02Test"
 return(ret)
@@ -257,9 +258,11 @@ summary.TVECMHanSeo02Test<-function(object,...){
   if(object$args$nboot>0){
       cat("\nCritical values:\n")
       print(matrix(object$CriticalValBoot, ncol=3, dimnames=list("", c("0.90%", "0.95%", "0.99%"))))
-      cat("Number of bootstrap replications:\t", object$args$nboot)
+      cat("Number of bootstrap replications:\t", object$args$nboot, "\n")
     }
-}
+
+  cat("\nCointegrating value (estimated under restricted linear model):", object$beta,"\n")
+}	
 
 ### Plot method
 plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){

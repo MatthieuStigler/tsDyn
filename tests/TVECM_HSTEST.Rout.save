@@ -94,7 +94,10 @@ P-Value:	 0 		( Fixed regressor bootstrap )
 Critical values:
    0.90%   0.95%    0.99%
  15.5439 15.6446 15.72516
-Number of bootstrap replications:	 5> plot(t1)
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> plot(t1)
 > plot(t1, which="Density")
 > plot(t1, which="LM values")
 > t2
@@ -111,7 +114,10 @@ P-Value:	 0 		( Fixed regressor bootstrap )
 Critical values:
     0.90%    0.95%    0.99%
  14.69722 14.97985 15.20596
-Number of bootstrap replications:	 5> t3
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> t3
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
 Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
@@ -125,7 +131,10 @@ P-Value:	 0 		( Residual Bootstrap )
 Critical values:
    0.90%   0.95%    0.99%
  15.1108 15.1244 15.13527
-Number of bootstrap replications:	 5> t4
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> t4
 ## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
 
 Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
@@ -139,7 +148,10 @@ P-Value:	 0 		( Residual Bootstrap )
 Critical values:
    0.90%   0.95%    0.99%
  15.1108 15.1244 15.13527
-Number of bootstrap replications:	 5> 
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> 
 > proc.time()
    user  system elapsed 
   6.310   0.050   6.378 
