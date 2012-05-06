@@ -1,0 +1,196 @@
+
+R version 2.15.0 (2012-03-30)
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+[Sauvegarde de la session précédente restaurée]
+
+> 
+> library(tsDyn)
+Le chargement a nécessité le package : mgcv
+This is mgcv 1.7-13. For overview type 'help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : iterators
+Le chargement a nécessité le package : codetools
+Le chargement a nécessité le package : MASS
+Le chargement a nécessité le package : nlme
+> 
+> ################################################################
+> ######### From man file:
+> ################################################################
+> #see that:
+> a<-matrix(c(-0.2, 0.2), ncol=1)
+> b<-matrix(c(1,-1), nrow=1)
+> a%*%b
+     [,1] [,2]
+[1,] -0.2  0.2
+[2,]  0.2 -0.2
+> 
+> innov<-rmnorm(100, varcov=diag(2))
+> vecm1<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1,n=100, lag=1,include="none", innov=innov)
+> ECT<-vecm1[,1]-vecm1[,2]
+> 
+> #add an intercept as in panel B
+> b<-TVECM.sim(B=rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0)), nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov)
+> 
+> 
+> 
+> ##Bootstrap a TVAR with 1 threshold (two regimes)
+> data(zeroyld)
+> dat<-zeroyld
+> TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE)
+29 (7.2%) points of the grid lead to regimes with percentage of observations < trim and were not computed
+> b<-TVECM.sim(TVECMobject=TVECMobject,type="boot")
+> 
+> ##Check the bootstrap
+> all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
+28 (7%) points of the grid lead to regimes with percentage of observations < trim and were not computed
+[1] TRUE
+> 
+> ################################################################
+> ######### Check error message when matrix badly specified:
+> ################################################################
+> 
+> B<-matrix(rnorm(14), byrow=TRUE,ncol=7)
+> 
+> ## 0 thresh
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="none"))
+Matrix B badly specified: should have  3 columns, but has 7 
+       ECT L{x1}{1} L{x2}{1}
+Equ x1  NA       NA       NA
+Equ x2  NA       NA       NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="const"))
+Matrix B badly specified: should have  4 columns, but has 7 
+       ECT const L{x1}{1} L{x2}{1}
+Equ x1  NA    NA       NA       NA
+Equ x2  NA    NA       NA       NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="both"))
+Matrix B badly specified: should have  5 columns, but has 7 
+       ECT const trend L{x1}{1} L{x2}{1}
+Equ x1  NA    NA    NA       NA       NA
+Equ x2  NA    NA    NA       NA       NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="trend"))
+Matrix B badly specified: should have  4 columns, but has 7 
+       ECT trend L{x1}{1} L{x2}{1}
+Equ x1  NA    NA       NA       NA
+Equ x2  NA    NA       NA       NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+  
+> 
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=2,show.parMat=TRUE, include="none"))
+Matrix B badly specified: should have  5 columns, but has 7 
+       ECT L{x1}{1} L{x2}{1} L{x1}{2} L{x2}{2}
+Equ x1  NA       NA       NA       NA       NA
+Equ x2  NA       NA       NA       NA       NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 2, show.parMat = TRUE,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=2,show.parMat=TRUE, include="const"))
+Matrix B badly specified: should have  6 columns, but has 7 
+       ECT const L{x1}{1} L{x2}{1} L{x1}{2} L{x2}{2}
+Equ x1  NA    NA       NA       NA       NA       NA
+Equ x2  NA    NA       NA       NA       NA       NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 2, show.parMat = TRUE,  : 
+  
+> 
+> ## 1 thresh  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="none"))
+Matrix B badly specified: should have  6 columns, but has 7 
+       ECT_low L{x1}{1}_low L{x2}{1}_low ECT_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1      NA           NA           NA      NA           NA           NA
+Equ x2      NA           NA           NA      NA           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="const"))
+Matrix B badly specified: should have  8 columns, but has 7 
+       ECT_low const_low L{x1}{1}_low L{x2}{1}_low ECT_upr const_upr
+Equ x1      NA        NA           NA           NA      NA        NA
+Equ x2      NA        NA           NA           NA      NA        NA
+       L{x1}{1}_upr L{x2}{1}_upr
+Equ x1           NA           NA
+Equ x2           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="both"))
+Matrix B badly specified: should have  10 columns, but has 7 
+       ECT_low const_low trend_low L{x1}{1}_low L{x2}{1}_low ECT_upr const_upr
+Equ x1      NA        NA        NA           NA           NA      NA        NA
+Equ x2      NA        NA        NA           NA           NA      NA        NA
+       trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1        NA           NA           NA
+Equ x2        NA           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="trend"))
+Matrix B badly specified: should have  8 columns, but has 7 
+       ECT_low trend_low L{x1}{1}_low L{x2}{1}_low ECT_upr trend_upr
+Equ x1      NA        NA           NA           NA      NA        NA
+Equ x2      NA        NA           NA           NA      NA        NA
+       L{x1}{1}_upr L{x2}{1}_upr
+Equ x1           NA           NA
+Equ x2           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+  
+> 
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=2,show.parMat=TRUE, include="const"))
+Matrix B badly specified: should have  12 columns, but has 7 
+       ECT_low const_low L{x1}{1}_low L{x2}{1}_low L{x1}{2}_low L{x2}{2}_low
+Equ x1      NA        NA           NA           NA           NA           NA
+Equ x2      NA        NA           NA           NA           NA           NA
+       ECT_upr const_upr L{x1}{1}_upr L{x2}{1}_upr L{x1}{2}_upr L{x2}{2}_upr
+Equ x1      NA        NA           NA           NA           NA           NA
+Equ x2      NA        NA           NA           NA           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+  
+> 
+> ## 2 thresh
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=2, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="none"))
+Matrix B badly specified: should have  9 columns, but has 7 
+       ECT_low L{x1}{1}_low L{x2}{1}_low ECT_mid L{x1}{1}_mid L{x2}{1}_mid
+Equ x1      NA           NA           NA      NA           NA           NA
+Equ x2      NA           NA           NA      NA           NA           NA
+       ECT_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1      NA           NA           NA
+Equ x2      NA           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  : 
+  
+> try(a<-TVECM.sim(B=B, beta=1, nthresh=2, Thresh=0, n=100, lag=2,show.parMat=TRUE, include="const"))
+Matrix B badly specified: should have  18 columns, but has 7 
+       ECT_low const_low L{x1}{1}_low L{x2}{1}_low L{x1}{2}_low L{x2}{2}_low
+Equ x1      NA        NA           NA           NA           NA           NA
+Equ x2      NA        NA           NA           NA           NA           NA
+       ECT_mid const_mid L{x1}{1}_mid L{x2}{1}_mid L{x1}{2}_mid L{x2}{2}_mid
+Equ x1      NA        NA           NA           NA           NA           NA
+Equ x2      NA        NA           NA           NA           NA           NA
+       ECT_upr const_upr L{x1}{1}_upr L{x2}{1}_upr L{x1}{2}_upr L{x2}{2}_upr
+Equ x1      NA        NA           NA           NA           NA           NA
+Equ x2      NA        NA           NA           NA           NA           NA
+Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  : 
+  
+> 
+> 
+> proc.time()
+utilisateur     système      écoulé 
+      3.040       0.040       3.066 

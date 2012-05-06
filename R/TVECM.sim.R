@@ -1,4 +1,8 @@
-TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
+VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
+  TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat)
+}
+
+TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=varcov, show.parMat=FALSE){
 
 
 if(!missing(data)&!missing(B))
@@ -14,15 +18,10 @@ if(!missing(n)&any(!missing(data), !missing(TVECMobject)))
   stop("arg n should not be given with arg data or TVECMobject")
 if(!missing(TVECMobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag)))
   warning("When object TVECMobject is given, only args 'type' and 'round' are relevant, others are not considered")
+
 ##include term
-  if(include=="none")
-    ninc<-0
-  else if(include=="const")
-    ninc<-1
-  else if(include=="trend")
-    ninc<-1
-  else if(include=="both")
-    ninc<-2
+  ninc<- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
+  incVal<- switch(include, "none"=NULL, "const"="const", "trend"="trend", "both"=c("const","trend"))
 
 ### possibility 1: only parameters matrix is given
 if(!missing(B)){
@@ -33,10 +32,20 @@ if(!missing(B)){
     warning("Type check or boot are only avalaible with pre specified data. The type simul was used")
     }
   nB<-nrow(B)
+  if(nB==1) stop("B matrix should at least have two rows for two variables\n")
   ndig<-4
   esp<-p*nB+1+ninc #number of lags +ecm
-  if(esp*(nthresh+1)!=ncol(B))
-    stop(paste("Matrix B bad specified: should have ", esp*(nthresh+1), "columns, but has", ncol(B), "\n"))
+  ## naming of variables:
+  pa<-switch(as.character(nthresh), "0"="", "1"=c("_low", "_upr"),"2"=c("_low", "_mid","_upr"))
+  lags<-as.vector(outer("L{x", 1:nB,  paste, sep=""))
+  lags2<-paste(rep(lags, times=p),"}{", rep(1:p,each=p),"}",sep="")
+  if(esp*(nthresh+1)!=ncol(B)){
+    colnames_Matrix_input<-as.vector(outer(c("ECT",incVal, lags2), pa, paste, sep=""))
+    cat("Matrix B badly specified: should have ", esp*(nthresh+1), "columns, but has", ncol(B), "\n")
+    print(matrix(NA, nrow=nB, ncol=esp*(nthresh+1), dimnames=list(paste("Equ x", 1:nB, sep=""), colnames_Matrix_input)))
+    stop()
+  }
+  rownames(B)<- paste("Equ x", 1:nB, ":",sep="")
   y<-matrix(0,ncol=nB, nrow=n)
   if(!is.null(starting)){
     if(all(dim(as.matrix(starting))==c(nB,p)))
@@ -161,8 +170,11 @@ else if(nthresh==2){
   }
 }
 
-if(show.parMat)
+if(show.parMat){
+  colnames_Matrix_system<-as.vector(outer(c("ECT","const", "trend", lags2), pa, paste, sep=""))
+  colnames(Bmat)<- colnames_Matrix_system
   print(Bmat)
+}
 res<-round(Yb, ndig)
 return(res)
 }
