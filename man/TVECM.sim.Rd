@@ -1,5 +1,6 @@
 \name{TVECM.sim}
 \alias{TVECM.sim}
+\alias{VECM.sim}
 \title{Simulation and bootstrap of bivariate VECM/TVECM}
 \description{
 Estimate or bootstraps a multivariate Threshold VAR
@@ -8,6 +9,7 @@ Estimate or bootstraps a multivariate Threshold VAR
 TVECM.sim(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE)
 }
 
+VECM.sim(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE)
 
 \value{
 A matrix with the simulated/bootstraped series.
@@ -30,13 +32,14 @@ A matrix with the simulated/bootstraped series.
 }
 \details{
 This function offers the possibility to generate series following a
-VECM/TVECM from two approaches: bootstrap or simulation.
+VECM/TVECM from two approaches: bootstrap or simulation. \code{VECM.sim} is just a wrapper for \code{TVECM.sim}. 
 
 When the argument \code{matrix} is given, on can only simulate a VECM
-(nthresh=0) or TVECM (nthresh=1 or 2). One can have a specification with
-constant (default), trend, both or none (see argument \code{include}). Order for the 
+(\code{nthresh}=0) or TVECM (\code{nthresh}=1 or 2). One can have a specification with
+constant (\code{"const"}), \code{"trend"}, \code{"both"} or \code{"none"} (see argument \code{include}). Order for the 
 parameters is ECT/include/lags for VECM and
-ECT1/include1/lags1/ECT2/include2/lags2 for TVECM.
+ECT1/include1/lags1/ECT2/include2/lags2 for TVECM. To be sure that once is using it correctly, setting \code{show.parMat = TRUE}
+will show the matrix of parameters together with their values and names.
 
 The argument \code{beta} is the contegrating value on the right side of the
 long-run relationship, and hence the function use the vector
@@ -86,7 +89,5 @@ TVECM.sim(TVECMobject=TVECMobject,type="boot")
 all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
 }
 \keyword{ ts }
-\references{
-TODO
-}
+
 

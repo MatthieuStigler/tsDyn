@@ -21,7 +21,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
        nlarDialog, linear, isLinear, nnetTs, aar,
 	star, addRegime, 
        TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
-	MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, regime, getTh,
+	MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, VECM.sim, regime, getTh,
 	TVECM.HStest)
 S3method(extend, list)
 S3method(isLinear, lstar)
