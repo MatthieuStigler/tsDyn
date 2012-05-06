@@ -23,7 +23,7 @@ TVECM.HStest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  i
 \details{
 This test follows the implementation done by Hansen and Seo (2002). The cointegrating value is estimated from the linear VECM. Then, conditional on this value, the LM test is run for a range of different threshold values. The maximum of those LM test values is reported. 
 
-Two bootstrap are available: a fixed regressor, as well as a usual residual bootstrap (using the function TVECM.sim). 
+Two bootstrap are available: a fixed regressor, as well as a usual residual bootstrap (using the function \code{\link{TVECM.sim}}). 
 
 Available methods are \code{print()}, \code{summary()} and \code{plot()}. 
 
@@ -43,9 +43,13 @@ With the argument \code{hpc}, the burdensome bootstrap replication can be run on
 Comparison is done with the GAUSS code available on the page of Bruce Hansen. Running tar_ci, we have the same sup-LM value when lags=1 and lags=2, a higher value with lag=3. When the test is run with pre-specified beta values, we have different results, sometimes higher but also smaller sup-LM value. 
 }
 \seealso{
+\code{\link{zeroyld}}: data used in the original paper of Hansen and Seo. 
+
 \code{\link{TVECM.SeoTest}}: a similar test, but with null hypothesis of no-cointegration. 
+
 \code{\link{TVECM}} for estimating a TVECM, \code{\link{TVECM.sim}} for simulating/bootstrap a TVECM, 
 }
+
 
 \author{Matthieu Stigler}
 \keyword{ ts }
