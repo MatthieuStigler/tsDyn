@@ -563,7 +563,7 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
   par(mar=c(0,4,4,0))	#number of lines of margin to be specified on the 4 sides of the plot
   plot(t, series, type=ifelse(length(regime)<=300, "p", "n"), ax=FALSE, ylab="time series values", main="Regime switching plot")
   legRSP<-c("low",if(nthresh==2|restriction=="OuterSymAll") "middle","high")
-  legend("topright", legend=legRSP, pch=pch[c(1,1)], col=seq_len(length(legRSP)), merge=FALSE, title="regime")
+  legend("topright", legend=legRSP, pch=pch[c(1,1)], col=seq_len(length(legRSP)), merge=FALSE, title="regime", lty=1)
   abline(h=th)
   if(restriction=="OuterSymAll")
     abline(h=-th)
