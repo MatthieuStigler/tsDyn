@@ -10,7 +10,7 @@ logLik.nlVar<-function(object,...){
 	k<-object$k
 	t<-object$t
 	Sigmabest<-matrix(1/t*crossprod(res),ncol=k)
-	log(det(Sigmabest))
+	log(det(Sigmabest)) ## should use t/2*log(det(Sigmabest)) as in Hansen?? to check!
 }
 
 logLik.VECM<-function(object,r=1,...){
