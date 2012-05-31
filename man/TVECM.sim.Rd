@@ -7,17 +7,17 @@ Estimate or bootstraps a multivariate Threshold VAR
 }
 \usage{
 TVECM.sim(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE)
-}
+
 
 VECM.sim(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE)
-
+}
 \value{
 A matrix with the simulated/bootstraped series.
 }
 \arguments{
 \item{data}{matrix of parameter to simulate}
 \item{B}{Matrix of coefficients to simulate}
-\item{TVECMobject}{Object computed by function TVECM() or linear VECM}
+\item{TVECMobject,VECMobject}{Object computed by function \code{\link{TVECM}} or linear \code{\link{VECM}}}
 \item{nthresh}{number of threshold (see details)}
 \item{Thresh}{The threshold value(s). Vector of length nthresh}
 \item{beta}{The cointegrating value}
@@ -32,7 +32,7 @@ A matrix with the simulated/bootstraped series.
 }
 \details{
 This function offers the possibility to generate series following a
-VECM/TVECM from two approaches: bootstrap or simulation. \code{VECM.sim} is just a wrapper for \code{TVECM.sim}. 
+VECM/TVECM from two approaches: bootstrap or simulation. \code{VECM.sim} is just a wrapper for \code{\link{TVECM.sim}}. 
 
 When the argument \code{matrix} is given, on can only simulate a VECM
 (\code{nthresh}=0) or TVECM (\code{nthresh}=1 or 2). One can have a specification with

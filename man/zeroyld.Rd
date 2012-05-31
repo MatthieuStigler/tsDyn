@@ -22,7 +22,7 @@ The authors themselves took the data from the wepage of Huston McCulloch:
 }
 
 \seealso{
-\code{\link{TVECM.HSTest}}: Hansen and Seo test. 
+\code{\link{TVECM.HStest}}: Hansen and Seo test. 
 
 \code{\link{TVECM}} for estimating a TVECM.
 }
