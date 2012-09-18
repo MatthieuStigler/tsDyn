@@ -39,11 +39,12 @@ AIC.nlVar<-function(object,..., k=2){
 }
 
 AIC.VECM<-function(object,..., k=2,r){
-	kVar<-object$k
+	nVar<-object$k
 	Rank<-if(missing(r)) object$model.specific$r else r
 	t<-object$t
 #formula from Gonzalo pitarakis is p^2(k-1) +2pr -r^2+constan, here npar already contains pr
-	nParFree<- object$npar+kVar*Rank- Rank^2
+	slopePars <- prod(dim(coef(object)[,-grep("^ECT[0-9]*$", colnames(coef(object)))])) ## get numb of al params but the alpha (ECT)
+	nParFree<- slopePars+2*nVar*Rank- Rank^2
 	t*logLik.VECM(object,r=Rank)+k*nParFree 
 }
 
