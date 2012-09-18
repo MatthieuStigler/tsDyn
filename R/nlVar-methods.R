@@ -5,15 +5,18 @@ print.nlVar<-function(object,...){
 		cat("\n\nNon Linear Model\n")
 }
 
-logLik.nlVar<-function(object,...){
+### logLik.VAR see: Luetkepohl, 3.4.5 (p. 89), Juselius (2006) p. 56. Hamilton 11.1.10, p. 293 gives -t/2 log(solve(S))
+logLik.nlVar <- function(object,...){
 	res<-object$residuals
 	k<-object$k
 	t<-object$t
-	Sigmabest<-matrix(1/t*crossprod(res),ncol=k)
-	log(det(Sigmabest)) ## should use t/2*log(det(Sigmabest)) as in Hansen?? to check!
+	Sigma<-matrix(1/t*crossprod(res),ncol=k)
+	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(res %*% solve(Sigma) %*% t(res)))
+	return(res)
 }
 
-logLik.VECM<-function(object,r=1,...){
+### logLik.VECM see Hamilton 20.2.10, p. 637
+logLik.VECM <- function(object,r=1,...){
   t<-object$t
   k<-object$k
   
