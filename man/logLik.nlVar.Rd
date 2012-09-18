@@ -25,7 +25,7 @@ logLik(object, ...)
   }
 Where \eqn{\Sigma} is the Variance matrix of residuals, and \eqn{x_t} is the matrix stacking the regressors (lags and deterministic). 
 
-(Note that Hamilton (1996) 11.1.10, p. 293 gives \eqn{+ (T/2) \log|\Sigma^{-1}|}, which is the same as \eqn{-(T/2) \log|\Sigma|)}. 
+(Note that Hamilton (1994) 11.1.10, p. 293 gives \eqn{+ (T/2) \log|\Sigma^{-1}|}, which is the same as \eqn{-(T/2) \log|\Sigma|)}. 
 }
 
 \value{
@@ -33,7 +33,7 @@ Log-Likelihood value.
 }
 
 \references{
-Hamilton (1996) \emph{Time Series Analysis}, Princeton University Press
+Hamilton (1994) \emph{Time Series Analysis}, Princeton University Press
 
 Juselius (2006) \emph{The Cointegrated VAR model: methodology and Applications}, Oxford Univesity Press
 
