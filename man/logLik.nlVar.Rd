@@ -1,17 +1,15 @@
 \name{logLik}
+
 \alias{logLik}
-\alias{logLik.default}
+
+\alias{logLik.nlVar}
 
 \title{ Extract Log-Likelihood}
 \description{
 Log-Likelihood method for VAR models. 
 }
 \usage{
-logLik(object, ...)
-
-## S3 method for class 'VAR'
-logLik(object, ...)
-
+\method{logLik}{nlVar}(object, ...)
 }
 \arguments{
   \item{object}{ object of class \code{VAR} computed by \code{lineVar}.}
