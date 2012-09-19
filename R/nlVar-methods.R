@@ -24,7 +24,6 @@ logLik.VECM <- function(object,r=1,...){
     S00<-object$model.specific$S00
     lambda<-object$model.specific$lambda
     seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (number of variables)")
-    
     res <- -(t*k/2)*log(2*pi) - t*k/2 -(t/2)*log(det(S00))-(t/2)*sum(log(1-lambda[seq]))
   } else {
     Sigmabest<-matrix(1/t*crossprod(object$residuals),ncol=k)
@@ -33,34 +32,55 @@ logLik.VECM <- function(object,r=1,...){
   return(res)
 }
 
-AIC.nlVar<-function(object,..., k=2){
-	t<-object$t
-	t*logLik.nlVar(object)+k*(object$npar+object$model.specific$nthresh)
+#### Small function: get number of estimated parameters
+npar  <- function (object, ...)  
+  UseMethod("npar")
+ 
+npar.default<-function(object, ...) NULL
+
+npar.nlVar<-function(object, ...) 
+  object$npar+object$model.specific$nthresh
+
+npar.VECM<-function(object, ..., r) {
+  nVar<-object$k
+  Rank<-if(missing(r)) object$model.specific$r else r
+  slopePars <- prod(dim(coef(object)[,-grep("^ECT[0-9]*$", colnames(coef(object)))])) ## get numb of al params but the alpha (ECT)
+  nPar <- slopePars+2*nVar*Rank- Rank^2
+  return(nPar)
 }
 
-AIC.VECM<-function(object,..., k=2,r){
+
+#### AIC criterions
+AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
+	fitMeasure <- match.arg(fitMeasure)
+	t<-object$t
+	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object) else log(det(crossprod(residuals(object))))
+	t*fit+k*npar(object)
+}
+
+AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
+	fitMeasure <- match.arg(fitMeasure)
+	Rank<-if(missing(r)) object$model.specific$r else r
+	t<-object$t
+	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else log(det(crossprod(residuals(object))))
+	t*fit+k*npar(object, r=Rank)
+}
+
+#### BIC criterions
+BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
+	fitMeasure <- match.arg(fitMeasure)
+	t<-object$t
+	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object) else log(det(crossprod(residuals(object))))
+	t*fit+k*npar(object)
+}
+
+BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
+	fitMeasure <- match.arg(fitMeasure)
 	nVar<-object$k
 	Rank<-if(missing(r)) object$model.specific$r else r
 	t<-object$t
-#formula from Gonzalo pitarakis is p^2(k-1) +2pr -r^2+constan, here npar already contains pr
-	slopePars <- prod(dim(coef(object)[,-grep("^ECT[0-9]*$", colnames(coef(object)))])) ## get numb of al params but the alpha (ECT)
-	nParFree<- slopePars+2*nVar*Rank- Rank^2
-	t*logLik.VECM(object,r=Rank)+k*nParFree 
-}
-
-BIC.nlVar<-function(object,..., k=log(object$t)){
-	t<-object$t
-	t*logLik.nlVar(object)+k*(object$nparB+object$model.specific$nthresh)
-}
-
-BIC.VECM<-function(object,..., k=log(object$t),r){
-	nVar<-object$k
-	Rank<-if(missing(r)) object$model.specific$r else r
-	t<-object$t
-	#formula from Gonzalo pitarakis is p^2(k-1) +2pr -r^2+constan, here npar already contains pr
-	slopePars <- prod(dim(coef(object)[,-grep("^ECT[0-9]*$", colnames(coef(object)))])) ## get numb of al params but the alpha (ECT)
-	nParFree<- slopePars+2*nVar*Rank- Rank^2
-	t*logLik.VECM(object,r=Rank)+k*nParFree 
+	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else log(det(crossprod(residuals(object))))
+	t*fit+k*npar(object, r=Rank)
 }
 
 deviance.nlVar<-function(object,...){
