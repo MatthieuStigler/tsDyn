@@ -16,14 +16,15 @@ logLik.nlVar <- function(object,...){
 }
 
 ### logLik.VECM see Hamilton 20.2.10, p. 637
-logLik.VECM <- function(object,r=1,...){
+logLik.VECM <- function(object,r,...){
   t<-object$t
   k<-object$k
   
   if(object$model.specific$estim=="ML"){
     S00<-object$model.specific$S00
     lambda<-object$model.specific$lambda
-    seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (number of variables)")
+    Rank <- if(missing(r)) object$model.specific$r else r
+    seq<-if(Rank==0) 0 else if(Rank%in%1:k) 1:Rank else warning("r cann't be greater than k (number of variables)")
     res <- -(t*k/2)*log(2*pi) - t*k/2 -(t/2)*log(det(S00))-(t/2)*sum(log(1-lambda[seq]))
   } else {
     Sigmabest<-matrix(1/t*crossprod(object$residuals),ncol=k)

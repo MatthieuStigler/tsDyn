@@ -7,11 +7,11 @@
 Log-Likelihood method for VECM models. 
 }
 \usage{
-\method{logLik}{VECM}(object,r=1,...)
+\method{logLik}{VECM}(object,r,...)
 }
 \arguments{
   \item{object}{ object of class \code{VECM} computed by \code{VECM}.}
-  \item{r}{The cointegraing rank.}
+  \item{r}{The cointegrating rank. By default the rank specified in the call to \code{VECM}, but can be set differently by user.}
   \item{\dots}{ additional arguments to \code{logLik}.}
 }
 \details{
