@@ -1,6 +1,4 @@
-\name{logLik}
-
-\alias{logLik}
+\name{logLik.nlVar}
 
 \alias{logLik.nlVar}
 
