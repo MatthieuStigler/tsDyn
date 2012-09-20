@@ -11,7 +11,8 @@ logLik.nlVar <- function(object,...){
 	k<-object$k
 	t<-object$t
 	Sigma<-matrix(1/t*crossprod(resids),ncol=k)
-	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(resids %*% solve(Sigma) %*% t(resids)))
+# 	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(resids %*% solve(Sigma) %*% t(resids)))
+	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *t*k
 	return(res)
 }
 

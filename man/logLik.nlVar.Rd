@@ -17,9 +17,17 @@ Log-Likelihood method for VAR models.
   The Log-Likelihood is computed as in Luetkepohl (2006) equ. 3.4.5 (p. 89) and Juselius (2006) p. 56:
 
   \deqn{
-    LL = -(TN/2) \log(2\pi) - (T/2) \log|\Sigma| - (1/2)  \sum^{T} \left [ (y_t - A^{'}x_t)^{'} \Sigma^{-1} (y_t - A^{'}x_t) \right ]
+    LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| - (1/2)  \sum^{T} \left [ (y_t - A^{'}x_t)^{'} \Sigma^{-1} (y_t - A^{'}x_t) \right ]
   }
 Where \eqn{\Sigma} is the Variance matrix of residuals, and \eqn{x_t} is the matrix stacking the regressors (lags and deterministic). 
+
+However, we use a computationally simpler version:
+
+  \deqn{
+    LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| - (TK/2)
+  }
+
+See Juselius (2006), p. 57. 
 
 (Note that Hamilton (1994) 11.1.10, p. 293 gives \eqn{+ (T/2) \log|\Sigma^{-1}|}, which is the same as \eqn{-(T/2) \log|\Sigma|)}. 
 }

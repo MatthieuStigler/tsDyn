@@ -20,7 +20,7 @@ Log-Likelihood method for VECM models.
 When the model is estimated with ML, the LL is computed as in Hamilton (1994) 20.2.10 (p. 637):
 
   \deqn{
-    LL = -(TN/2) \log(2\pi) - (TN/2) -(T/2) \log|\hat\Sigma_{UU}| - (T/2)  \sum_{i=1}^{r} \log (1-\hat\lambda_{i})
+    LL = -(TK/2) \log(2\pi) - (TK/2) -(T/2) \log|\hat\Sigma_{UU}| - (T/2)  \sum_{i=1}^{r} \log (1-\hat\lambda_{i})
   }
 Where \eqn{\Sigma_{UU}} is the variance matrix of residuals from the first auxiliary regression, i.e. regressing \eqn{\Delta y_t} on a constant and lags, \eqn{\Delta y_{t-1}, \ldots, \Delta y_{t-p}}. \eqn{\lambda_{i}} are the eigenvalues from the \eqn{\Sigma_{VV}^{-1}\Sigma_{VU}\Sigma_{UU}^{-1}\Sigma_{UV}}, see 20.2.9 in Hamilton (1994).
 
