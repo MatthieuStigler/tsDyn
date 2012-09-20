@@ -56,7 +56,7 @@ npar.VECM<-function(object, ..., r) {
 AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object) else log(det(crossprod(residuals(object))))
+	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else log(det(crossprod(residuals(object))))
 	t*fit+k*npar(object)
 }
 
@@ -72,7 +72,7 @@ AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
 BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object) else log(det(crossprod(residuals(object))))
+	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else log(det(crossprod(residuals(object))))
 	t*fit+k*npar(object)
 }
 
