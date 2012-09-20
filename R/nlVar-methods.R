@@ -7,11 +7,11 @@ print.nlVar<-function(object,...){
 
 ### logLik.VAR see: Luetkepohl, 3.4.5 (p. 89), Juselius (2006) p. 56. Hamilton 11.1.10, p. 293 gives -t/2 log(solve(S))
 logLik.nlVar <- function(object,...){
-	res<-object$residuals
+	resids<-object$residuals
 	k<-object$k
 	t<-object$t
-	Sigma<-matrix(1/t*crossprod(res),ncol=k)
-	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(res %*% solve(Sigma) %*% t(res)))
+	Sigma<-matrix(1/t*crossprod(resids),ncol=k)
+	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(resids %*% solve(Sigma) %*% t(resids)))
 	return(res)
 }
 
