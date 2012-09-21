@@ -12,7 +12,7 @@ logLik.nlVar <- function(object,...){
 	t<-object$t
 	Sigma<-matrix(1/t*crossprod(resids),ncol=k)
 # 	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(resids %*% solve(Sigma) %*% t(resids)))
-	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *t*k
+	res <- -(t*k/2)*log(2*pi) -t*k/2 - (t/2)* log(det(Sigma)) 
 	return(res)
 }
 
@@ -22,14 +22,15 @@ logLik.VECM <- function(object,r,...){
   k<-object$k
   
   if(object$model.specific$estim=="ML"){
-    S00<-object$model.specific$S00
+    S00<-object$model.specific$S00/t
     lambda<-object$model.specific$lambda
     Rank <- if(missing(r)) object$model.specific$r else r
     seq<-if(Rank==0) 0 else if(Rank%in%1:k) 1:Rank else warning("r cann't be greater than k (number of variables)")
-    res <- -(t*k/2)*log(2*pi) - t*k/2 -(t/2)*log(det(S00))-(t/2)*sum(log(1-lambda[seq]))
+    res <- -(t*k/2)*log(2*pi) - t*k/2 - (t/2)*log(det(S00)) - (t/2)*sum(log(1-lambda[seq]))
   } else {
     Sigmabest<-matrix(1/t*crossprod(object$residuals),ncol=k)
     res <- log(det(Sigmabest))
+    if(!missing(r)) warning("Note this is computing the LL from a model estimated by 2 OLS\n")
   }
   return(res)
 }
