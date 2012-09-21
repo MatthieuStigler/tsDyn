@@ -10,7 +10,7 @@ Log-Likelihood method for VAR models.
 \method{logLik}{nlVar}(object, ...)
 }
 \arguments{
-  \item{object}{ object of class \code{VAR} computed by \code{lineVar}.}
+  \item{object}{ object of class \code{VAR} computed by \code{\link{lineVar}}.}
   \item{\dots}{ additional arguments to \code{logLik}.}
 }
 \details{
