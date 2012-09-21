@@ -2,7 +2,7 @@
 \alias{VAR.sim}
 \title{Simulation of VAR}
 \description{
-Estimate or bootstraps a multivariate Threshold VAR
+Estimate or bootstraps a multivariate VAR
 }
 \usage{
 VAR.sim(B, n=200, lag=1, include = c("const", "trend","none", "both"), starting=NULL,  innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE)
@@ -27,7 +27,7 @@ Bootstrap a VAR model. K, the number of variables, is determined by the number o
 
 }
 \seealso{
-\code{\link{lineVar}} to estimate a VAR/VECM, \code{\link{TVAR.sim}} to simulate/bootstrap a TVAR.
+\code{\link{lineVar}} to estimate a VAR/VECM, \code{\link{VECM.sim}} to simulate/bootstrap a VECM, \code{\link{TVAR.sim}} to simulate/bootstrap a TVAR.
 }
 \author{Matthieu Stigler}
 \examples{

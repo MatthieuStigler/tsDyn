@@ -40,7 +40,7 @@ The second possibility is to bootstrap the series. This is done on a object gene
 
 }
 \seealso{
-\code{\link{TVAR}} to estimate a TVAR, \code{\link{VAR.sim}} to simulate/bootstrap a VAR. 
+\code{\link{TVAR}} to estimate a TVAR, \code{\link{VAR.sim}} to simulate/bootstrap a VAR, \code{\link{TVECM.sim}} to simulate/bootstrap a TVECM. 
 }
 \author{Matthieu Stigler}
 \examples{
