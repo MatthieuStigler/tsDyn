@@ -56,7 +56,7 @@ Loading required package: nlme
 #############
 Full sample size: 482 	End sample size: 480
 Number of variables: 2 	Number of estimated slope parameters 8
-AIC -2157.303 	BIC -2148.607 	SSR 176.1575
+AIC -2155.303 	BIC -2117.738 	SSR 176.1575
 Cointegrating vector (estimated by OLS):
    short.run  long.run
 r1         1 -1.059351
@@ -74,7 +74,7 @@ Equation long.run  0.0508(0.0671)
 #############
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
-AIC -2135.868 	BIC -2118.511 	SSR 174.3576
+AIC -2133.868 	BIC -2062.984 	SSR 174.3576
 Cointegrating vector (estimated by OLS):
    short.run  long.run
 r1         1 -1.059351
@@ -95,7 +95,7 @@ Equation long.run  -0.1078(0.1188)     0.0082(0.0674)
 #############
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
-AIC -2107.432 	BIC -2090.075 	SSR 175.3061
+AIC -2105.432 	BIC -2034.549 	SSR 175.3061
 Cointegrating vector (fixed by user):
    short.run long.run
 r1         1        1
@@ -116,7 +116,7 @@ Equation long.run  -0.1072(0.1192)     -0.0190(0.0668)
 #############
 Full sample size: 482 	End sample size: 480
 Number of variables: 2 	Number of estimated slope parameters 8
-AIC -2157.763 	BIC -2149.068 	SSR 176.3897
+AIC -2155.763 	BIC -2118.199 	SSR 176.3897
 Cointegrating vector (estimated by ML):
    short.run  long.run
 r1         1 -1.022065
@@ -134,7 +134,7 @@ Equation long.run  0.0506(0.0673)
 #############
 Full sample size: 482 	End sample size: 478
 Number of variables: 2 	Number of estimated slope parameters 16
-AIC -2136.724 	BIC -2119.367 	SSR 174.5642
+AIC -2134.724 	BIC -2063.841 	SSR 174.5642
 Cointegrating vector (estimated by ML):
    short.run long.run
 r1         1  -1.0096
@@ -228,12 +228,12 @@ Loading required package: lmtest
 The value of the test statistic is: 0.3227 8.6483 19.6241 47.3369 
 
 [1] TRUE
-[1] -76720.71
-[1] -74771
-[1] -73963.44
-[1] -73611.83
-[1] -73607.49
-Warning message:
+[1] -491.2661
+[1] -470.5023
+[1] -455.671
+[1] -446.7722
+[1] -443.806
+Warning Message :
 In logLik.VECM(myVECM, r = 5) :
   r cann't be greater than k (number of variables)
 > 
