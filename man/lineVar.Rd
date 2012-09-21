@@ -5,7 +5,7 @@
 Estimate either a VAR or a VECM.
 }
 \usage{
-lineVar(data, lag,r=1, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
+lineVar(data, lag,r=1, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff", "ADF"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
 }
 \value{
 Fitted model data
@@ -16,7 +16,7 @@ Fitted model data
 \item{r}{Number of cointegrating relationships}
 \item{include}{Type of deterministic regressors to include}
 \item{model}{Model to estimate. Either a VAR or a VECM}
-\item{I}{For VAR only: whether in the VAR the variables are to be taken in levels (original series) or in difference}
+\item{I}{For VAR only: whether in the VAR the variables are to be taken in levels (original series) or in difference, or similarly to the univariate ADF case. }
 \item{beta}{for VECM only: cointegrating value. If null, will be estimated}
 \item{LRinclude}{Possibility to include in the long-run relationship and the ECT trend, constant... Can also be a matrix with exogeneous regressors}
 \item{estim}{Type of estimator for the VECM: '2OLS' for the two-step approach or 'ML' for Johansen MLE}

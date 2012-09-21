@@ -1,4 +1,4 @@
-lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
+lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff", "ADF"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
 {
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample
@@ -51,13 +51,32 @@ DeltaY<-diff(y)[(p+1):(T-1),]
 Xminus1<-embed(y,p+2)[,(k+1):(k+k)]
 DeltaX<-embed(diff(y),p+1)[,-(1:k)]
 
+# if(model=="VAR"){
+#   Z<-X
+#   Y<-Y}
+# if(model=="VECM"|I=="diff"){
+#   Z<-DeltaX
+#   Y<-DeltaY
+#   t<-t-1}
+
 if(model=="VAR"){
-  Z<-X
-  Y<-Y}
-if(model=="VECM"|I=="diff"){
+  if(I=="level"){
+    Z<-X
+    Y<-Y
+  } else if(I=="diff"){
+    Z<-DeltaX
+    Y<-DeltaY
+    t<-t-1
+  } else if(I=="ADF"){
+    Z<-cbind(Xminus1, DeltaX)
+    Y<-DeltaY
+    t<-t-1
+  }
+} else if(model=="VECM"){
   Z<-DeltaX
   Y<-DeltaY
-  t<-t-1}
+  t<-t-1
+}
 
 ###Regressors matrix
 if(include=="const")
@@ -172,9 +191,11 @@ res<-Y-fitted
 npar<-ncol(B)*nrow(B)
 rownames(B)<-paste("Equation",colnames(data))
 LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
+if(I=="ADF") LagNames <- paste("D", LagNames,sep="_")
 ECT<- if(model=="VECM") paste("ECT", if(r>1) 1:r else NULL, sep="") else NULL
+Xminus1Names<- if(I=="ADF") paste(colnames(data),"-1",sep="") else NULL
 BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
-Bnames<-c(ECT,BnamesInter, LagNames)
+Bnames<-c(ECT,BnamesInter,Xminus1Names, LagNames)
 colnames(B)<-Bnames
 
 
