@@ -20,16 +20,7 @@ Type 'q()' to quit R.
 
 > library(tsDyn)
 Loading required package: mgcv
-This is mgcv 1.7-13. For overview type 'help("mgcv-package")'.
-Loading required package: Matrix
-Loading required package: lattice
-
-Attaching package: ‘Matrix’
-
-The following object(s) are masked from ‘package:base’:
-
-    det
-
+This is mgcv 1.7-20. For overview type 'help("mgcv-package")'.
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach

@@ -16,12 +16,11 @@ Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
 en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
 Tapez 'q()' pour quitter R.
 
-[Sauvegarde de la session précédente restaurée]
 
 > 
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
-This is mgcv 1.7-13. For overview type 'help("mgcv-package")'.
+This is mgcv 1.7-20. For overview type 'help("mgcv-package")'.
 Le chargement a nécessité le package : Matrix
 Le chargement a nécessité le package : lattice
 Le chargement a nécessité le package : snow

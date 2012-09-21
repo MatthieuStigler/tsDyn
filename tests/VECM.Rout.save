@@ -20,16 +20,7 @@ Type 'q()' to quit R.
 
 > library(tsDyn)
 Loading required package: mgcv
-This is mgcv 1.7-13. For overview type 'help("mgcv-package")'.
-Loading required package: Matrix
-Loading required package: lattice
-
-Attaching package: ‘Matrix’
-
-The following object(s) are masked from ‘package:base’:
-
-    det
-
+This is mgcv 1.7-20. For overview type 'help("mgcv-package")'.
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach
@@ -233,7 +224,7 @@ The value of the test statistic is: 0.3227 8.6483 19.6241 47.3369
 [1] -455.671
 [1] -446.7722
 [1] -443.806
-Warning Message:
+Warning message:
 In logLik.VECM(myVECM, r = 5) :
   r cann't be greater than k (number of variables)
 > 
