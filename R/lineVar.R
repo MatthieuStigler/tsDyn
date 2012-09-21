@@ -181,9 +181,8 @@ colnames(B)<-Bnames
 ###Y and regressors matrix to be returned
 naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=T-t), Z)
 rownames(naX)<-rownames(data)
-colnames(naX)<-Bnames
 YnaX<-cbind(data, naX)
-
+colnames(YnaX)<-c(colnames(data),Bnames)
 
 ###Return outputs
 model.specific<-list()
