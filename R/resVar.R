@@ -4,7 +4,7 @@ resVar<-function(x, adj=c("OLS", "ML")){
   adj<-match.arg(adj)
   obj<-x$model.specific
   z<-obj$z
-  regime<-obj$regime
+  regime<-tail(obj$regime, nrow(x$str$xx))
   sigGen<-crossprod(na.omit(x$res))/(length(x$res)-ifelse(adj=="OLS",obj$k,0))
   names(sigGen)<-"Total"
   nc<-ifelse(adj=="OLS", length(obj$IncNames), 0)
