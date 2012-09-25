@@ -1,7 +1,7 @@
 
 
 #### Predict nlar
-predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap"), nboot=100, ci=0.95, ...)
+predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"), nboot=100, ci=0.95, block.size=3, ...)
 {
 
   type <- match.arg(type)
@@ -13,7 +13,7 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
   n.used <- length(res)
   m <- object$str$m
   d <- object$str$d
-  sd <- sqrt( mse(object) )
+  sd.res <- sqrt( mse(object) )
   steps <- object$str$steps
   resid <- as.numeric(residuals(object))
   resid <- resid[-is.na(resid)]
@@ -28,7 +28,11 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
 
   ## Loop for new predictions using specific oneStep()
   pred_fun <- function(res){ 
-    innov <- if(type=="naive") rep(0, n.ahead) else if (type=="MC") rnorm(n.ahead, mean=0, sd=sd) else sample(resid, size=n.ahead, replace=TRUE)
+    innov <- switch(type, 
+	      "naive"= rep(0, n.ahead), 
+	      "MC"= rnorm(n.ahead, mean=0, sd=sd.res), 
+	      "bootstrap" = sample(resid, size=n.ahead, replace=TRUE),
+	      "block-bootstrap" = sample.block(resid, block.size= block.size))
     for(i in n.used + (1:n.ahead)) {
       res[i] <- tsDyn:::oneStep(object, newdata = t(as.matrix(res[i - xrange])),
 			itime=(i - n.used), ...)
@@ -61,6 +65,23 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
   
 }
 
+#### Small function to sample in block: sample.block 
+sample.block <- function(x, size=length(x), block.size=2){
+  n <- length(x)
+  n.blocks <- ceiling((n/block.size))
+
+  block <- rep(1:n.blocks, each=block.size)[1:n]
+  sam <- sample(1:n.blocks , size=n.blocks , replace=TRUE)
+  m<-match(sam,block)
+  m2 <- rep(m, each=block.size)[1:n]
+  m3 <- m2 +rep(0:(block.size-1), n)[1:n]
+
+  if(any(m3>n)) m3[m3>n] <- m3[m3>n]-(max(m3)-n)
+  x[m3]
+}
+
+
+############# TESTS
 if(FALSE){
 library(tsDyn)
 
