@@ -1,0 +1,123 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+> library(tsDyn)
+Le chargement a nécessité le package : mgcv
+This is mgcv 1.7-21. For overview type 'help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : MASS
+Le chargement a nécessité le package : nlme
+> 
+> x <- log10(lynx)
+> 
+> ### Estimate models
+> mod <- list()
+> mod[["linear"]] <- linear(x, m=2)
+> mod[["setar"]] <- setar(x, m=2, thDelay=1)
+Message d'avis :
+Possible unit root in the high  regime. Roots are: 0.9943 0.9943 
+> mod[["lstar"]] <- lstar(x, m=2, thDelay=1)
+Using maximum autoregressive order for low regime: mL = 2 
+Using maximum autoregressive order for high regime: mH = 2 
+Performing grid search for starting values...
+Starting values fixed: gamma =  11.15385 , th =  3.337486 ; SSE =  4.337664 
+Optimization algorithm converged
+Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339198 ; SSE =  4.337643 
+> mod[["aar"]] <- aar(x, m=2)
+> 
+> 
+> ### Extract methods
+> sapply(mod, AIC)
+   linear     setar     lstar       aar 
+-333.8737 -358.3740 -356.6509 -328.0813 
+> sapply(mod, BIC)
+   linear     setar     lstar       aar 
+-325.6651 -339.2206 -334.7613 -276.0935 
+> sapply(mod, mse)
+    linear      setar      lstar        aar 
+0.05072439 0.03814203 0.03804950 0.04030663 
+> sapply(mod, MAPE)
+    linear      setar      lstar        aar 
+0.06801955 0.05648596 0.05580033 0.05951108 
+> 
+> sapply(mod, coef)
+$linear
+     const      phi.1      phi.2 
+ 1.0576005  1.3842377 -0.7477757 
+
+$setar
+   const L     phiL.1     phiL.2    const H     phiH.1     phiH.2         th 
+ 0.5884369  1.2642793 -0.4284292  1.1656919  1.5992541 -1.0115755  3.3100557 
+
+$lstar
+    const1     phi1.1     phi1.2     const2     phi2.1     phi2.2      gamma         th 
+ 0.4891014  1.2465399 -0.3664328 -1.0240758  0.4232669 -0.2546088 11.1538339  3.3391979 
+
+$aar
+(Intercept)   s(V1.0).1   s(V1.0).2   s(V1.0).3   s(V1.0).4   s(V1.0).5   s(V1.0).6   s(V1.0).7   s(V1.0).8   s(V1.0).9 
+ 2.91144117 -0.36498170  0.01351412  0.15042344  0.46192130  0.69842899  0.92642399  1.21227229  1.52942321  1.52021867 
+ s(V1..1).1  s(V1..1).2  s(V1..1).3  s(V1..1).4  s(V1..1).5  s(V1..1).6  s(V1..1).7  s(V1..1).8  s(V1..1).9 
+ 0.24288150  0.15368199  0.05293481 -0.05580803 -0.19975355 -0.42491643 -0.61782536 -0.81698171 -0.95424576 
+
+> sapply(mod, function(x) head(residuals(x)))
+          linear       setar       lstar         aar
+[1,]          NA          NA          NA          NA
+[2,]          NA          NA          NA          NA
+[3,]  0.05686638  0.05077340  0.04395966  0.03301780
+[4,] -0.07368020 -0.07301664 -0.07994243 -0.10249452
+[5,]  0.11071953  0.04888145  0.02963628  0.02850267
+[6,]  0.20491541  0.11531771  0.09356307  0.11476657
+> 
+> 
+> lapply(mod, predict, n.ahead=10)
+$linear
+Time Series:
+Start = 1935 
+End = 1944 
+Frequency = 1 
+ [1] 3.384622 3.102350 2.821052 2.642745 2.606274 2.689122 2.831076 2.965623 3.045717 3.055977
+
+$setar
+Time Series:
+Start = 1935 
+End = 1944 
+Frequency = 1 
+ [1] 3.348576 2.949075 2.494675 2.478933 2.653709 2.881419 3.094429 3.266175 3.392051 3.477612
+
+$lstar
+Time Series:
+Start = 1935 
+End = 1944 
+Frequency = 1 
+ [1] 3.346299 2.913211 2.560113 2.607044 2.800681 3.024812 3.232267 3.397451 3.444542 3.254686
+
+$aar
+Time Series:
+Start = 1935 
+End = 1944 
+Frequency = 1 
+ [1] 3.360676 2.982792 2.645410 2.586847 2.736918 2.964137 3.191294 3.347509 3.354504 3.188338
+
+> 
+> proc.time()
+utilisateur     système      écoulé 
+      3.940       0.120       4.075 
