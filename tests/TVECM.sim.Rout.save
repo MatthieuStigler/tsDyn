@@ -1,5 +1,5 @@
 
-R version 2.15.0 (2012-03-30)
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-pc-linux-gnu (64-bit)
@@ -16,18 +16,15 @@ Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
 en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
 Tapez 'q()' pour quitter R.
 
-
 > 
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
-This is mgcv 1.7-20. For overview type 'help("mgcv-package")'.
+This is mgcv 1.7-21. For overview type 'help("mgcv-package")'.
 Le chargement a nécessité le package : Matrix
 Le chargement a nécessité le package : lattice
 Le chargement a nécessité le package : snow
 Le chargement a nécessité le package : mnormt
 Le chargement a nécessité le package : foreach
-Le chargement a nécessité le package : iterators
-Le chargement a nécessité le package : codetools
 Le chargement a nécessité le package : MASS
 Le chargement a nécessité le package : nlme
 > 
@@ -192,4 +189,4 @@ Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  :
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      3.040       0.040       3.066 
+      3.610       0.060       3.683 

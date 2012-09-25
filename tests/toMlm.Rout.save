@@ -20,7 +20,7 @@ Type 'q()' to quit R.
 
 > library(tsDyn)
 Loading required package: mgcv
-This is mgcv 1.7-20. For overview type 'help("mgcv-package")'.
+This is mgcv 1.7-21. For overview type 'help("mgcv-package")'.
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach
