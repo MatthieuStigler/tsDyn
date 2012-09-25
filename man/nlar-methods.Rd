@@ -9,11 +9,10 @@
 \alias{residuals.nlar}
 \alias{summary.nlar}
 \alias{plot.nlar}
-\alias{predict.nlar}
 \alias{toLatex.nlar}
 \title{nlar methods}
 \description{
-Generic \sQuote{nlar} methods
+Generic \sQuote{nlar} methods. Method \sQuote{nlar} is described in a separate page: \code{\link{predict.nlar}}
 }
 \usage{
 \method{AIC}{nlar}(object, k=2,\dots)
@@ -25,15 +24,11 @@ Generic \sQuote{nlar} methods
 \method{residuals}{nlar}(object, \dots)
 \method{summary}{nlar}(object, \dots)
 \method{plot}{nlar}(x, ask=interactive(), \dots)
-\method{predict}{nlar}(object, newdata, n.ahead, simulate=FALSE, \dots)
 \method{toLatex}{nlar}(object, \dots)
 }
 
 \arguments{
   \item{x, object}{ fitted \sQuote{nlar} object }
-  \item{newdata}{ data to which to apply the prediction }
-  \item{n.ahead}{ number of steps ahead at which to predict }
-  \item{simulate}{ if \code{TRUE}, new observations are simulated from underlying Data Generating Process }
   \item{ask}{ graphical option. See \code{\link{par}}}
   \item{digits}{See \code{\link{printCoefmat}} }
   \item{k}{ numeric, the penalty per parameter to be used; the default k = 2 is the classical AIC}
@@ -44,7 +39,6 @@ Generic \sQuote{nlar} methods
 	\item{MAPE}{ Mean Absolute Percent Error }
 	\item{mse}{ Mean Square Error }
 	\item{plot}{ Diagnostic plots }
-	\item{predict}{ Model predictions. For \var{n.ahead}>1, the model is simply iterated on generated data }
 }
 }
 \author{ Antonio, Fabio Di Narzo }
