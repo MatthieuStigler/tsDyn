@@ -26,7 +26,7 @@ nnetTs(x, m, d = 1, steps = d, series, size,
     sum_i gamma[i,j] x[t-(i-1) d] )
   }
 
-Model is estimated using the \code{nnet} function in \code{nnet}
+Model is estimated using the \code{\link[nnet]{nnet}} function in \code{nnet}
 package. Optimization is done via the BFGS method of
 \code{\link{optim}}. Note that for this model, no additional
 model-specific summary and plot methods are made available from this package.
