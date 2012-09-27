@@ -5,6 +5,8 @@ importFrom(tseriesChaos, d2)
 importFrom(nnet, nnet)
 importFrom(tseries, na.remove)
 importFrom(Matrix, norm)
+importFrom(vars, irf)
+importFrom(vars, fevd)
 
 
 if (exists("BIC", envir=asNamespace("stats"), inherits=FALSE)) {
@@ -39,6 +41,8 @@ S3method(plot, Hansen99Test)
 S3method(plot, TVECMSeo06Test)
 S3method(plot, TVECMHanSeo02Test)
 S3method(predict, nlar)
+S3method(predict, VAR)
+S3method(predict, VECM)
 S3method(print, nlar)
 S3method(toLatex, nlar)
 S3method(print, linear)
@@ -106,6 +110,10 @@ S3method(print, llar)
 S3method(plot, llar)
 S3method(as.data.frame, llar)
 S3method(vcov, VAR)
+S3method(irf, VAR)
+S3method(irf, VECM)
+S3method(fevd, VAR)
+S3method(fevd, VECM)
 
 
 useDynLib(tsDyn)

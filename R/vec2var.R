@@ -96,9 +96,30 @@ vec2var.tsDyn <- function(x){
 #################### Methods
 ############################################################
 
-predict.nlVar <- function(object,...){
+predict.VAR <- function(object,...){
  predict(vec2var.tsDyn(object))
 }
+
+predict.VECM <- function(object,...){
+ predict(vec2var.tsDyn(object))
+}
+
+irf.VAR <- function(object,...){
+ irf(vec2var.tsDyn(object))
+}
+
+irf.VECM <- function(object,...){
+ irf(vec2var.tsDyn(object))
+}
+
+fevd.VAR <- function(object,...){
+ fevd(vec2var.tsDyn(object))
+}
+
+fevd.VECM <- function(object,...){
+ fevd(vec2var.tsDyn(object))
+}
+
 
 ############################################################
 #################### EXAMPLES, tests
