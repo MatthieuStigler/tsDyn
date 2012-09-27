@@ -71,9 +71,9 @@ vec2var.tsDyn <- function(x){
   rank <- if(model=="VECM") x$model.specific$r else K
 
 ## vecm
-  setClass("vecm", representation(season="ANY", dumvar="ANY",ecdet="character", lag="integer", spec="character"))
+#   setClass("ca.jo", representation(season="ANY", dumvar="ANY",ecdet="character", lag="integer", spec="character"))
   ecdet <- if(inherits(x,"VAR")) "none" else x$model.specific$LRinclude
-  vecm<- new("vecm", season = NULL, dumvar=NULL, ecdet=ecdet,lag=as.integer(lag),spec="transitory")
+  vecm<- new("ca.jo", season = NULL, dumvar=NULL, ecdet=ecdet,lag=as.integer(lag),spec="transitory")
 
 ## datamat
   if(model=="VAR"){
@@ -83,7 +83,7 @@ vec2var.tsDyn <- function(x){
     datamat <- as.matrix(tail(as.data.frame(newx$model),-lag))
   }
 ## Return:
-  result <- list(deterministic = detcoeffs, A = A, p = lag, K = K, y = x$model[,1:x$k], obs = x$t, totobs = 
+  result <- list(deterministic = detcoeffs, A = A, p = lag, K = K, y = as.matrix(x$model[,1:x$k]), obs = x$t, totobs = 
 		  x$T, call = match.call(), vecm = vecm, datamat = datamat, resid = residuals(x), r = rank)
 
   class(result) <- "vec2var"
@@ -127,8 +127,19 @@ fevd.VECM <- function(object,...){
 
 if(FALSE){
 
-library(vars)
+
 library(tsDyn)
+
+data(zeroyld)
+vec1 <- VECM(zeroyld, lag=2, estim="ML")
+predict(vec1 )
+fevd(vec1 )
+irf(vec1 )
+
+
+### Comparisons
+library(vars)
+
 
 data(denmark)
 dat_examp <- denmark[,2:3]
