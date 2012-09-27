@@ -22,6 +22,7 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 	res <- do.call(nnet::nnet, args)
 	res$k <- length(res$wts)
 	res$fitted <- res$fitted.values	
+	if(length(unique(res$fitted))/length(res$fitted)<0.1) warning("Fitted model seems to lead poor result. Please check result. ")
 	return(extend(nlar(str,
 		coefficients = res$wts,
 		residuals=res$residuals,
