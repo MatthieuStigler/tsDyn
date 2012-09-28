@@ -1,7 +1,7 @@
 
 
 #### Predict nlar
-predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"), nboot=100, ci=0.95, block.size=3, ...)
+predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"), nboot=100, ci=0.95, block.size=3, boot1Zero=TRUE,...)
 {
 
   type <- match.arg(type)
@@ -16,7 +16,7 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
   sd.res <- sqrt( mse(object) )
   steps <- object$str$steps
   resid <- as.numeric(residuals(object))
-  resid <- resid[-is.na(resid)]
+  resid <- resid[!is.na(resid)]
 
   tsp(res) <- NULL
   class(res) <- NULL
@@ -33,8 +33,8 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
 	      "MC"= rnorm(n.ahead, mean=0, sd=sd.res), 
 	      "bootstrap" = sample(resid, size=n.ahead, replace=TRUE),
 	      "block-bootstrap" = sample.block(resid, block.size= block.size))
+    if(boot1Zero) innov[1] <- 0
     for(i in n.used + (1:n.ahead)) {
-print(t(as.matrix(res[i - xrange])))
       res[i] <- tsDyn:::oneStep(object, newdata = t(as.matrix(res[i - xrange])),
 			itime=(i - n.used), ...)
       res[i] <- res[i] + innov[i-n.used]
@@ -121,10 +121,12 @@ mod.aar <- aar(lynx, m=2)
 predict(object=mod.aar , n.ahead=5)
 
 ## NNet
-mod.nnet <- nnetTs(lynx, m=1, size=3, control=list(maxit=10000))
-fitted(mod.nnet, n.ahead=10)
-
+mod.nnet <- nnetTs(log10(lynx), m=1, size=3, control=list(maxit=1000))
 
 predict(mod.nnet, n.ahead=10)
-tsDyn:::oneStep(mod.nnet, itime=1, newdata=1:5)
+predict(mod.nnet, n.ahead=10, type="MC", nboot=2)
+predict(mod.nnet, n.ahead=10, type="bootstrap", nboot=2)
+
+
 }
+
