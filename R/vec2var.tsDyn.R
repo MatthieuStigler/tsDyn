@@ -58,6 +58,9 @@ vec2var.tsDyn <- function(x){
     co <- VARrep(x)
   }
   rownames(co) <- gsub("Equation ", "", rownames(co))
+  colnames(co) <- gsub(" -([0-9]+)","\\.l\\1", colnames(co))
+  colnames(co) <- gsub("Intercept","constant", colnames(co))
+
 ## detcoeffs
   if(x$include=="none") warning("Not sure implemented\n")
   detcoeffs <- co[,grep("constant|Trend", colnames(co)), drop=FALSE]
@@ -110,20 +113,20 @@ predict.VECM <- function(object,...){
  predict(vec2var.tsDyn(object))
 }
 
-irf.VAR <- function(object,...){
- irf(vec2var.tsDyn(object),...)
+irf.VAR <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
+ irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
-irf.VECM <- function(object,...){
- irf(vec2var.tsDyn(object),...)
+irf.VECM <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
+ irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
-fevd.VAR <- function(object,...){
- fevd(vec2var.tsDyn(object),...)
+fevd.VAR <- function(x, n.ahead=10, ...){
+ fevd(vec2var.tsDyn(x),n.ahead=n.ahead, ...)
 }
 
-fevd.VECM <- function(object,...){
- fevd(vec2var.tsDyn(object),...)
+fevd.VECM <- function(x, n.ahead=10, ...){
+ fevd(vec2var.tsDyn(x), n.ahead=n.ahead, ...)
 }
 
 
@@ -149,6 +152,7 @@ data(Canada)
 
 VECM_tsD <- VECM(Canada, lag=2, estim="ML")
 VAR_tsD <- lineVar(Canada, lag=2)
+VAR_tsD_tovars <-tsDyn:::vec2var.tsDyn(VAR_tsD)
 VECM_tsD_tovars <-tsDyn:::vec2var.tsDyn(VECM_tsD)
 
 VAR_vars <- VAR(Canada, p=2)
@@ -173,6 +177,11 @@ all.equal(irf(VECM_tsD, boot=TRUE,runs=2, seed=1234)$Lower, irf(VECM_vars, boot=
 all.equal(irf(VECM_tsD, boot=TRUE,runs=2, seed=1234)$Upper, irf(VECM_vars, boot=TRUE,runs=2, seed=1234)$Upper)
 
 
+### Compare VECM methods:
+predict(VAR_tsD)
+all.equal(predict(VAR_tsD)$fcst,predict(VAR_vars)$fcst)
+all.equal(predict(VECM_tsD)$endog,predict(VECM_vars)$endog)
+
 
 ### compare VARrep
 data(denmark)
@@ -187,7 +196,7 @@ vec2 <- vec2var(ca.jo(dat_examp,  K=3, spec="transitory"))$A
   cbind(vec2$A1, vec2$A2, vec2$A3)
 
 
-#### compare slots
+#### compare slots: VECM
 all.equal(VECM_tsD_tovars,VECM_vars)
 all.equal(VECM_tsD_tovars$deterministic,VECM_vars$deterministic)
 all.equal(VECM_tsD_tovars$A,VECM_vars$A)
@@ -199,6 +208,10 @@ attributes(VECM_tsD_tovars$resid)
 all.equal(VECM_tsD_tovars$datamat,VECM_vars$datamat)
 all.equal(VECM_tsD_tovars$p,VECM_vars$p)
 all.equal(VECM_tsD_tovars$r,VECM_vars$r)
+
+
+#### compare slots: VAR
+
 
 ## compare coefs
 coef(VECM_tsD)
