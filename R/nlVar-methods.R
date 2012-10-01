@@ -39,7 +39,11 @@ logLik.VECM <- function(object,r,...){
 npar  <- function (object, ...)  
   UseMethod("npar")
  
-npar.default<-function(object, ...) NULL
+npar.default<-function(object, ...) 
+  length(coef(object))
+
+npar.nlar<-function(object, ...) 
+  object$x
 
 npar.nlVar<-function(object, ...) 
   object$npar+object$model.specific$nthresh
