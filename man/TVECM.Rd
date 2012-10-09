@@ -17,9 +17,9 @@ Fitted model data
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime}
 \item{ngridBeta}{number of elements to search for the cointegrating value}
 \item{ngridTh}{number of elements to search for the threshold value}
-\item{plot}{Whether a grid with the SSR of each threshold should be printed}
-\item{th1}{different possibilities to pre-specify an exact value, an interval or a central point for the search of gamma1}
-\item{th2}{different possibilities to pre-specify an exact value or a central point for the search of gamma2}
+\item{plot}{Whether the grid with the SSR of each threshold should be ploted. }
+\item{th1}{different possibilities to pre-specify an exact value, an interval or a central point for the search of the threshold (or first threshold if nthresh=2)}
+\item{th2}{different possibilities to pre-specify an exact value or a central point for the search of the second threshold (used only if nthresh=2)}
 \item{beta}{different possibilities to pre-specify an exact value, an interval or a central point for the search of the cointegrating value}
 \item{restr}{Currently not avalaible}
 \item{common}{Whether the regime-specific dynamics are only for the ECT or for the ECT and the lags}
@@ -30,15 +30,29 @@ Fitted model data
 \item{trace}{should additional infos be printed? (logical)}
 }
 \details{
-For fixed threshold  and cointegrating vector, the model is linear, so estimation of the regression parameters can be done directly by CLS (Conditional Least Squares). The search of the threshold and cointegrating parameters values which minimize the residual sum of squares (SSR) is made on a grid of potential values. Potential values of the threshold parameter are taken from the existing values of the error correction term, while the parameters of the grid for cointegrating value are taken from the confidence interval obtained in the linear VECM. 
+For fixed threshold  and cointegrating vector, the model is linear, so estimation of the regression parameters can be done directly by CLS (Conditional Least Squares). The search of the threshold and cointegrating parameters values which minimize the residual sum of squares (SSR) is made on a grid of potential values. For specification of the grids, see below. 
 
-The function can estimate 1 as well as two threhsolds:
+The function can estimate one as well as two thresholds:
 
-nthresh=1: estimation of one threshold model (two regimes) upon a grid of \var{ngridTh} values (default to ALL) possible thresholds and delays values. 
+\describe{
+    \item{nthresh=1:}{ estimation of one threshold model (two regimes) upon a grid of \var{ngridTh} values (default to ALL) possible thresholds and delays values. }
 
-nthresh=2: estimation of two thresholds model (three regimes) Conditional on the threshold found in model where nthresh=1, the second threshold is searched. When both are found, a second grid search is made with 30 values around each threshold.
+    \item{nthresh=2:}{estimation of two thresholds model (three regimes). Conditional on the threshold found in model where nthresh=1, the second threshold is searched. When both are found, a second grid search is made with 30 values around each threshold.}
+}
 
 The model can be either with a threshold effect on all variables ("All") or only on the error correction term (ECT) (argument "only ECT"). In the second case, the value for the middle threshold is taken a null, as in Balke and Fomby (1997). 
+
+The grid for the threshold parameters can be set in different ways, through the argument \var{th1}, \var{th2} and \var{beta}:
+
+ \describe{
+    \item{exact:}{Pre-specified value. }
+    \item{int:}{Specify an interval (of length \var{ngridTh}) in which to search.}
+    \item{around:}{Specify to take \var{ngridTh} points around the value given. }
+  }
+
+The default is to do an interval search. Interval bounds for the threshold interval are simply the \var{trim} and 1-\var{trim} percents of the sorted error correction term. 
+For the cointegrating parameter, bounds of the interval are obtained from the (OLS) confidence interval of the linear cointegration case. 
+It is often found however that this interval is too tight. It is hence recommended to inspect the plot of the grid search. 
 }
 \seealso{
 \code{\link{VECM}} for the linear VECM, \code{\link{TVAR}} for the threshold VAR, \code{\link{TVECM.SeoTest}} to test for TVECM, \code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
