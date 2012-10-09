@@ -14,15 +14,19 @@ VARrep <- function(vecm) {
   Pi <-  co[, grep("ECT", colnames(co))]%*%t(vecm$model.specific$beta)
   ## A_i matrix
   Amat <- matrix(NA, nrow=k, ncol=lag*(k)+k)
-  ## A_lag+1 matrix
-  Amat[,(1:k)+k*lag] <- -co[,grep(paste("-", lag, sep=""), colnames(co))]
-  ## A_lag+1 matrix
-  if(lag>1) for(i in 1:(lag-1)) Amat[,(1:k)+k*i] <- -(co[,grep(paste("-", i, sep=""), colnames(co))] -co[,grep(paste("-", i+1, sep=""), colnames(co))])
 
-  cumulMat <- matrix(0, k,k)
-  for(i in 1:lag) cumulMat <- cumulMat + Amat[,(1:k)+k*i]
-  Amat[, 1:k] <- Pi + (diag(k)- cumulMat )
+  if(lag>0){
+    ## A_lag+1 matrix
+    Amat[,(1:k)+k*lag] <- -co[,grep(paste("-", lag, sep=""), colnames(co))]
+    ## A_lag+1 matrix
+    if(lag>1) for(i in 1:(lag-1)) Amat[,(1:k)+k*i] <- -(co[,grep(paste("-", i, sep=""), colnames(co))] -co[,grep(paste("-", i+1, sep=""), colnames(co))])
 
+    cumulMat <- matrix(0, k,k)
+    for(i in 1:lag) cumulMat <- cumulMat + Amat[,(1:k)+k*i]
+    Amat[, 1:k] <- Pi + (diag(k)- cumulMat )
+  } else {
+    Amat[, 1:k] <- Pi + diag(k)
+  }
 ## Names
   varNames <- colnames(vecm$model)[1:k]
   colnames(Amat) <- paste(rep(varNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
