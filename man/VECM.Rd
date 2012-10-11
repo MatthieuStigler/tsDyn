@@ -1,8 +1,8 @@
 \name{VECM}
 \alias{VECM}
-\title{Estimation of Vector error correction model (VECM) by EG or MLE}
+\title{Estimation of Vector error correction model (VECM)}
 \description{
-Estimate either a VAR or a VEC
+Estimate either a  VECM by Engle-Granger or Johansen (MLE) method. 
 }
 \usage{
 VECM(data, lag,r=1, include = c( "const", "trend","none", "both"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
