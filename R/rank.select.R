@@ -43,8 +43,13 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
   BIC_min <- which(BICs==min(BICs),arr.ind=TRUE)
   HC_min <- which(HCs==min(HCs),arr.ind=TRUE)
 
+## Best rank:
+  best_ranks1 <- sapply(list(AIC_min, BIC_min, HC_min), rownames)
+  best_ranks <- as.numeric(gsub("r=", "", best_ranks1))
+  names(best_ranks) <- c("AIC", "BIC", "HC")
+
 ## return result
-  res <- list(AICs=AICs, BICs=BICs, HCs=HCs, AIC_min=AIC_min, HC_min=HC_min, BIC_min=BIC_min, LLs=LLs)
+  res <- list(AICs=AICs, BICs=BICs, HCs=HCs, AIC_min=AIC_min, HC_min=HC_min, BIC_min=BIC_min, LLs=LLs, best_ranks=best_ranks)
   class(res ) <- "rank.select"
   return(res)
 
@@ -123,9 +128,10 @@ dgp_r0_1 <- cbind(cumsum(rnorm(n)),cumsum(rnorm(n)))
 alpha_1 <- matrix(c(1,0.5),ncol=1)
 beta_1 <- matrix(c(-1,1),ncol=1)
 Pi_1 <- alpha_1%*%t(beta_1)
+# qr(Pi_1)$rank
 
 dgp_r1 <-  VECM.sim(B=rbind(c(0.5,0,0), c(1,0,0)), beta=1, include="none",show.parMat=TRUE)
-ts.plot(dgp_r1 )
+# ts.plot(dgp_r1 )
 
 ### DGP r=2
 PI_r2a <- matrix(c(-0.5, 0.1, 0.2, -0.4), ncol=2, byrow=TRUE)
