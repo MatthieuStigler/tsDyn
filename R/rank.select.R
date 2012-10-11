@@ -71,17 +71,17 @@ print.rank.select <- function(x,...){
   cat("Best HC :",  HC_rank_info, " lag=", x$HC_min[1,2],  "\n")
 }
 
-summary.rank.select <- function(x,...){
+summary.rank.select <- function(object,...){
 
-  print.rank.select(x)
+  print.rank.select(object)
 
   cat("\nBest number of lags:\n")
-  AIC_minlag<-apply(x$AICs, 1, which.min)
-  BIC_minlag<-apply(x$BICs, 1, which.min)
-  HC_minlag<-apply(x$BICs, 1, which.min)
+  AIC_minlag<-apply(object$AICs, 1, which.min)
+  BIC_minlag<-apply(object$BICs, 1, which.min)
+  HC_minlag<-apply(object$BICs, 1, which.min)
 
   mat <- rbind(AIC_minlag, BIC_minlag,HC_minlag)
-  dimnames(mat) <- list(c("AIC", "BIC", "HC"), paste("r", if(nrow(x$BICs)==1) 0 else 0:(nrow(x$BICs)-1), sep="="))
+  dimnames(mat) <- list(c("AIC", "BIC", "HC"), paste("r", if(nrow(object$BICs)==1) 0 else 0:(nrow(object$BICs)-1), sep="="))
   print(mat)
 }
 
