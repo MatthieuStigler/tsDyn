@@ -7,18 +7,21 @@ Selection of the cointegrating rank and the lags with Information criterion (AIC
 }
 
 \usage{
-rank.select(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL"))
+rank.select(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE)
 \method{print}{rank.select}(x,...)
-\method{summary}{rank.select}(x,...)
+\method{summary}{rank.select}(object,...)
 }
 
 
 \arguments{
-\item{data}{multivariate time series }
-\item{lag.max}{Maximum number of lags to investigate}
-\item{r.max}{Maximum rank to investigate}
+\item{data}{multivariate time series.}
+\item{lag.max}{Maximum number of lags to investigate.}
+\item{r.max}{Maximum rank to investigate.}
 \item{include}{Type of deterministic regressors to include. For now only intercept. }
-\item{fitMeasure}{Whether the AIC/BIC should be based on the full likelihood, or just the SSR. See explanations in \code{\link{logLik.VECM}}}
+\item{fitMeasure}{Whether the AIC/BIC should be based on the full likelihood, or just the SSR. See explanations in \code{\link{logLik.VECM}}.}
+\item{sameSample}{Logical. Whether the data should be shortened so that the AIC/BIC are estimated on the same sample. Default to TRUE. }
+\item{x}{The output from \code{rank.select} for the print method.}
+\item{object}{The output from \code{rank.select} for the summary method.}
 }
 
 \details{

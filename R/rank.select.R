@@ -1,6 +1,6 @@
 
 
-rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL")) {
+rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
 
   fitMeasure <- match.arg(fitMeasure)
 
@@ -10,8 +10,11 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
 
   for(i in 1:lag.max){
     models_list[[i]] <- list()
+    if(sameSample){
     data_cut <- if(i==lag.max) data else data[-c(1:(lag.max-i)),]
-
+    } else {
+      data_cut <- data
+    }
   ## VAR: rank 0 (on diffs)
     models_list[[i]][[1]] <- try(lineVar(data_cut, lag=i, I=VARtype ), silent=TRUE)
     if(inherits(models_list[[i]][[1]], "try-error")) models_list[[i]][[1]] <- NA
@@ -56,8 +59,8 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
 }
 
 
-lag.select <- function(data, lag.max=10, include="intercept", fitMeasure=c("SSR", "LL")) {
-  rank.select(data=data, lag.max=lag.max, r.max=0, include=include, fitMeasure=fitMeasure) 
+lag.select <- function(data, lag.max=10, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
+  rank.select(data=data, lag.max=lag.max, r.max=0, include=include, fitMeasure=fitMeasure, sameSample=sameSample) 
 }
 
 print.rank.select <- function(x,...){
@@ -86,20 +89,33 @@ summary.rank.select <- function(object,...){
 }
 
 
+
+
+####################################################
+####### TESTS
+####################################################
 if(FALSE){
 library(tsDyn)
 library(vars)
 data(Canada)
 
-resu <- rank.select(Canada)
+lag.select <- tsDyn:::lag.select
+resu <- rank.select(Canada, sameSample=TRUE)
 resu
+resu$LLs
+resu$AICs
 summary(resu)
 
+resu_LL <- rank.select(Canada, sameSample=TRUE, fitMeasure="LL")
+resu_LL
+summary(resu_LL)
+resu_LL$AICs
 
 resvar_SSR <- lag.select(Canada, fitMeasure="SSR")
 resvar_SSR
 summary(resvar_SSR)
 resvar_LL <- lag.select(Canada, fitMeasure="LL")
+resvar_LL
 
 
 resvar2 <- VARselect(Canada)
@@ -118,36 +134,15 @@ AIC(v)
 
 
 
-#### PHILIPS DGP
-
-### DGP r=0
-n<- 200
-dgp_r0_1 <- cbind(cumsum(rnorm(n)),cumsum(rnorm(n)))
-
-### DGP r=1
-alpha_1 <- matrix(c(1,0.5),ncol=1)
-beta_1 <- matrix(c(-1,1),ncol=1)
-Pi_1 <- alpha_1%*%t(beta_1)
-# qr(Pi_1)$rank
-
-dgp_r1 <-  VECM.sim(B=rbind(c(0.5,0,0), c(1,0,0)), beta=1, include="none",show.parMat=TRUE)
-# ts.plot(dgp_r1 )
-
-### DGP r=2
-PI_r2a <- matrix(c(-0.5, 0.1, 0.2, -0.4), ncol=2, byrow=TRUE)
-PI_r2b <- matrix(c(-0.5, 0.1, 0.2, -0.15), ncol=2, byrow=TRUE)
-dgp_r2_a <- VAR.sim(B=PI_r2a, n=200, lag=1, include="none")
-dgp_r2_b <- VAR.sim(B=PI_r2b, n=200, lag=1, include="none")
-
-rank.select(dgp_r0_1 )
-rank.select(dgp_r1 )
-rank.select(dgp_r2_a )
-rank.select(dgp_r2_b )
-
-
 
 ###
-logLik(VECM(Canada, lag=2, r=1, estim="ML"),r=0)
+rank.select(Canada, lag.max=3)$LLs
+
+ve_1 <- VECM(Canada, lag=1, r=1, estim="ML")
+round(ve_1$model.specific$lambda,5)
+
+
+
 logLik(lineVar(Canada, lag=2, I="diff"))
 
 logLik(VECM(Canada, lag=2, r=1, estim="ML"), r=1)
@@ -165,5 +160,7 @@ deviance(linear(x=sunspots, m=1, type="ADF"))
 
 deviance(lineVar(Canada, lag=2, I="level"))
 deviance(lineVar(Canada, lag=1, I="ADF"))
+
+
 
 }
