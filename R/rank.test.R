@@ -5,9 +5,24 @@
 rank.test <- function(vecm, type=c("trace", "eigen"), r_null=0:(vecm$k-1), cval=0.05){
 
   type <- match.arg(type)
-  lambda <- vecm$model.specific$lambda
   t <- vecm$t
   k <- vecm$k
+  inc <- vecm$include
+  LR_inc <- vecm$model.specific$LRinclude
+  lambda <- vecm$model.specific$lambda
+  if(LR_inc!="none") lambda <- lambda[1:k]
+
+  
+###
+  if(LR_inc=="none") {
+    testCat <- switch(inc, "const"="H_lc", "both"="H_ql", "none"="H_z") 
+  } else if(inc=="none"&LR_inc=="const") {
+    testCat <- "H_c" 
+#   } else if(inc=="const"&LR_inc=="trend") {# VECM does not seem to lead to go results in this case...
+#     testCat <- "H_l"
+  } else {
+    stop("Sorry, rank.test does not work for model selected (due to specification of deterministic terms)\n")
+  }
 
 ## trace test:
   trace <- -t*rev(cumsum(rev(log(1-lambda))))
@@ -16,10 +31,10 @@ rank.test <- function(vecm, type=c("trace", "eigen"), r_null=0:(vecm$k-1), cval=
   eigen <- -t*log(1-lambda)
 
 ## p-values:
-  trace_pval <- gamma_doornik_all(trace, nmp=length(trace):1, test="H_lc", type="trace")
+  trace_pval <- gamma_doornik_all(trace, nmp=length(trace):1, test=testCat, type="trace")
   adjT <- vecm$t -floor(npar(vecm)/vecm$k)
-  trace_pval_T <- gamma_doornik_all(trace, nmp=length(trace):1, test="H_lc", type="trace", smallSamp=TRUE, T=adjT)
-  eigen_pval <- gamma_doornik_all(eigen, nmp=length(eigen):1, test="H_lc", type="eigen")
+  trace_pval_T <- gamma_doornik_all(trace, nmp=length(trace):1, test=testCat, type="trace", smallSamp=TRUE, T=adjT)
+  eigen_pval <- gamma_doornik_all(eigen, nmp=length(eigen):1, test=testCat, type="eigen")
 
 ## select r
   pvals <- switch(type, trace=trace_pval, eigen=eigen_pval)
@@ -59,7 +74,7 @@ summary.rank.test <- function(object, ...) {
 ############ P val approximation
 #############################################
 
-gamma_doornik <- function(x, nmp,q,  test=c("H_c", "H_lc", "H_l"), type=c("trace", "eigen"), T, smallSamp=FALSE){
+gamma_doornik <- function(x, nmp,q,  test=c("H_z", "H_c", "H_lc", "H_l", "H_ql"), type=c("trace", "eigen"), T, smallSamp=FALSE){
 
   test <- match.arg(test)
   type <- match.arg(type)
@@ -69,22 +84,16 @@ gamma_doornik <- function(x, nmp,q,  test=c("H_c", "H_lc", "H_l"), type=c("trace
 ### TRACE CASE
 
 if(type=="trace"){
-## Mean
-  me_np <- switch(test, H_c=2.01, H_lc=1.05, H_l=4.05)
-  one   <- switch(test, H_c=0, H_lc=-1.55, H_l=0.5)
-  add   <- if(nmp ==1) switch(test, H_c=0.06, H_lc=-0.5, H_l=-0.23) else if(nmp==2) switch(test, H_c=0.05, H_lc=-0.23, H_l=-0.07) else 0
-  mean <- 2*(nmp)^2 +me_np*(nmp) +one+add
+## No corr:
+  paras_mean <- doornik_tab7_mean[,test]
+  paras_var  <- doornik_tab7_var[,test]
+  val_mean <- c(nmp^2, nmp, 1, ifelse(nmp==1,1,0), ifelse(nmp==2,1,0), sqrt(nmp))
+  val_var <- c(nmp^2, nmp, 1, ifelse(nmp==1,1,0), ifelse(nmp==2,1,0))
+  mean <- val_mean%*% paras_mean
+  var <- val_var%*% paras_var
 
-## Var
-  var_np <- switch(test, H_c=3.6, H_lc=1.8, H_l=5.7)
-  var_one   <- switch(test, H_c=0.75, H_lc=0, H_l=3.2)
-  var_add   <- if(nmp ==1) switch(test, H_c=-0.4, H_lc=-2.8, H_l=-1.3) else if(nmp==2) switch(test, H_c=-0.3, H_lc=-1.1, H_l=-0.5) else 0
-  var <- 3*(nmp)^2 +var_np*(nmp) +var_one+ var_add
-
-# print(c(mean, var))
 ### Small sample case:
   if(smallSamp){
-# print(c(mean, var))
     paras_mean <- doornik_tab9_mean[,test]
     paras_var  <- doornik_tab9_var[,test]
     vals <- c(sqrt(nmp)/T,  nmp/T,  nmp^2/T^2, ifelse(nmp==1, 1/T,0), ifelse(nmp==1,1,0), ifelse(nmp==2,1,0), ifelse(nmp==3,1,0))
@@ -92,28 +101,17 @@ if(type=="trace"){
     var_corr <- vals %*% paras_var
     mean <- exp(log(mean) +mean_corr)
     var <-  exp(log(var) +var_corr)
-# print(c(mean, var))
   }
 
 } else {
 
 ### EIGEN CASE
+  paras_mean_eig <- doornik_tab8_mean[,test]
+  paras_var_eig  <- doornik_tab8_var[,test]
+  val_eig <- c(nmp, 1, ifelse(nmp==1,1,0), ifelse(nmp==2,1,0), sqrt(nmp))
+  mean <- val_eig%*% paras_mean_eig
+  var <- val_eig%*% paras_var_eig
 
-## Mean
-  me_np <- switch(test, H_c=5.9498, H_lc=5.8271 , H_l=5.8658)
-  one   <- switch(test, H_c=0.43402, H_lc=-1.6487 , H_l=2.5595 )
-  add1   <- if(nmp== 1) switch(test, H_c=0.048360, H_lc= -1.6118 , H_l=-0.34443) else 0
-  add2   <- if(nmp== 2) switch(test, H_c=0.018198, H_lc=-0.25949, H_l=-0.077991) else 0
-  square <- switch(test, H_c=-2.3669, H_lc=-1.5666 , H_l=-1.7552 )
-  mean <- me_np*(nmp) +one+add1+add2 +sqrt(nmp)*square 
-
-## Var
-  var_np <- switch(test, H_c=2.2231, H_lc=2.0785, H_l=1.9955 )
-  var_one   <- switch(test, H_c=-7.9064, H_lc=-9.7846 , H_l=-5.5428 )
-  var_add1   <- if(nmp== 1) switch(test, H_c=0.58592, H_lc=-3.3680, H_l=1.2425) else 0
-  var_add2   <- if(nmp== 2) switch(test, H_c=-0.034324, H_lc=-0.24528, H_l=0.41949 ) else 0
-  var_square <- switch(test, H_c=12.058, H_lc=13.074, H_l=12.841 )
-  var <- var_np*(nmp) +var_one+ var_add1+var_add2 +sqrt(nmp)*var_square 
 }
 
 ## dfs
@@ -131,7 +129,7 @@ if(type=="trace"){
 }
 
 
-gamma_doornik_all <- function(x, nmp,q,  test=c("H_c", "H_lc", "H_l"), type=c("trace", "eigen"), smallSamp=FALSE, T){
+gamma_doornik_all <- function(x, nmp,q,  test=c("H_z", "H_c", "H_lc", "H_l", "H_ql"), type=c("trace", "eigen"), smallSamp=FALSE, T){
 
 ## small checks
   test <- match.arg(test)
@@ -156,6 +154,25 @@ return(res)
 
 ### Critical values tables (taken from Doornik, in gretl plugin/johansen.c 
 Hnames <- c("H_z", "H_c", "H_lc", "H_l", "H_ql")
+
+
+doornik_tab7_mean <- matrix(c(2, -1, 0.07, 0.07, 0, 0, 2, 2.01, 0, 0.06, 0.05, 
+0, 2, 1.05, -1.55, -0.5, -0.23, 0, 2, 4.05, 0.5, -0.23, -0.07, 
+0, 2, 2.85, -5.1, -0.1, -0.06, 1.35), ncol=5, dimnames=list(1:6, Hnames))
+
+doornik_tab7_var <- matrix(c(3, -0.33, -0.55, 0, 0,  3, 3.6, 0.75, -0.4, -0.3, 
+ 3, 1.8, 0, -2.8, -1.1,  3, 5.7, 3.2, -1.3, -0.5,  3, 4, 
+0.8, -5.8, -2.66), ncol=5, dimnames=list(1:5, Hnames))
+
+doornik_tab8_mean <- matrix(c(6.0019, -2.7558, 0.67185, 0.1149, -2.7764, 5.9498, 
+0.43402, 0.04836, 0.018198, -2.3669, 5.8271, -1.6487, -1.6118, 
+-0.25949, -1.5666, 5.8658, 2.5595, -0.34443, -0.077991, -1.7552, 
+5.6364, -0.90531, -3.5166, -0.47966, -0.21447), ncol=5, dimnames=list(1:5, Hnames))
+
+doornik_tab8_var <- matrix(c(1.8806, -15.499, 1.1136, 0.070508, 14.714, 2.2231, 
+-7.9064, 0.58592, -0.034324, 12.058, 2.0785, -9.7846, -3.368, 
+-0.24528, 13.074, 1.9955, -5.5428, 1.2425, 0.41949, 12.841, 2.0899, 
+-5.3303, -7.1523, -0.2526, 12.393), ncol=5, dimnames=list(1:5, Hnames))
 
 doornik_tab9_mean <- matrix(c(-0.101, 0.499, 0.896, -0.562, 0.00229, 0.00662, 0, 
 0, 0.465, 0.984, -0.273, -244, 0, 0, 0.134, 0.422, 1.02, 2.17, 
@@ -188,6 +205,13 @@ gamma_doornik(q=c(0.9, 0.95, 0.99), nmp=4)
 
 ## Vector test of p-vals/quantiles:
 gamma_doornik_all(x=c(49.14, 19.06, 8.89,2.35), nmp=4:1)
+gamma_doornik_all(x=c(49.14, 19.06, 8.89,2.35), nmp=4:1, test="H_lc")
+gamma_doornik_all(x=c(49.14, 19.06, 8.89,2.35), nmp=4:1, test="H_l")
+
+gamma_doornik_all(x=c(49.14, 19.06, 8.89,2.35), nmp=4:1, type="eigen")
+gamma_doornik_all(x=c(49.14, 19.06, 8.89,2.35), nmp=4:1, test="H_lc", type="eigen")
+gamma_doornik_all(x=c(49.14, 19.06, 8.89,2.35), nmp=4:1, test="H_l", type="eigen")
+
 gamma_doornik_all(q=c(0.9, 0.95, 0.99), nmp=4:1)
 
 }
@@ -223,6 +247,29 @@ r_l2b
 r_l2_ei
 summary(r_l2)
 
+## with include="both"
+ve_can_bo <- VECM(Canada, lag=1, estim="ML", include="both")
+r_can_bo <- rank.test(ve_can_bo )
+summary(r_can_bo)
+
+## with include="both"
+ve_can_none <- VECM(Canada, lag=1, estim="ML", include="none")
+r_can_none <- rank.test(ve_can_none)
+summary(r_can_none)
+
+## with include="trend"
+ve_can_tr <- VECM(Canada, lag=1, estim="ML", include="trend")
+r_can_bo <- rank.test(ve_can_tr)
+
+## with LRinclude=const
+ve_can_LrCo <- VECM(Canada, lag=1, estim="ML", LRinclude="const")
+r_can_LrCo <- rank.test(ve_can_LrCo)
+summary(r_can_LrCo)
+
+## with LRinclude=trend
+ve_can_LrTr <- VECM(Canada, lag=1, estim="ML", LRinclude="trend", include="const")
+ve_can_LrTr$model.specific$lambda
+r_can_LrTr <- rank.test(ve_can_LrTr)
 
 
 }
