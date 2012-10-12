@@ -61,24 +61,24 @@ npar.VECM<-function(object, ..., r) {
 AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else log(det(crossprod(residuals(object))/t))
-	t*fit+k*npar(object)
+	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else t*log(det(crossprod(residuals(object))/t))
+	fit+k*npar(object)
 }
 
 AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	Rank<-if(missing(r)) object$model.specific$r else r
 	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else log(det(crossprod(residuals(object))/t))
-	t*fit+k*npar(object, r=Rank)
+	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else t*log(det(crossprod(residuals(object))/t))
+	fit+k*npar(object, r=Rank)
 }
 
 #### BIC criterions
 BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else log(det(crossprod(residuals(object))/t))
-	t*fit+k*npar(object)
+	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else t*log(det(crossprod(residuals(object))/t))
+	fit+k*npar(object)
 }
 
 BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
@@ -86,8 +86,8 @@ BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
 	nVar<-object$k
 	Rank<-if(missing(r)) object$model.specific$r else r
 	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else log(det(crossprod(residuals(object))/t))
-	t*fit+k*npar(object, r=Rank)
+	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else t*log(det(crossprod(residuals(object))/t))
+	fit+k*npar(object, r=Rank)
 }
 
 deviance.nlVar<-function(object,...){
