@@ -1,5 +1,8 @@
 \name{rank.select}
 \alias{rank.select}
+\alias{print.rank.select}
+\alias{summary.rank.select}
+
 \title{Selection of the cointegrating rank with Information criterion.}
 
 \description{
@@ -22,6 +25,7 @@ rank.select(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasur
 \item{sameSample}{Logical. Whether the data should be shortened so that the AIC/BIC are estimated on the same sample. Default to TRUE. }
 \item{x}{The output from \code{rank.select} for the print method.}
 \item{object}{The output from \code{rank.select} for the summary method.}
+\item{...}{Unused.}
 }
 
 \details{
