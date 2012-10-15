@@ -38,8 +38,8 @@ An object of class \sQuote{rank.select}, with \sQuote{print} and \sQuote{summary
 
 
 \seealso{
-\code{\link{VECM}} for estimating a VECM. 
-\code{\link[urca]{ca.jo}} in package \pkg{urca} for the classical Johansen cointegration test. 
+\code{\link{VECM}} for estimating a VECM. \code{\link{rank.test}} (or \code{\link[urca]{ca.jo}} in package \pkg{urca})
+for the classical Johansen cointegration test. 
 }
 
 \author{Matthieu Stigler}

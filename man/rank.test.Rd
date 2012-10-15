@@ -18,6 +18,7 @@ rank.test(vecm, type=c("trace", "eigen"), r_null, cval=0.05)
 
 \arguments{
 \item{vecm}{\sQuote{VECM} object computed with the function \code{\link{VECM}}. }
+\item{type}{Type of test, either 'trace' or 'eigenvalue'. See details below. }
 \item{r_null}{Rank to test specifically. }
 \item{cval}{Critical value level for the automatic test. }
 \item{x}{The output from \code{rank.test} for the print method.}
