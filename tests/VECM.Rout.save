@@ -1,44 +1,45 @@
 
-R Under development (unstable) (2012-02-01 r58249)
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
 
-  Natural language support but running in an English locale
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
 
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
-
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
 
 > library(tsDyn)
-Loading required package: mgcv
+Le chargement a nécessité le package : mgcv
 This is mgcv 1.7-21. For overview type 'help("mgcv-package")'.
-Loading required package: snow
-Loading required package: mnormt
-Loading required package: foreach
-Loading required package: iterators
-Loading required package: codetools
-Loading required package: MASS
-Loading required package: nlme
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : MASS
+Le chargement a nécessité le package : nlme
 > data(zeroyld)
 > 
 > 
 > 
 > 
 > ## Test a few VECM models
-> myVECM1<-VECM(zeroyld, lag=1)
-> myVECM2<-VECM(zeroyld, lag=3, include="const")
+> myVECM1 <-VECM(zeroyld, lag=1)
+> myVECM2 <-VECM(zeroyld, lag=3, include="const")
 > myVECM2a<-VECM(zeroyld, lag=3, include="const", beta=-1)
-> myVECM3<-VECM(zeroyld, lag=1, estim="ML")
-> myVECM4<-VECM(zeroyld, lag=3, estim="ML")
+> myVECM3 <-VECM(zeroyld, lag=1, estim="ML")
+> myVECM4 <-VECM(zeroyld, lag=3, estim="ML")
+> myVECM5 <-VECM(zeroyld, lag=2, estim="ML", LRinclude="const")
+> myVECM6 <-VECM(zeroyld, lag=2, estim="ML", LRinclude="trend")
+> myVECM7 <-VECM(zeroyld, lag=2, estim="ML", LRinclude="both")
 > 
 > 
 > summary(myVECM1)
@@ -140,6 +141,128 @@ Equation long.run  0.0586(0.0694)     -0.0464(0.1196)     -0.0554(0.0687)
                    short.run -3        long.run -3        
 Equation short.run -0.0550(0.0691)     -0.0215(0.0393)    
 Equation long.run  -0.1105(0.1189)     0.0073(0.0676)     
+> summary(myVECM5)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 479
+Number of variables: 2 	Number of estimated slope parameters 10
+AIC -2148.629 	BIC -2102.74 	SSR 175.4204
+Cointegrating vector (estimated by ML):
+   short.run  long.run      const
+r1         1 -1.013765 -0.6390823
+
+
+                   ECT                 short.run -1       long.run -1       
+Equation short.run -0.0209(0.0159)     0.0385(0.0686)     0.0208(0.0399)    
+Equation long.run  0.0729(0.0273)**    0.3104(0.1177)**   0.0649(0.0684)    
+                   short.run -2        long.run -2        
+Equation short.run -0.0411(0.0690)     -0.0262(0.0392)    
+Equation long.run  -0.0271(0.1184)     -0.0726(0.0673)    
+> summary(myVECM6)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 479
+Number of variables: 2 	Number of estimated slope parameters 12
+AIC -2145.279 	BIC -2091.046 	SSR 175.3718
+Cointegrating vector (estimated by ML):
+   short.run   long.run         trend
+r1         1 -0.9784362 -0.0008556847
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0224(0.0169)     0.0239(0.0167)      0.0373(0.0687)    
+Equation long.run  0.0765(0.0290)**    -0.0337(0.0287)     0.3043(0.1180)*   
+                   long.run -1        short.run -2        long.run -2        
+Equation short.run 0.0210(0.0399)     -0.0422(0.0691)     -0.0262(0.0393)    
+Equation long.run  0.0671(0.0686)     -0.0329(0.1186)     -0.0710(0.0675)    
+> summary(myVECM7)
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 479
+Number of variables: 2 	Number of estimated slope parameters 10
+AIC -2148.782 	BIC -2102.893 	SSR 175.5415
+Cointegrating vector (estimated by ML):
+   short.run   long.run      const         trend
+r1         1 -0.9744439 -0.6491126 -0.0009181597
+
+
+                   ECT                 short.run -1       long.run -1       
+Equation short.run -0.0242(0.0169)     0.0395(0.0686)     0.0198(0.0399)    
+Equation long.run  0.0741(0.0289)*     0.3072(0.1178)**   0.0653(0.0685)    
+                   short.run -2        long.run -2        
+Equation short.run -0.0403(0.0690)     -0.0274(0.0392)    
+Equation long.run  -0.0304(0.1185)     -0.0727(0.0674)    
+> 
+> logLik(myVECM1)
+[1] -4.527714
+> logLik(myVECM2)
+[1] -4.535288
+> logLik(myVECM2a)
+[1] -4.4758
+> logLik(myVECM3)
+[1] -275.2995
+> logLik(myVECM4)
+[1] -272.1432
+> logLik(myVECM5)
+[1] -274.0287
+> logLik(myVECM6)
+[1] -273.7038
+> logLik(myVECM7)
+[1] -273.9521
+> 
+> logLik(myVECM3, r=2)
+[1] -273.9466
+> logLik(myVECM4, r=2)
+[1] -270.8732
+> 
+> AIC(myVECM3)
+[1] -2155.763
+> AIC(myVECM4)
+[1] -2134.724
+> AIC(myVECM5)
+[1] -2148.629
+> AIC(myVECM6)
+[1] -2145.279
+> AIC(myVECM7)
+[1] -2148.782
+> AIC(myVECM3, r=2)
+[1] -2153.763
+> AIC(myVECM4, r=2)
+[1] -2132.724
+> AIC(myVECM3, fitMeasure="LL")
+[1] 568.5989
+> AIC(myVECM4, fitMeasure="LL")
+[1] 578.2864
+> AIC(myVECM3, r=2, fitMeasure="LL")
+[1] 567.8931
+> AIC(myVECM4, r=2, fitMeasure="LL")
+[1] 577.7464
+> 
+> BIC(myVECM3)
+[1] -2118.199
+> BIC(myVECM4)
+[1] -2063.841
+> BIC(myVECM5)
+[1] -2102.74
+> BIC(myVECM6)
+[1] -2091.046
+> BIC(myVECM7)
+[1] -2102.893
+> BIC(myVECM3, r=2)
+[1] -2112.025
+> BIC(myVECM4, r=2)
+[1] -2057.671
+> BIC(myVECM3, fitMeasure="LL")
+[1] 606.163
+> BIC(myVECM4, fitMeasure="LL")
+[1] 649.1698
+> BIC(myVECM3, r=2, fitMeasure="LL")
+[1] 609.631
+> BIC(myVECM4, r=2, fitMeasure="LL")
+[1] 652.7994
 > 
 > myVECM1$model.specific$coint
                  r1
@@ -168,47 +291,399 @@ long.run  -1.022065
 short.run  1.000000
 long.run  -1.022065
 > 
+> myVECM4$model.specific$coint
+               r1
+short.run  1.0000
+long.run  -1.0096
+> myVECM5$model.specific$coint
+                  r1
+short.run  1.0000000
+long.run  -1.0137648
+const     -0.6390823
+> myVECM6$model.specific$coint
+                     r1
+short.run  1.0000000000
+long.run  -0.9784361611
+trend     -0.0008556847
+> myVECM7$model.specific$coint
+                     r1
+short.run  1.0000000000
+long.run  -0.9744439171
+const     -0.6491126231
+trend     -0.0009181597
 > 
-> ###Check Johansen MLE: comparing with vars package
+> 
+> ### rank test
+> r.test_VECM4 <- rank.test(myVECM4)
+> r.test_VECM4_tr <- rank.test(myVECM4, type="trace")
+> r.test_VECM4_spec <- rank.test(myVECM4, r_null=1)
+> r.test_VECM4_spec_tr <- rank.test(myVECM4,, r_null=1, type="trace")
+> 
+> r.test_VECM5 <- rank.test(myVECM5)
+> r.test_VECM6 <- rank.test(myVECM6)
+> 
+> 
+> r.test_VECM4
+Rank selected: 1 (first eigen test with pval above 5 %: 11.1 %)
+> r.test_VECM4_tr
+Rank selected: 1 (first trace test with pval above 5 %: 11.1 %)
+> r.test_VECM4_spec
+Test of rank 1 versus 2  (eigen test), p-value: 0.1109948.
+> r.test_VECM4_spec_tr
+Test of rank 1 versus 2  (trace test), p-value: 0.1109964.
+> r.test_VECM5
+Rank selected: 1 (first eigen test with pval above 5 %: 55.9 %)
+> r.test_VECM6
+Rank selected: 1 (first eigen test with pval above 5 %: 56.6 %)
+> 
+> summary(r.test_VECM4)
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 35.338328     <0.001       <0.001 32.798350     <0.001
+2 1  2.539978      0.111       0.1116  2.539978      0.111
+> summary(r.test_VECM5)
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 35.760018     <0.001      < 0.001 32.598076     <0.001
+2 1  3.161942     0.5605      < 0.001  3.161942     0.5594
+> summary(r.test_VECM6)
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 37.534252     <0.001       <0.001 32.249907     <0.001
+2 1  5.284345     0.5645       0.5651  5.284345     0.5659
+> 
+> ###############################################################
+> ### Check Johansen MLE: comparing with vars package
+> ###############################################################
+> 
 > if(require(vars)){
 + data(Canada)
 + 
-+ myVECM<-VECM(Canada, lag=1, include="const", estim="ML")
-+ VECM_vars<-cajorls(ca.jo(Canada, spec="trans"))
-+ print(all.equal(VECM_vars$beta, myVECM$model.specific$coint, check.attributes=FALSE))
++ print(summary(VECM(Canada, lag=2, include="const", estim="ML")))
++ print(summary(VECM(Canada, lag=2, include="trend", estim="ML")))
++ print(summary(VECM(Canada, lag=2, include="both", estim="ML")))
++ print(summary(VECM(Canada, lag=2, include="none", estim="ML")))
++ print(summary(VECM(Canada, lag=2, LRinclude="const", estim="ML")))
++ print(summary(VECM(Canada, lag=2, LRinclude="trend", estim="ML")))
++ print(summary(VECM(Canada, lag=2, LRinclude="both", estim="ML")))
++ 
++ ## VECM, l=1, inc=const
++ myVECM_l1<-VECM(Canada, lag=1, include="const", estim="ML")
++ ca_tes_l1 <- ca.jo(Canada,K=2, spec="trans")
++ ca_tes_l1_tr <- ca.jo(Canada,K=2, spec="trans", type="trace")
++ VECM_vars_l1<-cajorls(ca_tes_l1)
++ print(all.equal(ca_tes_l1@teststat, rev(rank.test(myVECM_l1)$res_df[,"eigen"]), check.attributes=FALSE))
++ print(all.equal(ca_tes_l1_tr@teststat, rev(rank.test(myVECM_l1)$res_df[,"trace"]), check.attributes=FALSE))
++ print(all.equal(VECM_vars_l1$beta, myVECM_l1$model.specific$coint, check.attributes=FALSE))
++ print(all.equal(t(coefficients(myVECM_l1)), coefficients(VECM_vars_l1$rlm), check.attr=FALSE))
++ 
++ ## VECM, l=2, inc=const
++ myVECM_l2<-VECM(Canada, lag=2, include="const", estim="ML")
++ ca_tes_l2 <- ca.jo(Canada,K=3, spec="trans")
++ ca_tes_l2_tr <- ca.jo(Canada,K=3, spec="trans", type="trace")
++ VECM_vars_l2<-cajorls(ca_tes_l2)
++ print(all.equal(ca_tes_l2_tr@teststat, rev(rank.test(myVECM_l2)$res_df[,"trace"]), check.attributes=FALSE))
++ print(all.equal(ca_tes_l2@teststat, rev(rank.test(myVECM_l2)$res_df[,"eigen"]), check.attributes=FALSE))
++ print(all.equal(VECM_vars_l2$beta, myVECM_l2$model.specific$coint, check.attributes=FALSE))
++ print(all.equal(t(coefficients(myVECM_l2)), coefficients(VECM_vars_l2$rlm), check.attr=FALSE))
++ 
++ ## VECM, l=1, inc const in coint
++ myVECM_l1_conCoint<-VECM(Canada, lag=1, LRinclude="const", estim="ML")
++ ca_tes_l1_conCoint <- ca.jo(Canada,K=2, spec="trans", ecdet="const")
++ ca_tes_l1_conCoint_tr <- ca.jo(Canada,K=2, spec="trans", ecdet="const", type="trace")
++ VECM_vars_l1_conCoint <-cajorls(ca_tes_l1_conCoint)
++ print(all.equal(ca_tes_l1_conCoint@teststat, rev(rank.test(myVECM_l1_conCoint)$res_df[,"eigen"]), check.attributes=FALSE))
++ print(all.equal(ca_tes_l1_conCoint_tr@teststat, rev(rank.test(myVECM_l1_conCoint)$res_df[,"trace"]), check.attributes=FALSE))
++ print(all.equal(VECM_vars_l1_conCoint$beta, myVECM_l1_conCoint$model.specific$coint, check.attributes=FALSE))
++ print(all.equal(t(coefficients(myVECM_l1_conCoint)), coefficients(VECM_vars_l1_conCoint$rlm), check.attr=FALSE))
++ 
++ ## VECM, l=2, inc const in coint
++ myVECM_l2_conCoint<-VECM(Canada, lag=2, LRinclude="const", estim="ML")
++ ca_tes_l2_conCoint <- ca.jo(Canada,K=3, spec="trans", ecdet="const")
++ ca_tes_l2_conCoint_tr <- ca.jo(Canada,K=3, spec="trans", ecdet="const", type="trace")
++ VECM_vars_l2_conCoint <-cajorls(ca_tes_l2_conCoint)
++ print(all.equal(ca_tes_l2_conCoint@teststat, rev(rank.test(myVECM_l2_conCoint)$res_df[,"eigen"]), check.attributes=FALSE))
++ print(all.equal(ca_tes_l2_conCoint_tr@teststat, rev(rank.test(myVECM_l2_conCoint)$res_df[,"trace"]), check.attributes=FALSE))
++ print(all.equal(VECM_vars_l2_conCoint$beta, myVECM_l2_conCoint$model.specific$coint, check.attributes=FALSE))
++ print(all.equal(t(coefficients(myVECM_l2_conCoint)), coefficients(VECM_vars_l2_conCoint$rlm), check.attr=FALSE))
++ 
++ ## VECM, l=1, inc trend in coint
++ myVECM_l2_trCoint<-VECM(Canada, lag=2, LRinclude="trend", estim="ML")
++ ca_tes_l2_trCoint <- ca.jo(Canada,K=3, spec="trans", ecdet="trend")
++ ca_tes_l2_trCoint_tr <- ca.jo(Canada,K=3, spec="trans", ecdet="trend", type="trace")
++ VECM_vars_l2_trCoint <-cajorls(ca_tes_l2_trCoint)
++ print(all.equal(ca_tes_l2_trCoint@teststat, rev(rank.test(myVECM_l2_trCoint)$res_df[,"eigen"]), check.attributes=FALSE))
++ print(all.equal(ca_tes_l2_trCoint_tr@teststat, rev(rank.test(myVECM_l2_trCoint)$res_df[,"trace"]), check.attributes=FALSE))
++ print(all.equal(VECM_vars_l2_trCoint$beta, myVECM_l2_trCoint$model.specific$coint, check.attributes=FALSE))
++ print(all.equal(VECM_vars_l2_trCoint$beta, myVECM_l2_trCoint$model.specific$coint, check.attributes=FALSE, tol=1e-06))
++ print(all.equal(t(coefficients(myVECM_l2_trCoint)), coefficients(VECM_vars_l2_trCoint$rlm), check.attr=FALSE, tol=1e-02))
++ 
++ ## VECM, l=1, inc both in coint
++ myVECM_l2_boCoint<-VECM(Canada, lag=2, LRinclude="trend", estim="ML")
++ ca_tes_l2_boCoint <- ca.jo(Canada,K=3, spec="trans", ecdet="trend")
++ ca_tes_l2_boCoint_tr <- ca.jo(Canada,K=3, spec="trans", ecdet="trend", type="trace")
++ VECM_vars_l2_boCoint <-cajorls(ca_tes_l2_boCoint)
++ print(all.equal(ca_tes_l2_boCoint@teststat, rev(rank.test(myVECM_l2_boCoint)$res_df[,"eigen"]), check.attributes=FALSE))
++ print(all.equal(ca_tes_l2_boCoint_tr@teststat, rev(rank.test(myVECM_l2_boCoint)$res_df[,"trace"]), check.attributes=FALSE))
++ print(all.equal(VECM_vars_l2_boCoint$beta, myVECM_l2_boCoint$model.specific$coint, check.attributes=FALSE))
++ print(all.equal(VECM_vars_l2_boCoint$beta, myVECM_l2_boCoint$model.specific$coint, check.attributes=FALSE, tol=1e-06))
++ print(all.equal(t(coefficients(myVECM_l2_boCoint)), coefficients(VECM_vars_l2_boCoint$rlm), check.attr=FALSE, tol=1e-02))
 + 
 + 
 + ## Check LL
-+ l1<-2*(logLik(myVECM,r=4)-logLik(myVECM,r=3))
-+ l2<-2*(logLik(myVECM,r=3)-logLik(myVECM,r=2))
-+ l3<-2*(logLik(myVECM,r=2)-logLik(myVECM,r=1))
-+ l4<-2*(logLik(myVECM,r=1)-logLik(myVECM,r=0))
++ l1<-2*(logLik(myVECM_l1,r=4)-logLik(myVECM_l1,r=3))
++ l2<-2*(logLik(myVECM_l1,r=3)-logLik(myVECM_l1,r=2))
++ l3<-2*(logLik(myVECM_l1,r=2)-logLik(myVECM_l1,r=1))
++ l4<-2*(logLik(myVECM_l1,r=1)-logLik(myVECM_l1,r=0))
 + print(c(l1,l2,l3,l4))
-+ logLik(myVECM,r=5)
 + print(ca.jo(Canada, spec="trans"))
 + print(all.equal(c(l1, l2, l3, l4),ca.jo(Canada, spec="trans")@teststat))
 + 
-+ print(AIC(myVECM,r=0, k=2*log(log(myVECM$t))))
-+ print(AIC(myVECM,r=1, k=2*log(log(myVECM$t))))
-+ print(AIC(myVECM,r=2, k=2*log(log(myVECM$t))))
-+ print(AIC(myVECM,r=3, k=2*log(log(myVECM$t))))
-+ print(AIC(myVECM,r=4, k=2*log(log(myVECM$t))))
++ print(AIC(myVECM_l1,r=0, k=2*log(log(myVECM_l1$t))))
++ print(AIC(myVECM_l1,r=1, k=2*log(log(myVECM_l1$t))))
++ print(AIC(myVECM_l1,r=2, k=2*log(log(myVECM_l1$t))))
++ print(AIC(myVECM_l1,r=3, k=2*log(log(myVECM_l1$t))))
++ print(AIC(myVECM_l1,r=4, k=2*log(log(myVECM_l1$t))))
 + 
 + 
 + }
-Loading required package: vars
-Loading required package: strucchange
-Loading required package: zoo
+Le chargement a nécessité le package : vars
+Le chargement a nécessité le package : strucchange
+Le chargement a nécessité le package : zoo
 
-Attaching package: ‘zoo’
+Attachement du package : ‘zoo’
 
 The following object(s) are masked from ‘package:base’:
 
     as.Date, as.Date.numeric
 
-Loading required package: sandwich
-Loading required package: urca
-Loading required package: lmtest
+Le chargement a nécessité le package : sandwich
+Le chargement a nécessité le package : urca
+Le chargement a nécessité le package : lmtest
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 40
+AIC -505.1143 	BIC -402.153 	SSR 88.63704
+Cointegrating vector (estimated by ML):
+   e      prod         rw         U
+r1 1 0.6409112 -0.6996053 0.5506937
+
+
+              ECT                Intercept            e -1               
+Equation e    0.0256(0.0097)*    -22.6200(8.6680)*    0.7654(0.1584)***  
+Equation prod 0.0013(0.0179)     -0.6758(16.0273)     -0.1754(0.2929)    
+Equation rw   0.0953(0.0212)***  -84.5565(18.9555)*** -0.6668(0.3464).   
+Equation U    0.0077(0.0080)     -6.8066(7.1625)      -0.6376(0.1309)*** 
+              prod -1             rw -1              U -1               
+Equation e    0.1950(0.0613)**    -0.0869(0.0504).   -0.0598(0.1941)    
+Equation prod 0.2178(0.1133).     0.0375(0.0933)     -0.9236(0.3589)*   
+Equation rw   -0.1356(0.1340)     0.0357(0.1103)     -0.0301(0.4245)    
+Equation U    -0.1465(0.0506)**   0.0265(0.0417)     -0.1891(0.1604)    
+              e -2                prod -2             rw -2              
+Equation e    -0.5171(0.1666)**   0.0403(0.0628)      -0.1056(0.0502)*   
+Equation prod -0.5205(0.3081).    -0.0484(0.1161)     -0.1554(0.0929).   
+Equation rw   0.0177(0.3644)      -0.3257(0.1374)*    -0.1095(0.1099)    
+Equation U    -0.0148(0.1377)     -0.0118(0.0519)     0.0899(0.0415)*    
+              U -2               
+Equation e    -0.1326(0.1957)    
+Equation prod -0.1032(0.3619)    
+Equation rw   -0.2760(0.4280)    
+Equation U    -0.2622(0.1617)    
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 40
+AIC -511.2953 	BIC -408.334 	SSR 85.14812
+Cointegrating vector (estimated by ML):
+   e       prod       rw         U
+r1 1 -0.5145416 -1.69144 0.1771118
+
+
+              ECT                Trend              e -1               
+Equation e    0.0139(0.0046)**   0.0134(0.0041)**   0.7961(0.1585)***  
+Equation prod 0.0175(0.0084)*    0.0199(0.0074)**   -0.2666(0.2889)    
+Equation rw   0.0570(0.0095)***  0.0491(0.0084)***  -0.6846(0.3286)*   
+Equation U    0.0049(0.0037)     0.0050(0.0033)     -0.6428(0.1290)*** 
+              prod -1             rw -1               U -1               
+Equation e    0.1988(0.0618)**    -0.0781(0.0511)     -0.0247(0.1945)    
+Equation prod 0.2423(0.1125)*     0.0092(0.0931)      -1.0015(0.3545)**  
+Equation rw   -0.1026(0.1280)     0.0070(0.1059)      -0.0009(0.4033)    
+Equation U    -0.1484(0.0503)**   0.0268(0.0416)      -0.1963(0.1583)    
+              e -2                prod -2             rw -2              
+Equation e    -0.4766(0.1662)**   0.0500(0.0640)      -0.0959(0.0510).   
+Equation prod -0.6072(0.3029)*    -0.0212(0.1166)     -0.1833(0.0929).   
+Equation rw   0.0999(0.3446)      -0.2617(0.1327).    -0.1432(0.1057)    
+Equation U    -0.0209(0.1353)     -0.0103(0.0521)     0.0901(0.0415)*    
+              U -2               
+Equation e    -0.1220(0.1973)    
+Equation prod -0.1228(0.3594)    
+Equation rw   -0.3019(0.4089)    
+Equation U    -0.2748(0.1605).   
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 44
+AIC -505.1706 	BIC -392.6315 	SSR 84.86231
+Cointegrating vector (estimated by ML):
+   e     prod       rw        U
+r1 1 1.761822 4.560902 10.77806
+
+
+              ECT                 Intercept           Trend             
+Equation e    -0.0030(0.0018).    11.4596(6.4380).    0.0098(0.0075)    
+Equation prod -0.0019(0.0032)     7.6142(11.6605)     0.0061(0.0137)    
+Equation rw   -0.0145(0.0036)***  54.4970(13.2353)*** 0.0430(0.0155)**  
+Equation U    -0.0024(0.0014).    8.8953(5.1569).     0.0101(0.0060).   
+              e -1                prod -1             rw -1              
+Equation e    0.8187(0.1585)***   0.2005(0.0634)**    -0.0812(0.0528)    
+Equation prod -0.2350(0.2870)     0.2312(0.1148)*     0.0089(0.0957)     
+Equation rw   -0.6301(0.3258).    -0.0835(0.1303)     -0.0223(0.1086)    
+Equation U    -0.6439(0.1269)***  -0.1387(0.0508)**   0.0207(0.0423)     
+              U -1                e -2                prod -2            
+Equation e    0.0025(0.1948)      -0.4618(0.1679)**   0.0470(0.0650)     
+Equation prod -0.9696(0.3529)**   -0.5701(0.3041).    -0.0337(0.1178)    
+Equation rw   0.0796(0.4005)      0.1141(0.3451)      -0.2630(0.1337).   
+Equation U    -0.1916(0.1561)     -0.0341(0.1345)     -0.0048(0.0521)    
+              rw -2               U -2               
+Equation e    -0.0988(0.0528).    -0.1023(0.1997)    
+Equation prod -0.1859(0.0957).    -0.1227(0.3616)    
+Equation rw   -0.1712(0.1086)     -0.2247(0.4105)    
+Equation U    0.0854(0.0423)*     -0.2561(0.1599)    
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 36
+AIC -504.2311 	BIC -410.8476 	SSR 92.08021
+Cointegrating vector (estimated by ML):
+   e      prod       rw       U
+r1 1 -5.896833 2.653526 14.8016
+
+
+              ECT                 e -1                prod -1            
+Equation e    -0.0029(0.0008)***  0.8013(0.1553)***   0.1996(0.0595)**   
+Equation prod -0.0030(0.0016).    -0.1323(0.2954)     0.2816(0.1132)*    
+Equation rw   -0.0092(0.0018)***  -0.5818(0.3409).    -0.1578(0.1307)    
+Equation U    -0.0011(0.0007)     -0.6423(0.1268)***  -0.1445(0.0486)**  
+              rw -1              U -1                e -2               
+Equation e    -0.0898(0.0510).   -0.0137(0.1901)     -0.4917(0.1649)**  
+Equation prod 0.0138(0.0971)     -0.8231(0.3617)*    -0.4525(0.3137)    
+Equation rw   0.0312(0.1120)     0.0581(0.4174)      0.0468(0.3621)     
+Equation U    0.0196(0.0417)     -0.1897(0.1552)     -0.0230(0.1346)    
+              prod -2             rw -2               U -2               
+Equation e    0.0384(0.0621)      -0.1074(0.0510)*    -0.0943(0.1911)    
+Equation prod -0.0123(0.1182)     -0.1736(0.0970).    0.0673(0.3635)     
+Equation rw   -0.3546(0.1364)*    -0.1139(0.1119)     -0.2523(0.4194)    
+Equation U    -0.0116(0.0507)     0.0829(0.0416).     -0.2588(0.1560)    
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 36
+AIC -506.165 	BIC -412.7815 	SSR 91.89193
+Cointegrating vector (estimated by ML):
+   e      prod         rw        U     const
+r1 1 0.5175539 -0.5809564 1.328744 -900.1429
+
+
+              ECT                e -1                prod -1            
+Equation e    0.0421(0.0108)***  0.7314(0.1578)***   0.1840(0.0587)**   
+Equation prod 0.0460(0.0208)*    -0.2192(0.3035)     0.2640(0.1130)*    
+Equation rw   0.1199(0.0244)***  -0.6854(0.3556).    -0.1976(0.1323)    
+Equation U    0.0111(0.0091)     -0.6283(0.1324)***  -0.1469(0.0493)**  
+              rw -1              U -1                e -2               
+Equation e    -0.0837(0.0483).   -0.1019(0.1932)     -0.5413(0.1644)**  
+Equation prod 0.0169(0.0928)     -0.9303(0.3716)*    -0.5179(0.3161)    
+Equation rw   0.0801(0.1088)     -0.0963(0.4353)     0.0061(0.3703)     
+Equation U    0.0319(0.0405)     -0.1800(0.1621)     -0.0019(0.1379)    
+              prod -2             rw -2               U -2               
+Equation e    0.0358(0.0610)      -0.1037(0.0481)*    -0.1691(0.1919)    
+Equation prod -0.0152(0.1173)     -0.1736(0.0926).    -0.0221(0.3691)    
+Equation rw   -0.3619(0.1374)*    -0.0682(0.1084)     -0.3957(0.4324)    
+Equation U    -0.0122(0.0511)     0.0958(0.0404)*     -0.2548(0.1610)    
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 40
+AIC -509.7954 	BIC -406.8341 	SSR 84.94376
+Cointegrating vector (estimated by ML):
+   e      prod        rw         U    trend
+r1 1 -41.92623 -76.94644 -132.8536 54.56955
+
+
+              ECT                 Intercept           e -1               
+Equation e    0.0002(0.0001)*     10.3534(5.0153)*    0.8216(0.1577)***  
+Equation prod 0.0002(0.0002)      8.2918(9.0548)      -0.2465(0.2847)    
+Equation rw   0.0011(0.0002)***   55.5894(10.2978)*** -0.6341(0.3238).   
+Equation U    0.0001(8.1e-05)     5.7001(4.0390)      -0.6468(0.1270)*** 
+              prod -1             rw -1               U -1               
+Equation e    0.2010(0.0631)**    -0.0785(0.0521)     0.0034(0.1940)     
+Equation prod 0.2344(0.1140)*     0.0047(0.0941)      -0.9799(0.3502)**  
+Equation rw   -0.0745(0.1296)     -0.0121(0.1070)     0.0631(0.3982)     
+Equation U    -0.1389(0.0508)**   0.0173(0.0420)      -0.1911(0.1562)    
+              e -2                prod -2             rw -2              
+Equation e    -0.4597(0.1660)**   0.0483(0.0649)      -0.0958(0.0519).   
+Equation prod -0.5805(0.2997).    -0.0295(0.1172)     -0.1903(0.0937)*   
+Equation rw   0.0812(0.3409)      -0.2519(0.1332).    -0.1574(0.1066)    
+Equation U    -0.0197(0.1337)     -0.0029(0.0523)     0.0804(0.0418).    
+              U -2               
+Equation e    -0.1034(0.1986)    
+Equation prod -0.1281(0.3586)    
+Equation rw   -0.2300(0.4078)    
+Equation U    -0.2627(0.1600)    
+#############
+###Model VECM 
+#############
+Full sample size: 84 	End sample size: 81
+Number of variables: 4 	Number of estimated slope parameters 36
+AIC -511.8764 	BIC -418.4929 	SSR 87.92541
+Cointegrating vector (estimated by ML):
+   e       prod        rw          U    const    trend
+r1 1 -0.7759476 -2.449106 -0.4752984 438.1754 1.515937
+
+
+              ECT                e -1                prod -1            
+Equation e    0.0094(0.0028)**   0.7996(0.1571)***   0.2005(0.0597)**   
+Equation prod 0.0146(0.0052)**   -0.2633(0.2895)     0.2764(0.1101)*    
+Equation rw   0.0334(0.0060)***  -0.6742(0.3336)*    -0.1592(0.1269)    
+Equation U    0.0036(0.0023)     -0.6422(0.1279)***  -0.1441(0.0486)**  
+              rw -1               U -1                e -2               
+Equation e    -0.0795(0.0501)     -0.0172(0.1921)     -0.4695(0.1634)**  
+Equation prod -0.0127(0.0923)     -0.9589(0.3541)**   -0.5535(0.3012).   
+Equation rw   0.0393(0.1064)      -0.0420(0.4080)     0.0345(0.3471)     
+Equation U    0.0238(0.0408)      -0.1903(0.1564)     -0.0136(0.1330)    
+              prod -2             rw -2               U -2               
+Equation e    0.0513(0.0625)      -0.0973(0.0499).    -0.1147(0.1941)    
+Equation prod 0.0072(0.1152)      -0.2056(0.0921)*    -0.0578(0.3578)    
+Equation rw   -0.3093(0.1328)*    -0.1101(0.1061)     -0.3875(0.4123)    
+Equation U    -0.0067(0.0509)     0.0870(0.0407)*     -0.2660(0.1580).   
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] "Mean relative difference: 1.152672e-07"
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] TRUE
+[1] "Mean relative difference: 1.152672e-07"
+[1] TRUE
 [1] TRUE
 [1]  0.3227339  8.6483204 19.6241250 47.3369295
 
@@ -224,10 +699,7 @@ The value of the test statistic is: 0.3227 8.6483 19.6241 47.3369
 [1] -455.671
 [1] -446.7722
 [1] -443.806
-Warning message:
-In logLik.VECM(myVECM, r = 5) :
-  r cann't be greater than k (number of variables)
 > 
 > proc.time()
-   user  system elapsed 
-  3.010   0.060   3.049 
+utilisateur     système      écoulé 
+      7.020       0.150       7.315 
