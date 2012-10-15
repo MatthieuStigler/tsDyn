@@ -20,8 +20,8 @@ rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
     testCat <- switch(inc, "const"="H_lc", "both"="H_ql", "none"="H_z") 
   } else if(inc=="none"&LR_inc=="const") {
     testCat <- "H_c" 
-#   } else if(inc=="const"&LR_inc=="trend") {# VECM does not seem to lead to go results in this case...
-#     testCat <- "H_l"
+  } else if(inc=="const"&LR_inc=="trend") {
+    testCat <- "H_l"
   } else {
     stop("Sorry, rank.test does not work for model selected (due to specification of deterministic terms)\n")
   }
@@ -291,6 +291,7 @@ summary(r_can_LrCo)
 ve_can_LrTr <- VECM(Canada, lag=1, estim="ML", LRinclude="trend", include="const")
 ve_can_LrTr$model.specific$lambda
 r_can_LrTr <- rank.test(ve_can_LrTr)
+summary(r_can_LrTr )
 
 
 }
