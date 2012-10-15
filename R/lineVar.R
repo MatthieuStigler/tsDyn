@@ -25,7 +25,7 @@ if(is.null(colnames(data)))
 ###Check args
 include<-match.arg(include)
 LRinclude<-match.arg(LRinclude)
-if(LRinclude=="const")  include<-"none"
+if(LRinclude%in%c("const", "both"))  include<-"none"
 ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
 model<-match.arg(model)
 estim<-match.arg(estim)
@@ -141,9 +141,10 @@ beta.estimated<-if(is.null(beta)) TRUE else FALSE
     reg_res2<-lm.fit(Z,Xminus1)
     v<-residuals(reg_res2)
     #Auxiliary regression 3
-    if(LRinclude=="const"){
-      reg_res3<-lm.fit(Z,matrix(1, nrow=nrow(Z)))
-      v<-cbind(v,residuals(reg_res3))
+    if(LRinclude!="none"){
+      add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
+      reg_res3<-lm.fit(Z,add)
+      v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
     }
     #Moment matrices
     S00<-crossprod(u)
@@ -165,13 +166,14 @@ beta.estimated<-if(is.null(beta)) TRUE else FALSE
     z0<-t(u)%*%v%*%ve_no[,1:r]%*%t(ve_no[,1:r])
 
       ###Slope parameters
-    if(LRinclude=="const"){
-      ECTminus1<-cbind(Xminus1,1)%*%ve_4
+    if(LRinclude!="none"){
+      ECTminus1<-cbind(Xminus1,add)%*%ve_4
     }else{
       ECTminus1<-Xminus1%*%ve_4
     }
     Z<-cbind(ECTminus1,Z)
-    dimnames(ve_4)<-list(c(colnames(data), if(LRinclude=="const") "const" else NULL), paste("r", 1:r, sep=""))
+    coin_ve_names <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
+    dimnames(ve_4)<-list(c(colnames(data), coin_ve_names), paste("r", 1:r, sep=""))
     betaLT<-ve_4
   }else{  #end beta to be estimated
     betaLT<-beta
