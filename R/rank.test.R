@@ -5,7 +5,7 @@
 rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
 
   type <- match.arg(type)
-  if(vecm$model.specific$estim!="ML") stop("Please note the 'vecm' object shold be estimated with estim=' ML', not (default) OLS")
+  if(vecm$model.specific$estim!="ML") stop("Please note the 'vecm' object should be estimated with estim=' ML', not (default) OLS")
 
   t <- vecm$t
   k <- vecm$k
@@ -41,9 +41,9 @@ rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
 ## select r
   pvals <- switch(type, trace=trace_pval, eigen=eigen_pval)
   if(missing(r_null)){
-    w.pvals <- which(pvals>cval)[1]
+    w.pvals <- if(all(pvals<cval)) length(pvals) else which(pvals>cval)[1] 
     pval <- pvals[w.pvals]
-    rank <- w.pvals-1
+    rank <- if(pval>cval) w.pvals-1 else w.pvals
     r_null <- "unspec"
   } else {
     pval <- pvals[r_null+1]
