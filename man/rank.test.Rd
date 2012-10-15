@@ -33,16 +33,25 @@ This function computes the two maximum-likelihood tests for the cointegration ra
     \item{eigenvalue}{Test the hypothesis of rank \sQuote{h} against rank \sQuote{h+1}.}
   }
 
-Two testing procedure canbe used:
+The test works for five specifications of the deterministic terms  as in Doornik et al (1998), to be specified in the previous call to \code{\link{VECM}}:
+  \describe{
+    \item{H_ql}{Unrestricted constant and trend: use \code{include="both"} }
+    \item{H_l}{Unrestricted constant and restricted trend: use \code{include="const"}} and \code{LRinclude="trend"}
+    \item{H_lc}{Unrestricted constant and no trend: use \code{include="const"}}
+    \item{H_c}{Restricted constant and no trend: use \code{LRinclude="const"}}
+    \item{H_z}{No constant nor trend: use \code{include="none"}}
+  }
+
+Two testing procedures can be used:
   \describe{
     \item{Specific test}{By specifying a value for \sQuote{r_null}. The \sQuote{pval} value returned gives the speciifc p-value.}
     \item{Automatic test}{If not value is specified for \sQuote{r_null}, the function makes a simple automatic test: 
-	    returns the rank (slot \sQuote{r}) of the first test not rejected (level specified by arg \sQuote{cval}).}
+	    returns the rank (slot \sQuote{r}) of the first test not rejected (level specified by arg \sQuote{cval}) as recommend i.a. in Doornik et al (1998, p. 544).}
 }
 
-The two statistics are given in the summary method, while the print method just gives information on the specific test chosen, indicating the first hypothesis to be not-rejected. 
+A full table with both test statistics ad their respective p-values is given in the summary method. 
 
-P-values are obtained from the gamam distribution from Doornik (1998). Small sample values adjused for the sample sitze are also available in the summary method. 
+P-values are obtained from the gamma aproximation from Doornik (1998, 1999). Small sample values adjusted for the sample site are also available in the summary method. 
 Note that the \sQuote{effective sample size} for the these values is different from output in gretl for example. 
 }
 
@@ -54,7 +63,7 @@ An object of class \sQuote{rank.test}, with \sQuote{print} and \sQuote{summary m
 \seealso{
 \code{\link{VECM}} for estimating a VECM. \code{\link{rank.select}} to estimate the rank based on information criteria. 
 
-\code{\link[urca]{ca.jo}} in package \pkg{urca} for another implementation of Johansen cointegration test. 
+\code{\link[urca]{ca.jo}} in package \pkg{urca} for another implementation of Johansen cointegration test (see section \sQuote{Comparison with urca} for more infos). 
 }
 
 \author{Matthieu Stigler}
@@ -64,7 +73,21 @@ An object of class \sQuote{rank.test}, with \sQuote{print} and \sQuote{summary m
 
 - Doornik, J. A. (1999) Erratum [Approximations to the Asymptotic Distribution of Cointegration Tests], Journal of Economic Surveys, 13, i
 
+- Doornik, Hendry and Nielsen (1998) Inference in Cointegrating Models: UK M1 Revisited, Journal of Economic Surveys, 12, 533-72
+
 - Johansen, S. (1996) Likelihood-based inference in cointegrated Vector Autoregresive Models, Oxford University Press
+
+}
+
+\section{Comparison with urca}{
+  While \code{\link[urca]{ca.jo}} in package \pkg{urca} and \code{rank.test} both implement Johansen tests, there are a few differences:
+
+  \begin{itemize}{
+    \item \code{rank.test} gives p-values, while \code{ca.jo} gives only critical values. 
+    \item \code{rank.test} allows for five different specifications of deterministic terms (see above), \code{ca.jo} for only three. 
+    \item \code{ca.jo} allows for seasonal and exogenous regressors, which is not available in \code{rank.test}. 
+    \item The lag is specified differently: \code{K} from \code{ca.jo} corresponds to \code{lag}+1 in \code{rank.test}. 
+  }
 
 }
 
@@ -103,8 +126,8 @@ rank.test(VECM(barry, lag=3, LRinclude="const",estim="ML"))
 }
 
 \keyword{ ts }
-\keyword{ VECM }
-\keyword{ cointegration }
-\keyword{ Rank test}
+\concept{ VECM }
+\concept{ cointegration }
+\concept{ Rank test}
 
 
