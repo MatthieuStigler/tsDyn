@@ -2,9 +2,11 @@
 ############ Rank test
 #############################################
 
-rank.test <- function(vecm, type=c("trace", "eigen"), r_null=0:(vecm$k-1), cval=0.05){
+rank.test <- function(vecm, type=c("trace", "eigen"), r_null, cval=0.05){
 
   type <- match.arg(type)
+  if(vecm$model.specific$estim!="ML") stop("Please note the 'vecm' object shold be estimated with estim=' ML', not (default) OLS")
+
   t <- vecm$t
   k <- vecm$k
   inc <- vecm$include
@@ -38,23 +40,42 @@ rank.test <- function(vecm, type=c("trace", "eigen"), r_null=0:(vecm$k-1), cval=
 
 ## select r
   pvals <- switch(type, trace=trace_pval, eigen=eigen_pval)
-  w.pvals <- which(pvals>cval)[1]
-  rank <- w.pvals-1
-#   if(length(r_null)==1)
+  if(missing(r_null)){
+    w.pvals <- which(pvals>cval)[1]
+    pval <- pvals[w.pvals]
+    rank <- w.pvals-1
+    r_null <- "unspec"
+  } else {
+    pval <- pvals[r_null+1]
+    rank <- r_null
+    r_null <- "specified"
+  }
 
 ## assemble
   res <- list()
+  cal <- list(call=match.call())
+  cal$cval <- cval
+  cal$type <- type
+  cal$r_null <- r_null
+
   res_df <- data.frame(r=0:(k-1), trace=trace, trace_pval=trace_pval, trace_pval_T=trace_pval_T, eigen=eigen, eigen_pval=eigen_pval)
   res$res_df <- res_df
   res$r <- rank
-  res$cval <- cval
+
+  res$pval <- pval
+  res$call <- cal
   class(res) <- "rank.test"
   return(res)
 }
 
 print.rank.test <- function(x, ...) {
 
-  cat("Rank selected:", x$r, "(first above critical value of", 100*x$cval, "%)\n")
+  if(x$call$r_null=="unspec"){
+    cat("Rank selected:", x$r, "(first",x$call$type, "test with pval above", 100*x$call$cval, "%:", round(100*x$pval,1), "%)\n")
+  } else {
+    alter <- switch(x$call$type, "eigen" = x$r+1, "trace"= eval(parse(text=x$call$call$vecm))$k)
+    cat("Test of rank ", x$r," versus ", alter, "  (",x$call$type, " test), p-value: ", x$pval,  ".\n", sep="")
+  }
 
 }
 
@@ -224,7 +245,7 @@ gamma_doornik_all(q=c(0.9, 0.95, 0.99), nmp=4:1)
 if(FALSE){
 library(tsDyn)
 library(vars)
-library(cajo)
+library(urca)
 
 environment(rank.test) <- environment(star)
 
@@ -235,7 +256,7 @@ ve_can <- VECM(Canada, lag=1, estim="ML")
 ve_can_l2 <- VECM(Canada, lag=2, estim="ML")
 
 r_l1<- rank.test(ve_can)
-r_l1
+
 summary(r_l1)
 
 
