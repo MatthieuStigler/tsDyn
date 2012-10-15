@@ -2,7 +2,7 @@
 ############ Rank test
 #############################################
 
-rank.test <- function(vecm, type=c("trace", "eigen"), r_null, cval=0.05){
+rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
 
   type <- match.arg(type)
   if(vecm$model.specific$estim!="ML") stop("Please note the 'vecm' object shold be estimated with estim=' ML', not (default) OLS")

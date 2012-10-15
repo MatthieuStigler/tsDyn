@@ -10,7 +10,7 @@ Maximum-likelihood test of the cointegrating rank.
 }
 
 \usage{
-rank.test(vecm, type=c("trace", "eigen"), r_null, cval=0.05)
+rank.test(vecm, type=c("eigen", "trace"), r_null, cval=0.05)
 \method{print}{rank.test}(x,...)
 \method{summary}{rank.test}(object,...)
 }
@@ -77,20 +77,20 @@ ve <- VECM(barry, lag=1, estim="ML")
 
 ## specific test:
 ve_test_spec <- rank.test(ve, r_null=1)
-ve_test_spec_eig <- rank.test(ve, r_null=1, type="eigen")
+ve_test_spec_tr <- rank.test(ve, r_null=1, type="trace")
 
 ve_test_spec
-ve_test_spec_eig
+ve_test_spec_tr
 
 ## No specific test: automatic method
 ve_test_unspec <- rank.test(ve)
-ve_test_unspec_eig <- rank.test(ve, type="eigen")
+ve_test_unspec_tr <- rank.test(ve, type="trace")
 
 ve_test_unspec
-ve_test_unspec_eig
+ve_test_unspec_tr
 
 ## summary method: output will be same for all types/test procedure:
-summary(ve_test_unspec_eig)
+summary(ve_test_unspec_tr)
 
 ## The function works for many specification of the VECM(), try:
 rank.test(VECM(barry, lag=3, estim="ML"))
@@ -105,5 +105,6 @@ rank.test(VECM(barry, lag=3, LRinclude="const",estim="ML"))
 \keyword{ ts }
 \keyword{ VECM }
 \keyword{ cointegration }
+\keyword{ Rank test}
 
 
