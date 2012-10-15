@@ -82,7 +82,7 @@ An object of class \sQuote{rank.test}, with \sQuote{print} and \sQuote{summary m
 \section{Comparison with urca}{
   While \code{\link[urca]{ca.jo}} in package \pkg{urca} and \code{rank.test} both implement Johansen tests, there are a few differences:
 
-  \begin{itemize}{
+  \itemize{
     \item \code{rank.test} gives p-values, while \code{ca.jo} gives only critical values. 
     \item \code{rank.test} allows for five different specifications of deterministic terms (see above), \code{ca.jo} for only three. 
     \item \code{ca.jo} allows for seasonal and exogenous regressors, which is not available in \code{rank.test}. 
