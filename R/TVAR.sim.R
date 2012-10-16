@@ -32,12 +32,13 @@ if(!missing(B)){
   nB<-nrow(B)
   ndig<-4
   esp<-p*nB+ninc 
-  if(esp*(nthresh+1)!=ncol(B))
-    stop("Matrix B bad specified")
+  if(esp*(nthresh+1)!=ncol(B)){
+    stop("Matrix B badly specified: expected ", esp*(nthresh+1), " elements ( (lag*K+ n inc)* (nthresh+1) ) but has ", ncol(B), "\n" )
+  }
   y<-matrix(0,ncol=nB, nrow=n)
   if(!is.null(starting)){
     if(all(dim(as.matrix(starting))==c(p,nB)))
-      y[seq_len(p),]<-starting
+      y[seq_len(p),]<- as.matrix(starting)
     else
       stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables")
   }
