@@ -11,7 +11,7 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
   for(i in 1:lag.max){
     models_list[[i]] <- list()
     if(sameSample){
-    data_cut <- if(i==lag.max) data else data[-c(1:(lag.max-i)),]
+      data_cut <- if(i==lag.max) data else data[-c(1:(lag.max-i)),]
     } else {
       data_cut <- data
     }
@@ -23,7 +23,7 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
     if(r.max>0){
       for(j in 1:r.max){
 	models_list[[i]][[j+1]] <- try(VECM(data_cut, lag=i, r=j, estim="ML"), silent=TRUE)
-	if(inherits(models_list[[i]][[j+1]], "try-error")) models_list[[i]][[j+1]] <- FALSE
+	if(inherits(models_list[[i]][[j+1]], "try-error")) models_list[[i]][[j+1]] <- NA
       }
       ## VAR: full rank
       models_list[[i]][[r.max+2]] <- try(lineVar(data_cut, lag=i+1, I="level"), silent=TRUE)
@@ -31,28 +31,29 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
   }
 
   logLik.logical <- function(x) NA
-
+  if_nona <- function(x, fun,...) if(inherits(x, "VAR")) fun(x,...) else NA
 
   AICs <- matrix(sapply(models_list, function(x) sapply(x,function(x) if(inherits(x, "VAR")) AIC(x,fitMeasure=fitMeasure) else NA)), ncol=lag.max)
-  HCs <- matrix(sapply(models_list, function(x) sapply(x,function(model) AIC(model, k=2*log(log(model$t)),fitMeasure=fitMeasure))), ncol=lag.max)
-  LLs <- matrix(sapply(models_list, function(x) sapply(x,logLik)), ncol=lag.max)
-  BICs <- matrix(sapply(models_list, function(x) sapply(x,BIC, fitMeasure=fitMeasure)), ncol=lag.max)
+  AICs <- matrix(sapply(models_list, function(x) sapply(x,function(x) if_nona(x,AIC, fitMeasure=fitMeasure))), ncol=lag.max)
+  HQs <- matrix(sapply(models_list, function(x) sapply(x,function(x) if_nona(x,AIC, fitMeasure=fitMeasure,k=2*log(log(x$t))))), ncol=lag.max)
+  LLs <- matrix(sapply(models_list, function(x) sapply(x,function(x) if_nona(x,logLik))), ncol=lag.max)
+  BICs <- matrix(sapply(models_list, function(x) sapply(x,function(x) if_nona(x,BIC, fitMeasure=fitMeasure))), ncol=lag.max)
 
   names_mats <- list(paste("r", 0:(r.max+min(r.max,1)), sep="="), paste("lag", 1:lag.max, sep="="))
-  dimnames(AICs) <- dimnames(BICs) <- dimnames(LLs) <- dimnames(HCs)<- names_mats
+  dimnames(AICs) <- dimnames(BICs) <- dimnames(LLs) <- dimnames(HQs)<- names_mats
 
 ## Best values:
-  AIC_min <- which(AICs==min(AICs),arr.ind=TRUE)
-  BIC_min <- which(BICs==min(BICs),arr.ind=TRUE)
-  HC_min <- which(HCs==min(HCs),arr.ind=TRUE)
+  AIC_min <- which(AICs==min(AICs, na.rm=TRUE),arr.ind=TRUE)
+  BIC_min <- which(BICs==min(BICs, na.rm=TRUE),arr.ind=TRUE)
+  HQ_min <- which(HQs==min(HQs, na.rm=TRUE),arr.ind=TRUE)
 
 ## Best rank:
-  best_ranks1 <- sapply(list(AIC_min, BIC_min, HC_min), rownames)
+  best_ranks1 <- sapply(list(AIC_min, BIC_min, HQ_min), rownames)
   best_ranks <- as.numeric(gsub("r=", "", best_ranks1))
-  names(best_ranks) <- c("AIC", "BIC", "HC")
+  names(best_ranks) <- c("AIC", "BIC", "HQ")
 
 ## return result
-  res <- list(AICs=AICs, BICs=BICs, HCs=HCs, AIC_min=AIC_min, HC_min=HC_min, BIC_min=BIC_min, LLs=LLs, best_ranks=best_ranks)
+  res <- list(AICs=AICs, BICs=BICs, HQs=HQs, AIC_min=AIC_min, HQ_min=HQ_min, BIC_min=BIC_min, LLs=LLs, best_ranks=best_ranks)
   class(res ) <- "rank.select"
   return(res)
 
@@ -67,11 +68,11 @@ print.rank.select <- function(x,...){
 
   AIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$AIC_min[1,1]-1)
   BIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$BIC_min[1,1]-1)
-  HC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$HC_min[1,1]-1)
+  HQ_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$HQ_min[1,1]-1)
 
   cat("Best AIC:", AIC_rank_info,  " lag=", x$AIC_min[1,2],  "\n")
   cat("Best BIC:", BIC_rank_info, " lag=", x$BIC_min[1,2],  "\n")
-  cat("Best HC :",  HC_rank_info, " lag=", x$HC_min[1,2],  "\n")
+  cat("Best HQ :",  HQ_rank_info, " lag=", x$HQ_min[1,2],  "\n")
 }
 
 summary.rank.select <- function(object,...){
@@ -81,10 +82,10 @@ summary.rank.select <- function(object,...){
   cat("\nBest number of lags:\n")
   AIC_minlag<-apply(object$AICs, 1, which.min)
   BIC_minlag<-apply(object$BICs, 1, which.min)
-  HC_minlag<-apply(object$BICs, 1, which.min)
+  HQ_minlag<-apply(object$BICs, 1, which.min)
 
-  mat <- rbind(AIC_minlag, BIC_minlag,HC_minlag)
-  dimnames(mat) <- list(c("AIC", "BIC", "HC"), paste("r", if(nrow(object$BICs)==1) 0 else 0:(nrow(object$BICs)-1), sep="="))
+  mat <- rbind(AIC_minlag, BIC_minlag,HQ_minlag)
+  dimnames(mat) <- list(c("AIC", "BIC", "HQ"), paste("r", if(nrow(object$BICs)==1) 0 else 0:(nrow(object$BICs)-1), sep="="))
   print(mat)
 }
 
@@ -135,8 +136,85 @@ AIC(v)
 
 
 
-###
-rank.select(Canada, lag.max=3)$LLs
+### Get AIC from one model?
+ve <- VECM(Canada, lag=2, estim="ML")
+var_r0 <- lineVar(Canada, lag=2, I="diff")
+var_rk_a <- lineVar(Canada, lag=3, I="level")
+
+
+logLiks <- Vectorize(logLik.VECM, vectorize.args="r")
+AICs <- Vectorize(tsDyn:::AIC.VECM, vectorize.args="r")
+
+logLiks(ve, r=0:3)
+AICs(ve, r=0:3, fitMeasure="LL")
+
+### rank 0
+logLik(ve, r=0)
+logLik(var_r0)
+AIC(ve, r=0, fitMeasure="LL")
+AIC(var_r0, fitMeasure="LL")
+
+## rank 1:3
+logLik(ve, r=1)
+logLik(ve, r=2)
+logLik(ve, r=3)
+
+## rank 4
+logLik(ve, r=4)
+logLik(var_rk_a)
+AIC(ve, r=4, fitMeasure="LL")
+AIC(var_rk_a, fitMeasure="LL")
+
+AIC(ve, r=4, fitMeasure="SSR")
+AIC(var_rk_a, fitMeasure="SSR")
+
+(AIC(var_rk_a, fitMeasure="LL")-AIC(ve, r=3, fitMeasure="LL"))/AIC(ve, r=3, fitMeasure="LL")
+(AIC(var_rk_a, fitMeasure="SSR")-AIC(ve, r=3, fitMeasure="SSR"))/AIC(ve, r=3, fitMeasure="SSR")
+
+AIC(VECM(Canada, lag=1, r=1, estim="ML"), r=2)
+AIC(VECM(Canada, lag=1, r=2, estim="ML"))
+
+AIC(VECM(Canada, lag=1, r=1, estim="ML"), r=2, fitMeasure="LL")
+AIC(VECM(Canada, lag=1, r=2, estim="ML"), fitMeasure="LL")
+
+####
+ve_r1 <- VECM(Canada, lag=1, r=1, estim="ML")
+ve_r2 <- VECM(Canada, lag=1, r=2, estim="ML")
+ve_r3 <- VECM(Canada, lag=1, r=3, estim="ML")
+var_r4 <- lineVar(Canada, lag=2, I="level")
+
+AIC(ve_r1)-AIC(ve_r2)
+AIC(ve_r1, fitMeasure="LL")-AIC(ve_r2, fitMeasure="LL")
+AIC(ve_r1, fitMeasure="LL")-AIC(ve_r1,r=2, fitMeasure="LL")
+
+AIC(var_r4)-AIC(ve_r3)
+AIC(var_r4, fitMeasure="LL")-AIC(ve_r3, fitMeasure="LL")
+AIC(ve_r3,r=4, fitMeasure="LL")-AIC(ve_r3, fitMeasure="LL")
+
+rs <- rank.select(Canada, lag.max=6)$AICs
+rs_LL <- rank.select(Canada, lag.max=6, fitMeasure="LL")$AICs
+all.equal(rs[1,]-rs[2,], rs_LL[1,]-rs_LL[2,])
+all.equal(rs[2,]-rs[3,], rs_LL[2,]-rs_LL[3,])
+all.equal(rs[3,]-rs[4,], rs_LL[3,]-rs_LL[4,])
+all.equal(rs[4,]-rs[5,], rs_LL[4,]-rs_LL[5,])
+
+
+rank.select(Canada, lag.max=6, sameSample=FALSE)$AICs
+AICs(VECM(Canada, lag=2, estim="ML"), r=0:4)
+
+rank.select(Canada, lag.max=6, sameSample=FALSE, fitMeasure="LL")$AICs
+AICs(VECM(Canada, lag=2, estim="ML"), r=0:4, fitMeasure="LL")
+
+
+
+
+
+
+tsDyn:::npar.VECM(ve, r=4)
+tsDyn:::npar.nlVar(var_rk_a)
+
+-2*logLik(ve, r=3) +2*tsDyn:::npar.VECM(ve, r=3)
+-2*logLik(var_rk_a) +2*(tsDyn:::npar.nlVar(var_rk_a)-1)
 
 ve_1 <- VECM(Canada, lag=1, r=1, estim="ML")
 round(ve_1$model.specific$lambda,5)
