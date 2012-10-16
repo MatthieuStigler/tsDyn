@@ -52,7 +52,7 @@ npar.VECM<-function(object, ..., r) {
   nVar<-object$k
   Rank<-if(missing(r)) object$model.specific$r else r
   slopePars <- prod(dim(coef(object)[,-grep("^ECT[0-9]*$", colnames(coef(object)))])) ## get numb of al params but the alpha (ECT)
-  nPar <- slopePars+2*nVar*Rank- Rank^2
+  nPar <- slopePars+2*nVar*Rank- Rank^2 ## formula: 2mr-r^2 (Cheng Phillips 2009, equ 1.2)
   return(nPar)
 }
 
