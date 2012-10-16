@@ -8,10 +8,15 @@ VARrep <- function(vecm) {
   k <- vecm$k
   r <- vecm$model.specific$r
   co <- vecm$coefficients
+  include <- vecm$include
+  LRinclude <- vecm$model.specific$LRinclude
 
 ##obtain matrices
+  betas <- vecm$model.specific$beta
+  if(LRinclude!="none") betas <- betas[1:k,, drop=FALSE]
+
   ## Pi matrix
-  Pi <-  co[, grep("ECT", colnames(co))]%*%t(vecm$model.specific$beta)
+  Pi <-  co[, grep("ECT", colnames(co))]%*%t(betas)
   ## A_i matrix
   Amat <- matrix(NA, nrow=k, ncol=lag*(k)+k)
 
@@ -32,10 +37,23 @@ VARrep <- function(vecm) {
   colnames(Amat) <- paste(rep(varNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
 
 ## Add deterministic terms
-  if(vecm$include!="none"){
+  if(include!="none"){
     incName <- switch(vecm$include, "const"="Intercept", trend="Trend", both="Intercept|Trend")
-    Amat <- cbind(co[,grep(incName , colnames(co)),drop=FALSE],Amat)
+    incVar <- co[,grep(incName , colnames(co)),drop=FALSE]
+    if(LRinclude!="none"){
+      Pi_all <-  co[, grep("ECT", colnames(co))]%*%t(vecm$model.specific$beta)
+      Pi_deter <- Pi_all[,"trend", drop=FALSE]
+      colnames(Pi_deter) <- "Trend"
+      Amat <- cbind(Pi_deter,Amat)
+    }
+    Amat <- cbind(incVar,Amat)
     colnames(Amat) <- gsub("Intercept", "constant", colnames(Amat))
+    
+  } else if(LRinclude!="none"){
+    Pi_all <-  co[, grep("ECT", colnames(co))]%*%t(vecm$model.specific$beta)
+    Pi_deter <- Pi_all[,switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend")), drop=FALSE]
+    colnames(Pi_deter) <- switch(LRinclude, "const"="constant", "trend"="Trend", "both"=c("constant", "Trend"))
+    Amat <- cbind(Pi_deter,Amat)
   }
   rownames(Amat) <- gsub("Equation ","",rownames(co))
 ## res
@@ -66,7 +84,6 @@ vec2var.tsDyn <- function(x){
   colnames(co) <- gsub("Intercept","constant", colnames(co))
 
 ## detcoeffs
-  if(x$include=="none") warning("Not sure implemented\n")
   detcoeffs <- co[,grep("constant|Trend", colnames(co)), drop=FALSE]
 
 ## A
@@ -78,7 +95,6 @@ vec2var.tsDyn <- function(x){
   rank <- if(model=="VECM") x$model.specific$r else K
 
 ## vecm
-#   setClass("ca.jo", representation(season="ANY", dumvar="ANY",ecdet="character", lag="integer", spec="character"))
   ecdet <- if(inherits(x,"VAR")) "none" else x$model.specific$LRinclude
   vecm<- new("ca.jo", season = NULL, dumvar=NULL, ecdet=ecdet,lag=as.integer(lag),spec="transitory")
 
@@ -191,13 +207,32 @@ all.equal(predict(VECM_tsD)$endog,predict(VECM_vars)$endog)
 data(denmark)
 dat_examp <- denmark[,2:3]
 
-vec2var.tsDyn(VECM(dat_examp, lag=1, include="const", estim="ML"))
-  vec1 <- vec2var(ca.jo(dat_examp,  K=2, spec="transitory"))$A
-  cbind(vec1$A1, vec1$A2)
 
-vec2var.tsDyn(VECM(dat_examp, lag=2, include="const", estim="ML"))
-vec2 <- vec2var(ca.jo(dat_examp,  K=3, spec="transitory"))$A
-  cbind(vec2$A1, vec2$A2, vec2$A3)
+toVARrep <- function(ca.jo){
+  vec2<- vec2var(ca.jo)
+  lags <- vec2$A[[1]]
+  if(length(vec2$A)>1) for(i in 2:length(vec2$A)) lags <- cbind(lags, vec2$A[[i]])
+  cbind(vec2$deterministic,lags)
+}
+
+toVARrep(ca.jo=ca.jo(dat_examp,  K=2, spec="transitory"))
+
+VARrep(VECM(dat_examp, lag=1, include="const", estim="ML"))
+toVARrep(ca.jo(dat_examp,  K=2, spec="transitory"))
+
+all.equal(VARrep(VECM(dat_examp, lag=1, include="const", estim="ML")), toVARrep(ca.jo(dat_examp,  K=2, spec="transitory")), check.attributes=FALSE)
+all.equal(VARrep(VECM(dat_examp, lag=2, include="const", estim="ML")), toVARrep(ca.jo(dat_examp,  K=3, spec="transitory")), check.attributes=FALSE)
+
+all.equal(VARrep(VECM(dat_examp, lag=1, LRinclude="const", estim="ML")), toVARrep(ca.jo(dat_examp,  K=2, spec="transitory", ecdet="const")), check.attributes=FALSE)
+all.equal(VARrep(VECM(dat_examp, lag=2, LRinclude="const", estim="ML")), toVARrep(ca.jo(dat_examp,  K=3, spec="transitory", ecdet="const")), check.attributes=FALSE)
+
+all.equal(VARrep(VECM(dat_examp, lag=1, LRinclude="trend", estim="ML")), toVARrep(ca.jo(dat_examp,  K=2, spec="transitory", ecdet="trend")), check.attributes=FALSE)
+all.equal(VARrep(VECM(dat_examp, lag=2, LRinclude="trend", estim="ML")), toVARrep(ca.jo(dat_examp,  K=3, spec="transitory", ecdet="trend")), check.attributes=FALSE)
+
+all.equal(VARrep(VECM(Canada, lag=1, LRinclude="trend", estim="ML")), toVARrep(ca.jo(Canada,  K=2, spec="transitory", ecdet="trend")), check.attributes=FALSE)
+VECM(Canada, lag=1, LRinclude="trend", estim="ML")
+cajorls(ca.jo(Canada,  K=2, spec="transitory", ecdet="trend"))$rlm
+
 
 
 #### compare slots: VECM

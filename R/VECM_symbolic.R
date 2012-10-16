@@ -52,6 +52,7 @@ VECM_symbolic <- function(alpha, beta, lags, inc, include = c("none", "const", "
   res$model.specific$beta <- beta
   res$coefficients <- co
   res$include <- include
+  res$model.specific$LRinclude <- "none"
 
   return(res)
 }
@@ -64,12 +65,12 @@ if(FALSE){
   a<-matrix(c(-0.4, 0.1), ncol=1)
   b<-matrix(c(1, -2), ncol=2)
 
-  # VECM_symb(alpha=a, beta=t(b))
-  d<- VECM_symb(alpha=a, beta=t(b))
+  # VECM_symbolic(alpha=a, beta=t(b))
+  d<- VECM_symbolic(alpha=a, beta=t(b))
   VARrep(d)
-  d<- VECM_symb(alpha=a, beta=t(b), lags=matrix(0, ncol=2, nrow=2))
+  d<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(0, ncol=2, nrow=2))
   VARrep(d)
-  d3<- VECM_symb(alpha=a, beta=t(b), lags=matrix(c(0.1, 0.3, 0.1, 0.2), ncol=2, nrow=2), inc=matrix(c(0.5, 0.1), ncol=1), include="const")
+  d3<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(c(0.1, 0.3, 0.1, 0.2), ncol=2, nrow=2), inc=matrix(c(0.5, 0.1), ncol=1), include="const")
   VARrep(d3)
 
 
