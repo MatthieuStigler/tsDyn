@@ -96,6 +96,17 @@ summary(r.test_VECM4)
 summary(r.test_VECM5)
 summary(r.test_VECM6)
 
+### rank select
+data(barry)
+r_sel <- rank.select(barry)
+r_sel_tre <- rank.select(barry, include="trend")
+
+r_sel$LLs
+r_sel$AICs
+
+r_sel_tre$LLs
+r_sel_tre$AICs
+
 ###############################################################
 ### Check Johansen MLE: comparing with vars package
 ###############################################################

@@ -162,7 +162,7 @@ predict2 <- function(vecm, n.ahead){
   tail(res, n.ahead)
 }
 
-predict2(vec1, n.ahead=5)
+
 
 
 ############################################################
@@ -177,6 +177,7 @@ library(tsDyn)
 data(zeroyld)
 vec1 <- VECM(zeroyld, lag=2, estim="ML")
 predict(vec1 )
+predict2(vec1, n.ahead=5)
 fevd(vec1 )
 irf(vec1 )
 
