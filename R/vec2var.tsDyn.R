@@ -150,6 +150,21 @@ fevd.VECM <- function(x, n.ahead=10, ...){
 }
 
 
+predict2 <- function(vecm, n.ahead){
+  lag <- vecm$lag
+  k <- vecm$k
+  B <- VARrep(vecm)
+  original.data <- vecm$model[,1:k]
+  starting <- if(is.data.frame(original.data)|is.matrix(original.data)) tail(original.data,lag+1) else if(is.ts(original.data)) apply(original.data,2,head,lag+1)
+  innov <- matrix(0, nrow=n.ahead+lag+1, ncol=k)
+  res <- VAR.sim(B=B, lag=lag+1, n=n.ahead+lag+1, starting=starting, innov=innov)
+  colnames(res) <- colnames(original.data )
+  tail(res, n.ahead)
+}
+
+predict2(vec1, n.ahead=5)
+
+
 ############################################################
 #################### EXAMPLES, tests
 ############################################################
