@@ -1,0 +1,56 @@
+\name{lag.select}
+\alias{lag.select}
+
+\title{Selection of the lag with Information criterion.}
+
+\description{
+Selection of the cointegrating rank and the lags with Information criterion (AIC, BIC).
+}
+
+\usage{
+lag.select(data, lag.max=10, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE)
+}
+
+
+\arguments{
+\item{data}{multivariate time series.}
+\item{lag.max}{Maximum number of lags to investigate.}
+\item{include}{Type of deterministic regressors to include. For now only intercept. }
+\item{fitMeasure}{Whether the AIC/BIC should be based on the full likelihood, or just the SSR. See explanations in \code{\link{logLik.VECM}}.}
+\item{sameSample}{Logical. Whether the data should be shortened so that the AIC/BIC are estimated on the same sample. Default to TRUE. }
+}
+
+\details{
+This function selects the lag according to AIC, BIC and Hannan-Quinn. 
+}
+
+\value{
+An object of class \code{\link{rank.select}}, with \sQuote{print} and \sQuote{summary methods}, containing among other the matrices of AIC/BIC/HQ. 
+}
+
+
+\seealso{
+\code{\link{rank.select}}, the underlying function, to estimate the rank also. 
+
+\code{\link[urca]{VARselect}} in package \pkg{urca}, does basically the same. 
+}
+
+\author{Matthieu Stigler}
+
+
+\examples{
+
+data(barry)
+
+# 
+rk_sel <- lag.select(barry)
+rk_sel
+summary(rk_sel)
+
+}
+
+\keyword{ ts }
+\concept{ AIC }
+\concept{ Lag selection }
+
+
