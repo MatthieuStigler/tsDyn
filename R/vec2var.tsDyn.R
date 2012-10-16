@@ -126,11 +126,11 @@ vec2var.tsDyn <- function(x){
 ############################################################
 
 predict.VAR <- function(object,...){
- predict(vec2var.tsDyn(object))
+ predict(vec2var.tsDyn(object), ...)
 }
 
 predict.VECM <- function(object,...){
- predict(vec2var.tsDyn(object))
+ predict(vec2var.tsDyn(object), ...)
 }
 
 irf.VAR <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
@@ -164,6 +164,8 @@ vec1 <- VECM(zeroyld, lag=2, estim="ML")
 predict(vec1 )
 fevd(vec1 )
 irf(vec1 )
+
+
 
 
 ### Comparisons
