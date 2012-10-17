@@ -1,13 +1,15 @@
 
 
-rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE, returnModels=FALSE) {
+rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE, returnModels=FALSE) {
 
   fitMeasure <- match.arg(fitMeasure)
+  include <- match.arg(include)
 
   models_list <- list()
 
   VARtype <- if(r.max==0) "level" else "diff"
 
+## Loop to get each model:
   for(i in 1:lag.max){
     models_list[[i]] <- list()
     if(sameSample){
@@ -16,17 +18,17 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
       data_cut <- data
     }
   ## VAR: rank 0 (on diffs)
-    models_list[[i]][[1]] <- try(lineVar(data_cut, lag=i, I=VARtype ), silent=TRUE)
+    models_list[[i]][[1]] <- try(lineVar(data_cut, lag=i, I=VARtype, include=include ), silent=TRUE)
     if(inherits(models_list[[i]][[1]], "try-error")) models_list[[i]][[1]] <- NA
 
   ## VECM: rank 1 to k-1
     if(r.max>0){
       for(j in 1:r.max){
-	models_list[[i]][[j+1]] <- try(VECM(data_cut, lag=i, r=j, estim="ML"), silent=TRUE)
+	models_list[[i]][[j+1]] <- try(VECM(data_cut, lag=i, r=j, estim="ML", include=include), silent=TRUE)
 	if(inherits(models_list[[i]][[j+1]], "try-error")) models_list[[i]][[j+1]] <- NA
       }
       ## VAR: full rank
-      models_list[[i]][[r.max+2]] <- try(lineVar(data_cut, lag=i+1, I="level"), silent=TRUE)
+      models_list[[i]][[r.max+2]] <- try(lineVar(data_cut, lag=i+1, I="level", include=include), silent=TRUE)
     }
   }
 

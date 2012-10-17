@@ -100,6 +100,8 @@ summary(r.test_VECM6)
 data(barry)
 r_sel <- rank.select(barry)
 r_sel_tre <- rank.select(barry, include="trend")
+r_sel_none <- rank.select(barry, include="none")
+r_sel_both <- rank.select(barry, include="both")
 
 r_sel$LLs
 r_sel$AICs
@@ -107,6 +109,11 @@ r_sel$AICs
 r_sel_tre$LLs
 r_sel_tre$AICs
 
+r_sel_none$LLs
+r_sel_none$AICs
+
+r_sel_both$LLs
+r_sel_both$AICs
 ###############################################################
 ### Check Johansen MLE: comparing with vars package
 ###############################################################
