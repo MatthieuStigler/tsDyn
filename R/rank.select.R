@@ -1,6 +1,6 @@
 
 
-rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
+rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE, returnModels=FALSE) {
 
   fitMeasure <- match.arg(fitMeasure)
 
@@ -58,6 +58,7 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
 
 ## return result
   res <- list(AICs=AICs, BICs=BICs, HQs=HQs, AIC_min=AIC_min, HQ_min=HQ_min, BIC_min=BIC_min, LLs=LLs, best_ranks=best_ranks)
+  res$models_list <-  if(returnModels) models_list else NULL
   class(res ) <- "rank.select"
   return(res)
 
