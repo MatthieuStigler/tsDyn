@@ -46,6 +46,10 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include="intercept
   AIC_min <- which(AICs==min(AICs, na.rm=TRUE),arr.ind=TRUE)
   BIC_min <- which(BICs==min(BICs, na.rm=TRUE),arr.ind=TRUE)
   HQ_min <- which(HQs==min(HQs, na.rm=TRUE),arr.ind=TRUE)
+  AIC_min[1,1] <- AIC_min[1,1]-1
+  BIC_min[1,1] <- BIC_min[1,1]-1
+  HQ_min[1,1] <- HQ_min[1,1]-1
+  colnames(AIC_min) <- colnames(BIC_min) <- colnames(HQ_min) <- c("rank", "lag")
 
 ## Best rank:
   best_ranks1 <- sapply(list(AIC_min, BIC_min, HQ_min), rownames)
@@ -66,13 +70,13 @@ lag.select <- function(data, lag.max=10, include="intercept", fitMeasure=c("SSR"
 
 print.rank.select <- function(x,...){
 
-  AIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$AIC_min[1,1]-1)
-  BIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$BIC_min[1,1]-1)
-  HQ_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$HQ_min[1,1]-1)
+  AIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$AIC_min[1,"rank"])
+  BIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$BIC_min[1,"rank"])
+  HQ_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$HQ_min[1,"rank"])
 
-  cat("Best AIC:", AIC_rank_info,  " lag=", x$AIC_min[1,2],  "\n")
-  cat("Best BIC:", BIC_rank_info, " lag=", x$BIC_min[1,2],  "\n")
-  cat("Best HQ :",  HQ_rank_info, " lag=", x$HQ_min[1,2],  "\n")
+  cat("Best AIC:", AIC_rank_info,  " lag=", x$AIC_min[1,"lag"],  "\n")
+  cat("Best BIC:", BIC_rank_info, " lag=", x$BIC_min[1,"lag"],  "\n")
+  cat("Best HQ :",  HQ_rank_info, " lag=", x$HQ_min[1,"lag"],  "\n")
 }
 
 summary.rank.select <- function(object,...){
