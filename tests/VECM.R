@@ -84,12 +84,11 @@ sapply(vecm_all, function(x) x$model.specific$beta)
 lapply(vecm_all, VARrep)
 
 ### fevd
-vecm_fevd <- vecm_all[-grep("l1_LRco|l1_LRtr|l1_LRbo", names(vecm_all))] ## does not work for these models
-lapply(vecm_fevd, fevd)
+lapply(vecm_all, function(x) sapply(fevd(x, n.ahead=2), head))
 
 ### irf
-vecm_fevd <- vecm_all[-grep("l1_no|l1_LRco|l1_LRtr|l1_LRbo", names(vecm_all))] ## does not work for these models
-lapply(vecm_fevd, function(x) sapply(irf(x, runs=1)$irf,head,2))
+vecm_irf <- vecm_all[-grep("l1_no|bo", names(vecm_all))] ## does not work for these models
+lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
