@@ -117,6 +117,7 @@ if(model=="VECM"&estim=="2OLS"){
 
 ## case beta pre-estimated
   } else {
+    if(length(beta)!=k-1) stop("Arg 'beta' should be of length k-1")
     if(LRinclude!="none")
       warning("Arg LRinclude not taken into account when beta is given by user")
       LRinc_name <- NULL
