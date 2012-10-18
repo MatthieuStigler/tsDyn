@@ -98,8 +98,26 @@ residuals.nlVar<-function(object,...){
 	object$residuals
 }
 
-fitted.nlVar<-function(object,...){
-	object$fitted
+
+fitted.nlVar <- function(object, level=c("model", "original"),...){
+
+  level <- match.arg(level)
+  mod <- ifelse(inherits(object, "VECM"), "VECM", "VAR")
+
+  if(mod=="VAR"&&level=="original" &&attr(object, "varsLevel")=="level"){
+    warning("level='original' has no effect for VAR models in levels")
+    level <- "model"
+  }
+
+  if(level=="model"){
+    res <- object$fitted
+  } else {
+    original.data <- object$model[,1:object$k]
+    series <- rbind(original.data[1,,drop=FALSE], object$fitted)
+    res <- apply(series, 2, cumsum)[-1,]
+  }
+
+  return(res)
 }
 
 coef.nlVar<-function(object,...){
