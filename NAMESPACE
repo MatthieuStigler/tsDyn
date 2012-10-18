@@ -25,7 +25,7 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
 	star, addRegime, 
        TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
 	MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, VECM.sim, regime, getTh,
-	TVECM.HStest,fevd, irf, VARrep, VECM_symbolic, rank.select, lag.select, rank.test)
+	TVECM.HStest,fevd, irf, VARrep, VECM_symbolic, rank.select, lags.select, rank.test)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)

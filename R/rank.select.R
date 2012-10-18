@@ -67,7 +67,7 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include = c( "cons
 }
 
 
-lag.select <- function(data, lag.max=10, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
+lags.select <- function(data, lag.max=10, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
   rank.select(data=data, lag.max=lag.max, r.max=0, include=include, fitMeasure=fitMeasure, sameSample=sameSample) 
 }
 
@@ -107,7 +107,7 @@ library(tsDyn)
 library(vars)
 data(Canada)
 
-lag.select <- tsDyn:::lag.select
+
 resu <- rank.select(Canada, sameSample=TRUE)
 resu
 resu$LLs
@@ -119,10 +119,10 @@ resu_LL
 summary(resu_LL)
 resu_LL$AICs
 
-resvar_SSR <- lag.select(Canada, fitMeasure="SSR")
+resvar_SSR <- lags.select(Canada, fitMeasure="SSR")
 resvar_SSR
 summary(resvar_SSR)
-resvar_LL <- lag.select(Canada, fitMeasure="LL")
+resvar_LL <- lags.select(Canada, fitMeasure="LL")
 resvar_LL
 
 

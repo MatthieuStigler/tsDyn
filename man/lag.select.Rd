@@ -1,5 +1,5 @@
-\name{lag.select}
-\alias{lag.select}
+\name{lags.select}
+\alias{lags.select}
 
 \title{Selection of the lag with Information criterion.}
 
@@ -8,7 +8,7 @@ Selection of the cointegrating rank and the lags with Information criterion (AIC
 }
 
 \usage{
-lag.select(data, lag.max=10, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE)
+lags.select(data, lag.max=10, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE)
 }
 
 
@@ -43,7 +43,7 @@ An object of class \code{\link{rank.select}}, with \sQuote{print} and \sQuote{su
 data(barry)
 
 # 
-rk_sel <- lag.select(barry)
+rk_sel <- lags.select(barry)
 rk_sel
 summary(rk_sel)
 
