@@ -2,7 +2,7 @@
 \alias{autotriples}
 \title{Trivariate time series plots}
 \description{
-Trivariate time series plots: kernel autoregression using functions in the 'sm' package
+Trivariate time series plots: kernel autoregression using functions in the \pkg{sm} package
 }
 \usage{
 autotriples(x, lags=1:2, h,

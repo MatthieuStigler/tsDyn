@@ -20,7 +20,7 @@ This function displays interactive trivariate time series plots
 None. A plot is produced on the current \code{rgl} device.
 }
 \seealso{
-\code{\link{autotriples}} for 3d visualization via \code{scatterplot3d} package and for kernel post-processing of the cloud for nonparametric autoregression functions estimates.
+\code{\link{autotriples}} for 3d visualization via \pkg{scatterplot3d} package and for kernel post-processing of the cloud for nonparametric autoregression functions estimates.
 }
 \examples{
 if(interactive())

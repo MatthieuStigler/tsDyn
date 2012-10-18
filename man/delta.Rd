@@ -29,9 +29,9 @@ Results are sensible to the choice of the window \code{eps}. So, try the test fo
 delta(log10(lynx), m=3, eps=sd(log10(lynx)))
 }
 \seealso{
-BDS marginal independence test: \code{\link[tseries]{bds.test}} in package \code{tseries}
+BDS marginal independence test: \code{\link[tseries]{bds.test}} in package \pkg{tseries}
 
-Teraesvirta's neural network test for nonlinearity: \code{\link[tseries]{terasvirta.test}} in package \code{tseries}
+Teraesvirta's neural network test for nonlinearity: \code{\link[tseries]{terasvirta.test}} in package \pkg{tseries}
 
 delta test for nonlinearity: \code{\link{delta.lin.test}}
 }

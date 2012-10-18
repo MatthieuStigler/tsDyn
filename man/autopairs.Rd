@@ -33,7 +33,7 @@ None. Plots are produced on the default graphical device.
 \seealso{
 For finer control on density estimation, consider using directly 
 \code{\link[sm]{sm.density}} and, especially, 
-\code{\link[sm]{sm.ts.pdf}} from package \code{\link[sm]{sm}}.
+\code{\link[sm]{sm.ts.pdf}} from package \pkg{sm}.
 }
 \examples{
 x <- log10(lynx)

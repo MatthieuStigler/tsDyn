@@ -14,7 +14,7 @@
 \encoding{latin1}
 
 \description{
-  Use the \code{fevd} function from package \code{vars} to tompute the impulse response coefficients 
+  Use the \code{fevd} function from package \pkg{vars} to tompute the impulse response coefficients 
   of a VAR(p) (or transformed VECM to VAR(p)) for \code{n.ahead} steps. 
 }
 

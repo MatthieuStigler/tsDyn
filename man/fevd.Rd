@@ -11,7 +11,7 @@
 \encoding{latin1}
 
 \description{
-  Use the \code{fevd} function from package \code{vars} to compute the forecast error variance decomposition 
+  Use the \code{fevd} function from package \pkg{vars} to compute the forecast error variance decomposition 
   of a VAR(p) or VECM for \code{n.ahead} steps. 
 }
 
@@ -31,7 +31,7 @@
 \details{
 The function converts the VAR or VECM computed by package tsDyn into 
 an object of class \sQuote{\code{vec2var}}, on which then the \code{\link[vars]{fevd}}
-method is applied. For details, see the relevant package. 
+method is applied. For details, see  package \pkg{vars}. 
   
 }
 
