@@ -91,41 +91,42 @@ else if(include=="both")
 if(model=="VECM"&estim=="2OLS"){
 	#beta has to be estimated
   beta.estimated<-if(is.null(beta)) TRUE else FALSE
-  if(is.null(beta) ){  
+  if(is.null(beta) ){
+
+  ## build LRplus: deterministic/exogeneous regressor in coint
     if(class(LRinclude)=="character"){
-      LRplus<-switch(LRinclude, "none"=rep(0,T),"const"=rep(1,T),"trend"=seq_len(T),"both"=rep(1,T),seq_len(T))
-    }
-    else if(class(LRinclude)%in%c("matrix", "numeric"))
+      LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
+      LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
+      LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
+    } else if(class(LRinclude)%in%c("matrix", "numeric")) {
       LRplus<-LRinclude
-    else
+    } else{
       stop("Argument LRinclude badly given")
-    if(class(LRinclude)=="character") {
-      if(LRinclude=="none"){
-        LRplusplus<-matrix(0, nrow=T, ncol=1)
-        cointLM<-lm(y[,1] ~  y[,-1]-1)
-      } else{
-        cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-        LRplusplus<-as.matrix(LRplus)%*%cointLM$coef[-1]
-      }
     }
-    else{
+  ## run coint regression
+    if(LRinclude=="none"){
+      cointLM<-lm(y[,1] ~  y[,-1]-1)
+    } else {
       cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-      LRplusplus<-as.matrix(LRplus)%*%cointLM$coef[-1]
+      Xminus1 <- cbind(Xminus1, tail(LRplus,nrow(Xminus1)))
     }
     
-    betaLT<-coint<-c(1,-cointLM$coef[1:(k-1)])
-    betaLT_std <- c(1,summary(cointLM)$coef[1:(k-1),2])
-    names(betaLT_std)<-colnames(data)
-  }
-else{
+    betaLT<-coint<-c(1,-cointLM$coef)
+    betaLT_std <- c(1,summary(cointLM)$coef[,2])
+    names(betaLT_std)<-c(colnames(data), LRinc_name)
+
+## case beta pre-estimated
+  } else {
     if(LRinclude!="none")
       warning("Arg LRinclude not taken into account when beta is given by user")
+      LRinc_name <- NULL
+      LRinc_dim <- 0
     coint<-c(1, -beta)
     betaLT<-c(1,-beta)
   }
 
-  coint_export<-matrix(coint, nrow=k, dimnames=list(colnames(data),"r1"))
-  betaLT<-matrix(betaLT, nrow=k, dimnames=list(colnames(data),"r1"))
+  coint_export<-matrix(coint, nrow=k+LRinc_dim , dimnames=list(c(colnames(data),LRinc_name), "r1"))
+  betaLT<-matrix(betaLT, nrow=k+LRinc_dim , dimnames=list(c(colnames(data),LRinc_name),"r1"))
   ECTminus1<-Xminus1%*%betaLT
   Z<-cbind(ECTminus1,Z)
 }
