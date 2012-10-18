@@ -32,7 +32,7 @@ An object of class \code{\link{rank.select}}, with \sQuote{print} and \sQuote{su
 \seealso{
 \code{\link{rank.select}}, the underlying function, to estimate the rank also. 
 
-\code{\link[urca]{VARselect}} in package \pkg{urca}, does basically the same. 
+\code{\link[vars]{VARselect}} in package \pkg{vars}, does basically the same. 
 }
 
 \author{Matthieu Stigler}
