@@ -1,100 +1,109 @@
 library(tsDyn)
+
+
 data(zeroyld)
+data(barry)
 
 
 
 
 ## Test a few VECM models
-myVECM1 <-VECM(zeroyld, lag=1)
-myVECM2 <-VECM(zeroyld, lag=3, include="const")
-myVECM2a<-VECM(zeroyld, lag=3, include="const", beta=-1)
-myVECM3 <-VECM(zeroyld, lag=1, estim="ML")
-myVECM4 <-VECM(zeroyld, lag=3, estim="ML")
-myVECM5 <-VECM(zeroyld, lag=2, estim="ML", LRinclude="const")
-myVECM6 <-VECM(zeroyld, lag=2, estim="ML", LRinclude="trend")
-myVECM7 <-VECM(zeroyld, lag=2, estim="ML", LRinclude="both")
+vecm_OLS_l1_co <-VECM(barry, lag=1)
+vecm_OLS_l3_co <-VECM(barry, lag=3, include="const")
+vecm_OLS_l3_co_betaGiven<-VECM(barry, lag=3, include="const", beta=c(0.1, -0.05))
+vecm_OLS_l1_tr <-VECM(barry, lag=1, include="trend")
+vecm_OLS_l1_bo <-VECM(barry, lag=1, include="both")
+vecm_OLS_l1_no <-VECM(barry, lag=1, include="none")
+vecm_OLS_l1_LRco <-VECM(barry, lag=1, LRinclude="const")
+vecm_OLS_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend")
+vecm_OLS_l1_LRtr_noCo <-VECM(barry, lag=1, LRinclude="trend", include="none")
+vecm_OLS_l1_LRbo <-VECM(barry, lag=1, LRinclude="both")
+
+vecm_ML_l1_co <-VECM(barry, lag=1, estim="ML")
+vecm_ML_l3_co <-VECM(barry, lag=3, include="const", estim="ML")
+# vecm_ML_l3_co_betaGiven<-VECM(barry, lag=3, include="const", beta=-1, estim="ML")
+vecm_ML_l1_tr <-VECM(barry, lag=1, include="trend", estim="ML")
+vecm_ML_l1_bo <-VECM(barry, lag=1, include="both", estim="ML")
+vecm_ML_l1_no <-VECM(barry, lag=1, include="none", estim="ML")
+vecm_ML_l1_LRco <-VECM(barry, lag=1, LRinclude="const", estim="ML")
+vecm_ML_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend", estim="ML")
+vecm_ML_l1_LRtr_noCo <-VECM(barry, lag=1, LRinclude="trend", include="none", estim="ML")
+vecm_ML_l1_LRbo <-VECM(barry, lag=1, LRinclude="both", estim="ML")
+
+vecm_all <- list(
+		vecm_OLS_l1_co, vecm_OLS_l3_co, vecm_OLS_l3_co_betaGiven, vecm_OLS_l1_tr, 
+		vecm_OLS_l1_bo, vecm_OLS_l1_no, vecm_OLS_l1_LRco, vecm_OLS_l1_LRtr, 
+		vecm_OLS_l1_LRtr_noCo, vecm_OLS_l1_LRbo, 
+		vecm_ML_l1_co, vecm_ML_l3_co,  vecm_ML_l1_tr, 
+		vecm_ML_l1_bo, vecm_ML_l1_no, vecm_ML_l1_LRco, vecm_ML_l1_LRtr, 
+		vecm_ML_l1_LRtr_noCo, vecm_ML_l1_LRbo)
+
+names(vecm_all) <-c("vecm_OLS_l1_co", "vecm_OLS_l3_co", "vecm_OLS_l3_co_betaGiven", "vecm_OLS_l1_tr", 
+		"vecm_OLS_l1_bo", "vecm_OLS_l1_no", "vecm_OLS_l1_LRco", "vecm_OLS_l1_LRtr", 
+		"vecm_OLS_l1_LRtr_noCo", "vecm_OLS_l1_LRbo", 
+		"vecm_ML_l1_co", "vecm_ML_l3_co", " vecm_ML_l1_tr", 
+		"vecm_ML_l1_bo", "vecm_ML_l1_no", "vecm_ML_l1_LRco", "vecm_ML_l1_LRtr", 
+		"vecm_ML_l1_LRtr_noCo", "vecm_ML_l1_LRbo")
+
+vecm_ML <- vecm_all[grep("ML", names(vecm_all))]
+
+lapply(vecm_all, print)
+lapply(vecm_all, summary)
+
+lapply(vecm_all, function(x) head(residuals(x), 3))
+lapply(vecm_all, function(x) head(fitted(x), 3))
+sapply(vecm_all, deviance)
 
 
-summary(myVECM1)
-summary(myVECM2)
-summary(myVECM2a)
-summary(myVECM3)
-summary(myVECM4)
-summary(myVECM5)
-summary(myVECM6)
-summary(myVECM7)
 
-logLik(myVECM1)
-logLik(myVECM2)
-logLik(myVECM2a)
-logLik(myVECM3)
-logLik(myVECM4)
-logLik(myVECM5)
-logLik(myVECM6)
-logLik(myVECM7)
+## logLik
+sapply(vecm_all, logLik)
+sapply(vecm_ML, logLik, r=0)
+sapply(vecm_ML, logLik, r=1)
+sapply(vecm_ML, logLik, r=2)
 
-logLik(myVECM3, r=2)
-logLik(myVECM4, r=2)
+## AIC/BIC
+sapply(vecm_all, AIC)
+sapply(vecm_ML, AIC, r=0)
+sapply(vecm_ML, AIC, r=1)
+sapply(vecm_ML, AIC, r=2)
+sapply(vecm_ML, AIC, r=0, fitMeasure="LL")
+sapply(vecm_ML, AIC, r=1, fitMeasure="LL")
+sapply(vecm_ML, AIC, r=2, fitMeasure="LL")
 
-AIC(myVECM3)
-AIC(myVECM4)
-AIC(myVECM5)
-AIC(myVECM6)
-AIC(myVECM7)
-AIC(myVECM3, r=2)
-AIC(myVECM4, r=2)
-AIC(myVECM3, fitMeasure="LL")
-AIC(myVECM4, fitMeasure="LL")
-AIC(myVECM3, r=2, fitMeasure="LL")
-AIC(myVECM4, r=2, fitMeasure="LL")
+sapply(vecm_all, BIC)
+sapply(vecm_ML, BIC, r=0)
+sapply(vecm_ML, BIC, r=0, fitMeasure="LL")
 
-BIC(myVECM3)
-BIC(myVECM4)
-BIC(myVECM5)
-BIC(myVECM6)
-BIC(myVECM7)
-BIC(myVECM3, r=2)
-BIC(myVECM4, r=2)
-BIC(myVECM3, fitMeasure="LL")
-BIC(myVECM4, fitMeasure="LL")
-BIC(myVECM3, r=2, fitMeasure="LL")
-BIC(myVECM4, r=2, fitMeasure="LL")
 
-myVECM1$model.specific$coint
-myVECM1$model.specific$beta
+## coint
+sapply(vecm_all, function(x) x$model.specific$coint )
+sapply(vecm_all, function(x) x$model.specific$beta)
 
-myVECM2a$model.specific$coint
-myVECM2a$model.specific$beta
+### VARrep
+lapply(vecm_all, VARrep)
 
-myVECM3$model.specific$coint
-myVECM3$model.specific$beta
+### fevd
+vecm_fevd <- vecm_all[-grep("l1_LRco|l1_LRtr|l1_LRbo", names(vecm_all))] ## does not work for these models
+lapply(vecm_fevd, fevd)
 
-myVECM4$model.specific$coint
-myVECM5$model.specific$coint
-myVECM6$model.specific$coint
-myVECM7$model.specific$coint
-
+### irf
+vecm_fevd <- vecm_all[-grep("l1_no|l1_LRco|l1_LRtr|l1_LRbo", names(vecm_all))] ## does not work for these models
+lapply(vecm_fevd, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
 ### rank test
-r.test_VECM4 <- rank.test(myVECM4)
-r.test_VECM4_tr <- rank.test(myVECM4, type="trace")
-r.test_VECM4_spec <- rank.test(myVECM4, r_null=1)
-r.test_VECM4_spec_tr <- rank.test(myVECM4,, r_null=1, type="trace")
+vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
 
-r.test_VECM5 <- rank.test(myVECM5)
-r.test_VECM6 <- rank.test(myVECM6)
+rank.tests <- lapply(vecm_ML_rtest , rank.test)
+rank.tests_rnull1 <- lapply(vecm_ML_rtest , rank.test, r_null=1)
+rank.tests_tr <- lapply(vecm_ML_rtest , rank.test, type="trace")
+rank.tests_tr_rnull1 <- lapply(vecm_ML_rtest , rank.test, r_null=1, type="trace")
 
+rank.tests.all <- c(rank.tests , rank.tests_rnull1, rank.tests_tr,rank.tests_tr_rnull1 )
 
-r.test_VECM4
-r.test_VECM4_tr
-r.test_VECM4_spec
-r.test_VECM4_spec_tr
-r.test_VECM5
-r.test_VECM6
+lapply(rank.tests.all, print)
+lapply(rank.tests.all, summary)
 
-summary(r.test_VECM4)
-summary(r.test_VECM5)
-summary(r.test_VECM6)
 
 ### rank select
 data(barry)
@@ -114,6 +123,10 @@ r_sel_none$AICs
 
 r_sel_both$LLs
 r_sel_both$AICs
+
+
+
+
 ###############################################################
 ### Check Johansen MLE: comparing with vars package
 ###############################################################
