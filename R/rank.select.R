@@ -67,7 +67,7 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include = c( "cons
 }
 
 
-lag.select <- function(data, lag.max=10, include="intercept", fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
+lag.select <- function(data, lag.max=10, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
   rank.select(data=data, lag.max=lag.max, r.max=0, include=include, fitMeasure=fitMeasure, sameSample=sameSample) 
 }
 
