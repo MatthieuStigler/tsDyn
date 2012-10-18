@@ -2,9 +2,7 @@
 
 \alias{fevd}
 
-\alias{fevd.VAR}
-
-\alias{fevd.VECM}
+\alias{fevd.nlVar}
 
 \title{Forecast Error Variance Decomposition}
 
@@ -16,8 +14,7 @@
 }
 
 \usage{
-\method{fevd}{VAR}(x, n.ahead=10, ...)
-\method{fevd}{VECM}(x, n.ahead=10, ...)
+\method{fevd}{nlVar}(x, n.ahead=10, ...)
 }
 
 \arguments{

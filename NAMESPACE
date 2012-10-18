@@ -115,10 +115,8 @@ S3method(print, llar)
 S3method(plot, llar)
 S3method(as.data.frame, llar)
 S3method(vcov, VAR)
-S3method(irf, VAR)
-S3method(irf, VECM)
-S3method(fevd, VAR)
-S3method(fevd, VECM)
+S3method(irf, nlVar)
+S3method(fevd, nlVar)
 
 
 useDynLib(tsDyn)

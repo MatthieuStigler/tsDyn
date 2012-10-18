@@ -74,6 +74,21 @@ vec2var.tsDyn <- function(x){
   co <- coef(x)
   lag <- ifelse(model=="VECM",x$lag+1, x$lag)
   K <- x$k
+  include <- x$include
+
+## VECM case: 
+  if(model=="VECM"){
+    LRinclude <- x$model.specific$LRinclude
+    if(LRinclude!="none"){
+      if(LRinclude=="const"){
+	include <- "const"
+      } else if(LRinclude=="trend"){
+	include <- if(include=="const") "both" else "trend"
+      } else if(LRinclude=="both"){
+	include <- "both"
+      }
+    }
+  }
 
 ## Take vec2var representation for VECMs
   if(model=="VECM") {
@@ -95,14 +110,14 @@ vec2var.tsDyn <- function(x){
   rank <- if(model=="VECM") x$model.specific$r else K
 
 ## vecm
-  ecdet <- if(inherits(x,"VAR")) "none" else x$model.specific$LRinclude
+  ecdet <- if(model=="VECM") x$model.specific$LRinclude else "none"
   vecm<- new("ca.jo", season = NULL, dumvar=NULL, ecdet=ecdet,lag=as.integer(lag),spec="transitory")
 
 ## datamat
   if(model=="VAR"){
     datamat <- as.matrix(tail(as.data.frame(x$model),-lag))
   } else {
-    newx <- lineVar(x$model[,1:K], lag=lag, include=x$include)
+    newx <- lineVar(x$model[,1:K], lag=lag, include=include)
     datamat <- as.matrix(tail(as.data.frame(newx$model),-lag))
   }
   colnames(datamat) <- gsub(" -([0-9]+)","\\.l\\1", colnames(datamat))
@@ -135,21 +150,27 @@ predict.VECM <- function(object,...){
  predict(vec2var.tsDyn(object), ...)
 }
 
-irf.VAR <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
+irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
+  model <- attr(x, "model")
+  if(model=="VECM"){
+    LRinc <- x$model.specific$LRinclude
+    inc <- x$include
+    if(LRinc=="both"|inc=="none"&LRinc=="none") stop("Sorry, irf() is not available for this specification of deterministic terms.")
+  }
  irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
-irf.VECM <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
- irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
-}
 
-fevd.VAR <- function(x, n.ahead=10, ...){
+fevd.nlVar <- function(x, n.ahead=10, ...){
+  model <- attr(x, "model")
+  if(model=="VECM"){
+    LRinc <- x$model.specific$LRinclude
+    inc <- x$include
+    if(LRinc=="both"|inc=="none"&LRinc=="none") warning("Not guaranted to work with this specification of deterministic terms.")
+  }
  fevd(vec2var.tsDyn(x),n.ahead=n.ahead, ...)
 }
 
-fevd.VECM <- function(x, n.ahead=10, ...){
- fevd(vec2var.tsDyn(x), n.ahead=n.ahead, ...)
-}
 
 ####### Predict 
 
@@ -189,10 +210,21 @@ predict2.VECM <- function(object, n.ahead=1, newdata){
   lag <- object$lag
   k <- object$k
   include <- object$include
+  LRinclude <- object$model.specific$LRinclude
 
 ## get VAR rrepresentation
   B <- VARrep(object)
 
+## check deterministc specification
+  if(LRinclude!="none"){
+    if(LRinclude=="const"){
+      include <- "const"
+    } else if(LRinclude=="trend"){
+      include <- if(include=="const") "both" else "trend"
+    } else if(LRinclude=="both"){
+      include <- "both"
+    }
+  }
 ## setup starting values (data in y), innovations (0)
   original.data <- object$model[,1:k]
   starting <-  myTail(original.data,lag+1) 
@@ -256,12 +288,13 @@ predict2.VECM(vec1, n.ahead=5)
 fevd(vec1 )
 irf(vec1, runs=10 )
 
-
+varpToDf <- function(x) matrix(sapply(x$fcst, function(x) x[,"fcst"]), nrow=nrow(x$fcst[[1]]))
 
 
 ### Comparisons
 library(vars)
 data(Canada)
+n <- nrow(Canada)
 
 VECM_tsD <- VECM(Canada, lag=2, estim="ML")
 VAR_tsD <- lineVar(Canada, lag=2)
@@ -387,7 +420,6 @@ head(fevd(VECM_vars)$U,3)
 
 ### compare prediction and actual
 Var_1 <- lineVar(Canada, lag=1)
-n <- nrow(Canada)
 all.equal(predict2.VAR(Var_1),predict2.VAR(Var_1, newdata=Canada[n,,drop=FALSE]))
 all.equal(tail(fitted(Var_1),1),predict2.VAR(Var_1, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
 
@@ -409,54 +441,57 @@ all.equal(tail(fitted(Var_1_bo),1),predict2.VAR(Var_1_bo, n.ahead=1, newdata=Can
 
 
 ### VECM
-Vecm_1_co <- VECM(Canada, lag=1, include="const")
+Vecm_1_co <- VECM(Canada, lag=1, include="const", estim="ML")
+Vecm_1_co_vars <- ca.jo(Canada, K=2,spec="transitory",  ecdet="none")
 all.equal(predict2.VECM(Vecm_1_co),predict2.VECM(Vecm_1_co, newdata=Canada[c(n-1,n),,drop=FALSE]))
 all.equal(predict2.VECM(Vecm_1_co), varpToDf( predict(Vecm_1_co,n.ahead=1)), check.attributes=FALSE)
+all.equal(predict2.VECM(Vecm_1_co), varpToDf( predict(vec2var(Vecm_1_co_vars ),n.ahead=1)), check.attributes=FALSE)
 all.equal(tail(fitted(Vecm_1_co, level="original"),1),predict2.VECM(Vecm_1_co, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
 
-Vecm_2_co <- VECM(Canada, lag=2, include="const")
+Vecm_2_co <- VECM(Canada, lag=2, include="const", estim="ML")
+Vecm_2_co_vars <- ca.jo(Canada, K=3,spec="transitory",  ecdet="none")
 all.equal(predict2.VECM(Vecm_2_co),predict2.VECM(Vecm_2_co, newdata=Canada[c(n-2,n-1,n),,drop=FALSE]))
 all.equal(predict2.VECM(Vecm_2_co), varpToDf( predict(Vecm_2_co,n.ahead=1)), check.attributes=FALSE)
+all.equal(predict2.VECM(Vecm_2_co), varpToDf( predict(vec2var(Vecm_2_co_vars ),n.ahead=1)), check.attributes=FALSE)
 all.equal(tail(fitted(Vecm_2_co, level="original"),1),predict2.VECM(Vecm_2_co, n.ahead=1, newdata=Canada[c(n-3,n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
-Vecm_1_tr <- VECM(Canada, lag=1, include="trend")
+Vecm_1_tr <- VECM(Canada, lag=1, include="trend", estim="ML")
 all.equal(predict2.VECM(Vecm_1_tr),predict2.VECM(Vecm_1_tr, newdata=Canada[c(n-1,n),,drop=FALSE]))
 all.equal(predict2.VECM(Vecm_1_tr), varpToDf( predict(Vecm_1_tr,n.ahead=1)), check.attributes=FALSE)
 all.equal(tail(fitted(Vecm_1_tr, level="original"),1),predict2.VECM(Vecm_1_tr, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
-Vecm_1_non <- VECM(Canada, lag=1, include="none")
+Vecm_1_non <- VECM(Canada, lag=1, include="none", estim="ML")
 all.equal(predict2.VECM(Vecm_1_non),predict2.VECM(Vecm_1_non, newdata=Canada[c(n-1,n),,drop=FALSE]))
 all.equal(tail(fitted(Vecm_1_non, level="original"),1),predict2.VECM(Vecm_1_non, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
-Vecm_1_LRco <- VECM(Canada, lag=1, LRinclude="const")
+Vecm_1_LRco <- VECM(Canada, lag=1, LRinclude="const", estim="ML")
+Vecm_1_LRco_vars <- ca.jo(Canada, K=2,spec="transitory",  ecdet="const")
 all.equal(predict2.VECM(Vecm_1_LRco),predict2.VECM(Vecm_1_LRco, newdata=Canada[c(n-1,n),,drop=FALSE]))
+all.equal(predict2.VECM(Vecm_1_LRco ), varpToDf( predict(Vecm_1_LRco ,n.ahead=1)), check.attributes=FALSE)
+all.equal(predict2.VECM(Vecm_1_LRco), varpToDf( predict(vec2var(Vecm_1_LRco_vars),n.ahead=1)), check.attributes=FALSE)
 all.equal(tail(fitted(Vecm_1_LRco, level="original"),1),predict2.VECM(Vecm_1_LRco, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
 
+Vecm_1_LRt <- VECM(Canada, lag=1, LRinclude="trend", estim="ML")
+Vecm_1_LRt_vars <- ca.jo(Canada, K=2,spec="transitory",  ecdet="trend")
+all.equal(predict2.VECM(Vecm_1_LRt),predict2.VECM(Vecm_1_LRt, newdata=Canada[c(n-1,n),,drop=FALSE]))
+all.equal(predict2.VECM(Vecm_1_LRt ), varpToDf( predict(Vecm_1_LRt ,n.ahead=1)), check.attributes=FALSE)
+all.equal(predict2.VECM(Vecm_1_LRt), varpToDf( predict(vec2var(Vecm_1_LRt_vars),n.ahead=1)), check.attributes=FALSE)
+all.equal(tail(fitted(Vecm_1_LRt, level="original"),1),predict2.VECM(Vecm_1_LRt, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
-Vecm_1_LRc <- VECM(Canada, lag=1, LRinclude="const")
-all.equal(predict2.VECM(Vecm_1_LRc),predict2.VECM(Vecm_1_LRc, newdata=Canada[c(n-1,n),,drop=FALSE]))
-all.equal(tail(fitted(Vecm_1_LRc),1),predict2.VECM(Vecm_1_LRc, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
 
-Vecm_1_LRt <- lineVar(Canada, lag=1, LRinclude="trend")
-all.equal(predict2.VECM(Vecm_1_LRt),predict2.VECM(Vecm_1_LRt, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Vecm_1_LRt),1),predict2.VECM(Vecm_1_LRt, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
+Vecm_1_LRbo <- VECM(Canada, lag=1, LRinclude="both", estim="ML")
+all.equal(predict2.VECM(Vecm_1_LRbo),predict2.VECM(Vecm_1_LRbo, newdata=Canada[c(n-1,n),,drop=FALSE]))
+all.equal(tail(fitted(Vecm_1_LRbo, level="original"),1),predict2.VECM(Vecm_1_LRbo, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
-Vecm_1_LRt_noc <- lineVar(Canada, lag=1, LRinclude="trend", include="none")
-all.equal(predict2.VECM(Vecm_1_LRt_noc),predict2.VECM(Vecm_1_LRt_noc, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Vecm_1_LRt_noc),1),predict2.VECM(Vecm_1_LRt_noc, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
-
-Vecm_1_LRbo<- lineVar(Canada, lag=1, LRinclude="both")
-all.equal(predict2.VECM(Vecm_1_LRbo),predict2.VECM(Vecm_1_LRbo, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Vecm_1_LRbo),1),predict2.VECM(Vecm_1_LRbo, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
 
 predict2.VAR(lineVar(Canada, lag=1, include="none"))
 predict2.VECM(VECM(Canada, lag=1))
 predict2.VECM(VECM(Canada, lag=1), newdata=Canada[(nrow(Canada)-1):nrow(Canada),,drop=FALSE])
 
 
-varpToDf <- function(x) matrix(sapply(x$fcst, function(x) x[,"fcst"]), nrow=nrow(x$fcst[[1]]))
+
 
 all.equal(sapply(predict(VECM_tsD, n.ahead=5)$fcst, function(x) x[,"fcst"]), predict2(VECM_tsD, n.ahead=5), check.attributes=FALSE, tol=1e-07)
 all.equal(sapply(predict(VECM_tsD, n.ahead=10)$fcst, function(x) x[,"fcst"]), predict2(VECM_tsD, n.ahead=10), check.attributes=FALSE, tol=1e-07)
