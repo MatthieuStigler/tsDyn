@@ -1,0 +1,163 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+> 
+> 
+> 
+> library(tsDyn)
+Le chargement a nécessité le package : mgcv
+This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : MASS
+Le chargement a nécessité le package : nlme
+> library(vars)
+Le chargement a nécessité le package : strucchange
+Le chargement a nécessité le package : zoo
+
+Attachement du package : ‘zoo’
+
+The following object(s) are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+Le chargement a nécessité le package : sandwich
+Le chargement a nécessité le package : urca
+Le chargement a nécessité le package : lmtest
+> data(Canada)
+> 
+> 
+> ########################
+> ######## Models
+> ########################
+> 
+> ##### VECM #####
+> 
+> ### unrestricted cons
+> vecm_l1_co_tsD <-VECM(Canada, lag=1, include="const", estim="ML")
+> vecm_l3_co_tsD <-VECM(Canada, lag=3, include="const", estim="ML")
+> 
+> vecm_l1_co_var <- ca.jo(Canada, K=2, ecdet="none", spec="transitory")
+> vecm_l3_co_var <- ca.jo(Canada, K=4, ecdet="none", spec="transitory")
+> 
+> ### restricted cons
+> vecm_l1_LRco_tsD <-VECM(Canada, lag=1, LRinclude="const", estim="ML")
+> vecm_l1_LRco_var <- ca.jo(Canada, K=2, ecdet="const", spec="transitory")
+> 
+> vecm_l3_LRco_tsD <-VECM(Canada, lag=3, LRinclude="const", estim="ML")
+> vecm_l3_LRco_var <- ca.jo(Canada, K=4, ecdet="const", spec="transitory")
+> 
+> ### restricted trend
+> vecm_l1_LRtr_tsD <-VECM(Canada, lag=1, LRinclude="trend", estim="ML")
+> vecm_l1_LRtr_var <- ca.jo(Canada, K=2, ecdet="trend", spec="transitory")
+> 
+> vecm_l3_LRtr_tsD <-VECM(Canada, lag=3, LRinclude="trend", estim="ML")
+> vecm_l3_LRtr_var <- ca.jo(Canada, K=4, ecdet="trend", spec="transitory")
+> 
+> all_models <- list(
++ 		    list(vecm_l1_co_var, vecm_l1_co_tsD), 
++ 		    list(vecm_l3_co_var, vecm_l3_co_tsD), 
++ 		    list(vecm_l1_LRco_var, vecm_l1_LRco_tsD),
++ 		    list(vecm_l3_LRco_var, vecm_l3_LRco_tsD),
++ 		    list(vecm_l1_LRtr_var, vecm_l1_LRtr_tsD),
++ 		    list(vecm_l3_LRtr_var, vecm_l3_LRtr_tsD))
+> 
+> comp_teststat <- function(x) all.equal(x[[1]]@teststat, rev(rank.test(x[[2]])$res_df[,"eigen"]), check.attributes=FALSE)
+> comp_betas <- function(x) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$coint, check.attributes=FALSE)
+> comp_coefs <- function(x) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attr=FALSE)
+> comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attr=FALSE)
+> comp_IRF <- function(x) all.equal(irf(vec2var(x[[1]]), boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attr=FALSE)
+> comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$irf, irf(x[[2]], runs=2, seed=1234)$irf, check.attr=FALSE)
+> comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attr=FALSE)
+> comp_resid <- function(x) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attr=FALSE)
+> comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attr=FALSE)
+> comp_predict <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, predict(x[[2]])$fcst, check.attr=FALSE)
+> 
+> 
+> ### Compare VECM methods:
+> print(sapply(all_models, comp_teststat ))
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> print(sapply(all_models, comp_betas))
+[1] "TRUE"                                  
+[2] "Mean relative difference: 1.830196e-08"
+[3] "TRUE"                                  
+[4] "TRUE"                                  
+[5] "TRUE"                                  
+[6] "Mean relative difference: 1.551162e-08"
+> print(sapply(all_models, comp_coefs))
+[1] "TRUE"                                  
+[2] "TRUE"                                  
+[3] "TRUE"                                  
+[4] "TRUE"                                  
+[5] "Mean relative difference: 0.0001434445"
+[6] "Mean relative difference: 0.001799332" 
+> print(sapply(all_models, comp_LL))
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> print(sapply(all_models, comp_IRF))
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> print(sapply(all_models, comp_IRF_rand))
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> print(sapply(all_models, comp_FEVD))
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> print(sapply(all_models, comp_resid))
+[1] "TRUE"                                  
+[2] "TRUE"                                  
+[3] "TRUE"                                  
+[4] "TRUE"                                  
+[5] "Mean relative difference: 2.719027e-08"
+[6] "Mean relative difference: 1.916757e-08"
+> print(sapply(all_models, comp_fitted))
+[1] "Mean relative difference: 0.00373983" 
+[2] "Mean relative difference: 0.007480656"
+[3] "Mean relative difference: 0.003764749"
+[4] "Mean relative difference: 0.007607238"
+[5] "Mean relative difference: 0.003578087"
+[6] "Mean relative difference: 0.007644095"
+> print(sapply(all_models, comp_predict))
+[[1]]
+[1] TRUE
+
+[[2]]
+[1] TRUE
+
+[[3]]
+[1] TRUE
+
+[[4]]
+[1] TRUE
+
+[[5]]
+[1] "Component 1: Mean relative difference: 4.087915e-05"
+[2] "Component 2: Mean relative difference: 0.0001349058"
+[3] "Component 3: Mean relative difference: 0.0003334996"
+[4] "Component 4: Mean relative difference: 0.007030107" 
+
+[[6]]
+[1] "Component 1: Mean relative difference: 5.3734e-05" 
+[2] "Component 2: Mean relative difference: 0.000208582"
+[3] "Component 3: Mean relative difference: 0.001637227"
+[4] "Component 4: Mean relative difference: 0.01815156" 
+
+> 
+> 
+> proc.time()
+utilisateur     système      écoulé 
+      5.290       0.050       5.402 
