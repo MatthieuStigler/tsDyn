@@ -206,11 +206,19 @@ getTh.summary.setar<-function(object,...){
 }
 
 getTh.nlVar<-function(object,...){
-  th<-object$model.specific$Thresh
-  if(length(th)==1)
-    names(th)<-"th"
-  else
-    names(th)<-c("th1", "th2")
+  nth <- object$model.specific$nthresh
+
+  if(nth>0){
+    th<-object$model.specific$Thresh
+    if(length(th)==1){
+      names(th)<-"th"
+    } else{
+      names(th)<-c("th1", "th2")
+    }
+  } else {
+    th <- NULL
+  }
+
   return(th)
 }
 
