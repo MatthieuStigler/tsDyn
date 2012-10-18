@@ -55,6 +55,7 @@ rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
   res <- list()
   cal <- list(call=match.call())
   cal$cval <- cval
+  cal$k <- k
   cal$type <- type
   cal$r_null <- r_null
 
@@ -73,10 +74,10 @@ print.rank.test <- function(x, ...) {
   if(x$call$r_null=="unspec"){
     cat("Rank selected:", x$r, "(first",x$call$type, "test with pval above", 100*x$call$cval, "%:", round(100*x$pval,1), "%)\n")
   } else {
-    alter <- switch(x$call$type, "eigen" = x$r+1, "trace"= eval(parse(text=x$call$call$vecm))$k)
+    alter <- switch(x$call$type, "eigen" = x$r+1, "trace"= x$call$k)
     cat("Test of rank ", x$r," versus ", alter, "  (",x$call$type, " test), p-value: ", x$pval,  ".\n", sep="")
   }
-
+  invisible(x)
 }
 
 summary.rank.test <- function(object, ...) {
