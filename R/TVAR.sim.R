@@ -40,7 +40,7 @@ if(!missing(B)){
     if(all(dim(as.matrix(starting))==c(p,nB)))
       y[seq_len(p),]<- as.matrix(starting)
     else
-      stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables")
+      stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables. But is: ", dim(as.matrix(starting)), sep="")
   }
   Bmat<-B
   temp<-TVAR_thresh(mTh=mTh,thDelay=thDelay,thVar=thVar,y=y, p=p) #Stored in misc.R
@@ -192,7 +192,7 @@ if(FALSE){
 
 if(show.parMat)
   print(Bmat)
-res<-round(Yb, ndig)
+res<-if(round) round(Yb, ndig) else Yb
 return(res)
 }
 
