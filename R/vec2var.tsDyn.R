@@ -447,6 +447,7 @@ all.equal(predict2.VECM(Vecm_1_co),predict2.VECM(Vecm_1_co, newdata=Canada[c(n-1
 all.equal(predict2.VECM(Vecm_1_co), varpToDf( predict(Vecm_1_co,n.ahead=1)), check.attributes=FALSE)
 all.equal(predict2.VECM(Vecm_1_co), varpToDf( predict(vec2var(Vecm_1_co_vars ),n.ahead=1)), check.attributes=FALSE)
 all.equal(tail(fitted(Vecm_1_co, level="original"),1),predict2.VECM(Vecm_1_co, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
+all.equal(tail(fitted(vec2var(Vecm_1_co_vars)),1),predict2.VECM(Vecm_1_co, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
 
 Vecm_2_co <- VECM(Canada, lag=2, include="const", estim="ML")

@@ -112,9 +112,9 @@ fitted.nlVar <- function(object, level=c("model", "original"),...){
   if(level=="model"){
     res <- object$fitted
   } else {
-    original.data <- object$model[,1:object$k]
-    series <- rbind(original.data[1,,drop=FALSE], object$fitted)
-    res <- apply(series, 2, cumsum)[-1,]
+    original.data <- object$model[-c(1:(object$T-object$t-1),object$T),1:object$k]
+    series <- cbind(original.data, object$fitted)
+    res<- original.data+ object$fitted
   }
 
   return(res)

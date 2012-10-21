@@ -43,25 +43,25 @@ all_models <- list(
 
 comp_teststat <- function(x) all.equal(x[[1]]@teststat, rev(rank.test(x[[2]])$res_df[,"eigen"]), check.attributes=FALSE)
 comp_betas <- function(x) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$coint, check.attributes=FALSE)
-comp_coefs <- function(x) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attr=FALSE)
-comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attr=FALSE)
-comp_IRF <- function(x) all.equal(irf(vec2var(x[[1]]), boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attr=FALSE)
-comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$irf, irf(x[[2]], runs=2, seed=1234)$irf, check.attr=FALSE)
-comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attr=FALSE)
-comp_resid <- function(x) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attr=FALSE)
-comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attr=FALSE)
-comp_predict <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, predict(x[[2]])$fcst, check.attr=FALSE)
+comp_coefs <- function(x) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE)
+comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attributes=FALSE)
+comp_IRF <- function(x) all.equal(irf(vec2var(x[[1]]), boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$irf, irf(x[[2]], runs=2, seed=1234)$irf, check.attributes=FALSE)
+comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
+comp_resid <- function(x) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE)
+comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
+comp_predict <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, predict(x[[2]])$fcst, check.attributes=FALSE)
 
 
 ### Compare VECM methods:
 print(sapply(all_models, comp_teststat ))
-print(sapply(all_models, comp_betas))
-print(sapply(all_models, comp_coefs))
-print(sapply(all_models, comp_LL))
+print(sapply(all_models, comp_betas)) # 2 and 6
+print(sapply(all_models, comp_coefs)) # 5 and 6
+print(sapply(all_models, comp_LL)) # 2 and 6
 print(sapply(all_models, comp_IRF))
 print(sapply(all_models, comp_IRF_rand))
 print(sapply(all_models, comp_FEVD))
-print(sapply(all_models, comp_resid))
-print(sapply(all_models, comp_fitted))
-print(sapply(all_models, comp_predict))
+print(sapply(all_models, comp_resid)) # 5 and 6
+print(sapply(all_models, comp_fitted)) # ALL!!
+print(sapply(all_models, comp_predict)) # 5 and 6
 
