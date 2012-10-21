@@ -62,6 +62,6 @@ print(sapply(all_models, comp_IRF))
 print(sapply(all_models, comp_IRF_rand))
 print(sapply(all_models, comp_FEVD))
 print(sapply(all_models, comp_resid)) # 5 and 6
-print(sapply(all_models, comp_fitted)) # ALL!!
+print(sapply(all_models, comp_fitted)) 
 print(sapply(all_models, comp_predict)) # 5 and 6
 
