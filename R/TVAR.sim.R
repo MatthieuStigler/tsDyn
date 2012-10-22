@@ -82,6 +82,8 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
     Bmat<-coefMat(TVARobject)
     y<-as.matrix(TVARobject$model)[,1:k]
     ndig<-getndp(y[,1])
+    nthresh<-modSpe$nthresh
+    include <- TVARobject$include
     if(nthresh>0){
       if(modSpe$oneMatrix)
 	stop("arg commoninter in TVAR currently not implemented in TVAR.sim")
@@ -92,7 +94,6 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
       Thresh<-modSpe$Thresh
       thDelay<-modSpe$thDelay
       combin<-modSpe$transCombin
-      nthresh<-modSpe$nthresh
     }
   }
 
@@ -126,6 +127,7 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
   }
 
   trend<-1:T
+  trend<-c(NA, 1:(T-1))
 
   ##resampling
   if(type=="simul"&&dim(innov)!=c(n,k))
@@ -214,27 +216,38 @@ TVAR.sim(data=serie,nthresh=2,type="boot",mTh=1, Thresh=c(7,9))
 
 ##Check the bootstrap: ok!
 environment(TVAR.sim)<-environment(star)
-all(TVAR.sim(data=serie,nthresh=0, type="check",mTh=1)==serie) #TRUE
-all(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1)==serie)#TRUE
-all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1)==serie) #TRUE
 
-all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=2)==serie) #TRUE
-all(TVAR.sim(data=serie,nthresh=0,lag=3, type="check",mTh=2)==serie) #TRUE
-all(TVAR.sim(data=serie,nthresh=1,lag=2, type="check",mTh=2)==serie) #TRUE
+all.equal(TVAR.sim(data=serie,nthresh=0, type="check",mTh=1),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1),as.matrix(serie), check.attributes=FALSE)
+
+all.equal(TVAR.sim(data=serie,nthresh=2, type="check",mTh=2),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=0,lag=3, type="check",mTh=2),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=1,lag=2, type="check",mTh=2),as.matrix(serie), check.attributes=FALSE)
 
 
 ###with TVARobject
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=2, lag=1),type="check")==serie) #TRUE
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=1),type="check")==serie) #TRUE
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")==serie) #TRUE
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")==serie) #TRUE
+all.equal(TVAR.sim(TVARobject=lineVar(serie, lag=1),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(TVARobject=lineVar(serie, lag=1, include="trend"),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(TVARobject=lineVar(serie, lag=1, include="both"),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(TVARobject=lineVar(serie, lag=1, include="none"),type="check"),as.matrix(serie), check.attributes=FALSE)
 
-all(TVAR.sim(TVARobject=lineVar(serie, lag=1),type="check")==serie) #TRUE
+
+all.equal(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+
+all.equal(TVAR.sim(TVARobject=TVAR(serie, nthresh=2, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(TVARobject=TVAR(serie, nthresh=2, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+
 
 ##Check the bootstrap: no! prob with trend... both.. none...
-all(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="const", round=TRUE)==serie)
-TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE)==serie
-TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend")==serie
-all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="both")==serie)
-TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="none", round=TRUE)==serie
+all.equal(TVAR.sim(data=serie,nthresh=0, type="check", include="const", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=0, type="check", include="trend", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+
+all.equal(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+
+all.equal(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+
 }
