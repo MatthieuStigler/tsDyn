@@ -17,14 +17,7 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
   if(!missing(TVARobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag), !missing(thDelay), !missing(mTh)))
     warning("When object TVARobject is given, only args 'type' and 'round' are relevant, others are not considered")
   ##include term
-    if(include=="none")
-      ninc<-0
-    else if(include=="const")
-      ninc<-1
-    else if(include=="trend")
-      ninc<-1
-    else if(include=="both")
-      ninc<-2
+    ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
 
   ### possibility 1: only parameters matrix is given
   if(!missing(B)){
@@ -55,8 +48,7 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
       if(length(Thresh)!=1){
 	warning("Please only one Thresh value if you choose nthresh=1. First one was chosen")
 	Thresh<-Thresh[1]}
-    }
-    if(nthresh==2){
+    } else  if(nthresh==2){
       if(missing(Thresh))
 	Thresh<-quantile(trans, probs=c(0.25, 0.75))
       if(length(Thresh)!=2)
@@ -72,12 +64,12 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
   else if(!missing(data)){
     if(nthresh==0){
       TVARobject<-lineVar(data, lag=p, include=include, model="VAR")
-    }
-    else{ 
-      if(!missing(Thresh))
+    } else{ 
+      if(!missing(Thresh)){
 	TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, gamma=Thresh)
-      else
+      } else{
 	TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
+      }
     }
   }
   ### possibility 3: setarobject is given by user (or by poss 2)
@@ -131,7 +123,7 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
   if(nthresh>0){
     z2<-vector("numeric", length=nrow(y))
     z2[1:p]<-y[1:p,]%*%combin
-    }
+  }
 
   trend<-1:T
 
@@ -145,9 +137,7 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
 	  for(i in (p+1):T){
 		  Yb[i,]<-rowSums(cbind(Bmat[,1], Bmat[,2]*trend[i], Bmat[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
 	  }
-  }
-
-  else if(nthresh==1){
+  } else if(nthresh==1){
 	  BDown<-Bmat[,seq_len(nparBmat)]
 	  BUp<-Bmat[,-seq_len(nparBmat)]
 
@@ -164,10 +154,7 @@ TVAR.sim<-function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", 
 		  }
 		  z2[i]<-Yb[i,]%*%combin
 	  }
-  }
-
-
-  else if(nthresh==2){
+  }  else if(nthresh==2){
 	  BDown <- Bmat[,seq_len(nparBmat)]
 	  BMiddle <- Bmat[,seq_len(nparBmat)+nparBmat]
 	  BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
@@ -209,7 +196,7 @@ environment(TVAR.sim)<-environment(star)
 
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
-sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=c(5.2, 5.5))$serie
+sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=matrix(c(5.2, 5.5), nrow=1))
 
 #estimate the new serie
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
@@ -220,33 +207,34 @@ data(zeroyld)
 serie<-zeroyld
 
 TVAR.sim(data=serie,nthresh=0, type="sim")
-all(TVAR.sim(data=serie,nthresh=0, type="check", lag=1)$serie==serie)
+all(TVAR.sim(data=serie,nthresh=0, type="check", lag=1)==serie)
 
 ##with two threshold (three regimes)
 TVAR.sim(data=serie,nthresh=2,type="boot",mTh=1, Thresh=c(7,9))
 
 ##Check the bootstrap: ok!
 environment(TVAR.sim)<-environment(star)
-all(TVAR.sim(data=serie,nthresh=0, type="check",mTh=1)$serie==serie) #TRUE
-all(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1)$serie==serie)#TRUE
-all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1)$serie==serie) #TRUE
+all(TVAR.sim(data=serie,nthresh=0, type="check",mTh=1)==serie) #TRUE
+all(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1)==serie)#TRUE
+all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1)==serie) #TRUE
 
-all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=2)$serie==serie) #TRUE
-all(TVAR.sim(data=serie,nthresh=0,lag=3, type="check",mTh=2)$serie==serie) #TRUE
-all(TVAR.sim(data=serie,nthresh=1,lag=2, type="check",mTh=2)$serie==serie) #TRUE
+all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=2)==serie) #TRUE
+all(TVAR.sim(data=serie,nthresh=0,lag=3, type="check",mTh=2)==serie) #TRUE
+all(TVAR.sim(data=serie,nthresh=1,lag=2, type="check",mTh=2)==serie) #TRUE
 
 
 ###with TVARobject
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=2, lag=1),type="check")$serie==serie) #TRUE
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=1),type="check")$serie==serie) #TRUE
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")$serie==serie) #TRUE
-all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")$serie==serie) #TRUE
+all(TVAR.sim(TVARobject=TVAR(serie, nthresh=2, lag=1),type="check")==serie) #TRUE
+all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=1),type="check")==serie) #TRUE
+all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")==serie) #TRUE
+all(TVAR.sim(TVARobject=TVAR(serie, nthresh=1, lag=2),type="check")==serie) #TRUE
 
-all(TVAR.sim(TVARobject=lineVar(serie, lag=1),type="check")$serie==serie) #TRUE
+all(TVAR.sim(TVARobject=lineVar(serie, lag=1),type="check")==serie) #TRUE
 
 ##Check the bootstrap: no! prob with trend... both.. none...
-TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE)$serie==serie
-TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend")$serie==serie
-all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="both")$serie==serie)
-TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="none", round=TRUE)$serie==serie
+all(TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="const", round=TRUE)==serie)
+TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE)==serie
+TVAR.sim(data=serie,nthresh=1, type="check",mTh=1, include="trend")==serie
+all(TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="both")==serie)
+TVAR.sim(data=serie,nthresh=2, type="check",mTh=1, include="none", round=TRUE)==serie
 }
