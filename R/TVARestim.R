@@ -226,10 +226,10 @@ if(nthresh==2){
 # secondBestThresh<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)$newThresh
 # step2FirstBest<-condiStep(allgammas, threshRef=secondBestThresh, delayRef=bestDelay,ninter=ninter, fun=func2)
 
-last<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay, fun=func2, trim=trim)
+last<-condiStep(allgammas, threshRef=bestThresh, delayRef=bestDelay, fun=func2, trim=trim, trace=trace)
 i<-1
 while(i<max.iter){
-	b<-condiStep(allgammas, threshRef=last$newThresh, delayRef=bestDelay, fun=func2, trim=trim)
+	b<-condiStep(allgammas, threshRef=last$newThresh, delayRef=bestDelay, fun=func2, trim=trim, trace=trace)
 	if(b$SSR<last$SSR){	#minimum still not reached
 		i<-i+1
 		last<-b}
@@ -247,7 +247,7 @@ gammasDown <- aroundGrid(around=smallThresh,allgammas,ngrid=30, trim=trim, trace
 bigThresh <- max(bests)			#bestThresh,secondBestThresh)
 gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim, trace=trace)
 
-bestThresh<-grid(gammasUp, gammasDown, fun=func2, method=trick, thDelay=bestDelay)
+bestThresh<-grid(gammasUp, gammasDown, fun=func2, method=trick, thDelay=bestDelay, trace=trace)
 
 }#end if nthresh=2
 
