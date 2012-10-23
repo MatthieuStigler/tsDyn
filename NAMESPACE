@@ -17,15 +17,17 @@ if (exists("BIC", envir=asNamespace("stats"), inherits=FALSE)) {
 } 
 
 export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
-       autopairs, autotriples, autotriples.rgl,
-       delta, delta.test, delta.lin, delta.lin.test,
-       llar, llar.predict, llar.fitted, sigmoid, dsigmoid,
+	autopairs, autotriples, autotriples.rgl,
+	delta, delta.test, delta.lin, delta.lin.test,
+	llar, llar.predict, llar.fitted, sigmoid, dsigmoid,
 	setar, lstar, star, availableModels,
-       nlarDialog, linear, isLinear, nnetTs, aar,
+	nlarDialog, linear, isLinear, nnetTs, aar,
 	star, addRegime, 
-       TVAR, TVECM,TVAR.LRtest, setar.sim, TVAR.sim, VAR.sim,TVECM.SeoTest, lineVar, VECM,setarTest,
-	MakeThSpec,BBCTest,KapShinTest, resVar, extendBoot, TVECM.sim, VECM.sim, regime, getTh,
-	TVECM.HStest,fevd, irf, VARrep, VECM_symbolic, rank.select, lags.select, rank.test)
+	TVAR, TVECM, TVAR.sim, TVAR.boot, TVECM.sim, TVAR.LRtest, TVECM.SeoTest, TVECM.HStest,
+	lineVar, VECM, VAR.sim, VAR.boot, VECM.sim, 
+	setar.sim, setarTest,
+	MakeThSpec, BBCTest, KapShinTest, resVar, extendBoot, regime, getTh,
+	fevd, irf, VARrep, VECM_symbolic, rank.select, lags.select, rank.test)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
