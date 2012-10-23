@@ -141,7 +141,9 @@ vec2var.tsDyn <- function(x){
 ############################################################
 
 predict.VAR <- function(object,...){
-  if(object$include=="none"&&object$model.specific$LRinclude=="none") stop("Does not work with include='none'")
+  if(object$include%in%c("both","none")) stop("Does not work with include='none' or 'both'")
+  if(attr(object, "varsLevel")!="level") stop("Does not work with VAR in diff or ADf specification")
+
   predict(vec2var.tsDyn(object), ...)
 }
 
@@ -206,7 +208,7 @@ predict2.VAR <- function(object, newdata, n.ahead=1){
 }
 
 
-predict2.VECM <- function(object, n.ahead=1, newdata){
+predict2.VECM <- function(object, n.ahead=1, newdata, level=c("model", "original"),...){
   lag <- object$lag
   k <- object$k
   include <- object$include
