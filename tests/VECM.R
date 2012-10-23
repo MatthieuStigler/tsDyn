@@ -52,6 +52,7 @@ lapply(vecm_all, summary)
 
 lapply(vecm_all, function(x) head(residuals(x), 3))
 lapply(vecm_all, function(x) head(fitted(x), 3))
+lapply(vecm_all, function(x) head(fitted(x, level="original"), 3))
 sapply(vecm_all, deviance)
 
 
@@ -90,6 +91,9 @@ lapply(vecm_all, function(x) sapply(fevd(x, n.ahead=2), head))
 vecm_irf <- vecm_all[-grep("l1_no|bo", names(vecm_all))] ## does not work for these models
 lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
+## predict
+lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], function(x) sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
+
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
 
@@ -122,102 +126,3 @@ r_sel_none$AICs
 
 r_sel_both$LLs
 r_sel_both$AICs
-
-
-
-
-###############################################################
-### Check Johansen MLE: comparing with vars package
-###############################################################
-
-if(require(vars)){
-data(Canada)
-
-print(summary(VECM(Canada, lag=2, include="const", estim="ML")))
-print(summary(VECM(Canada, lag=2, include="trend", estim="ML")))
-print(summary(VECM(Canada, lag=2, include="both", estim="ML")))
-print(summary(VECM(Canada, lag=2, include="none", estim="ML")))
-print(summary(VECM(Canada, lag=2, LRinclude="const", estim="ML")))
-print(summary(VECM(Canada, lag=2, LRinclude="trend", estim="ML")))
-print(summary(VECM(Canada, lag=2, LRinclude="both", estim="ML")))
-
-## VECM, l=1, inc=const
-myVECM_l1<-VECM(Canada, lag=1, include="const", estim="ML")
-ca_tes_l1 <- ca.jo(Canada,K=2, spec="trans")
-ca_tes_l1_tr <- ca.jo(Canada,K=2, spec="trans", type="trace")
-VECM_vars_l1<-cajorls(ca_tes_l1)
-print(all.equal(ca_tes_l1@teststat, rev(rank.test(myVECM_l1)$res_df[,"eigen"]), check.attributes=FALSE))
-print(all.equal(ca_tes_l1_tr@teststat, rev(rank.test(myVECM_l1)$res_df[,"trace"]), check.attributes=FALSE))
-print(all.equal(VECM_vars_l1$beta, myVECM_l1$model.specific$coint, check.attributes=FALSE))
-print(all.equal(t(coefficients(myVECM_l1)), coefficients(VECM_vars_l1$rlm), check.attr=FALSE))
-
-## VECM, l=2, inc=const
-myVECM_l2<-VECM(Canada, lag=2, include="const", estim="ML")
-ca_tes_l2 <- ca.jo(Canada,K=3, spec="trans")
-ca_tes_l2_tr <- ca.jo(Canada,K=3, spec="trans", type="trace")
-VECM_vars_l2<-cajorls(ca_tes_l2)
-print(all.equal(ca_tes_l2_tr@teststat, rev(rank.test(myVECM_l2)$res_df[,"trace"]), check.attributes=FALSE))
-print(all.equal(ca_tes_l2@teststat, rev(rank.test(myVECM_l2)$res_df[,"eigen"]), check.attributes=FALSE))
-print(all.equal(VECM_vars_l2$beta, myVECM_l2$model.specific$coint, check.attributes=FALSE))
-print(all.equal(t(coefficients(myVECM_l2)), coefficients(VECM_vars_l2$rlm), check.attr=FALSE))
-
-## VECM, l=1, inc const in coint
-myVECM_l1_conCoint<-VECM(Canada, lag=1, LRinclude="const", estim="ML")
-ca_tes_l1_conCoint <- ca.jo(Canada,K=2, spec="trans", ecdet="const")
-ca_tes_l1_conCoint_tr <- ca.jo(Canada,K=2, spec="trans", ecdet="const", type="trace")
-VECM_vars_l1_conCoint <-cajorls(ca_tes_l1_conCoint)
-print(all.equal(ca_tes_l1_conCoint@teststat, rev(rank.test(myVECM_l1_conCoint)$res_df[,"eigen"]), check.attributes=FALSE))
-print(all.equal(ca_tes_l1_conCoint_tr@teststat, rev(rank.test(myVECM_l1_conCoint)$res_df[,"trace"]), check.attributes=FALSE))
-print(all.equal(VECM_vars_l1_conCoint$beta, myVECM_l1_conCoint$model.specific$coint, check.attributes=FALSE))
-print(all.equal(t(coefficients(myVECM_l1_conCoint)), coefficients(VECM_vars_l1_conCoint$rlm), check.attr=FALSE))
-
-## VECM, l=2, inc const in coint
-myVECM_l2_conCoint<-VECM(Canada, lag=2, LRinclude="const", estim="ML")
-ca_tes_l2_conCoint <- ca.jo(Canada,K=3, spec="trans", ecdet="const")
-ca_tes_l2_conCoint_tr <- ca.jo(Canada,K=3, spec="trans", ecdet="const", type="trace")
-VECM_vars_l2_conCoint <-cajorls(ca_tes_l2_conCoint)
-print(all.equal(ca_tes_l2_conCoint@teststat, rev(rank.test(myVECM_l2_conCoint)$res_df[,"eigen"]), check.attributes=FALSE))
-print(all.equal(ca_tes_l2_conCoint_tr@teststat, rev(rank.test(myVECM_l2_conCoint)$res_df[,"trace"]), check.attributes=FALSE))
-print(all.equal(VECM_vars_l2_conCoint$beta, myVECM_l2_conCoint$model.specific$coint, check.attributes=FALSE))
-print(all.equal(t(coefficients(myVECM_l2_conCoint)), coefficients(VECM_vars_l2_conCoint$rlm), check.attr=FALSE))
-
-## VECM, l=1, inc trend in coint
-myVECM_l2_trCoint<-VECM(Canada, lag=2, LRinclude="trend", estim="ML")
-ca_tes_l2_trCoint <- ca.jo(Canada,K=3, spec="trans", ecdet="trend")
-ca_tes_l2_trCoint_tr <- ca.jo(Canada,K=3, spec="trans", ecdet="trend", type="trace")
-VECM_vars_l2_trCoint <-cajorls(ca_tes_l2_trCoint)
-print(all.equal(ca_tes_l2_trCoint@teststat, rev(rank.test(myVECM_l2_trCoint)$res_df[,"eigen"]), check.attributes=FALSE))
-print(all.equal(ca_tes_l2_trCoint_tr@teststat, rev(rank.test(myVECM_l2_trCoint)$res_df[,"trace"]), check.attributes=FALSE))
-print(all.equal(VECM_vars_l2_trCoint$beta, myVECM_l2_trCoint$model.specific$coint, check.attributes=FALSE))
-print(all.equal(VECM_vars_l2_trCoint$beta, myVECM_l2_trCoint$model.specific$coint, check.attributes=FALSE, tol=1e-06))
-print(all.equal(t(coefficients(myVECM_l2_trCoint)), coefficients(VECM_vars_l2_trCoint$rlm), check.attr=FALSE, tol=1e-02))
-
-## VECM, l=1, inc both in coint
-myVECM_l2_boCoint<-VECM(Canada, lag=2, LRinclude="trend", estim="ML")
-ca_tes_l2_boCoint <- ca.jo(Canada,K=3, spec="trans", ecdet="trend")
-ca_tes_l2_boCoint_tr <- ca.jo(Canada,K=3, spec="trans", ecdet="trend", type="trace")
-VECM_vars_l2_boCoint <-cajorls(ca_tes_l2_boCoint)
-print(all.equal(ca_tes_l2_boCoint@teststat, rev(rank.test(myVECM_l2_boCoint)$res_df[,"eigen"]), check.attributes=FALSE))
-print(all.equal(ca_tes_l2_boCoint_tr@teststat, rev(rank.test(myVECM_l2_boCoint)$res_df[,"trace"]), check.attributes=FALSE))
-print(all.equal(VECM_vars_l2_boCoint$beta, myVECM_l2_boCoint$model.specific$coint, check.attributes=FALSE))
-print(all.equal(VECM_vars_l2_boCoint$beta, myVECM_l2_boCoint$model.specific$coint, check.attributes=FALSE, tol=1e-06))
-print(all.equal(t(coefficients(myVECM_l2_boCoint)), coefficients(VECM_vars_l2_boCoint$rlm), check.attr=FALSE, tol=1e-02))
-
-
-## Check LL
-l1<-2*(logLik(myVECM_l1,r=4)-logLik(myVECM_l1,r=3))
-l2<-2*(logLik(myVECM_l1,r=3)-logLik(myVECM_l1,r=2))
-l3<-2*(logLik(myVECM_l1,r=2)-logLik(myVECM_l1,r=1))
-l4<-2*(logLik(myVECM_l1,r=1)-logLik(myVECM_l1,r=0))
-print(c(l1,l2,l3,l4))
-print(ca.jo(Canada, spec="trans"))
-print(all.equal(c(l1, l2, l3, l4),ca.jo(Canada, spec="trans")@teststat))
-
-print(AIC(myVECM_l1,r=0, k=2*log(log(myVECM_l1$t))))
-print(AIC(myVECM_l1,r=1, k=2*log(log(myVECM_l1$t))))
-print(AIC(myVECM_l1,r=2, k=2*log(log(myVECM_l1$t))))
-print(AIC(myVECM_l1,r=3, k=2*log(log(myVECM_l1$t))))
-print(AIC(myVECM_l1,r=4, k=2*log(log(myVECM_l1$t))))
-
-
-}
