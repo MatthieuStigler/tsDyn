@@ -8,8 +8,8 @@
 Simulate a multivariate Threshold VAR (TVAR)
 }
 \usage{
-TVAR.sim(B, Thresh, nthresh=1, n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, ...)
-VAR.sim(B,  n=200, lag=1, include = c("const", "trend","none", "both"),  starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, ...)
+TVAR.sim(B, Thresh, nthresh=1, n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...)
+VAR.sim(B,  n=200, lag=1, include = c("const", "trend","none", "both"),  starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...)
 
 }
 
@@ -32,6 +32,7 @@ A matrix with the simulated/bootstraped series.
 \item{varcov}{Variance-covariance matrix for the innovations. By default identity matrix.}
 \item{show.parMat}{Logical. Should the parameter matrix be shown? Useful to understand how to give right input}
 \item{round}{Rounds the series created to have the same digits (hopefully) as original series. }
+\item{seed}{Optional. Seed for the random number generation.}
 \item{\dots}{Further arguments passed to the underlying (un-exported) \code{TVAR.gen} function}
 }
 \details{
