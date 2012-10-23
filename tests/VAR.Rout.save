@@ -1,0 +1,1225 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R est un logiciel libre livré sans AUCUNE GARANTIE.
+Vous pouvez le redistribuer sous certaines conditions.
+Tapez 'license()' ou 'licence()' pour plus de détails.
+
+R est un projet collaboratif avec de nombreux contributeurs.
+Tapez 'contributors()' pour plus d'information et
+'citation()' pour la façon de le citer dans les publications.
+
+Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
+en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
+Tapez 'q()' pour quitter R.
+
+> library(tsDyn)
+Le chargement a nécessité le package : mgcv
+This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
+Le chargement a nécessité le package : Matrix
+Le chargement a nécessité le package : lattice
+Le chargement a nécessité le package : snow
+Le chargement a nécessité le package : mnormt
+Le chargement a nécessité le package : foreach
+Le chargement a nécessité le package : MASS
+Le chargement a nécessité le package : nlme
+> 
+> 
+> data(zeroyld)
+> data(barry)
+> 
+> 
+> 
+> 
+> ## Test a few VECM models
+> var_l1_co <-lineVar(barry, lag=1, include="const")
+> var_l1_tr <-lineVar(barry, lag=1, include="trend")
+> var_l1_bo <-lineVar(barry, lag=1, include="both")
+> var_l1_no <-lineVar(barry, lag=1, include="none")
+> 
+> var_l3_co <-lineVar(barry, lag=3, include="const")
+> var_l3_tr <-lineVar(barry, lag=3, include="trend")
+> var_l3_bo <-lineVar(barry, lag=3, include="both")
+> var_l3_no <-lineVar(barry, lag=3, include="none")
+> 
+> var_l2_diff_co <-lineVar(barry, lag=2, include="const", I="diff")
+> var_l2_diff_tr <-lineVar(barry, lag=2, include="trend", I="diff")
+> var_l2_diff_bo <-lineVar(barry, lag=2, include="both", I="diff")
+> var_l2_diff_no <-lineVar(barry, lag=2, include="none", I="diff")
+> 
+> var_l2_adf_co <-lineVar(barry, lag=2, include="const", I="ADF")
+> var_l2_adf_tr <-lineVar(barry, lag=2, include="trend", I="ADF")
+> var_l2_adf_bo <-lineVar(barry, lag=2, include="both", I="ADF")
+> var_l2_adf_no <-lineVar(barry, lag=2, include="none", I="ADF")
+> 
+> var_all <- list(
++ 		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, 
++ 		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no,
++ 		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no,
++ 		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no)
+> 
+> 
+> names(var_all) <-c(
++ 		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", 
++ 		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no",
++ 		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no",
++ 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no")
+> 
+> 
+> 
+> lapply(var_all, print)
+                 Intercept   dolcan -1     cpiUSA -1     cpiCAN -1
+Equation dolcan 0.01606226  0.98184934  0.0006535181 -0.0005441472
+Equation cpiUSA 0.47682275 -0.17515457  1.0034816358 -0.0035567095
+Equation cpiCAN 0.33858157  0.07511337 -0.0023545869  0.9998414195
+                        Trend  dolcan -1   cpiUSA -1     cpiCAN -1
+Equation dolcan -0.0001267674  0.9842553 0.001245808 -0.0006663591
+Equation cpiUSA -0.0031568297 -0.0330855 1.017304394 -0.0060219580
+Equation cpiCAN -0.0049290069 -0.1371091 0.024124244  0.9929378172
+                   Intercept         Trend   dolcan -1   cpiUSA -1
+Equation dolcan  0.007388597 -8.622274e-05  0.98107844 0.001083529
+Equation cpiUSA  0.355501243 -1.206028e-03 -0.18593743 1.009496344
+Equation cpiCAN -0.351032771 -6.855288e-03  0.01382157 0.031834151
+                    cpiCAN -1
+Equation dolcan -0.0006442119
+Equation cpiUSA -0.0049563493
+Equation cpiCAN  0.9918856026
+                dolcan -1     cpiUSA -1     cpiCAN -1
+Equation dolcan 0.9990246  0.0004597724 -4.232838e-04
+Equation cpiUSA 0.3347079  0.9977301171  3.123187e-05
+Equation cpiCAN 0.4371558 -0.0064386166  1.002389e+00
+                Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
+Equation dolcan 0.0213132 1.1426667 -0.002923395 -5.319548e-05 -0.1947679
+Equation cpiUSA 0.2297914 0.6115380  1.473715592 -3.413037e-02 -1.2214788
+Equation cpiCAN 0.1465491 0.4721442  0.279405970  9.752629e-01 -0.6781416
+                   cpiUSA -2    cpiCAN -2  dolcan -3     cpiUSA -3    cpiCAN -3
+Equation dolcan  0.003242556 -0.007019863 0.03224004  0.0002842096  0.006567983
+Equation cpiUSA -0.497252953  0.109356758 0.54022105  0.0237898927 -0.075679565
+Equation cpiCAN -0.269165140  0.196158934 0.33685344 -0.0136459470 -0.170361820
+                        Trend dolcan -1    cpiUSA -1    cpiCAN -1  dolcan -2
+Equation dolcan -0.0001881242 1.1378299 -0.002052382 -0.001345096 -0.1939782
+Equation cpiUSA -0.0009482088 0.6932990  1.485950589 -0.039084647 -1.2536289
+Equation cpiCAN -0.0033032731 0.1897148  0.280103019  0.949680615 -0.5970450
+                   cpiUSA -2    cpiCAN -2  dolcan -3    cpiUSA -3    cpiCAN -3
+Equation dolcan  0.002896672 -0.007040656 0.03788217 0.0006495858  0.007690921
+Equation cpiUSA -0.498754452  0.109946225 0.62254152 0.0160737109 -0.071308210
+Equation cpiCAN -0.275688576  0.194501980 0.33566340 0.0105541664 -0.148246352
+                   Intercept         Trend dolcan -1    cpiUSA -1   cpiCAN -1
+Equation dolcan  0.006752721 -0.0001508005 1.1366000 -0.002387016 -0.00112091
+Equation cpiUSA  0.296441336  0.0006902825 0.6393083  1.471260344 -0.02924296
+Equation cpiCAN -0.369694108 -0.0053466472 0.2570470  0.298423329  0.93740698
+                 dolcan -2    cpiUSA -2    cpiCAN -2  dolcan -3    cpiUSA -3
+Equation dolcan -0.1933896  0.002960305 -0.007050852 0.03565128 0.0007742571
+Equation cpiUSA -1.2277882 -0.495960965  0.109498610 0.52460627 0.0215467228
+Equation cpiCAN -0.6292711 -0.279172353  0.195060203 0.45779914 0.0037287342
+                   cpiCAN -3
+Equation dolcan  0.007494714
+Equation cpiUSA -0.079921633
+Equation cpiCAN -0.137504492
+                dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2    cpiUSA -2
+Equation dolcan 1.1611539 -0.001557016  0.0002180556 -0.2010610  0.003284684
+Equation cpiUSA 0.8108598  1.488447400 -0.0312058402 -1.2893289 -0.496798740
+Equation cpiCAN 0.5992614  0.288801153  0.9771280000 -0.7214129 -0.268875466
+                   cpiCAN -2  dolcan -3    cpiUSA -3    cpiCAN -3
+Equation dolcan -0.006898937 0.04162504 -0.001380531  0.006343534
+Equation cpiUSA  0.110660533 0.64140684  0.005841242 -0.078099491
+Equation cpiCAN  0.196990414 0.40138450 -0.025092666 -0.171905123
+                  Intercept dolcan -1    cpiUSA -1     cpiCAN -1   dolcan -2
+Equation dolcan 0.003381125 0.1617849 -0.002353031 -0.0001260648 -0.03741108
+Equation cpiUSA 0.122912595 0.6790979  0.479686920 -0.0255459970 -0.57705874
+Equation cpiCAN 0.122931337 0.4349111  0.289182756  0.0073892530 -0.27376324
+                   cpiUSA -2    cpiCAN -2
+Equation dolcan  0.001311048 -0.007055727
+Equation cpiUSA -0.020762565  0.084046495
+Equation cpiCAN  0.005901144  0.203559141
+                       Trend dolcan -1     cpiUSA -1   cpiCAN -1   dolcan -2
+Equation dolcan 6.881061e-06 0.1700795 -0.0000530234 0.001237383 -0.03274944
+Equation cpiUSA 2.664988e-04 0.9706962  0.5601041675 0.023760364 -0.41527155
+Equation cpiCAN 1.112911e-04 0.8208368  0.3999317151 0.059156879 -0.03909198
+                  cpiUSA -2    cpiCAN -2
+Equation dolcan 0.003147651 -0.005464321
+Equation cpiUSA 0.042855080  0.141273505
+Equation cpiCAN 0.099407996  0.266724853
+                  Intercept         Trend dolcan -1    cpiUSA -1   cpiCAN -1
+Equation dolcan 0.004385404 -4.912709e-06 0.1610634 -0.002475913 -0.00048570
+Equation cpiUSA 0.151995174 -1.422654e-04 0.6582061  0.476128424 -0.03596055
+Equation cpiCAN 0.222507194 -4.871027e-04 0.3633795  0.276998818 -0.02826914
+                  dolcan -2    cpiUSA -2    cpiCAN -2
+Equation dolcan -0.03744932  0.001317679 -0.007418833
+Equation cpiUSA -0.57816617 -0.020570538  0.073531416
+Equation cpiCAN -0.27755496  0.006558625  0.167556559
+                dolcan -1   cpiUSA -1  cpiCAN -1   dolcan -2   cpiUSA -2
+Equation dolcan 0.1742584 0.001290824 0.00134614 -0.02952010 0.004471999
+Equation cpiUSA 1.1325421 0.612150449 0.02797246 -0.29020130 0.094146156
+Equation cpiCAN 0.8884244 0.421666484 0.06091587  0.01313794 0.120827387
+                   cpiCAN -2
+Equation dolcan -0.005201487
+Equation cpiUSA  0.151452883
+Equation cpiCAN  0.270975808
+                Intercept    dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan 0.0213132 -0.01986115  0.0006033709 -0.0005050753   0.1625279
+Equation cpiUSA 0.2297914 -0.06971973  0.0002525317 -0.0004531813   0.6812577
+Equation cpiCAN 0.1465491  0.13085606 -0.0034051167  0.0010599980   0.3412882
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2   D_cpiUSA -2
+Equation dolcan -0.003526765  0.0004518798 -0.03224004 -0.0002842096
+Equation cpiUSA  0.473463061 -0.0336771926 -0.54022104 -0.0237898926
+Equation cpiCAN  0.282811088 -0.0257971141 -0.33685344  0.0136459464
+                 D_cpiCAN -2
+Equation dolcan -0.006567983
+Equation cpiUSA  0.075679565
+Equation cpiCAN  0.170361820
+                        Trend    dolcan-1    cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan -0.0001881242 -0.01826616 0.001493875 -0.0006948306   0.1560960
+Equation cpiUSA -0.0009482088  0.06221155 0.003269849 -0.0004466327   0.6310874
+Equation cpiCAN -0.0033032731 -0.07166682 0.014968609 -0.0040637573   0.2613816
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2   D_cpiUSA -2
+Equation dolcan -0.003546258 -0.0006502656 -0.03788217 -0.0006495858
+Equation cpiUSA  0.482680741 -0.0386380146 -0.62254152 -0.0160737108
+Equation cpiCAN  0.265134411 -0.0462556278 -0.33566340 -0.0105541670
+                 D_cpiCAN -2
+Equation dolcan -0.007690921
+Equation cpiUSA  0.071308210
+Equation cpiCAN  0.148246352
+                   Intercept         Trend    dolcan-1     cpiUSA-1
+Equation dolcan  0.006752721 -0.0001508005 -0.02113829  0.001347547
+Equation cpiUSA  0.296441336  0.0006902825 -0.06387369 -0.003153899
+Equation cpiCAN -0.369694108 -0.0053466472  0.08557500  0.022979710
+                     cpiCAN-1 D_dolcan -1  D_cpiUSA -1   D_cpiCAN -1
+Equation dolcan -0.0006770479   0.1577383 -0.003734563 -0.0004438617
+Equation cpiUSA  0.0003340156   0.7031820  0.474414243 -0.0295769776
+Equation cpiCAN -0.0050373093   0.1714720  0.275443620 -0.0575557118
+                D_dolcan -2   D_cpiUSA -2  D_cpiCAN -2
+Equation dolcan -0.03565128 -0.0007742571 -0.007494714
+Equation cpiUSA -0.52460627 -0.0215467227  0.079921633
+Equation cpiCAN -0.45779914 -0.0037287348  0.137504492
+                   dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan 0.001717879  0.0003471365 -0.0003373473   0.1594360
+Equation cpiUSA 0.162937785 -0.0025100975  0.0013552021   0.6479220
+Equation cpiCAN 0.279232965 -0.0051669784  0.0022132913   0.3200284
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2  D_cpiUSA -2
+Equation dolcan -0.001904153  0.0005554029 -0.04162504  0.001380531
+Equation cpiUSA  0.490957498 -0.0325610424 -0.64140684 -0.005841242
+Equation cpiCAN  0.293968133 -0.0250852914 -0.40138450  0.025092665
+                 D_cpiCAN -2
+Equation dolcan -0.006343534
+Equation cpiUSA  0.078099491
+Equation cpiCAN  0.171905123
+$var_l1_co
+                 Intercept   dolcan -1     cpiUSA -1     cpiCAN -1
+Equation dolcan 0.01606226  0.98184934  0.0006535181 -0.0005441472
+Equation cpiUSA 0.47682275 -0.17515457  1.0034816358 -0.0035567095
+Equation cpiCAN 0.33858157  0.07511337 -0.0023545869  0.9998414195
+
+$var_l1_tr
+                        Trend  dolcan -1   cpiUSA -1     cpiCAN -1
+Equation dolcan -0.0001267674  0.9842553 0.001245808 -0.0006663591
+Equation cpiUSA -0.0031568297 -0.0330855 1.017304394 -0.0060219580
+Equation cpiCAN -0.0049290069 -0.1371091 0.024124244  0.9929378172
+
+$var_l1_bo
+                   Intercept         Trend   dolcan -1   cpiUSA -1
+Equation dolcan  0.007388597 -8.622274e-05  0.98107844 0.001083529
+Equation cpiUSA  0.355501243 -1.206028e-03 -0.18593743 1.009496344
+Equation cpiCAN -0.351032771 -6.855288e-03  0.01382157 0.031834151
+                    cpiCAN -1
+Equation dolcan -0.0006442119
+Equation cpiUSA -0.0049563493
+Equation cpiCAN  0.9918856026
+
+$var_l1_no
+                dolcan -1     cpiUSA -1     cpiCAN -1
+Equation dolcan 0.9990246  0.0004597724 -4.232838e-04
+Equation cpiUSA 0.3347079  0.9977301171  3.123187e-05
+Equation cpiCAN 0.4371558 -0.0064386166  1.002389e+00
+
+$var_l3_co
+                Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
+Equation dolcan 0.0213132 1.1426667 -0.002923395 -5.319548e-05 -0.1947679
+Equation cpiUSA 0.2297914 0.6115380  1.473715592 -3.413037e-02 -1.2214788
+Equation cpiCAN 0.1465491 0.4721442  0.279405970  9.752629e-01 -0.6781416
+                   cpiUSA -2    cpiCAN -2  dolcan -3     cpiUSA -3    cpiCAN -3
+Equation dolcan  0.003242556 -0.007019863 0.03224004  0.0002842096  0.006567983
+Equation cpiUSA -0.497252953  0.109356758 0.54022105  0.0237898927 -0.075679565
+Equation cpiCAN -0.269165140  0.196158934 0.33685344 -0.0136459470 -0.170361820
+
+$var_l3_tr
+                        Trend dolcan -1    cpiUSA -1    cpiCAN -1  dolcan -2
+Equation dolcan -0.0001881242 1.1378299 -0.002052382 -0.001345096 -0.1939782
+Equation cpiUSA -0.0009482088 0.6932990  1.485950589 -0.039084647 -1.2536289
+Equation cpiCAN -0.0033032731 0.1897148  0.280103019  0.949680615 -0.5970450
+                   cpiUSA -2    cpiCAN -2  dolcan -3    cpiUSA -3    cpiCAN -3
+Equation dolcan  0.002896672 -0.007040656 0.03788217 0.0006495858  0.007690921
+Equation cpiUSA -0.498754452  0.109946225 0.62254152 0.0160737109 -0.071308210
+Equation cpiCAN -0.275688576  0.194501980 0.33566340 0.0105541664 -0.148246352
+
+$var_l3_bo
+                   Intercept         Trend dolcan -1    cpiUSA -1   cpiCAN -1
+Equation dolcan  0.006752721 -0.0001508005 1.1366000 -0.002387016 -0.00112091
+Equation cpiUSA  0.296441336  0.0006902825 0.6393083  1.471260344 -0.02924296
+Equation cpiCAN -0.369694108 -0.0053466472 0.2570470  0.298423329  0.93740698
+                 dolcan -2    cpiUSA -2    cpiCAN -2  dolcan -3    cpiUSA -3
+Equation dolcan -0.1933896  0.002960305 -0.007050852 0.03565128 0.0007742571
+Equation cpiUSA -1.2277882 -0.495960965  0.109498610 0.52460627 0.0215467228
+Equation cpiCAN -0.6292711 -0.279172353  0.195060203 0.45779914 0.0037287342
+                   cpiCAN -3
+Equation dolcan  0.007494714
+Equation cpiUSA -0.079921633
+Equation cpiCAN -0.137504492
+
+$var_l3_no
+                dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2    cpiUSA -2
+Equation dolcan 1.1611539 -0.001557016  0.0002180556 -0.2010610  0.003284684
+Equation cpiUSA 0.8108598  1.488447400 -0.0312058402 -1.2893289 -0.496798740
+Equation cpiCAN 0.5992614  0.288801153  0.9771280000 -0.7214129 -0.268875466
+                   cpiCAN -2  dolcan -3    cpiUSA -3    cpiCAN -3
+Equation dolcan -0.006898937 0.04162504 -0.001380531  0.006343534
+Equation cpiUSA  0.110660533 0.64140684  0.005841242 -0.078099491
+Equation cpiCAN  0.196990414 0.40138450 -0.025092666 -0.171905123
+
+$var_l2_diff_co
+                  Intercept dolcan -1    cpiUSA -1     cpiCAN -1   dolcan -2
+Equation dolcan 0.003381125 0.1617849 -0.002353031 -0.0001260648 -0.03741108
+Equation cpiUSA 0.122912595 0.6790979  0.479686920 -0.0255459970 -0.57705874
+Equation cpiCAN 0.122931337 0.4349111  0.289182756  0.0073892530 -0.27376324
+                   cpiUSA -2    cpiCAN -2
+Equation dolcan  0.001311048 -0.007055727
+Equation cpiUSA -0.020762565  0.084046495
+Equation cpiCAN  0.005901144  0.203559141
+
+$var_l2_diff_tr
+                       Trend dolcan -1     cpiUSA -1   cpiCAN -1   dolcan -2
+Equation dolcan 6.881061e-06 0.1700795 -0.0000530234 0.001237383 -0.03274944
+Equation cpiUSA 2.664988e-04 0.9706962  0.5601041675 0.023760364 -0.41527155
+Equation cpiCAN 1.112911e-04 0.8208368  0.3999317151 0.059156879 -0.03909198
+                  cpiUSA -2    cpiCAN -2
+Equation dolcan 0.003147651 -0.005464321
+Equation cpiUSA 0.042855080  0.141273505
+Equation cpiCAN 0.099407996  0.266724853
+
+$var_l2_diff_bo
+                  Intercept         Trend dolcan -1    cpiUSA -1   cpiCAN -1
+Equation dolcan 0.004385404 -4.912709e-06 0.1610634 -0.002475913 -0.00048570
+Equation cpiUSA 0.151995174 -1.422654e-04 0.6582061  0.476128424 -0.03596055
+Equation cpiCAN 0.222507194 -4.871027e-04 0.3633795  0.276998818 -0.02826914
+                  dolcan -2    cpiUSA -2    cpiCAN -2
+Equation dolcan -0.03744932  0.001317679 -0.007418833
+Equation cpiUSA -0.57816617 -0.020570538  0.073531416
+Equation cpiCAN -0.27755496  0.006558625  0.167556559
+
+$var_l2_diff_no
+                dolcan -1   cpiUSA -1  cpiCAN -1   dolcan -2   cpiUSA -2
+Equation dolcan 0.1742584 0.001290824 0.00134614 -0.02952010 0.004471999
+Equation cpiUSA 1.1325421 0.612150449 0.02797246 -0.29020130 0.094146156
+Equation cpiCAN 0.8884244 0.421666484 0.06091587  0.01313794 0.120827387
+                   cpiCAN -2
+Equation dolcan -0.005201487
+Equation cpiUSA  0.151452883
+Equation cpiCAN  0.270975808
+
+$var_l2_adf_co
+                Intercept    dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan 0.0213132 -0.01986115  0.0006033709 -0.0005050753   0.1625279
+Equation cpiUSA 0.2297914 -0.06971973  0.0002525317 -0.0004531813   0.6812577
+Equation cpiCAN 0.1465491  0.13085606 -0.0034051167  0.0010599980   0.3412882
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2   D_cpiUSA -2
+Equation dolcan -0.003526765  0.0004518798 -0.03224004 -0.0002842096
+Equation cpiUSA  0.473463061 -0.0336771926 -0.54022104 -0.0237898926
+Equation cpiCAN  0.282811088 -0.0257971141 -0.33685344  0.0136459464
+                 D_cpiCAN -2
+Equation dolcan -0.006567983
+Equation cpiUSA  0.075679565
+Equation cpiCAN  0.170361820
+
+$var_l2_adf_tr
+                        Trend    dolcan-1    cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan -0.0001881242 -0.01826616 0.001493875 -0.0006948306   0.1560960
+Equation cpiUSA -0.0009482088  0.06221155 0.003269849 -0.0004466327   0.6310874
+Equation cpiCAN -0.0033032731 -0.07166682 0.014968609 -0.0040637573   0.2613816
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2   D_cpiUSA -2
+Equation dolcan -0.003546258 -0.0006502656 -0.03788217 -0.0006495858
+Equation cpiUSA  0.482680741 -0.0386380146 -0.62254152 -0.0160737108
+Equation cpiCAN  0.265134411 -0.0462556278 -0.33566340 -0.0105541670
+                 D_cpiCAN -2
+Equation dolcan -0.007690921
+Equation cpiUSA  0.071308210
+Equation cpiCAN  0.148246352
+
+$var_l2_adf_bo
+                   Intercept         Trend    dolcan-1     cpiUSA-1
+Equation dolcan  0.006752721 -0.0001508005 -0.02113829  0.001347547
+Equation cpiUSA  0.296441336  0.0006902825 -0.06387369 -0.003153899
+Equation cpiCAN -0.369694108 -0.0053466472  0.08557500  0.022979710
+                     cpiCAN-1 D_dolcan -1  D_cpiUSA -1   D_cpiCAN -1
+Equation dolcan -0.0006770479   0.1577383 -0.003734563 -0.0004438617
+Equation cpiUSA  0.0003340156   0.7031820  0.474414243 -0.0295769776
+Equation cpiCAN -0.0050373093   0.1714720  0.275443620 -0.0575557118
+                D_dolcan -2   D_cpiUSA -2  D_cpiCAN -2
+Equation dolcan -0.03565128 -0.0007742571 -0.007494714
+Equation cpiUSA -0.52460627 -0.0215467227  0.079921633
+Equation cpiCAN -0.45779914 -0.0037287348  0.137504492
+
+$var_l2_adf_no
+                   dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan 0.001717879  0.0003471365 -0.0003373473   0.1594360
+Equation cpiUSA 0.162937785 -0.0025100975  0.0013552021   0.6479220
+Equation cpiCAN 0.279232965 -0.0051669784  0.0022132913   0.3200284
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2  D_cpiUSA -2
+Equation dolcan -0.001904153  0.0005554029 -0.04162504  0.001380531
+Equation cpiUSA  0.490957498 -0.0325610424 -0.64140684 -0.005841242
+Equation cpiCAN  0.293968133 -0.0250852914 -0.40138450  0.025092665
+                 D_cpiCAN -2
+Equation dolcan -0.006343534
+Equation cpiUSA  0.078099491
+Equation cpiCAN  0.171905123
+
+> lapply(var_all, summary)
+$var_l1_co
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 12
+AIC -4867.939 	BIC -4822.608 	SSR 29.23749
+
+                Intercept         dolcan -1           cpiUSA -1          
+Equation dolcan 0.0161(0.0084).   0.9818(0.0093)***   0.0007(0.0003)*    
+Equation cpiUSA 0.4768(0.1147)*** -0.1752(0.1275)     1.0035(0.0044)***  
+Equation cpiCAN 0.3386(0.1591)*   0.0751(0.1770)      -0.0024(0.0062)    
+                cpiCAN -1          
+Equation dolcan -0.0005(0.0003).   
+Equation cpiUSA -0.0036(0.0041)    
+Equation cpiCAN 0.9998(0.0056)***  
+
+$var_l1_tr
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 12
+AIC -4875.198 	BIC -4829.866 	SSR 28.55718
+
+                Trend               dolcan -1           cpiUSA -1        
+Equation dolcan -0.0001(6.2e-05)*   0.9843(0.0076)***   0.0012(0.0005)*  
+Equation cpiUSA -0.0032(0.0009)***  -0.0331(0.1053)     1.0173(0.0068)***
+Equation cpiCAN -0.0049(0.0012)***  -0.1371(0.1423)     0.0241(0.0092)** 
+                cpiCAN -1          
+Equation dolcan -0.0007(0.0003)*   
+Equation cpiUSA -0.0060(0.0043)    
+Equation cpiCAN 0.9929(0.0058)***  
+
+$var_l1_bo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 15
+AIC -4879.388 	BIC -4822.723 	SSR 28.29124
+
+                Intercept           Trend                 dolcan -1          
+Equation dolcan 0.0074(0.0125)      -8.6e-05(9.2e-05)     0.9811(0.0093)***  
+Equation cpiUSA 0.3555(0.1714)*     -0.0012(0.0013)       -0.1859(0.1281)    
+Equation cpiCAN -0.3510(0.2324)     -0.0069(0.0017)***    0.0138(0.1736)     
+                cpiUSA -1         cpiCAN -1          
+Equation dolcan 0.0011(0.0006).   -0.0006(0.0003)*   
+Equation cpiUSA 1.0095(0.0077)*** -0.0050(0.0043)    
+Equation cpiCAN 0.0318(0.0105)**  0.9919(0.0058)***  
+
+$var_l1_no
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 9
+AIC -4851.887 	BIC -4817.888 	SSR 30.05131
+
+                dolcan -1         cpiUSA -1           cpiCAN -1          
+Equation dolcan 0.9990(0.0026)*** 0.0005(0.0003)      -0.0004(0.0003)    
+Equation cpiUSA 0.3347(0.0359)*** 0.9977(0.0043)***   3.1e-05(0.0041)    
+Equation cpiCAN 0.4372(0.0489)*** -0.0064(0.0059)     1.0024(0.0055)***  
+
+$var_l3_co
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 30
+AIC -4901.837 	BIC -4788.693 	SSR 25.40966
+
+                Intercept          dolcan -1          cpiUSA -1          
+Equation dolcan 0.0213(0.0087)*    1.1427(0.0563)***  -0.0029(0.0047)    
+Equation cpiUSA 0.2298(0.1080)*    0.6115(0.6982)     1.4737(0.0587)***  
+Equation cpiCAN 0.1465(0.1625)     0.4721(1.0511)     0.2794(0.0884)**   
+                cpiCAN -1            dolcan -2           cpiUSA -2         
+Equation dolcan -5.3e-05(0.0031)     -0.1948(0.0851)*    0.0032(0.0080)    
+Equation cpiUSA -0.0341(0.0386)      -1.2215(1.0544)     -0.4973(0.0994)***
+Equation cpiCAN 0.9753(0.0581)***    -0.6781(1.5874)     -0.2692(0.1497).  
+                cpiCAN -2           dolcan -3          cpiUSA -3          
+Equation dolcan -0.0070(0.0044)     0.0322(0.0562)     0.0003(0.0049)     
+Equation cpiUSA 0.1094(0.0544)*     0.5402(0.6962)     0.0238(0.0603)     
+Equation cpiCAN 0.1962(0.0820)*     0.3369(1.0481)     -0.0136(0.0908)    
+                cpiCAN -3         
+Equation dolcan 0.0066(0.0031)*   
+Equation cpiUSA -0.0757(0.0388).  
+Equation cpiCAN -0.1704(0.0583)** 
+
+$var_l3_tr
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 30
+AIC -4907.476 	BIC -4794.333 	SSR 25.12657
+
+                Trend               dolcan -1          cpiUSA -1          
+Equation dolcan -0.0002(6.6e-05)**  1.1378(0.0562)***  -0.0021(0.0047)    
+Equation cpiUSA -0.0009(0.0008)     0.6933(0.7029)     1.4860(0.0586)***  
+Equation cpiCAN -0.0033(0.0012)**   0.1897(1.0418)     0.2801(0.0869)**   
+                cpiCAN -1           dolcan -2           cpiUSA -2         
+Equation dolcan -0.0013(0.0031)     -0.1940(0.0848)*    0.0029(0.0080)    
+Equation cpiUSA -0.0391(0.0394)     -1.2536(1.0598)     -0.4988(0.1000)***
+Equation cpiCAN 0.9497(0.0583)***   -0.5970(1.5709)     -0.2757(0.1482).  
+                cpiCAN -2           dolcan -3          cpiUSA -3         
+Equation dolcan -0.0070(0.0044)     0.0379(0.0558)     0.0006(0.0049)    
+Equation cpiUSA 0.1099(0.0547)*     0.6225(0.6983)     0.0161(0.0607)    
+Equation cpiCAN 0.1945(0.0811)*     0.3357(1.0351)     0.0106(0.0899)    
+                cpiCAN -3         
+Equation dolcan 0.0077(0.0031)*   
+Equation cpiUSA -0.0713(0.0394).  
+Equation cpiCAN -0.1482(0.0584)*  
+
+$var_l3_bo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 33
+AIC -4910.109 	BIC -4785.651 	SSR 24.9023
+
+                Intercept           Trend                dolcan -1         
+Equation dolcan 0.0068(0.0127)      -0.0002(9.6e-05)     1.1366(0.0563)*** 
+Equation cpiUSA 0.2964(0.1583).     0.0007(0.0012)       0.6393(0.7006)    
+Equation cpiCAN -0.3697(0.2350)     -0.0053(0.0018)**    0.2570(1.0403)    
+                cpiUSA -1           cpiCAN -1           dolcan -2          
+Equation dolcan -0.0024(0.0047)     -0.0011(0.0032)     -0.1934(0.0849)*   
+Equation cpiUSA 1.4713(0.0589)***   -0.0292(0.0395)     -1.2278(1.0556)    
+Equation cpiCAN 0.2984(0.0875)***   0.9374(0.0587)***   -0.6293(1.5674)    
+                cpiUSA -2          cpiCAN -2           dolcan -3         
+Equation dolcan 0.0030(0.0080)     -0.0071(0.0044)     0.0357(0.0561)    
+Equation cpiUSA -0.4960(0.0996)*** 0.1095(0.0545)*     0.5246(0.6975)    
+Equation cpiCAN -0.2792(0.1478).   0.1951(0.0809)*     0.4578(1.0356)    
+                cpiUSA -3          cpiCAN -3         
+Equation dolcan 0.0008(0.0049)     0.0075(0.0032)*   
+Equation cpiUSA 0.0215(0.0605)     -0.0799(0.0395)*  
+Equation cpiCAN 0.0037(0.0898)     -0.1375(0.0586)*  
+
+$var_l3_no
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 27
+AIC -4896.79 	BIC -4794.961 	SSR 25.56968
+
+                dolcan -1          cpiUSA -1           cpiCAN -1          
+Equation dolcan 1.1612(0.0563)***  -0.0016(0.0047)     0.0002(0.0031)     
+Equation cpiUSA 0.8109(0.6958)     1.4884(0.0586)***   -0.0312(0.0388)    
+Equation cpiCAN 0.5993(1.0413)     0.2888(0.0877)**    0.9771(0.0580)***  
+                dolcan -2           cpiUSA -2          cpiCAN -2          
+Equation dolcan -0.2011(0.0857)*    0.0033(0.0081)     -0.0069(0.0044)    
+Equation cpiUSA -1.2893(1.0599)     -0.4968(0.1000)*** 0.1107(0.0548)*    
+Equation cpiCAN -0.7214(1.5862)     -0.2689(0.1497).   0.1970(0.0819)*    
+                dolcan -3          cpiUSA -3           cpiCAN -3         
+Equation dolcan 0.0416(0.0565)     -0.0014(0.0049)     0.0063(0.0031)*   
+Equation cpiUSA 0.6414(0.6985)     0.0058(0.0601)      -0.0781(0.0390)*  
+Equation cpiCAN 0.4014(1.0453)     -0.0251(0.0899)     -0.1719(0.0583)** 
+
+$var_l2_diff_co
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 21
+AIC -4902.876 	BIC -4823.675 	SSR 26.01173
+
+                Intercept         dolcan -1          cpiUSA -1          
+Equation dolcan 0.0034(0.0015)*   0.1618(0.0560)**   -0.0024(0.0047)    
+Equation cpiUSA 0.1229(0.0185)*** 0.6791(0.6908)     0.4797(0.0585)***  
+Equation cpiCAN 0.1229(0.0282)*** 0.4349(1.0514)     0.2892(0.0891)**   
+                cpiCAN -1           dolcan -2           cpiUSA -2          
+Equation dolcan -0.0001(0.0031)     -0.0374(0.0561)     0.0013(0.0048)     
+Equation cpiUSA -0.0255(0.0379)     -0.5771(0.6919)     -0.0208(0.0596)    
+Equation cpiCAN 0.0074(0.0577)      -0.2738(1.0531)     0.0059(0.0908)     
+                cpiCAN -2         
+Equation dolcan -0.0071(0.0031)*  
+Equation cpiUSA 0.0840(0.0379)*   
+Equation cpiCAN 0.2036(0.0577)*** 
+
+$var_l2_diff_tr
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 21
+AIC -4865.286 	BIC -4786.086 	SSR 27.74863
+
+                Trend                 dolcan -1          cpiUSA -1           
+Equation dolcan  6.9e-06(5.5e-06)     0.1701(0.0562)**   -5.3e-05(0.0046)    
+Equation cpiUSA 0.0003(7.0e-05)***    0.9707(0.7190)     0.5601(0.0591)***   
+Equation cpiCAN 0.0001(0.0001)        0.8208(1.0775)     0.3999(0.0885)***   
+                cpiCAN -1          dolcan -2           cpiUSA -2         
+Equation dolcan 0.0012(0.0030)     -0.0327(0.0564)     0.0031(0.0048)    
+Equation cpiUSA 0.0238(0.0387)     -0.4153(0.7218)     0.0429(0.0611)    
+Equation cpiCAN 0.0592(0.0580)     -0.0391(1.0816)     0.0994(0.0915)    
+                cpiCAN -2         
+Equation dolcan -0.0055(0.0030).  
+Equation cpiUSA 0.1413(0.0382)*** 
+Equation cpiCAN 0.2667(0.0573)*** 
+
+$var_l2_diff_bo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 24
+AIC -4908.37 	BIC -4817.856 	SSR 25.37086
+
+                Intercept         Trend                 dolcan -1         
+Equation dolcan 0.0044(0.0022).   -4.9e-06(8.1e-06)     0.1611(0.0561)**  
+Equation cpiUSA 0.1520(0.0275)*** -0.0001(1.0e-04)      0.6582(0.6898)    
+Equation cpiCAN 0.2225(0.0414)*** -0.0005(0.0002)**     0.3634(1.0361)    
+                cpiUSA -1           cpiCAN -1           dolcan -2          
+Equation dolcan -0.0025(0.0048)     -0.0005(0.0031)     -0.0374(0.0562)    
+Equation cpiUSA 0.4761(0.0585)***   -0.0360(0.0386)     -0.5782(0.6908)    
+Equation cpiCAN 0.2770(0.0878)**    -0.0283(0.0579)     -0.2776(1.0374)    
+                cpiUSA -2           cpiCAN -2         
+Equation dolcan 0.0013(0.0048)      -0.0074(0.0031)*  
+Equation cpiUSA -0.0206(0.0595)     0.0735(0.0386).   
+Equation cpiCAN 0.0066(0.0894)      0.1676(0.0579)**  
+
+$var_l2_diff_no
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 18
+AIC -4855.443 	BIC -4787.557 	SSR 28.20989
+
+                dolcan -1          cpiUSA -1          cpiCAN -1         
+Equation dolcan 0.1743(0.0561)**   0.0013(0.0045)     0.0013(0.0030)    
+Equation cpiUSA 1.1325(0.7329)     0.6122(0.0587)***  0.0280(0.0395)    
+Equation cpiCAN 0.8884(1.0758)     0.4217(0.0861)***  0.0609(0.0580)    
+                dolcan -2           cpiUSA -2          cpiCAN -2         
+Equation dolcan -0.0295(0.0564)     0.0045(0.0047)     -0.0052(0.0030).  
+Equation cpiUSA -0.2902(0.7362)     0.0941(0.0608)     0.1515(0.0389)*** 
+Equation cpiCAN 0.0131(1.0807)      0.1208(0.0893)     0.2710(0.0571)*** 
+
+$var_l2_adf_co
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 30
+AIC -4901.837 	BIC -4788.693 	SSR 25.40966
+
+                Intercept          dolcan-1            cpiUSA-1           
+Equation dolcan 0.0213(0.0087)*    -0.0199(0.0094)*    0.0006(0.0003).    
+Equation cpiUSA 0.2298(0.1080)*    -0.0697(0.1163)     0.0003(0.0041)     
+Equation cpiCAN 0.1465(0.1625)     0.1309(0.1751)      -0.0034(0.0061)    
+                cpiCAN-1            D_dolcan -1        D_cpiUSA -1        
+Equation dolcan -0.0005(0.0003).    0.1625(0.0559)**   -0.0035(0.0048)    
+Equation cpiUSA -0.0005(0.0037)     0.6813(0.6934)     0.4735(0.0589)***  
+Equation cpiCAN 0.0011(0.0056)      0.3413(1.0439)     0.2828(0.0887)**   
+                D_cpiCAN -1         D_dolcan -2         D_cpiUSA -2        
+Equation dolcan 0.0005(0.0031)      -0.0322(0.0562)     -0.0003(0.0049)    
+Equation cpiUSA -0.0337(0.0388)     -0.5402(0.6962)     -0.0238(0.0603)    
+Equation cpiCAN -0.0258(0.0585)     -0.3369(1.0481)     0.0136(0.0908)     
+                D_cpiCAN -2       
+Equation dolcan -0.0066(0.0031)*  
+Equation cpiUSA 0.0757(0.0388).   
+Equation cpiCAN 0.1704(0.0583)**  
+
+$var_l2_adf_tr
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 30
+AIC -4907.476 	BIC -4794.333 	SSR 25.12657
+
+                Trend               dolcan-1            cpiUSA-1          
+Equation dolcan -0.0002(6.6e-05)**  -0.0183(0.0077)*    0.0015(0.0005)**  
+Equation cpiUSA -0.0009(0.0008)     0.0622(0.0959)      0.0033(0.0063)    
+Equation cpiCAN -0.0033(0.0012)**   -0.0717(0.1422)     0.0150(0.0094)    
+                cpiCAN-1            D_dolcan -1        D_cpiUSA -1        
+Equation dolcan -0.0007(0.0003)*    0.1561(0.0557)**   -0.0035(0.0047)    
+Equation cpiUSA -0.0004(0.0039)     0.6311(0.6969)     0.4827(0.0591)***  
+Equation cpiCAN -0.0041(0.0059)     0.2614(1.0331)     0.2651(0.0875)**   
+                D_cpiCAN -1         D_dolcan -2         D_cpiUSA -2        
+Equation dolcan -0.0007(0.0031)     -0.0379(0.0558)     -0.0006(0.0049)    
+Equation cpiUSA -0.0386(0.0394)     -0.6225(0.6983)     -0.0161(0.0607)    
+Equation cpiCAN -0.0463(0.0584)     -0.3357(1.0351)     -0.0106(0.0899)    
+                D_cpiCAN -2       
+Equation dolcan -0.0077(0.0031)*  
+Equation cpiUSA 0.0713(0.0394).   
+Equation cpiCAN 0.1482(0.0584)*   
+
+$var_l2_adf_bo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 33
+AIC -4910.109 	BIC -4785.651 	SSR 24.9023
+
+                Intercept           Trend                dolcan-1           
+Equation dolcan 0.0068(0.0127)      -0.0002(9.6e-05)     -0.0211(0.0094)*   
+Equation cpiUSA 0.2964(0.1583).     0.0007(0.0012)       -0.0639(0.1169)    
+Equation cpiCAN -0.3697(0.2350)     -0.0053(0.0018)**    0.0856(0.1735)     
+                cpiUSA-1            cpiCAN-1            D_dolcan -1       
+Equation dolcan 0.0013(0.0006)*     -0.0007(0.0003)*    0.1577(0.0559)**  
+Equation cpiUSA -0.0032(0.0072)     0.0003(0.0040)      0.7032(0.6952)    
+Equation cpiCAN 0.0230(0.0107)*     -0.0050(0.0059)     0.1715(1.0322)    
+                D_cpiUSA -1         D_cpiCAN -1         D_dolcan -2        
+Equation dolcan -0.0037(0.0047)     -0.0004(0.0032)     -0.0357(0.0561)    
+Equation cpiUSA 0.4744(0.0590)***   -0.0296(0.0395)     -0.5246(0.6975)    
+Equation cpiCAN 0.2754(0.0876)**    -0.0576(0.0587)     -0.4578(1.0356)    
+                D_cpiUSA -2         D_cpiCAN -2       
+Equation dolcan -0.0008(0.0049)     -0.0075(0.0032)*  
+Equation cpiUSA -0.0215(0.0605)     0.0799(0.0395)*   
+Equation cpiCAN -0.0037(0.0898)     0.1375(0.0586)*   
+
+$var_l2_adf_no
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 27
+AIC -4896.79 	BIC -4794.961 	SSR 25.56968
+
+                dolcan-1           cpiUSA-1            cpiCAN-1           
+Equation dolcan 0.0017(0.0032)     0.0003(0.0003)      -0.0003(0.0003)    
+Equation cpiUSA 0.1629(0.0399)***  -0.0025(0.0039)     0.0014(0.0036)     
+Equation cpiCAN 0.2792(0.0597)***  -0.0052(0.0058)     0.0022(0.0054)     
+                D_dolcan -1        D_cpiUSA -1         D_cpiCAN -1        
+Equation dolcan 0.1594(0.0564)**   -0.0019(0.0047)     0.0006(0.0032)     
+Equation cpiUSA 0.6479(0.6972)     0.4910(0.0586)***   -0.0326(0.0390)    
+Equation cpiCAN 0.3200(1.0433)     0.2940(0.0878)***   -0.0251(0.0584)    
+                D_dolcan -2         D_cpiUSA -2         D_cpiCAN -2       
+Equation dolcan -0.0416(0.0565)     0.0014(0.0049)      -0.0063(0.0031)*  
+Equation cpiUSA -0.6414(0.6985)     -0.0058(0.0601)     0.0781(0.0390)*   
+Equation cpiCAN -0.4014(1.0453)     0.0251(0.0899)      0.1719(0.0583)**  
+
+> 
+> lapply(var_all, function(x) head(residuals(x), 3))
+$var_l1_co
+           dolcan      cpiUSA      cpiCAN
+[1,] -0.005838096 -0.11723045 -0.20366013
+[2,] -0.001153241 -0.03804209 -0.27291264
+[3,]  0.001628365 -0.11854049 -0.05234842
+
+$var_l1_tr
+            dolcan      cpiUSA      cpiCAN
+[1,] -0.0054651762 -0.10222994 -0.21042618
+[2,] -0.0007400776 -0.02164029 -0.27959938
+[3,]  0.0020142860 -0.10269771 -0.06053874
+
+$var_l1_bo
+           dolcan      cpiUSA      cpiCAN
+[1,] -0.005751876 -0.11602446 -0.19680505
+[2,] -0.001051344 -0.03661682 -0.26481110
+[3,]  0.001708235 -0.11742333 -0.04599823
+
+$var_l1_no
+            dolcan        cpiUSA      cpiCAN
+[1,] -0.0046435736 -0.0817699620 -0.17848040
+[2,]  0.0001247203 -0.0001046374 -0.24597407
+[3,]  0.0029312845 -0.0798621340 -0.02488375
+
+$var_l3_co
+            dolcan      cpiUSA      cpiCAN
+[1,]  8.589724e-05 -0.09997021 -0.02038427
+[2,] -4.837982e-03 -0.05650368 -0.08080706
+[3,] -5.189144e-03 -0.04941830 -0.06424025
+
+$var_l3_tr
+            dolcan      cpiUSA      cpiCAN
+[1,] -8.628397e-05 -0.08995471 -0.04365856
+[2,] -4.705314e-03 -0.04519675 -0.09827242
+[3,] -4.894064e-03 -0.03650256 -0.08032415
+
+$var_l3_bo
+            dolcan      cpiUSA      cpiCAN
+[1,] -0.0002766288 -0.09831076 -0.03323768
+[2,] -0.0049510848 -0.05598596 -0.08481713
+[3,] -0.0051883571 -0.04942190 -0.06421236
+
+$var_l3_no
+           dolcan      cpiUSA       cpiCAN
+[1,]  0.001981517 -0.07953230 -0.007350036
+[2,] -0.002985055 -0.03652607 -0.068066373
+[3,] -0.003198583 -0.02795678 -0.050553202
+
+$var_l2_diff_co
+           dolcan      cpiUSA       cpiCAN
+[1,]  0.001685337 -0.07134359  0.057361248
+[2,] -0.003263559 -0.02900376 -0.007299898
+[3,] -0.003403099 -0.02259077  0.004510002
+
+$var_l2_diff_tr
+           dolcan      cpiUSA     cpiCAN
+[1,]  0.003779509 0.006317124 0.12048960
+[2,] -0.001374186 0.041270702 0.04788365
+[3,] -0.001545613 0.046319519 0.06027517
+
+$var_l2_diff_bo
+            dolcan      cpiUSA      cpiCAN
+[1,]  0.0007945498 -0.09713958 -0.03096166
+[2,] -0.0041038164 -0.05333648 -0.09061271
+[3,] -0.0041979248 -0.04560785 -0.07429820
+
+$var_l2_diff_no
+           dolcan      cpiUSA     cpiCAN
+[1,]  0.003134868 -0.01864941 0.11006347
+[2,] -0.002043534  0.01534729 0.03705792
+[3,] -0.002128709  0.02373660 0.05084444
+
+$var_l2_adf_co
+            dolcan      cpiUSA      cpiCAN
+[1,]  8.589731e-05 -0.09997020 -0.02038427
+[2,] -4.837982e-03 -0.05650368 -0.08080706
+[3,] -5.189144e-03 -0.04941830 -0.06424025
+
+$var_l2_adf_tr
+            dolcan      cpiUSA      cpiCAN
+[1,] -8.628392e-05 -0.08995471 -0.04365856
+[2,] -4.705314e-03 -0.04519675 -0.09827242
+[3,] -4.894064e-03 -0.03650256 -0.08032415
+
+$var_l2_adf_bo
+            dolcan      cpiUSA      cpiCAN
+[1,] -0.0002766288 -0.09831076 -0.03323767
+[2,] -0.0049510848 -0.05598596 -0.08481712
+[3,] -0.0051883571 -0.04942190 -0.06421235
+
+$var_l2_adf_no
+           dolcan      cpiUSA       cpiCAN
+[1,]  0.001981517 -0.07953230 -0.007350036
+[2,] -0.002985054 -0.03652607 -0.068066373
+[3,] -0.003198583 -0.02795677 -0.050553202
+
+> lapply(var_all, function(x) head(fitted(x), 3))
+$var_l1_co
+        dolcan   cpiUSA   cpiCAN
+[1,] 1.0014381 28.28723 26.20366
+[2,] 0.9978532 28.47804 26.34291
+[3,] 0.9990716 28.74854 26.41235
+
+$var_l1_tr
+        dolcan   cpiUSA   cpiCAN
+[1,] 1.0010652 28.27223 26.21043
+[2,] 0.9974401 28.46164 26.34960
+[3,] 0.9986857 28.73270 26.42054
+
+$var_l1_bo
+        dolcan   cpiUSA   cpiCAN
+[1,] 1.0013519 28.28602 26.19681
+[2,] 0.9977513 28.47662 26.33481
+[3,] 0.9989918 28.74742 26.40600
+
+$var_l1_no
+        dolcan   cpiUSA   cpiCAN
+[1,] 1.0002436 28.25177 26.17848
+[2,] 0.9965753 28.44010 26.31597
+[3,] 0.9977687 28.70986 26.38488
+
+$var_l3_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.000614 28.72997 26.38038
+[2,] 1.005638 28.86650 26.63081
+[3,] 1.003589 29.05942 26.85424
+
+$var_l3_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.000786 28.71995 26.40366
+[2,] 1.005505 28.85520 26.64827
+[3,] 1.003294 29.04650 26.87032
+
+$var_l3_bo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.000977 28.72831 26.39324
+[2,] 1.005751 28.86599 26.63482
+[3,] 1.003588 29.05942 26.85421
+
+$var_l3_no
+        dolcan   cpiUSA   cpiCAN
+[1,] 0.9987185 28.70953 26.36735
+[2,] 1.0037851 28.84653 26.61807
+[3,] 1.0015986 29.03796 26.84055
+
+$var_l2_diff_co
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.002314663 0.2613436 0.2326388
+[2,] 0.003363559 0.2090038 0.1972999
+[3,] 0.001003099 0.2225908 0.2354900
+
+$var_l2_diff_tr
+            dolcan    cpiUSA    cpiCAN
+[1,]  0.0002204907 0.1836829 0.1695104
+[2,]  0.0014741857 0.1387293 0.1421163
+[3,] -0.0008543874 0.1536805 0.1797248
+
+$var_l2_diff_bo
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.003205450 0.2871396 0.3209617
+[2,] 0.004203816 0.2333365 0.2806127
+[3,] 0.001797925 0.2456079 0.3142982
+
+$var_l2_diff_no
+            dolcan    cpiUSA    cpiCAN
+[1,]  0.0008651325 0.2086494 0.1799365
+[2,]  0.0021435343 0.1646527 0.1529421
+[3,] -0.0002712910 0.1762634 0.1891556
+
+$var_l2_adf_co
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.003914103 0.2899702 0.3103843
+[2,] 0.004937982 0.2365037 0.2708071
+[3,] 0.002789144 0.2494183 0.3042403
+
+$var_l2_adf_tr
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.004086284 0.2799547 0.3336586
+[2,] 0.004805314 0.2251968 0.2882724
+[3,] 0.002494064 0.2365026 0.3203242
+
+$var_l2_adf_bo
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.004276629 0.2883108 0.3232377
+[2,] 0.005051085 0.2359860 0.2748171
+[3,] 0.002788357 0.2494219 0.3042124
+
+$var_l2_adf_no
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.002018483 0.2695323 0.2973500
+[2,] 0.003085054 0.2165261 0.2580664
+[3,] 0.000798583 0.2279568 0.2905532
+
+> sapply(var_all, deviance)
+     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
+      29.23749       28.55718       28.29124       30.05131       25.40966 
+     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
+      25.12657       24.90230       25.56968       26.01173       27.74863 
+var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
+      25.37086       28.20989       25.40966       25.12657       24.90230 
+ var_l2_adf_no 
+      25.56968 
+> 
+> 
+> ## logLik/AIC/BIC
+> sapply(var_all, logLik)
+     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
+      1071.018       1074.647       1079.742       1059.992       1114.481 
+     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
+      1117.300       1121.617       1108.957       1106.000       1087.205 
+var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
+      1111.747       1079.284       1114.481       1117.300       1121.617 
+ var_l2_adf_no 
+      1108.957 
+> sapply(var_all, AIC)
+     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
+     -4867.939      -4875.198      -4879.388      -4851.887      -4901.837 
+     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
+     -4907.476      -4910.109      -4896.790      -4902.876      -4865.286 
+var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
+     -4908.370      -4855.443      -4901.837      -4907.476      -4910.109 
+ var_l2_adf_no 
+     -4896.790 
+> sapply(var_all, AIC, fitMeasure="LL")
+     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
+     -2118.037      -2125.295      -2129.485      -2101.984      -2168.961 
+     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
+     -2174.601      -2177.233      -2163.914      -2170.000      -2132.411 
+var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
+     -2175.495      -2122.568      -2168.961      -2174.601      -2177.233 
+ var_l2_adf_no 
+     -2163.914 
+> sapply(var_all, BIC)
+     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
+     -4822.608      -4829.866      -4822.723      -4817.888      -4788.693 
+     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
+     -4794.333      -4785.651      -4794.961      -4823.675      -4786.086 
+var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
+     -4817.856      -4787.557      -4788.693      -4794.333      -4785.651 
+ var_l2_adf_no 
+     -4794.961 
+> sapply(var_all, BIC, fitMeasure="LL")
+     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
+     -2072.705      -2079.963      -2072.820      -2067.986      -2055.818 
+     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
+     -2061.457      -2052.775      -2062.085      -2090.800      -2053.211 
+var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
+     -2084.980      -2054.682      -2055.818      -2061.457      -2052.775 
+ var_l2_adf_no 
+     -2062.085 
+> 
+> 
+> 
+> 
+> ### fevd
+> var_all_fevd <- var_all[-grep("diff|adf", names(var_all))]
+> lapply(var_all_fevd , function(x) sapply(fevd(x, n.ahead=2), head))
+$var_l1_co
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 2.511863e-03 0.003808572
+[2,] 9.999371e-01 3.217085e-03 0.003570799
+[3,] 0.000000e+00 9.974881e-01 0.116854952
+[4,] 1.491635e-05 9.967722e-01 0.116372232
+[5,] 0.000000e+00 0.000000e+00 0.879336476
+[6,] 4.800138e-05 1.067863e-05 0.880056969
+
+$var_l1_tr
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 2.385796e-03 0.006014811
+[2,] 9.998427e-01 2.479829e-03 0.006642536
+[3,] 0.000000e+00 9.976142e-01 0.105575764
+[4,] 8.760678e-05 9.974912e-01 0.110794700
+[5,] 0.000000e+00 0.000000e+00 0.888409425
+[6,] 6.969380e-05 2.899129e-05 0.882562764
+
+$var_l1_bo
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.0000000000 2.815169e-03 0.005634980
+[2,] 0.9998763308 3.597262e-03 0.005626463
+[3,] 0.0000000000 9.971848e-01 0.114291384
+[4,] 0.0000593246 9.963830e-01 0.121493936
+[5,] 0.0000000000 0.000000e+00 0.880073637
+[6,] 0.0000643446 1.970996e-05 0.872879602
+
+$var_l1_no
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 5.899930e-04 0.002330785
+[2,] 9.999654e-01 2.958055e-04 0.001486612
+[3,] 0.000000e+00 9.994100e-01 0.128830703
+[4,] 6.274854e-06 9.997042e-01 0.127467168
+[5,] 0.000000e+00 0.000000e+00 0.868838511
+[6,] 2.828318e-05 7.866867e-10 0.871046220
+
+$var_l3_co
+           dolcan       cpiUSA       cpiCAN
+[1,] 1.000000e+00 0.0003468833 0.0009968040
+[2,] 9.994225e-01 0.0002869233 0.0005175215
+[3,] 0.000000e+00 0.9996531167 0.0706477288
+[4,] 5.770874e-04 0.9989310527 0.1290219711
+[5,] 0.000000e+00 0.0000000000 0.9283554672
+[6,] 3.963741e-07 0.0007820240 0.8704605074
+
+$var_l3_tr
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.0000000000 0.0001565851 0.002482185
+[2,] 0.9992975808 0.0005479747 0.001987790
+[3,] 0.0000000000 0.9998434149 0.069315333
+[4,] 0.0004515501 0.9984683802 0.128984494
+[5,] 0.0000000000 0.0000000000 0.928202481
+[6,] 0.0002508691 0.0009836452 0.869027716
+
+$var_l3_bo
+          dolcan       cpiUSA      cpiCAN
+[1,] 1.000000000 0.0002495098 0.002241994
+[2,] 0.999282688 0.0003710554 0.001668615
+[3,] 0.000000000 0.9997504902 0.075744094
+[4,] 0.000545248 0.9990739282 0.141636536
+[5,] 0.000000000 0.0000000000 0.922013912
+[6,] 0.000172064 0.0005550165 0.856694850
+
+$var_l3_no
+           dolcan       cpiUSA       cpiCAN
+[1,] 1.000000e+00 3.412194e-06 0.0005863181
+[2,] 9.998530e-01 1.284915e-03 0.0003134402
+[3,] 0.000000e+00 9.999966e-01 0.0729798607
+[4,] 1.405523e-04 9.980805e-01 0.1346035471
+[5,] 0.000000e+00 0.000000e+00 0.9264338212
+[6,] 6.427015e-06 6.345555e-04 0.8650830127
+
+> 
+> 
+> 
+> ## predict
+> var_all_pred <- var_all[-grep("bo|no|adf|diff", names(var_all))]
+> lapply(var_all_pred, function(x) sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
+$var_l1_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.475498 110.6729 107.1721
+[2,] 1.478789 110.8955 107.3440
+
+$var_l1_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.515193 111.6651 108.7021
+[2,] 1.557888 112.8895 110.4156
+
+$var_l3_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.478664 110.5527 107.0629
+[2,] 1.483144 110.7147 107.1851
+
+$var_l3_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.537566 110.8513 108.0941
+[2,] 1.606902 111.4570 109.2867
+
+> lapply(var_all, function(x) try(sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
+$var_l1_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.475498 110.6729 107.1721
+[2,] 1.478789 110.8955 107.3440
+
+$var_l1_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.515193 111.6651 108.7021
+[2,] 1.557888 112.8895 110.4156
+
+$var_l1_bo
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l1_no
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l3_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.478664 110.5527 107.0629
+[2,] 1.483144 110.7147 107.1851
+
+$var_l3_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.537566 110.8513 108.0941
+[2,] 1.606902 111.4570 109.2867
+
+$var_l3_bo
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l3_no
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l2_diff_co
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+
+$var_l2_diff_tr
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+
+$var_l2_diff_bo
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l2_diff_no
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l2_adf_co
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+
+$var_l2_adf_tr
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+
+$var_l2_adf_bo
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l2_adf_no
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+> 
+> ## boot
+> var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
+> lapply(var_all_boot, function(x) head(VAR.boot(x, seed=1234),2))
+$var_l1_co
+          [,1]     [,2]     [,3]
+[1,] 0.9993000 27.98000 25.86000
+[2,] 0.9856327 28.07279 26.00096
+
+$var_l1_tr
+          [,1]     [,2]     [,3]
+[1,] 0.9993000 27.98000 25.86000
+[2,] 0.9861951 28.08904 26.01449
+
+$var_l1_bo
+          [,1]     [,2]     [,3]
+[1,] 0.9993000 27.98000 25.86000
+[2,] 0.9859495 28.07722 26.02615
+
+$var_l1_no
+          [,1]    [,2]     [,3]
+[1,] 0.9993000 27.9800 25.86000
+[2,] 0.9861012 28.0867 26.01084
+
+$var_l3_co
+       [,1]  [,2]  [,3]
+[1,] 0.9993 27.98 25.86
+[2,] 0.9956 28.17 26.00
+
+$var_l3_tr
+       [,1]  [,2]  [,3]
+[1,] 0.9993 27.98 25.86
+[2,] 0.9956 28.17 26.00
+
+$var_l3_bo
+       [,1]  [,2]  [,3]
+[1,] 0.9993 27.98 25.86
+[2,] 0.9956 28.17 26.00
+
+$var_l3_no
+       [,1]  [,2]  [,3]
+[1,] 0.9993 27.98 25.86
+[2,] 0.9956 28.17 26.00
+
+> 
+> 
+> proc.time()
+utilisateur     système      écoulé 
+      3.340       0.070       3.479 
