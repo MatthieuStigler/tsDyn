@@ -1,23 +1,27 @@
 
 
 TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, round=FALSE){
-  if(!missing(data)&!missing(B))
-	  stop("You have to provide either B or y, but not both")
-  p<-lag
-  type<-match.arg(type)
-  include<-match.arg(include)
 
   ###check correct arguments
   if(!nthresh%in%c(0,1,2))
     stop("Arg nthresh should  be either 0, 1 or 2")
   if(!missing(n)&any(!missing(data), !missing(TVARobject)))
     stop("arg n should not be given with arg data or TVARobject")
-  if(max(thDelay)>p)
-	  stop("Max of thDelay should be smaller or equal to the number of lags")
   if(!missing(TVARobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag), !missing(thDelay), !missing(mTh)))
     warning("When object TVARobject is given, only args 'type' and 'round' are relevant, others are not considered")
-  ##include term
-    ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
+  if(!missing(data)&!missing(B))
+	  stop("You have to provide either B or y, but not both")
+
+  type<-match.arg(type)
+  include<-match.arg(include)
+
+  ## Create some variables/parameters
+  p <- switch(type, "boot"=if(!missing(TVARobject)) TVARobject$lag else lag, lag)
+  ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
+  add <- switch(type, "simul"=p, 0)
+  if(max(thDelay)>p)
+	  stop("Max of thDelay should be smaller or equal to the number of lags")
+
 
   ### possibility 1: only parameters matrix is given
   if(!missing(B)){
@@ -98,7 +102,7 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
     }
   }
 
-  t <- T-p 		#Size of end sample
+  t <- T-p+add 		#Size of end sample
   npar<-k*(p+ninc)
 
     ##### put coefficients vector in right form according to arg include (arg both need no modif)
@@ -119,7 +123,7 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
   ##############################
 
   #initial values
-  Yb<-matrix(0, nrow=T, ncol=k)
+  Yb<-matrix(0, nrow=T+add, ncol=k)
   Yb[1:p,]<-y[1:p,]		
 
   if(nthresh>0){
@@ -127,24 +131,26 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
     z2[1:p]<-y[1:p,]%*%combin
   }
 
-  trend<-1:T
-  trend<-c(NA, 1:(T-1))
+  trend<-1:(T+add)
+  trend<-c(NA, 1:(T-1+add))
 
-  ##resampling
+  ##Innovations Specifications 
   if(type=="simul"&&dim(innov)!=c(n,k))
     stop(paste("input innov is not of right dim, should be matrix with", n,"rows and ", k, "cols\n"))
-  innov<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"=innov, "check"=res)
+  innov<-switch(type, "boot"=if(missing(innov)) res[sample(seq_len(t), replace=TRUE),] else innov, "simul"=innov, "check"=res)
   resb<-rbind(matrix(0,nrow=p, ncol=k),innov)	
 
+  ## MAIN loop:
+
   if(nthresh==0){
-	  for(i in (p+1):T){
+	  for(i in (p+1):(T+add)){
 		  Yb[i,]<-rowSums(cbind(Bmat[,1], Bmat[,2]*trend[i], Bmat[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
 	  }
   } else if(nthresh==1){
 	  BDown<-Bmat[,seq_len(nparBmat)]
 	  BUp<-Bmat[,-seq_len(nparBmat)]
 
-	  for(i in (p+1):(nrow(y))){
+	  for(i in (p+1):(T+add)){
 		  if(round(z2[i-thDelay],ndig)<=Thresh) {
 			  Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
 			  if(round)
@@ -161,7 +167,7 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
 	  BDown <- Bmat[,seq_len(nparBmat)]
 	  BMiddle <- Bmat[,seq_len(nparBmat)+nparBmat]
 	  BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
-	  for(i in (p+1):(nrow(y))){
+	  for(i in (p+1):(T+add)){
 		  if(round(z2[i-thDelay],ndig)<=Thresh[1]) 
 			  Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
 		  else if(round(z2[i-thDelay],ndig)>Thresh[2]) 
@@ -181,6 +187,11 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
 		  Recall(B=Bmat, n=n, lag=lag, nthresh=nthresh, thDelay=thDelay, Thresh, thVar=thVar, mTh=mTh, type=type, starting=starting)
   }
   # print(cbind(y, round(Yb,3)))
+
+  if(type=="simul"){
+    Yb <- tail(Yb, -p)
+    rownames(Yb) <- seq_len(nrow(Yb))
+  }
 
   if(show.parMat)
     print(Bmat)

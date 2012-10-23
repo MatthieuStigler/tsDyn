@@ -27,9 +27,9 @@ A matrix with the simulated/bootstraped series.
 \item{thDelay}{'time delay' for the threshold variable (as multiple of embedding time delay d) PLEASE NOTE that the notation is currently different to univariate models in tsDyn. The left side variable is taken at time t, and not t+1 as in univariate cases.}
 \item{thVar}{external transition variable}
 \item{mTh}{combination of variables with same lag order for the transition variable. Either a single value (indicating which variable to take) or a combination}
-\item{starting}{Starting values when a simulation with given parameter matrix is made}
-\item{innov}{Innovations used for simulation. Should be matrix of dim nxk. By default multivariate normal.}
-\item{varcov}{Variance-covariance matrix for the innovations. By default multivariate normal is used.}
+\item{starting}{Starting values (matrix of dimension lag x k). If not given, set to zero. }
+\item{innov}{Innovations used for simulation. Should be matrix of dim n x k. By default multivariate normal.}
+\item{varcov}{Variance-covariance matrix for the innovations. By default identity matrix.}
 \item{show.parMat}{Logical. Should the parameter matrix be shown? Useful to understand how to give right input}
 \item{round}{Rounds the series created to have the same digits (hopefully) as original series. }
 \item{\dots}{Further arguments passed to the underlying (un-exported) \code{TVAR.gen} function}
