@@ -969,8 +969,8 @@ var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo
 > 
 > 
 > ### fevd
-> var_all_fevd <- var_all[-grep("diff|adf", names(var_all))]
-> lapply(var_all_fevd , function(x) sapply(fevd(x, n.ahead=2), head))
+> var_all_level <- var_all[-grep("diff|adf", names(var_all))]
+> lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 $var_l1_co
            dolcan       cpiUSA      cpiCAN
 [1,] 1.000000e+00 2.511863e-03 0.003808572
@@ -1177,48 +1177,80 @@ attr(,"condition")
 > 
 > ## boot
 > var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
-> lapply(var_all_boot, function(x) head(VAR.boot(x, seed=1234),2))
+> lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 $var_l1_co
-          [,1]     [,2]     [,3]
-[1,] 0.9993000 27.98000 25.86000
-[2,] 0.9856327 28.07279 26.00096
+           [,1]     [,2]     [,3]
+[323,] 1.442404 113.8773 110.2911
+[324,] 1.445671 114.0330 110.5575
 
 $var_l1_tr
-          [,1]     [,2]     [,3]
-[1,] 0.9993000 27.98000 25.86000
-[2,] 0.9861951 28.08904 26.01449
+           [,1]     [,2]     [,3]
+[323,] 1.137617 102.2290 99.10353
+[324,] 1.137412 102.2283 99.17006
 
 $var_l1_bo
-          [,1]     [,2]     [,3]
-[1,] 0.9993000 27.98000 25.86000
-[2,] 0.9859495 28.07722 26.02615
+           [,1]     [,2]     [,3]
+[323,] 1.503339 114.4799 108.1857
+[324,] 1.506696 114.6297 108.4283
 
 $var_l1_no
-          [,1]    [,2]     [,3]
-[1,] 0.9993000 27.9800 25.86000
-[2,] 0.9861012 28.0867 26.01084
+           [,1]     [,2]     [,3]
+[323,] 1.238563 104.0766 101.5310
+[324,] 1.240809 104.1735 101.7416
 
 $var_l3_co
-       [,1]  [,2]  [,3]
-[1,] 0.9993 27.98 25.86
-[2,] 0.9956 28.17 26.00
+           [,1]     [,2]     [,3]
+[323,] 1.598671 113.2035 108.8799
+[324,] 1.602465 113.1174 109.1044
 
 $var_l3_tr
-       [,1]  [,2]  [,3]
-[1,] 0.9993 27.98 25.86
-[2,] 0.9956 28.17 26.00
+           [,1]     [,2]     [,3]
+[323,] 1.626017 116.6467 114.0517
+[324,] 1.633879 116.6164 114.3531
 
 $var_l3_bo
-       [,1]  [,2]  [,3]
-[1,] 0.9993 27.98 25.86
-[2,] 0.9956 28.17 26.00
+           [,1]     [,2]     [,3]
+[323,] 1.473404 113.6039 113.9904
+[324,] 1.479700 113.5191 114.2641
 
 $var_l3_no
-       [,1]  [,2]  [,3]
-[1,] 0.9993 27.98 25.86
-[2,] 0.9956 28.17 26.00
+           [,1]     [,2]     [,3]
+[323,] 1.675683 110.2168 105.3033
+[324,] 1.681117 110.2065 105.6054
 
 > 
+> ## sim 
+> comp_tvar_sim <- function(mod, serie){
++   ns <- nrow(serie)
++   sim_mod <- TVAR.sim(B=coef(mod), lag=mod$lag, include=mod$include,nthresh=0, n=ns-mod$lag, innov=residuals(mod), starting=serie[1:mod$lag,,drop=FALSE])
++   all.equal(sim_mod, as.matrix(serie)[-c(1:mod$lag),], check.attr=FALSE)
++ }
+> 
+> lapply(var_all_level, comp_tvar_sim, serie=barry)
+$var_l1_co
+[1] TRUE
+
+$var_l1_tr
+[1] "Mean relative difference: 0.02489267"
+
+$var_l1_bo
+[1] "Mean relative difference: 0.004819636"
+
+$var_l1_no
+[1] TRUE
+
+$var_l3_co
+[1] TRUE
+
+$var_l3_tr
+[1] "Mean relative difference: 0.05214437"
+
+$var_l3_bo
+[1] "Mean relative difference: 0.01007661"
+
+$var_l3_no
+[1] TRUE
+
 > 
 > proc.time()
 utilisateur     système      écoulé 

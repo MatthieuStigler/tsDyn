@@ -62,8 +62,8 @@ sapply(var_all, BIC, fitMeasure="LL")
 
 
 ### fevd
-var_all_fevd <- var_all[-grep("diff|adf", names(var_all))]
-lapply(var_all_fevd , function(x) sapply(fevd(x, n.ahead=2), head))
+var_all_level <- var_all[-grep("diff|adf", names(var_all))]
+lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 
 
 
@@ -74,5 +74,13 @@ lapply(var_all, function(x) try(sapply(predict(x, n.ahead=2)$fcst, function(y) y
 
 ## boot
 var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
-lapply(var_all_boot, function(x) head(VAR.boot(x, seed=1234),2))
+lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 
+## sim 
+comp_tvar_sim <- function(mod, serie){
+  ns <- nrow(serie)
+  sim_mod <- TVAR.sim(B=coef(mod), lag=mod$lag, include=mod$include,nthresh=0, n=ns-mod$lag, innov=residuals(mod), starting=serie[1:mod$lag,,drop=FALSE])
+  all.equal(sim_mod, as.matrix(serie)[-c(1:mod$lag),], check.attr=FALSE)
+}
+
+lapply(var_all_level, comp_tvar_sim, serie=barry)
