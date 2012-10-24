@@ -17,8 +17,6 @@ en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
 Tapez 'q()' pour quitter R.
 
 > 
-> 
-> 
 > library(tsDyn)
 Le chargement a nécessité le package : mgcv
 This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
@@ -42,14 +40,13 @@ The following object(s) are masked from ‘package:base’:
 Le chargement a nécessité le package : sandwich
 Le chargement a nécessité le package : urca
 Le chargement a nécessité le package : lmtest
+> 
 > data(Canada)
 > 
 > 
-> ########################
-> ######## Models
-> ########################
-> 
+> #########################
 > ##### VECM #####
+> #########################
 > 
 > ### unrestricted cons
 > vecm_l1_co_tsD <-VECM(Canada, lag=1, include="const", estim="ML")
@@ -151,6 +148,128 @@ Le chargement a nécessité le package : lmtest
 [3] "Component 3: Mean relative difference: 0.001637227"
 [4] "Component 4: Mean relative difference: 0.01815156" 
 
+> 
+> #########################
+> ##### VAR #####
+> #########################
+> 
+> var_l1_co_tsD <-lineVar(Canada, lag=1, include="const")
+> var_l1_tr_tsD <-lineVar(Canada, lag=1, include="trend")
+> var_l1_bo_tsD <-lineVar(Canada, lag=1, include="both")
+> var_l1_no_tsD <-lineVar(Canada, lag=1, include="none")
+> 
+> var_l3_co_tsD <-lineVar(Canada, lag=3, include="const")
+> var_l3_tr_tsD <-lineVar(Canada, lag=3, include="trend")
+> var_l3_bo_tsD <-lineVar(Canada, lag=3, include="both")
+> var_l3_no_tsD <-lineVar(Canada, lag=3, include="none")
+> 
+> var_l1_co_var <- VAR(Canada, p=1, type="const")
+> var_l1_tr_var <- VAR(Canada, p=1, type="trend")
+> var_l1_bo_var <- VAR(Canada, p=1, type="both")
+> var_l1_no_var <- VAR(Canada, p=1, type="none")
+> 
+> var_l3_co_var <- VAR(Canada, p=3, type="const")
+> var_l3_tr_var <- VAR(Canada, p=3, type="trend")
+> var_l3_bo_var <- VAR(Canada, p=3, type="both")
+> var_l3_no_var <- VAR(Canada, p=3, type="none")
+> 
+> 
+> 
+> all_var_models <- list(
++ 		    list(var_l1_co_tsD, var_l1_co_var), 
++ 		    list(var_l1_tr_tsD, var_l1_tr_var), 
++ 		    list(var_l1_bo_tsD, var_l1_bo_var), 
++ 		    list(var_l1_no_tsD, var_l1_no_var), 
++ 		    list(var_l3_co_tsD, var_l3_co_var), 
++ 		    list(var_l3_tr_tsD, var_l3_tr_var), 
++ 		    list(var_l3_bo_tsD, var_l3_bo_var), 
++ 		    list(var_l3_no_tsD, var_l3_no_var))
+> 
+> all_var_models_noNoBo <- all_var_models <- list(
++ 		    list(var_l1_co_tsD, var_l1_co_var), 
++ 		    list(var_l1_tr_tsD, var_l1_tr_var), 
++ 		    list(var_l3_co_tsD, var_l3_co_var), 
++ 		    list(var_l3_tr_tsD, var_l3_tr_var))
+> 
+> ## test functions
+> coef_to_vars <- function(x){
++   c <- coef(x)
++   if(any(grepl("Intercept|Trend", colnames(c)))){
++     wh.deter <- grep("Intercept|Trend", colnames(c))
++     res <- cbind(c[,-wh.deter], c[,wh.deter,drop=FALSE])
++   } else {
++     res <- c
++   }
++   colnames(res) <-gsub(" -", "\\.l", colnames(res))
++   rownames(res) <-gsub("Equation ", "", rownames(res))
++   return(res)
++ }
+> 
+> comp_var_coefs <- function(x) all.equal(coef_to_vars (x[[1]]), t(sapply(coef(x[[2]]), function(x) x[,"Estimate"])), check.attributes=FALSE)
+> comp_var_logLik <- function(x) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE)
+> 
+> comp_var_pred <- function(x) all.equal(predict(x[[1]])$fcst, predict(x[[2]])$fcst, check.attributes=FALSE)
+> comp_var_fevd <- function(x) all.equal(sapply(fevd(x[[1]]), head,2), sapply(fevd(x[[2]]), head,2), check.attributes=FALSE)
+> comp_var_IRF <- function(x) all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+> 
+> ### Compare VECM methods:
+> sapply(all_var_models, comp_var_coefs)
+[1] "TRUE"                                  
+[2] "Mean relative difference: 0.0001085181"
+[3] "TRUE"                                  
+[4] "Mean relative difference: 0.0001395301"
+> sapply(all_var_models, comp_var_logLik)
+[1] "TRUE"                                  
+[2] "Mean relative difference: 6.786063e-07"
+[3] "TRUE"                                  
+[4] "Mean relative difference: 1.354595e-07"
+> sapply(all_var_models_noNoBo, comp_var_pred)
+     [,1]                                                 
+[1,] "Component 1: Mean relative difference: 7.675739e-05"
+[2,] "Component 2: Mean relative difference: 0.0002255499"
+[3,] "Component 3: Mean relative difference: 0.0001963706"
+[4,] "Component 4: Mean relative difference: 0.008199526" 
+     [,2]                                                
+[1,] "Component 1: Mean relative difference: 0.006846102"
+[2,] "Component 2: Mean relative difference: 0.03638343" 
+[3,] "Component 3: Mean relative difference: 0.02381402" 
+[4,] "Component 4: Mean relative difference: 0.4321642"  
+     [,3]                                                 
+[1,] "Component 1: Mean relative difference: 0.0002389407"
+[2,] "Component 2: Mean relative difference: 0.0006668945"
+[3,] "Component 3: Mean relative difference: 0.0005358804"
+[4,] "Component 4: Mean relative difference: 0.03067129"  
+     [,4]                                               
+[1,] "Component 1: Mean relative difference: 0.01482293"
+[2,] "Component 2: Mean relative difference: 0.06318516"
+[3,] "Component 3: Mean relative difference: 0.01409701"
+[4,] "Component 4: Mean relative difference: 0.5178776" 
+> sapply(all_var_models_noNoBo, comp_var_fevd)
+[1] "TRUE"                                  
+[2] "Mean relative difference: 1.261389e-05"
+[3] "TRUE"                                  
+[4] "Mean relative difference: 2.108834e-05"
+> sapply(all_var_models_noNoBo, comp_var_IRF)
+     [,1]                                               
+[1,] "Component 1: Mean relative difference: 0.03155347"
+[2,] "Component 2: Mean relative difference: 0.03155347"
+[3,] "Component 3: Mean relative difference: 0.03155347"
+[4,] "Component 4: Mean relative difference: 0.03155348"
+     [,2]                                               
+[1,] "Component 1: Mean relative difference: 0.03160114"
+[2,] "Component 2: Mean relative difference: 0.03154884"
+[3,] "Component 3: Mean relative difference: 0.0315109" 
+[4,] "Component 4: Mean relative difference: 0.03154268"
+     [,3]                                               
+[1,] "Component 1: Mean relative difference: 0.09141032"
+[2,] "Component 2: Mean relative difference: 0.09141032"
+[3,] "Component 3: Mean relative difference: 0.09141031"
+[4,] "Component 4: Mean relative difference: 0.09141032"
+     [,4]                                               
+[1,] "Component 1: Mean relative difference: 0.09141319"
+[2,] "Component 2: Mean relative difference: 0.09157098"
+[3,] "Component 3: Mean relative difference: 0.09115843"
+[4,] "Component 4: Mean relative difference: 0.09112954"
 > 
 > 
 > proc.time()

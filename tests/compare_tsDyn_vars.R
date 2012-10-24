@@ -1,16 +1,13 @@
 
-
-
 library(tsDyn)
 library(vars)
+
 data(Canada)
 
 
-########################
-######## Models
-########################
-
+#########################
 ##### VECM #####
+#########################
 
 ### unrestricted cons
 vecm_l1_co_tsD <-VECM(Canada, lag=1, include="const", estim="ML")
@@ -64,4 +61,74 @@ print(sapply(all_models, comp_FEVD))
 print(sapply(all_models, comp_resid)) # 5 and 6
 print(sapply(all_models, comp_fitted)) 
 print(sapply(all_models, comp_predict)) # 5 and 6
+
+#########################
+##### VAR #####
+#########################
+
+var_l1_co_tsD <-lineVar(Canada, lag=1, include="const")
+var_l1_tr_tsD <-lineVar(Canada, lag=1, include="trend")
+var_l1_bo_tsD <-lineVar(Canada, lag=1, include="both")
+var_l1_no_tsD <-lineVar(Canada, lag=1, include="none")
+
+var_l3_co_tsD <-lineVar(Canada, lag=3, include="const")
+var_l3_tr_tsD <-lineVar(Canada, lag=3, include="trend")
+var_l3_bo_tsD <-lineVar(Canada, lag=3, include="both")
+var_l3_no_tsD <-lineVar(Canada, lag=3, include="none")
+
+var_l1_co_var <- VAR(Canada, p=1, type="const")
+var_l1_tr_var <- VAR(Canada, p=1, type="trend")
+var_l1_bo_var <- VAR(Canada, p=1, type="both")
+var_l1_no_var <- VAR(Canada, p=1, type="none")
+
+var_l3_co_var <- VAR(Canada, p=3, type="const")
+var_l3_tr_var <- VAR(Canada, p=3, type="trend")
+var_l3_bo_var <- VAR(Canada, p=3, type="both")
+var_l3_no_var <- VAR(Canada, p=3, type="none")
+
+
+
+all_var_models <- list(
+		    list(var_l1_co_tsD, var_l1_co_var), 
+		    list(var_l1_tr_tsD, var_l1_tr_var), 
+		    list(var_l1_bo_tsD, var_l1_bo_var), 
+		    list(var_l1_no_tsD, var_l1_no_var), 
+		    list(var_l3_co_tsD, var_l3_co_var), 
+		    list(var_l3_tr_tsD, var_l3_tr_var), 
+		    list(var_l3_bo_tsD, var_l3_bo_var), 
+		    list(var_l3_no_tsD, var_l3_no_var))
+
+all_var_models_noNoBo <- all_var_models <- list(
+		    list(var_l1_co_tsD, var_l1_co_var), 
+		    list(var_l1_tr_tsD, var_l1_tr_var), 
+		    list(var_l3_co_tsD, var_l3_co_var), 
+		    list(var_l3_tr_tsD, var_l3_tr_var))
+
+## test functions
+coef_to_vars <- function(x){
+  c <- coef(x)
+  if(any(grepl("Intercept|Trend", colnames(c)))){
+    wh.deter <- grep("Intercept|Trend", colnames(c))
+    res <- cbind(c[,-wh.deter], c[,wh.deter,drop=FALSE])
+  } else {
+    res <- c
+  }
+  colnames(res) <-gsub(" -", "\\.l", colnames(res))
+  rownames(res) <-gsub("Equation ", "", rownames(res))
+  return(res)
+}
+
+comp_var_coefs <- function(x) all.equal(coef_to_vars (x[[1]]), t(sapply(coef(x[[2]]), function(x) x[,"Estimate"])), check.attributes=FALSE)
+comp_var_logLik <- function(x) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE)
+
+comp_var_pred <- function(x) all.equal(predict(x[[1]])$fcst, predict(x[[2]])$fcst, check.attributes=FALSE)
+comp_var_fevd <- function(x) all.equal(sapply(fevd(x[[1]]), head,2), sapply(fevd(x[[2]]), head,2), check.attributes=FALSE)
+comp_var_IRF <- function(x) all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+
+### Compare VECM methods:
+sapply(all_var_models, comp_var_coefs)
+sapply(all_var_models, comp_var_logLik)
+sapply(all_var_models_noNoBo, comp_var_pred)
+sapply(all_var_models_noNoBo, comp_var_fevd)
+sapply(all_var_models_noNoBo, comp_var_IRF)
 
