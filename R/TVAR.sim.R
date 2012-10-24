@@ -132,8 +132,7 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
     z2[1:p]<-y[1:p,]%*%combin
   }
 
-  trend<-1:(T+add)
-  trend<-c(NA, 1:(T-1+add))
+  trend<-1:(T+add) #   trend<-c(NA, 1:(T-1+add))
 
   ##Innovations Specifications 
   if(type=="simul"&&dim(innov)!=c(n,k))
@@ -257,67 +256,67 @@ environment(TVAR.sim)<-environment(star)
 ##Check case 1 (B is given) ok!
 ns<-nrow(serie)
 
-
-mod<-lineVar(serie, lag=1)
-mod_sim <- TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=rbind(residuals(mod),345), starting=serie[1,,drop=FALSE])
-all.equal(mod_sim, as.matrix(serie), check=FALSE)
-
-mod_l3<-lineVar(serie, lag=2)
-mod_l3_sim <- TVAR.sim(B=coef(mod_l3),type="simul", nthresh=0, lag=2,n=ns, innov=rbind(residuals(mod_l3),0,1), starting=serie[1:2,,drop=FALSE])
-all.equal(mod_l3_sim , as.matrix(serie), check=FALSE)
-tail(cbind(mod_l3_sim , as.matrix(serie)))
-
-innov <- matrix(0, nrow=ns, ncol=2)#residuals(mod)
-innov_res <- rbind(residuals(mod),0)
-start <- 
-# all.equal(TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=innov, starting=start, show.parMat=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=innov, starting=start)[-1,],fitted(mod), check.attributes=FALSE)
-
-head(cbind(TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=innov_res, starting=start)[-1,],serie[-1,]))
-
-## compare with original series: sim + residuals == original
-sim1 <- TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=innov, starting=start)+rbind(0,residuals(mod))
-sim2 <- TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=innov_res, starting=start)
-all.equal(sim2, as.matrix(serie), check=FALSE)
-head(cbind(sim1,sim2, as.matrix(serie)))
+comp_tvar_sim <- function(mod, serie){
+  ns <- nrow(serie)
+  sim_mod <- TVAR.sim(B=coef(mod), lag=mod$lag, include=mod$include,nthresh=0, n=ns-mod$lag, innov=residuals(mod), starting=serie[1:mod$lag,,drop=FALSE])
+  all.equal(sim_mod, as.matrix(serie)[-c(1:mod$lag),], check.attr=FALSE)
+}
 
 
+data(barry)
+var_l1_co <-lineVar(barry, lag=1, include="const")
+var_l1_tr <-lineVar(barry, lag=1, include="trend")
+var_l1_bo <-lineVar(barry, lag=1, include="both")
+var_l1_no <-lineVar(barry, lag=1, include="none")
 
-sim3 <- TVAR.sim(B=coef(mod),type="simul", nthresh=0, n=ns, innov=innov, starting=start, show.parMat=TRUE)
-head(cbind(sim3,rbind(start,fitted(mod))))
+var_l3_co <-lineVar(barry, lag=3, include="const")
+var_l3_tr <-lineVar(barry, lag=3, include="trend")
+var_l3_bo <-lineVar(barry, lag=3, include="both")
+var_l3_no <-lineVar(barry, lag=3, include="none")
 
-all.equal(TVAR.sim(data=serie,nthresh=0, type="check", include="const", round=FALSE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.sim(data=serie,nthresh=0, type="check", include="trend", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+var_all <- list(
+		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, 
+		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no)
+
+lapply(var_all , comp_tvar_sim, serie=barry)
+comp_tvar_sim(var_l3_tr, serie=barry)
+
+
 
 
 ##Check case 2 (data is given) ok!
-all.equal(TVAR.gen(data=serie,nthresh=0, type="check", include="const", round=FALSE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=0, type="check", include="trend", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="const", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="const", lag=3, round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="trend", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="trend", lag=3, round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="both", round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="both", lag=3, round=FALSE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=0, type="check", include="both", lag=2, round=FALSE),as.matrix(serie), check.attributes=FALSE)
 
-all.equal(TVAR.gen(data=serie,nthresh=1, type="check",mTh=1, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=1, type="check",mTh=2, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=1, type="check",mTh=2, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=1, type="check",mTh=1, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=1, type="check",mTh=1, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=1, type="check",mTh=2, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=1, type="check",mTh=2, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
 
-all.equal(TVAR.gen(data=serie,nthresh=2, type="check",mTh=1, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=2, type="check",mTh=1, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=2, type="check",mTh=2, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(data=serie,nthresh=2, type="check",mTh=2, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=2, type="check",mTh=1, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=2, type="check",mTh=1, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=2, type="check",mTh=2, include="const", round=TRUE),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(data=serie,nthresh=2, type="check",mTh=2, include="trend", round=TRUE),as.matrix(serie), check.attributes=FALSE)
 
 
 
 ### Check case 3: TVARobject is given
-all.equal(TVAR.gen(TVARobject=lineVar(serie, lag=1),type="check"),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(TVARobject=lineVar(serie, lag=1, include="trend"),type="check"),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(TVARobject=lineVar(serie, lag=1, include="both"),type="check"),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(TVARobject=lineVar(serie, lag=1, include="none"),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=lineVar(serie, lag=1),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=lineVar(serie, lag=1, include="trend"),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=lineVar(serie, lag=1, include="both"),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=lineVar(serie, lag=1, include="none"),type="check"),as.matrix(serie), check.attributes=FALSE)
 
 
-all.equal(TVAR.gen(TVARobject=TVAR(serie, nthresh=1, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(TVARobject=TVAR(serie, nthresh=1, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=1, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=1, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
 
-all.equal(TVAR.gen(TVARobject=TVAR(serie, nthresh=2, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
-all.equal(TVAR.gen(TVARobject=TVAR(serie, nthresh=2, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=2, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
+all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=2, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
 
 a1 <- TVAR.boot(TVARobject=lineVar(serie, lag=1))
 a2 <- TVAR.boot(TVARobject=lineVar(serie, lag=2))
