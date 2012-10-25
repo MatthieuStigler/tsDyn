@@ -95,6 +95,9 @@ lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], predict,  n.ahead=2)
 lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 
+lapply(vecm_all, predict_rolling, nroll=2)
+lapply(vecm_all, predict_rolling, nroll=2, refit.every=1)
+
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
 
@@ -127,3 +130,33 @@ r_sel_none$AICs
 
 r_sel_both$LLs
 r_sel_both$AICs
+
+
+###################################
+####### predict_rolling check
+###################################
+n_ca<- nrow(barry)
+
+#### VECM No refit lag=1
+pred_vec_roll_l1 <- predict_rolling(object=VECM(barry, lag=1), nroll=10, n.ahead=1)
+pred_vec_l1_1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-10,,drop=FALSE])
+pred_vec_l1_2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-9,,drop=FALSE])
+all.equal(rbind(pred_vec_l1_1, pred_vec_l1_2), head(pred_vec_roll_l1,2), check=FALSE)
+all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll_l1,1), check=FALSE)
+
+
+
+#### VECM No refit lag=3
+pred_vec_roll <- predict_rolling(object=VECM(barry, lag=3), nroll=10, n.ahead=1)
+pred_vec1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-10,,drop=FALSE])
+pred_vec2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-9,,drop=FALSE])
+all.equal(rbind(pred_vec1, pred_vec2), head(pred_vec_roll,2), check=FALSE)
+all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll,1), check=FALSE)
+
+
+### VECM Refit lag=1
+pred_vec_ref<-predict_rolling(object=VECM(barry, lag=1), nroll=10, n.ahead=1, refit.every=1)
+pred_vec_ref_1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1)
+pred_vec_ref_2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-9), lag=1), n.ahead=1)
+all.equal(rbind(pred_vec_ref_1, pred_vec_ref_2), head(pred_vec_ref,2), check=FALSE)
+all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-1), lag=1), n.ahead=1), tail(pred_vec_ref,1), check=FALSE)

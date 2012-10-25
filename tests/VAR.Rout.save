@@ -1289,6 +1289,89 @@ attr(,"condition")
 [1] "Component 2: Mean relative difference: 7.363527e-05"
 [2] "Component 4: Mean relative difference: 0.0001044433"
 > 
+> lapply(var_all_level , predict_rolling, nroll=2)
+$var_l1_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.481036 110.6107 107.1808
+[2,] 1.471126 110.6832 107.0801
+
+$var_l1_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.519417 111.5629 108.6744
+[2,] 1.509531 111.6351 108.5782
+
+$var_l1_bo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.506137 110.9268 109.2725
+[2,] 1.496271 110.9999 109.1754
+
+$var_l1_no
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.481917 110.6369 107.1993
+[2,] 1.471810 110.7036 107.0944
+
+$var_l3_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.480473 110.6062 107.2064
+[2,] 1.469801 110.5978 107.0229
+
+$var_l3_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.536749 110.8727 108.1630
+[2,] 1.526666 110.8598 108.0025
+
+$var_l3_bo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.524834 110.3459 108.7941
+[2,] 1.514772 110.3340 108.6325
+
+$var_l3_no
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.482165 110.6242 107.2174
+[2,] 1.470316 110.6033 107.0263
+
+> lapply(var_all_level , predict_rolling, nroll=2, refit.every=1)
+$var_l1_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.481036 110.6107 107.1808
+[2,] 1.470807 110.6795 107.0735
+
+$var_l1_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.519417 111.5629 108.6744
+[2,] 1.510604 111.6470 108.5972
+
+$var_l1_bo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.506137 110.9268 109.2725
+[2,] 1.497968 111.0198 109.2037
+
+$var_l1_no
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.481917 110.6369 107.1993
+[2,] 1.471485 110.6994 107.0877
+
+$var_l3_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.480473 110.6062 107.2064
+[2,] 1.469451 110.5936 107.0147
+
+$var_l3_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.536749 110.8727 108.1630
+[2,] 1.528059 110.8793 108.0342
+
+$var_l3_bo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.524834 110.3459 108.7941
+[2,] 1.516623 110.3607 108.6727
+
+$var_l3_no
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.482165 110.6242 107.2174
+[2,] 1.469934 110.5988 107.0181
+
+> 
 > ## boot
 > var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
 > lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
@@ -1365,6 +1448,49 @@ $var_l3_bo
 $var_l3_no
 [1] TRUE
 
+> 
+> 
+> 
+> ###################################
+> ####### predict_rolling check
+> ###################################
+> n_ca<- nrow(barry)
+> 
+> #### No refit lag=1
+> pred_roll<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1)
+> pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-10,,drop=FALSE])
+> pred2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-9,,drop=FALSE])
+> all.equal(rbind(pred1, pred2), head(pred_roll,2), check=FALSE)
+[1] TRUE
+> all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-1,,drop=FALSE]), tail(pred_roll,1), check=FALSE)
+[1] TRUE
+> 
+> #### No refit lag=3
+> pred_roll<-predict_rolling(object=lineVar(barry, lag=3), nroll=10, n.ahead=1)
+> pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-10,,drop=FALSE])
+> pred2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-9,,drop=FALSE])
+> all.equal(rbind(pred1, pred2), head(pred_roll,2), check=FALSE)
+[1] TRUE
+> all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-1,,drop=FALSE]), tail(pred_roll,1), check=FALSE)
+[1] TRUE
+> 
+> ### Refit lag=1
+> pred_ref<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1, refit.every=1)
+> pred_ref_1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1)
+> pred_ref_2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-9), lag=1), n.ahead=1)
+> all.equal(rbind(pred_ref_1, pred_ref_2), head(pred_ref,2), check=FALSE)
+[1] TRUE
+> all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-1), lag=1), n.ahead=1), tail(pred_ref,1), check=FALSE)
+[1] TRUE
+> 
+> ### Refit lag=3
+> pred_ref<-predict_rolling(object=lineVar(barry, lag=3), nroll=10, n.ahead=1, refit.every=1)
+> pred_ref_1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1)
+> pred_ref_2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-9), lag=3), n.ahead=1)
+> all.equal(rbind(pred_ref_1, pred_ref_2), head(pred_ref,2), check=FALSE)
+[1] TRUE
+> all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-1), lag=3), n.ahead=1), tail(pred_ref,1), check=FALSE)
+[1] TRUE
 > 
 > proc.time()
 utilisateur     système      écoulé 

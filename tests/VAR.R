@@ -76,6 +76,9 @@ lapply(var_all, function(x) try(sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst
 
 all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check=FALSE)
 
+lapply(var_all_level , predict_rolling, nroll=2)
+lapply(var_all_level , predict_rolling, nroll=2, refit.every=1)
+
 ## boot
 var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
 lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
@@ -88,3 +91,38 @@ comp_tvar_sim <- function(mod, serie){
 }
 
 lapply(var_all_level, comp_tvar_sim, serie=barry)
+
+
+
+###################################
+####### predict_rolling check
+###################################
+n_ca<- nrow(barry)
+
+#### No refit lag=1
+pred_roll<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1)
+pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-10,,drop=FALSE])
+pred2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-9,,drop=FALSE])
+all.equal(rbind(pred1, pred2), head(pred_roll,2), check=FALSE)
+all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-1,,drop=FALSE]), tail(pred_roll,1), check=FALSE)
+
+#### No refit lag=3
+pred_roll<-predict_rolling(object=lineVar(barry, lag=3), nroll=10, n.ahead=1)
+pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-10,,drop=FALSE])
+pred2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-9,,drop=FALSE])
+all.equal(rbind(pred1, pred2), head(pred_roll,2), check=FALSE)
+all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-1,,drop=FALSE]), tail(pred_roll,1), check=FALSE)
+
+### Refit lag=1
+pred_ref<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1, refit.every=1)
+pred_ref_1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1)
+pred_ref_2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-9), lag=1), n.ahead=1)
+all.equal(rbind(pred_ref_1, pred_ref_2), head(pred_ref,2), check=FALSE)
+all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-1), lag=1), n.ahead=1), tail(pred_ref,1), check=FALSE)
+
+### Refit lag=3
+pred_ref<-predict_rolling(object=lineVar(barry, lag=3), nroll=10, n.ahead=1, refit.every=1)
+pred_ref_1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1)
+pred_ref_2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-9), lag=3), n.ahead=1)
+all.equal(rbind(pred_ref_1, pred_ref_2), head(pred_ref,2), check=FALSE)
+all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-1), lag=3), n.ahead=1), tail(pred_ref,1), check=FALSE)
