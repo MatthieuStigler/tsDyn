@@ -1048,7 +1048,117 @@ $var_l3_no
 > 
 > ## predict
 > var_all_pred <- var_all[-grep("bo|no|adf|diff", names(var_all))]
-> lapply(var_all_pred, function(x) sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
+> lapply(var_all_pred, predict, n.ahead=2)
+$var_l1_co
+      dolcan   cpiUSA   cpiCAN
+325 1.475498 110.6729 107.1721
+326 1.478789 110.8955 107.3440
+
+$var_l1_tr
+      dolcan   cpiUSA   cpiCAN
+325 1.515066 111.6619 108.6972
+326 1.557509 112.8800 110.4008
+
+$var_l3_co
+      dolcan   cpiUSA   cpiCAN
+325 1.478664 110.5527 107.0629
+326 1.483144 110.7147 107.1851
+
+$var_l3_tr
+      dolcan   cpiUSA   cpiCAN
+325 1.537002 110.8484 108.0842
+326 1.605526 111.4489 109.2632
+
+> lapply(var_all, function(x) try(predict(x, n.ahead=2), silent=TRUE))
+$var_l1_co
+      dolcan   cpiUSA   cpiCAN
+325 1.475498 110.6729 107.1721
+326 1.478789 110.8955 107.3440
+
+$var_l1_tr
+      dolcan   cpiUSA   cpiCAN
+325 1.515066 111.6619 108.6972
+326 1.557509 112.8800 110.4008
+
+$var_l1_bo
+      dolcan   cpiUSA   cpiCAN
+325 1.502305 111.0479 109.3034
+326 1.530918 111.6332 111.6008
+
+$var_l1_no
+      dolcan   cpiUSA   cpiCAN
+325 1.476254 110.6954 107.1881
+326 1.480338 110.9416 107.3768
+
+$var_l3_co
+      dolcan   cpiUSA   cpiCAN
+325 1.478664 110.5527 107.0629
+326 1.483144 110.7147 107.1851
+
+$var_l3_tr
+      dolcan   cpiUSA   cpiCAN
+325 1.537002 110.8484 108.0842
+326 1.605526 111.4489 109.2632
+
+$var_l3_bo
+      dolcan   cpiUSA   cpiCAN
+325 1.525394 110.3388 108.7197
+326 1.581349 110.1689 110.3328
+
+$var_l3_no
+      dolcan   cpiUSA   cpiCAN
+325 1.478951 110.5558 107.0649
+326 1.483828 110.7233 107.1905
+
+$var_l2_diff_co
+        dolcan   cpiUSA   cpiCAN
+325 -0.6961694 57.21525 55.50463
+326 -0.9161091 31.52783 38.80554
+
+$var_l2_diff_tr
+         dolcan   cpiUSA   cpiCAN
+325  0.09242083 85.06183 91.14615
+326 -0.16121915 69.13818 78.94878
+
+$var_l2_diff_bo
+        dolcan   cpiUSA   cpiCAN
+325 -0.7864350 54.60128 46.55465
+326 -0.9835102 28.70155 31.98755
+
+$var_l2_diff_no
+       dolcan   cpiUSA   cpiCAN
+325 0.4377272 98.43531 96.73098
+326 0.2274674 89.63544 90.14735
+
+$var_l2_adf_co
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
+
+$var_l2_adf_tr
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
+
+$var_l2_adf_bo
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
+
+$var_l2_adf_no
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
+
+> lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 $var_l1_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.475498 110.6729 107.1721
@@ -1069,7 +1179,7 @@ $var_l3_tr
 [1,] 1.537566 110.8513 108.0941
 [2,] 1.606902 111.4570 109.2867
 
-> lapply(var_all, function(x) try(sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
+> lapply(var_all, function(x) try(sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
 $var_l1_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.475498 110.6729 107.1721
@@ -1081,18 +1191,18 @@ $var_l1_tr
 [2,] 1.557888 112.8895 110.4156
 
 $var_l1_bo
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l1_no
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l3_co
        dolcan   cpiUSA   cpiCAN
@@ -1105,75 +1215,79 @@ $var_l3_tr
 [2,] 1.606902 111.4570 109.2867
 
 $var_l3_bo
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l3_no
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l2_diff_co
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
 
 $var_l2_diff_tr
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
 
 $var_l2_diff_bo
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l2_diff_no
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l2_adf_co
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
 
 $var_l2_adf_tr
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
 
 $var_l2_adf_bo
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l2_adf_no
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
+> 
+> all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check=FALSE)
+[1] "Component 2: Mean relative difference: 7.363527e-05"
+[2] "Component 4: Mean relative difference: 0.0001044433"
 > 
 > ## boot
 > var_all_boot <- var_all[-grep("adf|diff", names(var_all))]

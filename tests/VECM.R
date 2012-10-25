@@ -92,7 +92,8 @@ vecm_irf <- vecm_all[-grep("l1_no|bo", names(vecm_all))] ## does not work for th
 lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
 ## predict
-lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], function(x) sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
+lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], predict,  n.ahead=2)
+lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models

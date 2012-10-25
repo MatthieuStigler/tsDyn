@@ -47,7 +47,8 @@ comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$i
 comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
 comp_resid <- function(x) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE)
 comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
-comp_predict <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, predict(x[[2]])$fcst, check.attributes=FALSE)
+comp_predictOld <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, tsDyn:::predictOld.VECM(x[[2]])$fcst, check.attributes=FALSE)
+comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
 
 
 ### Compare VECM methods:
@@ -61,6 +62,7 @@ print(sapply(all_models, comp_FEVD))
 print(sapply(all_models, comp_resid)) # 5 and 6
 print(sapply(all_models, comp_fitted)) 
 print(sapply(all_models, comp_predict)) # 5 and 6
+print(sapply(all_models, comp_predictOld)) # 5 and 6
 
 #########################
 ##### VAR #####
@@ -121,7 +123,8 @@ coef_to_vars <- function(x){
 comp_var_coefs <- function(x) all.equal(coef_to_vars (x[[1]]), t(sapply(coef(x[[2]]), function(x) x[,"Estimate"])), check.attributes=FALSE)
 comp_var_logLik <- function(x) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE)
 
-comp_var_pred <- function(x) all.equal(predict(x[[1]])$fcst, predict(x[[2]])$fcst, check.attributes=FALSE)
+comp_var_pred <- function(x) all.equal(predict(x[[1]]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
+comp_var_predOld <- function(x) all.equal(sapply(tsDyn:::predictOld.VAR(x[[1]], n.ahead=5)$fcst, function(x) x[,"fcst"]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 comp_var_fevd <- function(x) all.equal(sapply(fevd(x[[1]]), head,2), sapply(fevd(x[[2]]), head,2), check.attributes=FALSE)
 comp_var_IRF <- function(x) all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
 
@@ -129,6 +132,7 @@ comp_var_IRF <- function(x) all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], b
 sapply(all_var_models, comp_var_coefs)
 sapply(all_var_models, comp_var_logLik)
 sapply(all_var_models_noNoBo, comp_var_pred)
+sapply(all_var_models_noNoBo, comp_var_predOld)
 sapply(all_var_models_noNoBo, comp_var_fevd)
 sapply(all_var_models_noNoBo, comp_var_IRF)
 

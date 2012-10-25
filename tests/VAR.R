@@ -69,8 +69,12 @@ lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 
 ## predict
 var_all_pred <- var_all[-grep("bo|no|adf|diff", names(var_all))]
-lapply(var_all_pred, function(x) sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
-lapply(var_all, function(x) try(sapply(predict(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
+lapply(var_all_pred, predict, n.ahead=2)
+lapply(var_all, function(x) try(predict(x, n.ahead=2), silent=TRUE))
+lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
+lapply(var_all, function(x) try(sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
+
+all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check=FALSE)
 
 ## boot
 var_all_boot <- var_all[-grep("adf|diff", names(var_all))]

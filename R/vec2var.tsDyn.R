@@ -140,14 +140,14 @@ vec2var.tsDyn <- function(x){
 #################### Methods
 ############################################################
 
-predict.VAR <- function(object,...){
+predictOld.VAR <- function(object,...){
   if(object$include%in%c("both","none")) stop("Does not work with include='none' or 'both'")
   if(attr(object, "varsLevel")!="level") stop("Does not work with VAR in diff or ADf specification")
 
   predict(vec2var.tsDyn(object), ...)
 }
 
-predict.VECM <- function(object,...){
+predictOld.VECM <- function(object,...){
   if(object$include=="none"&&object$model.specific$LRinclude=="none") stop("Does not work with include='none'")
  predict(vec2var.tsDyn(object), ...)
 }
@@ -176,10 +176,11 @@ fevd.nlVar <- function(x, n.ahead=10, ...){
 
 ####### Predict 
 
-predict2.VAR <- function(object, newdata, n.ahead=1){
+predict.VAR <- function(object, newdata, n.ahead=5, ...){
   lag <- object$lag
   k <- object$k
   include <- object$include
+  if(attr(object, "varsLevel")=="ADF") stop("Does not work with VAR in diff specification")
 
 ## get coefs
   B <- coef(object)
@@ -187,8 +188,7 @@ predict2.VAR <- function(object, newdata, n.ahead=1){
 ## setup starting values (data in y), innovations (0)
   original.data <- object$model[,1:k, drop=FALSE]
   starting <-   myTail(original.data,lag)
-  innov <- matrix(0, nrow=n.ahead+lag, ncol=k)
-
+  innov <- matrix(0, nrow=n.ahead, ncol=k)
   if(!missing(newdata)) {
     if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
     if(nrow(newdata)!=lag) stop("Please provide newdata with nrow=lag")
@@ -196,7 +196,7 @@ predict2.VAR <- function(object, newdata, n.ahead=1){
   }
 
 ## use VAR sim
-  res <- VAR.sim(B=B, lag=lag, n=n.ahead+lag, starting=starting, innov=innov,include=include)
+  res <- VAR.sim(B=B, lag=lag, n=n.ahead, starting=starting, innov=innov,include=include)
 
 ## results
   colnames(res) <- colnames(original.data )
@@ -208,7 +208,7 @@ predict2.VAR <- function(object, newdata, n.ahead=1){
 }
 
 
-predict2.VECM <- function(object, n.ahead=1, newdata, level=c("model", "original"),...){
+predict.VECM <- function(object, n.ahead=5, newdata, ...){
   lag <- object$lag
   k <- object$k
   include <- object$include
@@ -230,7 +230,7 @@ predict2.VECM <- function(object, n.ahead=1, newdata, level=c("model", "original
 ## setup starting values (data in y), innovations (0)
   original.data <- object$model[,1:k]
   starting <-  myTail(original.data,lag+1) 
-  innov <- matrix(0, nrow=n.ahead+lag+1, ncol=k)
+  innov <- matrix(0, nrow=n.ahead, ncol=k)
 
   if(!missing(newdata)) {
     if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
@@ -239,7 +239,7 @@ predict2.VECM <- function(object, n.ahead=1, newdata, level=c("model", "original
   }
 
 ## use VAR sim
-  res <- VAR.sim(B=B, lag=lag+1, n=n.ahead+lag+1, starting=starting, innov=innov, include=include)
+  res <- VAR.sim(B=B, lag=lag+1, n=n.ahead, starting=starting, innov=innov, include=include)
 
 ## results
   colnames(res) <- colnames(original.data )
