@@ -36,7 +36,7 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
     if(esp*(nthresh+1)!=ncol(B)){
       stop("Matrix B badly specified: expected ", esp*(nthresh+1), " elements ( (lag*K+ n inc)* (nthresh+1) ) but has ", ncol(B), "\n" )
     }
-    y<-matrix(0,ncol=nB, nrow=n)
+    y<-matrix(0,ncol=nB, nrow=n+add)
     if(!is.null(starting)){
       if(all(dim(as.matrix(starting))==c(p,nB)))
 	y[seq_len(p),]<- as.matrix(starting)
@@ -64,6 +64,7 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
       Thresh<-round(Thresh,ndig)
     k <- nB 		#Number of variables
     T <- nrow(y) 		#Size of start sample
+    T <- n 		#Size of start sample
   }
 
   ### possibility 2: only data is given: compute it with linear or selectSETAR
