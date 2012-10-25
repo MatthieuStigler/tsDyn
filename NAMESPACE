@@ -27,7 +27,8 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
 	lineVar, VECM, VAR.sim, VAR.boot, VECM.sim, 
 	setar.sim, setarTest,
 	MakeThSpec, BBCTest, KapShinTest, resVar, extendBoot, regime, getTh,
-	fevd, irf, VARrep, VECM_symbolic, rank.select, lags.select, rank.test)
+	fevd, irf, VARrep, VECM_symbolic, rank.select, lags.select, rank.test,
+	predict_rolling)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
@@ -118,6 +119,7 @@ S3method(plot, llar)
 S3method(as.data.frame, llar)
 S3method(vcov, VAR)
 S3method(irf, nlVar)
+S3method(predict_rolling, nlVar)
 S3method(fevd, nlVar)
 
 

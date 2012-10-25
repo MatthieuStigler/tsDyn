@@ -5,7 +5,7 @@ predict_rolling  <- function (object, ...)
 predict_rolling.default  <- function (object, ...)  NULL
 
 
-predict_rolling.nlVAR <- function(object, nroll=10, n.ahead=1, refit.every){
+predict_rolling.nlVar <- function(object, nroll=10, n.ahead=1, refit.every, ...){
 
 ## Checks
   if(!missing(refit.every)&&refit.every>nroll) stop("arg 'refit.every' should be smaller or equal to arg 'nroll'")
@@ -60,6 +60,11 @@ predict_rolling.nlVAR <- function(object, nroll=10, n.ahead=1, refit.every){
     R[i,] <- predict(mod, n.ahead=n.ahead, newdata=out)[n.ahead,]
   }
 
+
+## Return
+#   if(inherits(origSerie, "ts")){
+#     attributes(R) <- attributes(outSerie)
+#   }
 
 return(R)
 
