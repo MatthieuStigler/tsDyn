@@ -37,8 +37,8 @@ predict_rolling.nlVar <- function(object, nroll=10, n.ahead=1, refit.every, ...)
   everys <-  if(!missing(refit.every)) seq(refit.every, by=refit.every, to=nroll) else 0
 
 ## Fit initial model
-  subSerie <- tsDyn:::myHead(origSerie, -nroll)
-  outSerie <- tsDyn:::myTail(origSerie, nroll+lag+add)
+  subSerie <- myHead(origSerie, -nroll)
+  outSerie <- myTail(origSerie, nroll+lag+add)
   mod <- modFit(subSerie)
 
 ## Refit model on smaller sample:
@@ -49,7 +49,7 @@ predict_rolling.nlVar <- function(object, nroll=10, n.ahead=1, refit.every, ...)
 
   ## model
     if(i%in%everys){
-      subSerie <- tsDyn:::myHead(origSerie, -nroll+i-1)
+      subSerie <- myHead(origSerie, -nroll+i-1)
       mod <- modFit(subSerie)
       out <- outSerie[i:(i+lag-1+add),,drop=FALSE]
     } else {

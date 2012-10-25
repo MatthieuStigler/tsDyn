@@ -44,7 +44,7 @@ Note that while the forecasts are updated with new values, the model estimation 
 
 
 \seealso{
-  \code{\link{setar}}, \code{\link{lstar}}
+  \code{\link{predict.nlar}} for the standard predict function. 
 } 
 
 \examples{

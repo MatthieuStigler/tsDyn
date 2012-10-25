@@ -208,7 +208,7 @@ predict.VAR <- function(object, newdata, n.ahead=5, ...){
 }
 
 
-predict.VECM <- function(object, n.ahead=5, newdata, ...){
+predict.VECM <- function(object, newdata, n.ahead=5, ...){
   lag <- object$lag
   k <- object$k
   include <- object$include
