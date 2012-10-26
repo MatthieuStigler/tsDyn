@@ -332,7 +332,7 @@ library(tsDyn)
 data(zeroyld)
 vec1 <- VECM(zeroyld, lag=2, estim="ML")
 predict(vec1 )
-predict2.VECM(vec1, n.ahead=5)
+tsDyn:::predictOld.VECM(vec1, n.ahead=5)
 fevd(vec1 )
 irf(vec1, runs=10 )
 
@@ -468,24 +468,28 @@ head(fevd(VECM_vars)$U,3)
 
 ### compare prediction and actual
 Var_1 <- lineVar(Canada, lag=1)
-all.equal(predict2.VAR(Var_1),predict2.VAR(Var_1, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Var_1),1),predict2.VAR(Var_1, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
+all.equal(predict(Var_1),predict(Var_1, newdata=Canada[n,,drop=FALSE]))
+all.equal(tail(fitted(Var_1),1),predict(Var_1, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
 
 Var_2 <- lineVar(Canada, lag=2)
-all.equal(predict2.VAR(Var_2),predict2.VAR(Var_2, newdata=Canada[c(n-1,n),,drop=FALSE]))
-all.equal(tail(fitted(Var_2),1),predict2.VAR(Var_2, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
+all.equal(predict(Var_2),predict(Var_2, newdata=Canada[c(n-1,n),,drop=FALSE]))
+all.equal(tail(fitted(Var_2),1),predict(Var_2, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
 Var_1_t <- lineVar(Canada, lag=1, include="trend")
-all.equal(predict2.VAR(Var_1_t),predict2.VAR(Var_1_t, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Var_1_t),1),predict2.VAR(Var_1_t, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
+all.equal(predict(Var_1_t),predict(Var_1_t, newdata=Canada[n,,drop=FALSE]))
+all.equal(tail(fitted(Var_1_t),1),predict(Var_1_t, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
 
 Var_1_no <- lineVar(Canada, lag=1, include="none")
-all.equal(predict2.VAR(Var_1_no),predict2.VAR(Var_1_no, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Var_1_no),1),predict2.VAR(Var_1_no, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
+all.equal(predict(Var_1_no),predict(Var_1_no, newdata=Canada[n,,drop=FALSE]))
+all.equal(tail(fitted(Var_1_no),1),predict(Var_1_no, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
 
 Var_1_bo <- lineVar(Canada, lag=1, include="both")
-all.equal(predict2.VAR(Var_1_bo),predict2.VAR(Var_1_bo, newdata=Canada[n,,drop=FALSE]))
-all.equal(tail(fitted(Var_1_bo),1),predict2.VAR(Var_1_bo, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
+all.equal(predict(Var_1_bo),predict(Var_1_bo, newdata=Canada[n,,drop=FALSE]))
+all.equal(tail(fitted(Var_1_bo),1),predict(Var_1_bo, n.ahead=1, newdata=Canada[(n-1),,drop=FALSE]), check.attributes=FALSE)
+
+Var_1_dif <- lineVar(Canada, lag=1, I="diff")
+all.equal(predict(Var_1_dif),predict(Var_1_dif, newdata=Canada[(n-1):n,,drop=FALSE]))
+all.equal(tail(fitted(Var_1_dif, level="original"),1),predict(Var_1_dif, n.ahead=1, newdata=Canada[(n-2):(n-1),,drop=FALSE]), check.attributes=FALSE)
 
 
 ### VECM
@@ -535,7 +539,7 @@ all.equal(predict2.VECM(Vecm_1_LRbo),predict2.VECM(Vecm_1_LRbo, newdata=Canada[c
 all.equal(tail(fitted(Vecm_1_LRbo, level="original"),1),predict2.VECM(Vecm_1_LRbo, n.ahead=1, newdata=Canada[c(n-2,n-1),,drop=FALSE]), check.attributes=FALSE)
 
 
-predict2.VAR(lineVar(Canada, lag=1, include="none"))
+predict(lineVar(Canada, lag=1, include="none"))
 predict2.VECM(VECM(Canada, lag=1))
 predict2.VECM(VECM(Canada, lag=1), newdata=Canada[(nrow(Canada)-1):nrow(Canada),,drop=FALSE])
 
@@ -547,18 +551,18 @@ all.equal(sapply(predict(VECM_tsD, n.ahead=10)$fcst, function(x) x[,"fcst"]), pr
 
 
 ### VAR
-all.equal(predict2.VAR(lineVar(Canada, lag=2), n.ahead=3), sapply(predict(VAR(Canada, p=2), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
-all.equal(predict2.VAR(lineVar(Canada, lag=4), n.ahead=3), sapply(predict(VAR(Canada, p=4), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=2), n.ahead=3), sapply(predict(VAR(Canada, p=2), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=4), n.ahead=3), sapply(predict(VAR(Canada, p=4), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
 
 
-all.equal(predict2.VAR(lineVar(Canada, lag=1, include="none"), n.ahead=3), sapply(predict(VAR(Canada, p=1, type="none"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
-all.equal(predict2.VAR(lineVar(Canada, lag=2, include="none"), n.ahead=3), sapply(predict(VAR(Canada, p=2, type="none"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=1, include="none"), n.ahead=3), sapply(predict(VAR(Canada, p=1, type="none"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=2, include="none"), n.ahead=3), sapply(predict(VAR(Canada, p=2, type="none"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
 
-all.equal(predict2.VAR(lineVar(Canada, lag=1, include="trend"), n.ahead=3), sapply(predict(VAR(Canada, p=1, type="trend"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
-all.equal(predict2.VAR(lineVar(Canada, lag=2, include="trend"), n.ahead=3), sapply(predict(VAR(Canada, p=2, type="trend"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=1, include="trend"), n.ahead=3), sapply(predict(VAR(Canada, p=1, type="trend"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=2, include="trend"), n.ahead=3), sapply(predict(VAR(Canada, p=2, type="trend"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
 
-all.equal(predict2.VAR(lineVar(Canada, lag=1, include="both"), n.ahead=3), sapply(predict(VAR(Canada, p=1, type="both"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
-all.equal(predict2.VAR(lineVar(Canada, lag=2, include="both"), n.ahead=3), sapply(predict(VAR(Canada, p=2, type="both"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=1, include="both"), n.ahead=3), sapply(predict(VAR(Canada, p=1, type="both"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
+all.equal(predict(lineVar(Canada, lag=2, include="both"), n.ahead=3), sapply(predict(VAR(Canada, p=2, type="both"), n.ahead=3)$fcst, function(x) x[,"fcst"]), check.attributes=FALSE)
 
 ### VECM
 all.equal(sapply(predict(VECM_tsD, n.ahead=5)$fcst, function(x) x[,"fcst"]), predict2(VECM_tsD, n.ahead=5), check.attributes=FALSE)
