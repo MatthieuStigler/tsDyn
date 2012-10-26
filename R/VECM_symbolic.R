@@ -54,6 +54,7 @@ VECM_symbolic <- function(alpha, beta, lags, inc, include = c("none", "const", "
   res$include <- include
   res$model.specific$LRinclude <- "none"
 
+  class(res) <- c("VECM_symb", "VECM")
   return(res)
 }
 

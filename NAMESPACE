@@ -121,6 +121,8 @@ S3method(vcov, VAR)
 S3method(irf, nlVar)
 S3method(predict_rolling, nlVar)
 S3method(fevd, nlVar)
+S3method(VARrep, VECM)
+S3method(VARrep, VAR)
 
 
 useDynLib(tsDyn)

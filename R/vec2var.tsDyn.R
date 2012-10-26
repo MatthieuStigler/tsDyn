@@ -1,18 +1,21 @@
 
 
 ########### VAR Representation
+VARrep  <- function (object, ...)  
+  UseMethod("VARrep")
 
-VARrep <- function(vecm) {
 
-  lag <- vecm$lag
-  k <- vecm$k
-  r <- vecm$model.specific$r
-  co <- vecm$coefficients
-  include <- vecm$include
-  LRinclude <- vecm$model.specific$LRinclude
+VARrep.VECM <- function(object, ...) {
+
+  lag <- object$lag
+  k <- object$k
+  r <- object$model.specific$r
+  co <- object$coefficients
+  include <- object$include
+  LRinclude <- object$model.specific$LRinclude
 
 ##obtain matrices
-  betas <- vecm$model.specific$beta
+  betas <- object$model.specific$beta
   if(LRinclude!="none") betas <- betas[1:k,, drop=FALSE]
 
   ## Pi matrix
@@ -33,15 +36,15 @@ VARrep <- function(vecm) {
     Amat[, 1:k] <- Pi + diag(k)
   }
 ## Names
-  varNames <- colnames(vecm$model)[1:k]
+  varNames <- colnames(object$model)[1:k]
   colnames(Amat) <- paste(rep(varNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
 
 ## Add deterministic terms
   if(include!="none"){
-    incName <- switch(vecm$include, "const"="Intercept", trend="Trend", both="Intercept|Trend")
+    incName <- switch(object$include, "const"="Intercept", trend="Trend", both="Intercept|Trend")
     incVar <- co[,grep(incName , colnames(co)),drop=FALSE]
     if(LRinclude!="none"){
-      Pi_all <-  co[, grep("ECT", colnames(co))]%*%t(vecm$model.specific$beta)
+      Pi_all <-  co[, grep("ECT", colnames(co))]%*%t(object$model.specific$beta)
       Pi_deter <- Pi_all[,"trend", drop=FALSE]
       colnames(Pi_deter) <- "Trend"
       Amat <- cbind(Pi_deter,Amat)
@@ -50,7 +53,7 @@ VARrep <- function(vecm) {
     colnames(Amat) <- gsub("Intercept", "constant", colnames(Amat))
     
   } else if(LRinclude!="none"){
-    Pi_all <-  co[, grep("ECT", colnames(co))]%*%t(vecm$model.specific$beta)
+    Pi_all <-  co[, grep("ECT", colnames(co))]%*%t(object$model.specific$beta)
     Pi_deter <- Pi_all[,switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend")), drop=FALSE]
     colnames(Pi_deter) <- switch(LRinclude, "const"="constant", "trend"="Trend", "both"=c("constant", "Trend"))
     Amat <- cbind(Pi_deter,Amat)
@@ -60,6 +63,45 @@ VARrep <- function(vecm) {
   Amat
 }
 
+VARrep.VAR <- function(object, ...) {
+
+  I <- attr(object, "varsLevel")
+
+  if(I=="level"){
+    res <- object
+  } else if(I=="diff"){
+    lag <- object$lag
+    k <- object$k
+    co <- coef(object)
+    include <- object$include
+    origNames <- colnames(object$model[,1:k])
+
+    comat <- matrix(NA, ncol=k*(lag+1), nrow=k)
+
+  ## first lag
+    comat[,(1:k)] <- diag(k)
+
+    for(i in 1:lag){
+      comat[,(1:k)+k*(i-1)] <- comat[,(1:k)+k*(i-1)]+co[,grep(paste("-", i, sep=""), colnames(co))] 
+#       if(i>1){
+	comat[,(1:k)+k*i] <- -co[,grep(paste("-", i, sep=""), colnames(co))] 
+#       }
+    }
+  ## names
+  colnames(comat) <- paste(rep(origNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
+
+  if(include!="none"){
+    inc_name <- switch(include, "none"=NULL, "const"="Intercept", "trend"="Trend", "both"=c("Intercept","Trend"))
+    comat <- cbind(co[,inc_name,drop=FALSE], comat)
+  }
+  res <- comat
+
+}
+
+##
+return(res)
+}
+  
 
 
 ############################################################
@@ -184,6 +226,10 @@ predict.VAR <- function(object, newdata, n.ahead=5, ...){
 
 ## get coefs
   B <- coef(object)
+  if(attr(object, "varsLevel")=="diff") {
+    B <- VARrep.VAR(object)
+    lag <- lag+1
+  }
 
 ## setup starting values (data in y), innovations (0)
   original.data <- object$model[,1:k, drop=FALSE]
@@ -523,6 +569,15 @@ ve2_tsD <- VECM(Canada, lag=2, estim="ML")
 ve2_var <- vec2var(ca.jo(Canada, K=3, spec="transitory"))
 all.equal(sapply(predict(ve2_tsD, n.ahead=5)$fcst, function(x) x[,"fcst"]), predict2(ve2_tsD, n.ahead=5), check.attributes=FALSE)
 all.equal(sapply(predict(ve2_var, n.ahead=10)$fcst, function(x) x[,"fcst"]), predict2(ve2_tsD, n.ahead=10), check.attributes=FALSE)
+
+
+coef(lineVar(Canada, lag=2, I="diff"))
+VARrep.VAR(lineVar(Canada, lag=2, I="diff"))
+
+coef(lineVar(Canada, lag=1, I="diff"))
+VARrep.VAR(lineVar(Canada, lag=1, I="diff"))
+
+
 
 }
 
