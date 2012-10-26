@@ -4,28 +4,30 @@ Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-pc-linux-gnu (64-bit)
 
-R est un logiciel libre livré sans AUCUNE GARANTIE.
-Vous pouvez le redistribuer sous certaines conditions.
-Tapez 'license()' ou 'licence()' pour plus de détails.
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
 
-R est un projet collaboratif avec de nombreux contributeurs.
-Tapez 'contributors()' pour plus d'information et
-'citation()' pour la façon de le citer dans les publications.
+  Natural language support but running in an English locale
 
-Tapez 'demo()' pour des démonstrations, 'help()' pour l'aide
-en ligne ou 'help.start()' pour obtenir l'aide au format HTML.
-Tapez 'q()' pour quitter R.
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
 
 > library(tsDyn)
-Le chargement a nécessité le package : mgcv
+Loading required package: mgcv
 This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
-Le chargement a nécessité le package : Matrix
-Le chargement a nécessité le package : lattice
-Le chargement a nécessité le package : snow
-Le chargement a nécessité le package : mnormt
-Le chargement a nécessité le package : foreach
-Le chargement a nécessité le package : MASS
-Le chargement a nécessité le package : nlme
+Loading required package: Matrix
+Loading required package: lattice
+Loading required package: snow
+Loading required package: mnormt
+Loading required package: foreach
+Loading required package: MASS
+Loading required package: nlme
 > 
 > 
 > data(zeroyld)
@@ -1111,24 +1113,24 @@ $var_l3_no
 326 1.483828 110.7233 107.1905
 
 $var_l2_diff_co
-        dolcan   cpiUSA   cpiCAN
-325 -0.6961694 57.21525 55.50463
-326 -0.9161091 31.52783 38.80554
+      dolcan   cpiUSA   cpiCAN
+325 1.477524 110.5696 107.1086
+326 1.480586 110.7564 107.2883
 
 $var_l2_diff_tr
-         dolcan   cpiUSA   cpiCAN
-325  0.09242083 85.06183 91.14615
-326 -0.16121915 69.13818 78.94878
+      dolcan   cpiUSA   cpiCAN
+325 1.474268 110.4512 106.9910
+326 1.473940 110.4671 107.0197
 
 $var_l2_diff_bo
-        dolcan   cpiUSA   cpiCAN
-325 -0.7864350 54.60128 46.55465
-326 -0.9835102 28.70155 31.98755
+      dolcan   cpiUSA  cpiCAN
+325 1.478506 110.5981 107.206
+326 1.482495 110.8212 107.479
 
 $var_l2_diff_no
-       dolcan   cpiUSA   cpiCAN
-325 0.4377272 98.43531 96.73098
-326 0.2274674 89.63544 90.14735
+      dolcan   cpiUSA   cpiCAN
+325 1.474305 110.4526 106.9916
+326 1.474002 110.4702 107.0212
 
 $var_l2_adf_co
 [1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
