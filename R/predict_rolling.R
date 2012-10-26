@@ -22,7 +22,7 @@ predict_rolling.nlVar <- function(object, nroll=10, n.ahead=1, refit.every, newd
   if(model=="VAR"){
     level <- attr(object, "varsLevel")
     modFit <- function(dat) lineVar(dat, lag=lag, include=include, I=level)
-    add <- 0
+    add <- if(level=="level") 0 else 1
   } else {
     r <- object$model.specific$r
     estim <- object$model.specific$estim
@@ -98,6 +98,8 @@ library(tsDyn)
 data(barry)
 n_ca<- nrow(barry)
 
+environment(predict_rolling.nlVar) <- environment(star)
+
 #### No refit lag=1
 pred_roll<-predict_rolling.nlVar(object=lineVar(barry, lag=1), nroll=10, n.ahead=1)
 
@@ -135,6 +137,16 @@ all.equal(rbind(pred_ref_1, pred_ref_2), head(pred_ref,2), check=FALSE)
 all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-1), lag=3), n.ahead=1), tail(pred_ref,1), check=FALSE)
 
 
+#### No refit: VAR diff,  lag=1
+pred_roll_dif<-predict_rolling.nlVar(object=lineVar(barry, lag=1, I="diff"), nroll=10, n.ahead=1)
+
+pred1_dif <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1, I="diff"), n.ahead=1, newdata=barry[(n_ca-1):n_ca-10,,drop=FALSE])
+pred2_dif <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1, I="diff"), n.ahead=1, newdata=barry[(n_ca-1):n_ca-9,,drop=FALSE])
+all.equal(rbind(pred1_dif, pred2_dif), head(pred_roll_dif,2), check=FALSE)
+
+all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1, I="diff"), n.ahead=1, newdata=barry[(n_ca-1):n_ca-1,,drop=FALSE]), tail(pred_roll_dif,1), check=FALSE)
+
+
 #### VECM No refit lag=1
 pred_vec_roll_l1 <- predict_rolling.nlVar(object=VECM(barry, lag=1), nroll=10, n.ahead=1)
 
@@ -154,8 +166,6 @@ pred_vec2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newd
 all.equal(rbind(pred_vec1, pred_vec2), head(pred_vec_roll,2), check=FALSE)
 
 all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll,1), check=FALSE)
-
-
 
 
 
