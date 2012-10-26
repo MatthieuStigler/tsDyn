@@ -13,7 +13,7 @@
 }
 
 \usage{
-\method{predict_rolling}{nlVar}(object, nroll=10, n.ahead=1, refit.every, ...)	
+\method{predict_rolling}{nlVar}(object, nroll=10, n.ahead=1, refit.every, newdata, ...)	
 }
 
 \arguments{
@@ -22,6 +22,7 @@
   \item{nroll}{The number of rolling forecasts}
   \item{n.ahead}{An integer specifying the number of forecast steps.}
   \item{refit.every}{Determines every how many periods the model is re-estimated. }
+  \item{newdata}{In case the model given is already estimated on the sub-sample, the out of sample data can be provided. Note it should contain observations to predict the first values, that are also contained in the in-sample. }
   \item{\dots}{Currently not used.}
 }
 
