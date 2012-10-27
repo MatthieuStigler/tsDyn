@@ -309,15 +309,11 @@ summary.lstar <- function(object, ...) {
   ## SE for ML estimates (from optim), taken from 'arma.R' in package tseries
   coef<- object$coefficients
   n <- object$str$n.used
-  rank <- qr(object$model.specific$hessian, 1e-07)$rank
-  if(rank != length(coef)) {
+  vc <- vcov(object)
+  if(all(is.na(vc)) {
     se <- rep(NA, length(coef))
-    warning("singular Hessian\n")
-  } else{
-    di <- diag(2*object$model.specific$value/n*solve(object$model.specific$hessian))
-    if(any(di < 0))
-      warning("Hessian negative-semi definite\n")
-    se <- sqrt(di)
+  } else {
+    se <- sqrt(diag(vc))
   }
 
   tval <- coef/ se
