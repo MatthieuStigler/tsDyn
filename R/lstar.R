@@ -118,7 +118,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
         warning("unknown names in starting.control: ", paste(noNms, collapse = ", "))
 
     # Maximum and minimum values for c
-    interv.Th <- if(is.na(thInt)) quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) else thInt# "trim" percentil of z
+    interv.Th <- if(is.na(start.con$thInt)) quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) else start.con$thInt# "trim" percentil of z
     
     for(newGamma in seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)) {
       for(newTh in seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh)) {
@@ -310,7 +310,7 @@ summary.lstar <- function(object, ...) {
   coef<- object$coefficients
   n <- object$str$n.used
   vc <- vcov(object)
-  if(all(is.na(vc)) {
+  if(all(is.na(vc))) {
     se <- rep(NA, length(coef))
   } else {
     se <- sqrt(diag(vc))
@@ -448,6 +448,9 @@ vcov.lstar <- function(object, ...){
 return(vc)
 }
 
+confint.lstar <- function(object, parm, level = 0.95, ...){
+  confint.default(object, parm=parm, level=level, ...)
+}
 
 oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   include <- object$model.specific$include
