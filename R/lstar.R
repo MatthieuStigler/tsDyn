@@ -316,7 +316,7 @@ summary.lstar <- function(object, ...) {
   } else{
     di <- diag(2*object$model.specific$value/n*solve(object$model.specific$hessian))
     if(any(di < 0))
-      warning("Hessian negative-semidefinite\n")
+      warning("Hessian negative-semi definite\n")
     se <- sqrt(di)
   }
 
@@ -434,6 +434,24 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   par(op)
   invisible(x)
 }
+
+vcov.lstar <- function(object, ...){
+  n <- object$str$n.used
+  coef<- object$coefficients
+  rank <- qr(object$model.specific$hessian, 1e-07)$rank
+
+  if(rank != length(coef(object))) {
+    vc <- matrix(NA, length(coef),length(coef))
+    warning("singular Hessian\n")
+  } else{
+    vc <- 2*object$model.specific$value/n*solve(object$model.specific$hessian)
+    if(any(diag(vc) < 0))
+      warning("Hessian negative-semi definite\n")
+  }
+
+return(vc)
+}
+
 
 oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   include <- object$model.specific$include
