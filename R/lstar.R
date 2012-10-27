@@ -108,16 +108,17 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 		    nTh=200, 
 		    trim=0.1,
 		    nGamma=40,
-		    gammaInt=c(1,100)
+		    gammaInt=c(1,100), 
+		    thInt=NA
     )
-    # Add if user defined, check if names confirm (code taken from optim)
+    # Add if user defined, check if names correspond (code taken from optim)
     nmsC <- names(start.con)
     start.con[(namc <- names(starting.control))] <- starting.control
     if (length(noNms <- namc[!namc %in% nmsC])) 
         warning("unknown names in starting.control: ", paste(noNms, collapse = ", "))
 
     # Maximum and minimum values for c
-    interv.Th <- quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) # percentil 10 de z
+    interv.Th <- if(is.na(thInt)) quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) else thInt# "trim" percentil of z
     
     for(newGamma in seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)) {
       for(newTh in seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh)) {

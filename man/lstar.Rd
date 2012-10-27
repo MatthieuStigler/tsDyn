@@ -100,7 +100,8 @@ Parameters of the grid (interval for the values, dimension of the grid) can be p
     \item{\code{nTh}}{The number of threshold values (\var{th}) in the grid. Defaults to 200}
     \item{\code{nGamma}}{The number of smoothing values (\var{gamma}) in the grid. Defaults to 40}
     \item{\code{trim}}{The minimal percentage of observations in each regime. Defaults to 10\% (possible threshold values are between the 0.1 and 0.9 quantile)}
-    \item{\code{gammaInt}}{The lower ad higher smoothing values of the grid. Defaults to c(1,40)}
+    \item{\code{gammaInt}}{The lower and higher smoothing values of the grid. Defaults to c(1,40)}
+    \item{\code{thInt}}{The lower and higher threshold values of the grid. When not specified (default, i.e NA), the interval are the \code{trim} quantiles above. }
   }
 }
 
