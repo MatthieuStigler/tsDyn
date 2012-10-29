@@ -201,6 +201,11 @@ getTh.setar<-function(object,...){
   getTh.default(object)
 }
 
+getTh.lstar<-function(object,...){
+  object <-object$coef
+  object["th"]
+}
+
 getTh.summary.setar<-function(object,...){
   object$th
 }
