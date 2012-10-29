@@ -38,11 +38,19 @@ sum(dummyDown)
 M<-cbind(1*dummyDown,X*dummyDown )
 lm(Y~M-1)
 
-setarTest(IIPUs, m=16, thDelay=5, nboot=1, check=TRUE)
-#because of the discrepency. test1vs2 does not correspond, test 1vs3 conforms
-setarTest(IIPUs, m=16, thDelay=5, nboot=1, check=TRUE, test="2vs3")
-#test 2vs3 is also different of the version in the article (27)
+## see the test functions (not run, due to long computing time, even with small nboot
+\dontrun{
+  setarTest(IIPUs, m=16, thDelay=5, nboot=10, check=TRUE)
+  #because of the discrepency. test1vs2 does not correspond, test 1vs3 conforms
+  setarTest(IIPUs, m=16, thDelay=5, nboot=10, check=TRUE, test="2vs3")
+  #test 2vs3 is also different of the version in the article (27)
 }
+
+}
+
 \keyword{datasets}
 \concept{Testing for linearity}
+\concept{Linearity test}
+\concept{SETAR model}
+\concept{Unidentified under the null.}
 
