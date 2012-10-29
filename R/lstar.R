@@ -109,7 +109,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 		    trim=0.1,
 		    nGamma=40,
 		    gammaInt=c(1,100), 
-		    thInt=NA
+		    thInt=NA, 
+		    candidates=NA
     )
     # Add if user defined, check if names correspond (code taken from optim)
     nmsC <- names(start.con)
@@ -117,28 +118,38 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if (length(noNms <- namc[!namc %in% nmsC])) 
         warning("unknown names in starting.control: ", paste(noNms, collapse = ", "))
 
-    # Maximum and minimum values for th
+  ## Set grid search values
     interv.Th <- quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) # "trim" percentil of z
     if(is.na(start.con$thInt)) interv.Th <- c(min(start.con$thInt[1], interv.Th[1], na.rm=TRUE), min(start.con$thInt[2], interv.Th[2], na.rm=TRUE))
+    Gammas <- seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)
+    ths <- seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh) 
 
-    for(newGamma in seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)) {
-      for(newTh in seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh)) {
+    IDS <- as.matrix(expand.grid(Gammas, ths) )
 
-        # We fix the linear parameters.
-        cost <- crossprod(lm.fit(cbind(xxL, xxH * G(z, newGamma, newTh)), yy)$residuals)
+    if(!is.na(start.con$candidates)){
+      li <- start.con$candidates
+      if(length(li)!=2 | any(names(li)!=c("th", "gamma")) | length(li[[1]])!=length(li[[2]])){
+	stop("Error in specification of starting.control$candidates: should be a list with element 'th' and 'gamma' of same length\n")
+      }
+      IDS <- rbind(IDS, cbind(li[["gamma"]], li[["th"]]))
+    }
+  ## Grid search: Loop over values
+    for(i in 1:nrow(IDS)){
 
-        if(cost <= bestCost) {
-          bestCost <- cost;
-          gamma <- newGamma;
-          th <- newTh;
-        }
+      # We fix the linear parameters.
+      cost <- crossprod(lm.fit(cbind(xxL, xxH * G(z, IDS[i,1], IDS[i,2])), yy)$residuals)
+
+      if(cost <= bestCost) {
+	bestCost <- cost;
+	gamma <- IDS[i,1]
+	th <- IDS[i,2]
       }
     }
 
     if (trace) {
       cat("Starting values fixed: gamma = ", gamma,", th = ", th, 
           "; SSE = ", bestCost, "\n")
-      if(gamma%in%start.con$gammaInt) cat("Grid search selected lower/upper bound gamma (default [1,100]). 
+      if(gamma%in%start.con$gammaInt) cat("Grid search selected lower/upper bound gamma (was: ", start.con$gammaInt, "]). 
 					  Might try to widen bound with arg: 'starting.control=list(gammaInt=c(1,200))'\n")
     }
   }
