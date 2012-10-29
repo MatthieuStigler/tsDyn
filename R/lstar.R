@@ -122,7 +122,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     
     for(newGamma in seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)) {
       for(newTh in seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh)) {
-        
+
         # We fix the linear parameters.
         cost <- crossprod(lm.fit(cbind(xxL, xxH * G(z, newGamma, newTh)), yy)$residuals)
 
@@ -181,13 +181,17 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     gamma <- p[1]   #Extract parms from vector p
     th <- p[2]      #Extract parms from vector p
 
+    trans <- G(z, gamma, th)
+    m_trans <- mean(trans, na.rm=TRUE)
+    pen <- if(min(m_trans, 1-m_trans)< 0.05) 1/(0.05-m_trans) else 0
+
     # First fix the linear parameters
-    xx <- cbind(xxL, xxH * G(z, gamma, th))
+    xx <- cbind(xxL, xxH * trans)
     if(any(is.na(as.vector(xx)))) {
       message('lstar: missing value during computations')
       return (Inf)
     }
-    crossprod(lm.fit(xx, yy)$residuals)
+    crossprod(lm.fit(xx, yy)$residuals) + pen
   }
  
   ## Numerical minimization##########
@@ -210,15 +214,22 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   names(phi_2) <-coefnames
   names(res$par) <- c("gamma", "th")
 
-  ## Optimization: second quick step to get hessian for all parameters########
+  ## Optimization: second quick step to get hessian for all parameters ########
   SS_2 <- function(p) {
     phi1 <- p[grep("const1|phi1|trend1",names(p))]	#Extract parms from vector p
     phi2 <- p[grep("const2|phi2|trend2",names(p))]	#Extract parms from vector p
     y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p["gamma"], p["th"])
     crossprod(yy - y.hat)
   }
-  res <- optim(c(phi_2,res$par), SS_2,  hessian = TRUE, method="BFGS", control = control)
-  #Results storing################
+  optPars <- c(phi_2,res$par)
+  res <- optim(optPars, SS_2,  hessian = TRUE, method="BFGS", control = control)
+  if(qr(res$hessian, 1e-07)$rank != length(c(phi_2,res$par))){
+    require(numDeriv)
+    hes <- hessian(SS_2, optPars)
+  }
+
+
+  # Results storing ################
   coefs <- res$par
   names(coefs) <- c(coefnames,"gamma", "th") 
   gamma <- coefs["gamma"]
@@ -237,14 +248,15 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
     res$mTh <- mTh
   }
-  res$thVar <- z
+  res$thVar <- c(rep(NA, length(x)-length(z)),z)
   res$fitted <- F(coefs[grep("phi1|const1|trend1", names(coefs))], coefs[grep("phi2|const2|trend2", names(coefs))], gamma, th)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
   res$ninc<-ninc
   res$include<-include
-  
+  res$timeAttributes <- attributes(x)
+
 ################################
 
   return(extend(nlar(str, 
@@ -323,7 +335,7 @@ summary.lstar <- function(object, ...) {
 
   ## Non-linearity test############
   xx <- object$str$xx
-  sX <- object$model.specific$thVar
+  sX <- tail(object$model.specific$thVar, -(length(object$str$x)-object$str$n.used))
   dim(sX) <- NULL
   xx1<- xx*sX		#predictors set B (approximated non-linear component)
   yy <- object$str$yy
@@ -379,7 +391,7 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   xx <- str$xx
   yy <- str$yy
   nms <- colnames(xx)
-  z <- x$model.specific$thVar
+  z <- tail(x$model.specific$thVar, -(length(x$str$x)-x$str$n.used))
   z <- plogis(z, x$coefficients["th"], 1/x$coefficients["gamma"])
   regime.id <- cut(z, breaks=quantile(z, 0:5/5), include.lowest=TRUE)
   regime.id <- as.numeric(regime.id)

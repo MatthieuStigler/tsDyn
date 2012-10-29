@@ -183,6 +183,36 @@ regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
 }
 
 
+regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...){
+
+  thVar <- object$model.specific$thVar
+  str <- object$str
+
+  reg <- G(thVar, g=coef(object)["gamma"], th=getTh(object))
+
+  if(discretize) {
+    reg <- ifelse(reg <=0.5, 1,2)
+  }
+
+  if(timeAttr){
+    attributes(reg) <- object$model.specific$timeAttributes
+    if(initVal) {
+      ans <- reg
+    } else {
+      ans <- window(reg, start=time(reg)[length(str$x)-length(str$yy)+1])
+    }
+  } else {
+    if(initVal){
+      ans <- reg
+    } else {
+      ans <- reg[-c(1:(length(str$x)-length(str$yy)))]
+    }
+  }
+
+  return(ans)
+
+}
+
 
 #get the threshold for setar and nlVar
 getTh<- function (object, ...)  
