@@ -281,12 +281,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 	
 
 #############################################
-  #Transition function
-  #y: variable
-  #g: smoothing parameter
-  #c: threshold value
-G <- function(y, g, th) 
-  plogis(y, th, 1/g)
+  #Transition function G: moved to star.R
+
   
 print.lstar <- function(x, ...) {
   NextMethod(...)
@@ -344,7 +340,7 @@ summary.lstar <- function(object, ...) {
 
   ## Non-linearity test############
   xx <- object$str$xx
-  sX <- tail(object$model.specific$thVar, -(length(object$str$x)-object$str$n.used))
+  sX <- tail(object$model.specific$thVar, -(object$str$n.used-nrow(object$str$xx)))
   dim(sX) <- NULL
   xx1<- xx*sX		#predictors set B (approximated non-linear component)
   yy <- object$str$yy
@@ -400,7 +396,7 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   xx <- str$xx
   yy <- str$yy
   nms <- colnames(xx)
-  z <- tail(x$model.specific$thVar, -(length(x$str$x)-x$str$n.used))
+  z <- tail(x$model.specific$thVar, -(x$str$n.used-nrow(x$str$xx)))
   z <- plogis(z, x$coefficients["th"], 1/x$coefficients["gamma"])
   regime.id <- cut(z, breaks=quantile(z, 0:5/5), include.lowest=TRUE)
   regime.id <- as.numeric(regime.id)

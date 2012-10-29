@@ -670,6 +670,9 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                   mH=m, mL=m, thDelay=thDelay, thVar=thVar,
                   trace=trace, control=list())
 
+  ## thVar contains starting NA values: remove:
+    temp$model.specific$thVar <-  tail(temp$model.specific$thVar, -(temp$str$n.used-nrow(temp$str$xx)))
+
     # Cast the lstar into a valid star object
     temp$model.specific$noRegimes <- noRegimes;
     temp$model.specific$m <- m;

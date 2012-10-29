@@ -188,7 +188,7 @@ regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...
   thVar <- object$model.specific$thVar
   str <- object$str
 
-  reg <- G(thVar, g=coef(object)["gamma"], th=getTh(object))
+  reg <- G(z=thVar, gamma=coef(object)["gamma"], th=getTh(object))
 
   if(discretize) {
     reg <- ifelse(reg <=0.5, 1,2)
