@@ -117,9 +117,10 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if (length(noNms <- namc[!namc %in% nmsC])) 
         warning("unknown names in starting.control: ", paste(noNms, collapse = ", "))
 
-    # Maximum and minimum values for c
-    interv.Th <- if(is.na(start.con$thInt)) quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) else start.con$thInt# "trim" percentil of z
-    
+    # Maximum and minimum values for th
+    interv.Th <- quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) # "trim" percentil of z
+    if(is.na(start.con$thInt)) interv.Th <- c(min(start.con$thInt[1], interv.Th[1], na.rm=TRUE), min(start.con$thInt[2], interv.Th[2], na.rm=TRUE))
+
     for(newGamma in seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)) {
       for(newTh in seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh)) {
 
@@ -130,8 +131,6 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
           bestCost <- cost;
           gamma <- newGamma;
           th <- newTh;
-#           phi1 <- new_phi1
-#           phi2 <- new_phi2
         }
       }
     }
@@ -183,7 +182,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     trans <- G(z, gamma, th)
     m_trans <- mean(trans, na.rm=TRUE)
-    pen <- if(min(m_trans, 1-m_trans)< 0.05) 1/(0.05-m_trans) else 0
+    pen <- if(min(m_trans, 1-m_trans, na.rm=TRUE)< 0.05) 1/(0.05-m_trans) else 0
 
     # First fix the linear parameters
     xx <- cbind(xxL, xxH * trans)
@@ -221,11 +220,10 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p["gamma"], p["th"])
     crossprod(yy - y.hat)
   }
-  optPars <- c(phi_2,res$par)
-  res <- optim(optPars, SS_2,  hessian = TRUE, method="BFGS", control = control)
-  if(qr(res$hessian, 1e-07)$rank != length(c(phi_2,res$par))){
-    require(numDeriv)
-    hes <- hessian(SS_2, optPars)
+  res$par <- c(phi_2,res$par)
+  res$hessian <- optimHess(res$par , SS_2)
+  if(trace & qr(res$hessian, 1e-07)$rank != length(res$par)){
+    cat("Problem: singular hessian\n")
   }
 
 
