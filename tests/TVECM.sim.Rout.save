@@ -1,5 +1,5 @@
 
-R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-pc-linux-gnu (64-bit)
@@ -23,6 +23,13 @@ Loading required package: mgcv
 This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
 Loading required package: Matrix
 Loading required package: lattice
+
+Attaching package: ‘Matrix’
+
+The following object(s) are masked from ‘package:stats’:
+
+    toeplitz
+
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach

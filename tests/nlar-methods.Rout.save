@@ -1,5 +1,5 @@
 
-R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 Platform: x86_64-pc-linux-gnu (64-bit)
@@ -23,6 +23,13 @@ Loading required package: mgcv
 This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
 Loading required package: Matrix
 Loading required package: lattice
+
+Attaching package: ‘Matrix’
+
+The following object(s) are masked from ‘package:stats’:
+
+    toeplitz
+
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach
@@ -43,7 +50,7 @@ Using maximum autoregressive order for high regime: mH = 2
 Performing grid search for starting values...
 Starting values fixed: gamma =  11.15385 , th =  3.337486 ; SSE =  4.337664 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339198 ; SSE =  4.337643 
+Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339199 ; SSE =  4.337643 
 > mod[["aar"]] <- aar(x, m=2)
 > 
 > 
@@ -59,7 +66,7 @@ Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339198 ; SSE 
 0.05072439 0.03814203 0.03804950 0.04030663 
 > sapply(mod, MAPE)
     linear      setar      lstar        aar 
-0.06801955 0.05648596 0.05580033 0.05951108 
+0.06801955 0.05648596 0.05580035 0.05951108 
 > 
 > sapply(mod, coef)
 $linear
@@ -72,9 +79,9 @@ $setar
 
 $lstar
     const1     phi1.1     phi1.2     const2     phi2.1     phi2.2      gamma 
- 0.4891014  1.2465399 -0.3664328 -1.0240758  0.4232669 -0.2546088 11.1538339 
+ 0.4891014  1.2465399 -0.3664328 -1.0240758  0.4232669 -0.2546088 11.1538344 
         th 
- 3.3391979 
+ 3.3391985 
 
 $aar
 (Intercept)   s(V1.0).1   s(V1.0).2   s(V1.0).3   s(V1.0).4   s(V1.0).5 
@@ -93,7 +100,7 @@ $aar
 [3,]  0.05686638  0.05077340  0.04395966  0.03301780
 [4,] -0.07368020 -0.07301664 -0.07994243 -0.10249452
 [5,]  0.11071953  0.04888145  0.02963628  0.02850267
-[6,]  0.20491541  0.11531771  0.09356307  0.11476657
+[6,]  0.20491541  0.11531771  0.09356303  0.11476657
 > 
 > 
 > lapply(mod, predict, n.ahead=10)
@@ -118,7 +125,7 @@ Time Series:
 Start = 1935 
 End = 1944 
 Frequency = 1 
- [1] 3.346299 2.913211 2.560113 2.607044 2.800681 3.024812 3.232267 3.397451
+ [1] 3.346300 2.913213 2.560114 2.607046 2.800682 3.024814 3.232268 3.397452
  [9] 3.444542 3.254686
 
 $aar

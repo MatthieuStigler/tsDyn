@@ -1,8 +1,8 @@
 
-R Under development (unstable) (2012-02-01 r58249)
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
 Copyright (C) 2012 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -21,11 +21,18 @@ Type 'q()' to quit R.
 > library(tsDyn)
 Loading required package: mgcv
 This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
+Loading required package: Matrix
+Loading required package: lattice
+
+Attaching package: ‘Matrix’
+
+The following object(s) are masked from ‘package:stats’:
+
+    toeplitz
+
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach
-Loading required package: iterators
-Loading required package: codetools
 Loading required package: MASS
 Loading required package: nlme
 > 
@@ -35,7 +42,7 @@ Using maximum autoregressive order for high regime: mH = 2
 Performing grid search for starting values...
 Starting values fixed: gamma =  11.15385 , th =  3.337486 ; SSE =  4.337664 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339198 ; SSE =  4.337643 
+Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339199 ; SSE =  4.337643 
 > mod.lstar
 
 Non linear autoregressive model
@@ -78,22 +85,22 @@ Variable: Z(t) = + (0) X(t) + (1) X(t-1)
 Value: 3.339 
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--0.59482 -0.10736  0.01431  0.11110  0.51034 
+      Min        1Q    Median        3Q       Max 
+-0.594820 -0.107360  0.014309  0.111098  0.510342 
 
 Fit:
 residuals variance = 0.03805,  AIC = -357, MAPE = 5.58%
 
 Coefficient(s):
         Estimate  Std. Error  t value  Pr(>|z|)    
-const1  0.489101    0.204915   2.3869 0.0169934 *  
+const1  0.489101    0.204914   2.3869 0.0169929 *  
 phi1.1  1.246540    0.067871  18.3663 < 2.2e-16 ***
 phi1.2 -0.366433    0.104301  -3.5132 0.0004427 ***
-const2 -1.024076    2.430088  -0.4214 0.6734520    
-phi2.1  0.423267    0.172146   2.4588 0.0139416 *  
-phi2.2 -0.254609    0.585420  -0.4349 0.6636233    
-gamma  11.153834   10.004778   1.1149 0.2649144    
-th      3.339198    0.092749  36.0026 < 2.2e-16 ***
+const2 -1.024076    2.430067  -0.4214 0.6734493    
+phi2.1  0.423267    0.172146   2.4588 0.0139415 *  
+phi2.2 -0.254609    0.585416  -0.4349 0.6636208    
+gamma  11.153834   10.004737   1.1149 0.2649124    
+th      3.339199    0.092748  36.0030 < 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -114,10 +121,10 @@ Using maximum autoregressive order for high regime: mH = 1
 Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  100 , th =  3.23744 ; SSE =  12.59824 
-Grid search selected lower/upper bound gamma (default [1,100]). 
+Grid search selected lower/upper bound gamma (was:  1 100 ]). 
 					  Might try to widen bound with arg: 'starting.control=list(gammaInt=c(1,200))'
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  100.0031 , th =  3.235707 ; SSE =  12.59746 
+Optimized values fixed for regime 2  : gamma =  100.0031 , th =  3.235652 ; SSE =  12.59746 
 > mod.lstar2
 
 Non linear autoregressive model
@@ -126,11 +133,11 @@ LSTAR model
 Coefficients:
 Low regime:
    const1    phi1.1 
-0.2884586 0.9280256 
+0.2884595 0.9280287 
 
 High regime:
     const2     phi2.1 
--0.6726321  0.1331181 
+-0.6726318  0.1331190 
 
 Smoothing parameter: gamma = 100 
 
@@ -146,11 +153,11 @@ LSTAR model
 Coefficients:
 Low regime:
    const1    phi1.1 
-0.2884586 0.9280256 
+0.2884595 0.9280287 
 
 High regime:
     const2     phi2.1 
--0.6726321  0.1331181 
+-0.6726318  0.1331190 
 
 Smoothing parameter: gamma = 100 
 
@@ -161,19 +168,19 @@ Value: 3.236
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--1.005042 -0.130153  0.093713  0.236273  0.646682 
+-1.005052 -0.130163  0.093703  0.236265  0.646672 
 
 Fit:
 residuals variance = 0.1105,  AIC = -239, MAPE = 9.965%
 
 Coefficient(s):
          Estimate  Std. Error  t value Pr(>|z|)    
-const1   0.288459    0.246037   1.1724   0.2410    
-phi1.1   0.928026    0.094170   9.8548   <2e-16 ***
-const2  -0.672632    1.336385  -0.5033   0.6147    
-phi2.1   0.133118    0.384832   0.3459   0.7294    
-gamma  100.003138   93.734135   1.0669   0.2860    
-th       3.235707    0.021025 153.8986   <2e-16 ***
+const1   0.288460    0.246039   1.1724   0.2410    
+phi1.1   0.928029    0.094171   9.8547   <2e-16 ***
+const2  -0.672632    1.336549  -0.5033   0.6148    
+phi2.1   0.133119    0.384879   0.3459   0.7294    
+gamma  100.003135   93.792934   1.0662   0.2863    
+th       3.235652    0.021034 153.8282   <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -196,7 +203,7 @@ Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  3.538462 , th =  2.719919 ; SSE =  4.933078 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  2.471204 , th =  2.708116 ; SSE =  4.907449 
+Optimized values fixed for regime 2  : gamma =  2.456908 , th =  2.707843 ; SSE =  4.907455 
 > mod.lstar_noConst
 
 Non linear autoregressive model
@@ -204,14 +211,14 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-   phi1.1    phi1.2 
- 1.401716 -0.227141 
+    phi1.1     phi1.2 
+ 1.4005126 -0.2253725 
 
 High regime:
     phi2.1     phi2.2 
- 0.7637752 -1.0519754 
+ 0.7660504 -1.0552844 
 
-Smoothing parameter: gamma = 2.471 
+Smoothing parameter: gamma = 2.457 
 
 Threshold
 Variable: Z(t) = + (1) X(t) + (0) X(t-1)
@@ -224,14 +231,14 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-   phi1.1    phi1.2 
- 1.401716 -0.227141 
+    phi1.1     phi1.2 
+ 1.4005126 -0.2253725 
 
 High regime:
     phi2.1     phi2.2 
- 0.7637752 -1.0519754 
+ 0.7660504 -1.0552844 
 
-Smoothing parameter: gamma = 2.471 
+Smoothing parameter: gamma = 2.457 
 
 Threshold
 Variable: Z(t) = + (1) X(t) + (0) X(t-1)
@@ -240,19 +247,19 @@ Value: 2.708
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.577262 -0.134041  0.025065  0.146966  0.508205 
+-0.576970 -0.134178  0.025047  0.147316  0.508265 
 
 Fit:
 residuals variance = 0.04305,  AIC = -347, MAPE = 6.175%
 
 Coefficient(s):
         Estimate  Std. Error  t value  Pr(>|z|)    
-phi1.1   1.40172     0.17279   8.1123 4.441e-16 ***
-phi1.2  -0.22714     0.21053  -1.0789  0.280641    
-phi2.1   0.76378     0.31455   2.4282  0.015175 *  
-phi2.2  -1.05198     0.37943  -2.7726  0.005562 ** 
-gamma    2.47120     1.30804   1.8892  0.058859 .  
-th       2.70812     0.15724  17.2224 < 2.2e-16 ***
+phi1.1   1.40051     0.17418   8.0406 8.882e-16 ***
+phi1.2  -0.22537     0.21261  -1.0600  0.289142    
+phi2.1   0.76605     0.31715   2.4154  0.015717 *  
+phi2.2  -1.05528     0.38318  -2.7540  0.005887 ** 
+gamma    2.45691     1.30651   1.8805  0.060039 .  
+th       2.70784     0.15844  17.0908 < 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -263,9 +270,9 @@ Threshold
 Variable: Z(t) = + (1) X(t) + (0) X(t-1)
 > deviance(mod.lstar_noConst)
          [,1]
-[1,] 4.907449
+[1,] 4.907455
 > c(AIC(mod.lstar_noConst),BIC(mod.lstar_noConst))
-[1] -346.5806 -330.1634
+[1] -346.5805 -330.1633
 > 
 > ## include: trend
 > mod.lstar_trend <- lstar(log10(lynx), m=2, control=list(maxit=1000), include="trend")
@@ -275,10 +282,7 @@ Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  3.538462 , th =  2.712901 ; SSE =  4.899802 
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  2.575169 , th =  2.697943 ; SSE =  4.880102 
-Warning messages:
-1: In plogis(q, location, scale, lower.tail, log.p) : NaNs produced
-2: In plogis(q, location, scale, lower.tail, log.p) : NaNs produced
+Optimized values fixed for regime 2  : gamma =  2.575672 , th =  2.697974 ; SSE =  4.880102 
 > mod.lstar_trend
 
 Non linear autoregressive model
@@ -287,13 +291,13 @@ LSTAR model
 Coefficients:
 Low regime:
        trend1        phi1.1        phi1.2 
- 1.823775e-05  1.403688e+00 -2.333263e-01 
+ 1.825193e-05  1.403688e+00 -2.333263e-01 
 
 High regime:
        trend2        phi2.1        phi2.2 
- 0.0006929443  0.7390088860 -1.0305204594 
+ 0.0006932109  0.7390089035 -1.0305204430 
 
-Smoothing parameter: gamma = 2.575 
+Smoothing parameter: gamma = 2.576 
 
 Threshold
 Variable: Z(t) = + (1) X(t) + (0) X(t-1)
@@ -307,13 +311,13 @@ LSTAR model
 Coefficients:
 Low regime:
        trend1        phi1.1        phi1.2 
- 1.823775e-05  1.403688e+00 -2.333263e-01 
+ 1.825193e-05  1.403688e+00 -2.333263e-01 
 
 High regime:
        trend2        phi2.1        phi2.2 
- 0.0006929443  0.7390088860 -1.0305204594 
+ 0.0006932109  0.7390089035 -1.0305204430 
 
-Smoothing parameter: gamma = 2.575 
+Smoothing parameter: gamma = 2.576 
 
 Threshold
 Variable: Z(t) = + (1) X(t) + (0) X(t-1)
@@ -322,21 +326,21 @@ Value: 2.698
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.596710 -0.132118  0.024021  0.143911  0.521352 
+-0.596707 -0.132155  0.024022  0.143877  0.521332 
 
 Fit:
 residuals variance = 0.04281,  AIC = -343, MAPE = 6.137%
 
 Coefficient(s):
           Estimate  Std. Error  t value  Pr(>|z|)    
-trend1  1.8238e-05  1.6343e-03   0.0112  0.991096    
-phi1.1  1.4037e+00  1.6545e-01   8.4840 < 2.2e-16 ***
-phi1.2 -2.3333e-01  2.1023e-01  -1.1099  0.267064    
-trend2  6.9294e-04  2.3868e-03   0.2903  0.771565    
-phi2.1  7.3901e-01  2.9735e-01   2.4853  0.012945 *  
-phi2.2 -1.0305e+00  3.5989e-01  -2.8634  0.004191 ** 
-gamma   2.5752e+00  1.3501e+00   1.9074  0.056465 .  
-th      2.6979e+00  1.6629e-01  16.2242 < 2.2e-16 ***
+trend1  1.8252e-05  1.6344e-03   0.0112  0.991090    
+phi1.1  1.4037e+00  1.6554e-01   8.4793 < 2.2e-16 ***
+phi1.2 -2.3333e-01  2.1044e-01  -1.1087  0.267542    
+trend2  6.9321e-04  2.3867e-03   0.2904  0.771476    
+phi2.1  7.3901e-01  2.9754e-01   2.4837  0.013002 *  
+phi2.2 -1.0305e+00  3.6030e-01  -2.8602  0.004234 ** 
+gamma   2.5757e+00  1.3529e+00   1.9038  0.056942 .  
+th      2.6980e+00  1.6629e-01  16.2246 < 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -358,10 +362,10 @@ Using maximum autoregressive order for high regime: mH = 2
 Using default threshold variable: thDelay=0
 Performing grid search for starting values...
 Starting values fixed: gamma =  100 , th =  2.565527 ; SSE =  4.581837 
-Grid search selected lower/upper bound gamma (default [1,100]). 
+Grid search selected lower/upper bound gamma (was:  1 100 ]). 
 					  Might try to widen bound with arg: 'starting.control=list(gammaInt=c(1,200))'
 Optimization algorithm converged
-Optimized values fixed for regime 2  : gamma =  100.0001 , th =  2.568065 ; SSE =  4.580635 
+Optimized values fixed for regime 2  : gamma =  100.0001 , th =  2.568063 ; SSE =  4.580635 
 > mod.lstar_both
 
 Non linear autoregressive model
@@ -412,16 +416,16 @@ residuals variance = 0.04018,  AIC = -346, MAPE = 5.915%
 
 Coefficient(s):
           Estimate  Std. Error  t value  Pr(>|z|)    
-const1  3.8694e-01  3.1768e-01   1.2180 0.2232147    
-trend1  2.5958e-04  1.3092e-03   0.1983 0.8428240    
-phi1.1  1.2410e+00  1.5052e-01   8.2444 2.220e-16 ***
-phi1.2 -3.2770e-01  9.8629e-02  -3.3226 0.0008919 ***
-const2  7.9812e-01  3.7117e-01   2.1503 0.0315334 *  
-trend2  1.9957e-04  1.4824e-03   0.1346 0.8929097    
-phi2.1  3.0345e-01  1.7018e-01   1.7831 0.0745684 .  
+const1  3.8694e-01  3.1768e-01   1.2180  0.223218    
+trend1  2.5958e-04  1.3092e-03   0.1983  0.842824    
+phi1.1  1.2410e+00  1.5053e-01   8.2443 2.220e-16 ***
+phi1.2 -3.2770e-01  9.8630e-02  -3.3226  0.000892 ***
+const2  7.9812e-01  3.7117e-01   2.1503  0.031534 *  
+trend2  1.9957e-04  1.4824e-03   0.1346  0.892910    
+phi2.1  3.0345e-01  1.7018e-01   1.7831  0.074570 .  
 phi2.2 -6.3465e-01  1.2179e-01  -5.2109 1.879e-07 ***
-gamma   1.0000e+02  8.0620e+01   1.2404 0.2148297    
-th      2.5681e+00  1.4783e-02 173.7191 < 2.2e-16 ***
+gamma   1.0000e+02  8.0617e+01   1.2404  0.214813    
+th      2.5681e+00  1.4783e-02 173.7213 < 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
@@ -501,8 +505,8 @@ phi1.2   -0.331696    0.097428  -3.4045 0.0006628 ***
 const2    0.782130    0.346191   2.2592 0.0238681 *  
 phi2.1    0.300946    0.165911   1.8139 0.0696923 .  
 phi2.2   -0.624613    0.118978  -5.2498 1.523e-07 ***
-gamma   871.923077 3673.244447   0.2374 0.8123687    
-th        2.560332    0.010033 255.1885 < 2.2e-16 ***
+gamma   871.923077 3673.244309   0.2374 0.8123687    
+th        2.560332    0.010033 255.1886 < 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
