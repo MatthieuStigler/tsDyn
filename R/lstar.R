@@ -504,31 +504,6 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   xL %*% phi1 + (xH %*% phi2) * z
 }
 
-#Exhaustive search over a grid of model parameters
-#x: time series
-#m: maximum autoregressive order
-#d: time delay
-#steps: steps ahead
-selectLSTAR <- function(x, m, d=1, steps=d, mL = 1:m, mH = 1:m, thDelay=0:(m-1)) {
-  op <- options(warn=-1)
-  computeAIC <- function(parms) {
-    mLVal <- parms[2]
-    mHVal <- parms[3]
-    thDelayVal <- parms[1]
-    m <- max(mLVal,mHVal,thDelayVal+1)
-    return(AIC( lstar(x, m=m, mL=mLVal, mH=mHVal, thDelay=thDelayVal, trace=FALSE,
-                      control=list(maxit=1e2)) ) )
-  }
-  IDS <- as.matrix( expand.grid(thDelay, mL, mH) )
-  colnames(IDS) <- c("thDelay","mL","mH")
-  computedAIC <- apply(IDS, 1, computeAIC)
-  options(op)
-  res <- cbind(IDS, AIC = computedAIC)
-  idSel <- sort(computedAIC, index=TRUE)$ix
-  idSel <- idSel[1:min(10, length(idSel))]
-  res <- data.frame(res[idSel,], row.names=NULL)
-  return(res)
-}
 
 showDialog.lstar <- function(x, ...) {
   vML  <- tclVar(1)
