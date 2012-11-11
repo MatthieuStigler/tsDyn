@@ -154,7 +154,7 @@ vec2var.tsDyn <- function(x){
 ## vecm
   ecdet <- if(model=="VECM") x$model.specific$LRinclude else "none"
   aChar <- "fakeChar"
-  vecm<- new("ca.jo", season = NULL, dumvar=NULL, ecdet=ecdet,lag=as.integer(lag),spec="transitory". lambda=aChar)
+  vecm<- new("ca.jo", season = NULL, dumvar=NULL, ecdet=ecdet,lag=as.integer(lag),spec="transitory", lambda=aChar)
 
 ## datamat
   if(model=="VAR"){
