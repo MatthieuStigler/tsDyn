@@ -232,7 +232,12 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     crossprod(yy - y.hat)
   }
   res$par <- c(phi_2,res$par)
-  res$hessian <- optimHess(res$par , SS_2)
+  if(as.numeric(R.Version()$minor)<15){
+    res$hessian <- optim(res$par, SS_2, method="L-BFGS-B", hessian=TRUE)$hessian
+  } else {
+    res$hessian <- optimHess(res$par , SS_2)
+  }
+
   if(trace & qr(res$hessian, 1e-07)$rank != length(res$par)){
     cat("Problem: singular hessian\n")
   }
