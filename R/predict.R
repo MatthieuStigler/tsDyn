@@ -49,13 +49,15 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
 ## Compute SE if MC/boot
   if(type!="naive"){
     SE <- t(apply(res[n.used + 1:n.ahead, ,drop=FALSE], 1 ,quantile, prob=sort(c(1-ci, ci)), na.rm=TRUE))
-    SE <- ts(SE, start = tsp(newdata)[2] + deltat(newdata),
-             frequency=frequency(newdata))
+    if(is.ts(newdata)){
+      SE <- ts(SE, start = tsp(newdata)[2] + deltat(newdata),
+	      frequency=frequency(newdata))
+    }
   }
 
 ## Return result
-  pred <- ts(pred, start = tsp(newdata)[2] + deltat(newdata),
-             frequency=frequency(newdata))
+  if(is.ts(newdata)) pred <- ts(pred, start = tsp(newdata)[2] + deltat(newdata),
+				frequency=frequency(newdata))
   if(type=="naive"){
     result <- pred
   } else {
