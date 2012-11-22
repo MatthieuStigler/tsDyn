@@ -25,6 +25,7 @@ if(is.null(colnames(data)))
 ###Check args
 include<-match.arg(include)
 LRinclude<-match.arg(LRinclude)
+if(lag<1) stop("Lag is minimum 1")
 if(LRinclude%in%c("const", "both"))  include<-"none"
 ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
 model<-match.arg(model)
