@@ -165,6 +165,53 @@ simplify2df <- function(x) {
 }
 
 
+predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FALSE, ...){
+
+  mod_cl <- deparse(substitute(model))
+  if(missing(newdata)) stop("Providing newdata required for objects ",  mod_cl, "!")
+  if(length(newdata) > length(object$x)) stop("newdta should not have leength bigger than sample used to estimate 'object'. Be careful not to provide first sub-sample in newdata!")
+ 
+
+  estim_samp <- object$x
+  n_estim_samp <- length(estim_samp)
+  nroll <- length(newdata)
+  full_samp <- c(estim_samp, newdata)
+
+## Get in sample forecasts
+  slotMod<- switch(mod_cl, "Arima"="pred", "ets"="mean")
+  pred <- vector("numeric",length=nroll*length(n.ahead))
+
+  for(j in 1:length(n.ahead)){
+    for(i in 1:nroll){
+      mod <- model(full_samp[1:(n_estim_samp+i-n.ahead[j])], model=object)
+      pred[i+(j-1)*nroll] <- forecast(mod, n.ahead=n.ahead[j])$mean[n.ahead[j]] 
+    }
+  }
+
+## format pred: add eventually n.ahead column
+  if(length(n.ahead)>1){
+    pred <- data.frame(pred=pred,n.ahead =rep(n.ahead, each=nroll))
+  } else {
+    pred <- as.data.frame(pred)
+  }
+  colnames(pred)[1] <- if(mod_cl=="Arima") object$series else deparse(object$call$y)
+
+## Return object
+  res <- list(pred=pred, true= as.data.frame(newdata))#, model=mod_cl)
+#   class(res) <- "fcstpkg"
+  return(res)
+}
+
+
+predict_rolling.Arima <- function(object, n.ahead=1, newdata,  ...){
+  predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=Arima,check=TRUE,  ...)
+}
+
+predict_rolling.ets <- function(object,  n.ahead=1, newdata,  ...){
+  predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=ets, check=FALSE, ...)
+}
+
+
 ##############################################################
 ##################### TESTS
 ##############################################################
@@ -277,5 +324,42 @@ predict_rolling(mod_set, newdata=lynx[101:114], n.ahead=5)$pred [5,1]
 predict(mod_set, n.ahead=5)
 
 predict_rolling(mod_set, newdata=lynx[101:114], n.ahead=1:3)$pred[c(1,14,15, 29),]
+
+
+############################
+########### FORECATS
+############################
+library(forecast)
+mod_arauto <- auto.arima(log(lynx[1:100]))
+mod_ets <- ets(log(lynx[1:100]))
+mod_arim <- Arima(log(lynx[1:100]), order=c(1,0,0))
+
+
+
+
+## ARIMA
+pr_fct_1 <- predict_rolling(mod_arim, newdata=log(lynx[101:114]), n.ahead=1)$pred
+pr_fct_2 <- predict_rolling(mod_arim, newdata=log(lynx[101:114]), n.ahead=2)$pred
+
+pr_fct_12 <- predict_rolling(mod_arim, newdata=log(lynx[101:114]), n.ahead=1:2)$pred
+all.equal(c(pr_fct_1[,1],pr_fct_2[,1]), pr_fct_12[,1])
+all.equal(c(pr_fct_1[1,1],pr_fct_2[2,1]), forecast(mod_arim, h=3)$mean[1:2])
+
+## auto.ARIMA
+pr_fct_at_1 <- predict_rolling(mod_arauto, newdata=log(lynx[101:114]), n.ahead=1)$pred
+pr_fct_at_2 <- predict_rolling(mod_arauto, newdata=log(lynx[101:114]), n.ahead=2)$pred
+
+pr_fct_at_12 <- predict_rolling(mod_arauto, newdata=log(lynx[101:114]), n.ahead=1:2)$pred
+all.equal(c(pr_fct_at_1[,1],pr_fct_at_2[,1]), pr_fct_at_12[,1])
+all.equal(c(pr_fct_at_1[1,1],pr_fct_at_2[2,1]), forecast(mod_arauto, h=3)$mean[1:2])
+
+## ETS
+pr_fct_ets_1 <- predict_rolling(mod_ets, newdata=log(lynx[101:114]), n.ahead=1)$pred
+pr_fct_ets_2 <- predict_rolling(mod_ets, newdata=log(lynx[101:114]), n.ahead=2)$pred
+
+pr_fct_ets_12 <- predict_rolling(mod_ets, newdata=log(lynx[101:114]), n.ahead=1:2)$pred
+all.equal(c(pr_fct_ets_1[,1],pr_fct_ets_2[,1]), pr_fct_ets_12[,1])
+all.equal(c(pr_fct_ets_1[1,1],pr_fct_ets_2[2,1]), forecast(mod_ets, h=3)$mean[1:2])
+
 
 }
