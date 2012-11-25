@@ -146,10 +146,14 @@ predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
   } else {
     pred <- as.data.frame(pred)
   }
-  colnames(pred)[1] <- object$str$series
 
-  ## Return object
-  res <- list(pred=pred, true=as.data.frame(newdata))
+
+## Format true data and pred
+  trueDat <- as.data.frame(newdata)
+  colnames(pred)[1] <- colnames(trueDat)[1] <- object$str$series
+
+## Return object
+  res <- list(pred=pred, true=trueDat)
   class(res) <- "pred_roll"
   return(res)
 
