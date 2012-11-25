@@ -64,7 +64,7 @@ Non-linear time series models in empirical finance, Philip Hans Franses and Dick
 \seealso{
   The model fitting functions \code{\link{setar}}, \code{\link{lstar}}; or \code{\link{lineVar}} and \code{\link{VECM}}. 
 
-A more sophisticated predict function, allowing to do sub-sample rlooing predictions: \code{\link{predict_rolling}}. 
+A more sophisticated predict function, allowing to do sub-sample rolling predictions: \code{\link{predict_rolling}}. 
 } 
 
 \examples{
@@ -89,6 +89,15 @@ lines(pred_setar_Bboot$pred, lty=4, col=4)
 lines(pred_setar_MC$pred, lty=5, col=5)
 
 legend("bottomleft", leg=c("Observed", "Naive F", "Bootstrap F","Block-Bootstrap F", "MC F"), lty=1:5, col=1:5)
+
+## Multivariate:
+data(barry)
+mod_vecm <- VECM(barry, lag=2)
+predict(mod_vecm)
+
+# note that when providing newdata, newdata has to be ordered chronologically, so that the first row/element is the earliest value:
+all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(322, 323, 324),]))
+
 }
 
 \keyword{regression}
