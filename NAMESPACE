@@ -7,6 +7,9 @@ importFrom(tseries, na.remove)
 importFrom(Matrix, norm)
 importFrom(vars, irf)
 importFrom(vars, fevd)
+importFrom(forecast, Arima)
+importFrom(forecast, ets)
+importFrom(forecast, forecast)
 
 importClassesFrom(urca, ca.jo)
 
