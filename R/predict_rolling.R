@@ -78,8 +78,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 
     lastPos <- T-nroll-n.ahead+i
     lags <- c(0:max(0,lag-1+add))
-print(lastPos-lags)
-    dat <- origSerie[lastPos-lags,,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
+    dat <- origSerie[sort(lastPos-lags),,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
     R[i,] <- predict(mod, n.ahead=n.ahead, newdata=dat)[n.ahead,]
   }
 
@@ -92,7 +91,7 @@ print(lastPos-lags)
 
 
 
-predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1:2, refit.every, newdata, ...){
+predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newdata, ...){
 
   morgAr <- list(object=object, nroll=nroll)
   if(!missing(refit.every)) morgAr$refit.every <- refit.every
@@ -233,59 +232,76 @@ n_ca<- nrow(barry)
 
 #### No refit lag=1
 as.M <- function(x) as.matrix(x)
-mod_var_1_full <- lineVar(barry, lag=1)
-mod_var_1_sub <- lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1)
+mod_var_l1_full <- lineVar(barry, lag=1)
+mod_var_l1_sub <- lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1)
+mod_var_l1_sub_ref5 <- lineVar(tsDyn:::myHead(barry,n_ca-5), lag=1)
 
 
-pred_roll_1<-predict_rolling_1step.nlVar(object=mod_var_1_full, nroll=10, n.ahead=1)
-pred_roll_2 <-predict_rolling(object=mod_var_1_full, nroll=10, n.ahead=2)
-pred_roll_12<-predict_rolling(object=mod_var_1_full, nroll=10, n.ahead=1:2)
-all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+int_check <- function(object=mod_var_l1_full){
+  pred_roll_1<-predict_rolling_1step.nlVar(object=object, nroll=10, n.ahead=1)
+  pred_roll_2 <-predict_rolling(object=object, nroll=10, n.ahead=2)
+  pred_roll_12<-predict_rolling(object=object, nroll=10, n.ahead=1:2)
+  all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+}
 
-pred_0_12_nd <- predict(mod_var_1_sub, n.ahead=2, newdata=barry[n_ca-11,,drop=FALSE])
-pred_1_12_nd <- predict(mod_var_1_sub, n.ahead=2, newdata=barry[n_ca-10,,drop=FALSE])
-pred_2_12_nd <- predict(mod_var_1_sub, n.ahead=2, newdata=barry[n_ca-9,,drop=FALSE])
-pred_1_12 <- predict(mod_var_1_sub, n.ahead=2)
-all.equal(pred_1_12_nd, pred_1_12) ## minor: consistency in predict with/withotut newdata=dataset
+int_check_refit <- function(object=mod_var_l1_full, refit=5){
+  pred_roll_1<-predict_rolling_1step.nlVar(object=object, nroll=10, n.ahead=1, refit=refit)
+  pred_roll_2 <-predict_rolling(object=object, nroll=10, n.ahead=2, refit=refit)
+  pred_roll_12<-predict_rolling(object=object, nroll=10, n.ahead=1:2, refit=refit)
+  all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+}
+int_check(object=mod_var_l1_full)
+
+pred_l1_roll_12<-predict_rolling(object=mod_var_l1_full, nroll=10, n.ahead=1:2)
+pred_l1_0_12_nd <- predict(mod_var_l1_sub, n.ahead=2, newdata=barry[n_ca-11,,drop=FALSE])
+pred_l1_1_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-5,,drop=FALSE])
+pred_l1_0_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-6,,drop=FALSE])
+pred_l1_1_12_nd <- predict(mod_var_l1_sub, n.ahead=2, newdata=barry[n_ca-10,,drop=FALSE])
+pred_l1_2_12_nd <- predict(mod_var_l1_sub, n.ahead=2, newdata=barry[n_ca-9,,drop=FALSE])
+pred_l1_1_12 <- predict(mod_var_l1_sub, n.ahead=2)
+all.equal(pred_l1_1_12_nd, pred_l1_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 
 
-pred_nd <- rbind(pred_0_12_nd, pred_1_12_nd, pred_2_12_nd)
-all.equal(pred_nd[c(3,5),], as.M(pred_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_nd[c(2,4),], as.M(pred_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+pred_l1_nd <- rbind(pred_l1_0_12_nd, pred_l1_1_12_nd, pred_l1_2_12_nd)
+all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
 
 
 #### No refit lag=3
 mod_var_l3_full <- lineVar(barry, lag=3)
 mod_var_l3_sub <- lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3)
+int_check(object=mod_var_l3_full)
 
-pred_roll_1<-predict_rolling_1step.nlVar(object=mod_var_l3_full, nroll=10, n.ahead=1)
-pred_roll_2 <-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=2)
-pred_roll_12<-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=1:2)
-all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
-
-pred_0_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-c(13:11),,drop=FALSE])
-pred_1_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-(12:10),,drop=FALSE])
-pred_2_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-c(9:11),,drop=FALSE])
-pred_1_12 <- predict(mod_var_l3_sub, n.ahead=2)
-all.equal(pred_1_12_nd, pred_1_12) ## minor: consistency in predict with/withotut newdata=dataset
+pred_l3_0_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-c(13:11),,drop=FALSE])
+pred_l3_1_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-(12:10),,drop=FALSE])
+pred_l3_2_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-c(11:9),,drop=FALSE])
+pred_l3_1_12 <- predict(mod_var_l3_sub, n.ahead=2)
+all.equal(pred_l3_1_12_nd, pred_l3_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 
 
-pred_nd <- rbind(pred_0_12_nd, pred_1_12_nd, pred_2_12_nd)
-all.equal(pred_nd[c(3,5),], as.M(pred_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_nd[c(2,4),], as.M(pred_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
-
-
-pred_roll<-predict_rolling(object=lineVar(barry, lag=3), nroll=10, n.ahead=1)
-
-pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-10,,drop=FALSE])
-pred2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-9,,drop=FALSE])
-all.equal(rbind(pred1, pred2), head(pred_roll$pred,2), check=FALSE)
-
-all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-1,,drop=FALSE]), tail(pred_roll$pred,1), check=FALSE)
-
+pred_l3_nd <- rbind(pred_l3_0_12_nd, pred_l3_1_12_nd, pred_l3_2_12_nd)
+all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
 
 
 ### Refit lag=1
+int_check_refit(object=mod_var_l1_full)
+
+pred_l1_ref_roll_12<-predict_rolling(object=mod_var_l1_full, nroll=10, n.ahead=1:2, refit=5)
+
+mod_var_l1_sub_ref5 <- lineVar(tsDyn:::myHead(barry,n_ca-6), lag=1)
+pred_l1_1_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-5,,drop=FALSE])
+pred_l1_0_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-6,,drop=FALSE])
+
+pred_l1_nd_ref5 <- rbind(pred_l1_0_12_nd_ref5, pred_l1_1_12_nd_ref5)
+all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_ref_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_ref_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l1_nd_ref5[c(2,4),], as.M(pred_l1_ref_roll_12$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+
+
+
+
+
 pred_ref<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1, refit.every=1)
 
 pred_ref_1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1)
