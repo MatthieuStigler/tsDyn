@@ -74,8 +74,6 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
     }
 
   ## pred
-    R[i,] <- predict(mod, n.ahead=n.ahead, newdata=out)[n.ahead,]
-
     lastPos <- T-nroll-n.ahead+i
     lags <- c(0:max(0,lag-1+add))
     dat <- origSerie[sort(lastPos-lags),,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
@@ -84,7 +82,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 
 
 ## Return
-  res <- list(pred=as.data.frame(R), true=outSerie)
+  res <- list(pred=as.data.frame(R), true=myTail(origSerie, nroll))
   return(res)
 
 }
