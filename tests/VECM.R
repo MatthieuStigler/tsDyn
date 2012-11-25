@@ -95,8 +95,8 @@ lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], predict,  n.ahead=2)
 lapply(vecm_all[-c(5, 6, 9, 10, 14, 15, 18, 19)], function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 
-lapply(vecm_all, predict_rolling, nroll=2)
-lapply(vecm_all, predict_rolling, nroll=2, refit.every=1)
+lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
+lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
@@ -136,27 +136,59 @@ r_sel_both$AICs
 ####### predict_rolling check
 ###################################
 n_ca<- nrow(barry)
+as.M <- function(x) as.matrix(x)
 
 #### VECM No refit lag=1
-pred_vec_roll_l1 <- predict_rolling(object=VECM(barry, lag=1), nroll=10, n.ahead=1)
-pred_vec_l1_1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-10,,drop=FALSE])
-pred_vec_l1_2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-9,,drop=FALSE])
-all.equal(rbind(pred_vec_l1_1, pred_vec_l1_2), head(pred_vec_roll_l1,2), check=FALSE)
-all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll_l1,1), check=FALSE)
+mod_vecm_l1_full <- VECM(barry, lag=1)
+mod_vecm_l1_sub <- VECM(tsDyn:::myHead(barry,n_ca-10), lag=1)
+mod_vecm_l1_sub_ref5 <- VECM(tsDyn:::myHead(barry,n_ca-5), lag=1)
+
+
+pred_l3_vecm_roll_12<-predict_rolling(object=mod_vecm_l1_full, nroll=10, n.ahead=1:2)
+pred_l3_vecm_0_12_nd <- predict(mod_vecm_l1_sub, n.ahead=2, newdata=barry[n_ca-c(12:11),,drop=FALSE])
+pred_l3_vecm_1_12_nd_ref5 <- predict(mod_vecm_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(6:5),,drop=FALSE])
+pred_l3_vecm_0_12_nd_ref5 <- predict(mod_vecm_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(7:6),,drop=FALSE])
+pred_l3_vecm_1_12_nd <- predict(mod_vecm_l1_sub, n.ahead=2, newdata=barry[n_ca-c(11:10),,drop=FALSE])
+pred_l3_vecm_2_12_nd <- predict(mod_vecm_l1_sub, n.ahead=2, newdata=barry[n_ca-c(10:9),,drop=FALSE])
+pred_l3_vecm_1_12 <- predict(mod_vecm_l1_sub, n.ahead=2)
+all.equal(pred_l3_vecm_1_12_nd, pred_l3_vecm_1_12) ## minor: consistency in predict with/withotut newdata=dataset
+
+
+pred_l3_vecm_nd <- rbind(pred_l3_vecm_0_12_nd, pred_l3_vecm_1_12_nd, pred_l3_vecm_2_12_nd)
+all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
 
 
 
 #### VECM No refit lag=3
-pred_vec_roll <- predict_rolling(object=VECM(barry, lag=3), nroll=10, n.ahead=1)
-pred_vec1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-10,,drop=FALSE])
-pred_vec2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-9,,drop=FALSE])
-all.equal(rbind(pred_vec1, pred_vec2), head(pred_vec_roll,2), check=FALSE)
-all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll,1), check=FALSE)
+mod_var_l3_vecm_full <- VECM(barry, lag=3)
+mod_var_l3_vecm_sub <- VECM(tsDyn:::myHead(barry,n_ca-10), lag=3)
+mod_var_l3_vecm_sub_ref5 <- VECM(tsDyn:::myHead(barry,n_ca-6), lag=3)
+
+pred_l3_vecm_roll_12<-predict_rolling(object=mod_var_l3_vecm_full, nroll=10, n.ahead=1:2)
+pred_l3_vecm_0_12_nd <- predict(mod_var_l3_vecm_sub, n.ahead=2, newdata=barry[n_ca-c(14:11),,drop=FALSE])
+pred_l3_vecm_1_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(6:9),,drop=FALSE])
+pred_l3_vecm_0_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(7:10),,drop=FALSE])
+pred_l3_vecm_1_12_nd <- predict(mod_var_l3_vecm_sub, n.ahead=2, newdata=barry[n_ca-c(13:10),,drop=FALSE])
+pred_l3_vecm_2_12_nd <- predict(mod_var_l3_vecm_sub, n.ahead=2, newdata=barry[n_ca-c(12:9),,drop=FALSE])
+pred_l3_vecm_1_12 <- predict(mod_var_l3_vecm_sub, n.ahead=2)
+all.equal(pred_l3_vecm_1_12_nd, pred_l3_vecm_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 
 
-### VECM Refit lag=1
-pred_vec_ref<-predict_rolling(object=VECM(barry, lag=1), nroll=10, n.ahead=1, refit.every=1)
-pred_vec_ref_1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1)
-pred_vec_ref_2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-9), lag=1), n.ahead=1)
-all.equal(rbind(pred_vec_ref_1, pred_vec_ref_2), head(pred_vec_ref,2), check=FALSE)
-all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-1), lag=1), n.ahead=1), tail(pred_vec_ref,1), check=FALSE)
+pred_l3_vecm_nd <- rbind(pred_l3_vecm_0_12_nd, pred_l3_vecm_1_12_nd, pred_l3_vecm_2_12_nd)
+all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+
+
+### VECM Refit lag=3
+pred_l3_vecm_roll_12_ref<-predict_rolling(object=mod_var_l3_vecm_full, nroll=10, n.ahead=1:2, refit=5)
+pred_l3_vecm_roll_12_ref_b<-predict_rolling(object=mod_var_l3_vecm_full, nroll=10, n.ahead=2, refit=5)
+
+
+pred_l3_vecm_0_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(9:6),,drop=FALSE])
+pred_l3_vecm_1_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(8:5),,drop=FALSE])
+
+pred_l3_vecm_nd_ref5 <- rbind(pred_l3_vecm_0_12_nd_ref5, pred_l3_vecm_1_12_nd_ref5)
+all.equal(pred_l3_vecm_nd_ref5[c(2,4),], as.M(pred_l3_vecm_roll_12_ref$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+
+

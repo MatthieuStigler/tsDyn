@@ -2141,197 +2141,197 @@ $vecm_ML_l1_LRtr
 [2,] 1.475404 110.7437 107.1001
 
 > 
-> lapply(vecm_all, predict_rolling, nroll=2)
+> lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
 $vecm_OLS_l1_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.480585 110.5887 107.1461
-[2,] 1.469095 110.5972 107.0019
+    dolcan   cpiUSA   cpiCAN
+1 1.480585 110.5887 107.1461
+2 1.469095 110.5972 107.0019
 
 $vecm_OLS_l3_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.481194 110.6156 107.1979
-[2,] 1.468014 110.6228 107.0398
+    dolcan   cpiUSA   cpiCAN
+1 1.481194 110.6156 107.1979
+2 1.468014 110.6228 107.0398
 
 $vecm_OLS_l3_co_betaGiven
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.481194 110.6156 107.1979
-[2,] 1.468014 110.6228 107.0398
+    dolcan   cpiUSA   cpiCAN
+1 1.481194 110.6156 107.1979
+2 1.468014 110.6228 107.0398
 
 $vecm_OLS_l1_tr
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.478187 110.3822 106.9131
-[2,] 1.466085 110.3744 106.7474
+    dolcan   cpiUSA   cpiCAN
+1 1.478187 110.3822 106.9131
+2 1.466085 110.3744 106.7474
 
 $vecm_OLS_l1_bo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.495613 110.6647 107.3329
-[2,] 1.484695 110.6761 107.1957
+    dolcan   cpiUSA   cpiCAN
+1 1.495613 110.6647 107.3329
+2 1.484695 110.6761 107.1957
 
 $vecm_OLS_l1_no
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.479264 110.5075 107.0518
-[2,] 1.466773 110.4544 106.8359
+    dolcan   cpiUSA   cpiCAN
+1 1.479264 110.5075 107.0518
+2 1.466773 110.4544 106.8359
 
 $vecm_OLS_l1_LRco
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.477714 110.5405 107.1498
-[2,] 1.465461 110.4848 106.9249
+    dolcan   cpiUSA   cpiCAN
+1 1.477714 110.5405 107.1498
+2 1.465461 110.4848 106.9249
 
 $vecm_OLS_l1_LRtr
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.522503 110.6063 107.5693
-[2,] 1.511573 110.6136 107.4249
+    dolcan   cpiUSA   cpiCAN
+1 1.522503 110.6063 107.5693
+2 1.511573 110.6136 107.4249
 
 $vecm_OLS_l1_LRtr_noCo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.513763 110.1662 107.0302
-[2,] 1.501544 110.1085 106.8063
+    dolcan   cpiUSA   cpiCAN
+1 1.513763 110.1662 107.0302
+2 1.501544 110.1085 106.8063
 
 $vecm_OLS_l1_LRbo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.483236 110.5364 107.0975
-[2,] 1.471002 110.4805 106.8727
+    dolcan   cpiUSA   cpiCAN
+1 1.483236 110.5364 107.0975
+2 1.471002 110.4805 106.8727
 
 $vecm_ML_l1_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.479862 110.5931 107.1624
-[2,] 1.468371 110.6024 107.0209
+    dolcan   cpiUSA   cpiCAN
+1 1.479862 110.5931 107.1624
+2 1.468371 110.6024 107.0209
 
 $vecm_ML_l3_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.479789 110.6225 107.2529
-[2,] 1.467058 110.6304 107.0900
+    dolcan   cpiUSA   cpiCAN
+1 1.479789 110.6225 107.2529
+2 1.467058 110.6304 107.0900
 
 $` vecm_ML_l1_tr`
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.489354 111.1907 108.3128
-[2,] 1.478158 111.2033 108.1869
+    dolcan   cpiUSA   cpiCAN
+1 1.489354 111.1907 108.3128
+2 1.478158 111.2033 108.1869
 
 $vecm_ML_l1_bo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.501741 110.4601 109.0899
-[2,] 1.490500 110.4693 108.9661
+    dolcan   cpiUSA   cpiCAN
+1 1.501741 110.4601 109.0899
+2 1.490500 110.4693 108.9661
 
 $vecm_ML_l1_no
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.478587 110.5890 107.2101
-[2,] 1.466826 110.5933 107.0667
+    dolcan   cpiUSA   cpiCAN
+1 1.478587 110.5890 107.2101
+2 1.466826 110.5933 107.0667
 
 $vecm_ML_l1_LRco
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.478697 110.5804 107.1969
-[2,] 1.467340 110.5911 107.0589
+    dolcan   cpiUSA   cpiCAN
+1 1.478697 110.5804 107.1969
+2 1.467340 110.5911 107.0589
 
 $vecm_ML_l1_LRtr
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.490669 110.8373 109.1888
-[2,] 1.479386 110.8475 109.0650
+    dolcan   cpiUSA   cpiCAN
+1 1.490669 110.8373 109.1888
+2 1.479386 110.8475 109.0650
 
 $vecm_ML_l1_LRtr_noCo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.490362 111.2475 108.1660
-[2,] 1.479145 111.2596 108.0407
+    dolcan   cpiUSA   cpiCAN
+1 1.490362 111.2475 108.1660
+2 1.479145 111.2596 108.0407
 
 $vecm_ML_l1_LRbo
-       dolcan   cpiUSA  cpiCAN
-[1,] 1.489512 111.1946 108.079
-[2,] 1.478307 111.2070 107.953
+    dolcan   cpiUSA  cpiCAN
+1 1.489512 111.1946 108.079
+2 1.478307 111.2070 107.953
 
-> lapply(vecm_all, predict_rolling, nroll=2, refit.every=1)
+> lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 $vecm_OLS_l1_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.480585 110.5887 107.1461
-[2,] 1.468852 110.5950 106.9981
+    dolcan   cpiUSA   cpiCAN
+1 1.480585 110.5887 107.1461
+2 1.468852 110.5950 106.9981
 
 $vecm_OLS_l3_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.481194 110.6156 107.1979
-[2,] 1.467823 110.6207 107.0362
+    dolcan   cpiUSA   cpiCAN
+1 1.481194 110.6156 107.1979
+2 1.467823 110.6207 107.0362
 
 $vecm_OLS_l3_co_betaGiven
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.481194 110.6156 107.1979
-[2,] 1.467823 110.6207 107.0362
+    dolcan   cpiUSA   cpiCAN
+1 1.481194 110.6156 107.1979
+2 1.467823 110.6207 107.0362
 
 $vecm_OLS_l1_tr
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.478187 110.3822 106.9131
-[2,] 1.465968 110.3746 106.7475
+    dolcan   cpiUSA   cpiCAN
+1 1.478187 110.3822 106.9131
+2 1.465968 110.3746 106.7475
 
 $vecm_OLS_l1_bo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.495613 110.6647 107.3329
-[2,] 1.484586 110.6732 107.1896
+    dolcan   cpiUSA   cpiCAN
+1 1.495613 110.6647 107.3329
+2 1.484586 110.6732 107.1896
 
 $vecm_OLS_l1_no
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.479264 110.5075 107.0518
-[2,] 1.466616 110.4536 106.8346
+    dolcan   cpiUSA   cpiCAN
+1 1.479264 110.5075 107.0518
+2 1.466616 110.4536 106.8346
 
 $vecm_OLS_l1_LRco
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.477714 110.5405 107.1498
-[2,] 1.465450 110.4847 106.9246
+    dolcan   cpiUSA   cpiCAN
+1 1.477714 110.5405 107.1498
+2 1.465450 110.4847 106.9246
 
 $vecm_OLS_l1_LRtr
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.522503 110.6063 107.5693
-[2,] 1.512039 110.6191 107.4331
+    dolcan   cpiUSA   cpiCAN
+1 1.522503 110.6063 107.5693
+2 1.512039 110.6191 107.4331
 
 $vecm_OLS_l1_LRtr_noCo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.513763 110.1662 107.0302
-[2,] 1.502199 110.1162 106.8197
+    dolcan   cpiUSA   cpiCAN
+1 1.513763 110.1662 107.0302
+2 1.502199 110.1162 106.8197
 
 $vecm_OLS_l1_LRbo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.483236 110.5364 107.0975
-[2,] 1.471005 110.4808 106.8735
+    dolcan   cpiUSA   cpiCAN
+1 1.483236 110.5364 107.0975
+2 1.471005 110.4808 106.8735
 
 $vecm_ML_l1_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.479862 110.5931 107.1624
-[2,] 1.468171 110.5994 107.0151
+    dolcan   cpiUSA   cpiCAN
+1 1.479862 110.5931 107.1624
+2 1.468171 110.5994 107.0151
 
 $vecm_ML_l3_co
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.479789 110.6225 107.2529
-[2,] 1.466549 110.6244 107.0731
+    dolcan   cpiUSA   cpiCAN
+1 1.479789 110.6225 107.2529
+2 1.466549 110.6244 107.0731
 
 $` vecm_ML_l1_tr`
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.489354 111.1907 108.3128
-[2,] 1.478568 111.2145 108.2080
+    dolcan   cpiUSA   cpiCAN
+1 1.489354 111.1907 108.3128
+2 1.478568 111.2145 108.2080
 
 $vecm_ML_l1_bo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.501741 110.4601 109.0899
-[2,] 1.491821 110.4872 108.9957
+    dolcan   cpiUSA   cpiCAN
+1 1.501741 110.4601 109.0899
+2 1.491821 110.4872 108.9957
 
 $vecm_ML_l1_no
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.478587 110.5890 107.2101
-[2,] 1.466702 110.5882 107.0601
+    dolcan   cpiUSA   cpiCAN
+1 1.478587 110.5890 107.2101
+2 1.466702 110.5882 107.0601
 
 $vecm_ML_l1_LRco
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.478697 110.5804 107.1969
-[2,] 1.467213 110.5862 107.0528
+    dolcan   cpiUSA   cpiCAN
+1 1.478697 110.5804 107.1969
+2 1.467213 110.5862 107.0528
 
 $vecm_ML_l1_LRtr
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.490669 110.8373 109.1888
-[2,] 1.481164 110.8757 109.0882
+    dolcan   cpiUSA   cpiCAN
+1 1.490669 110.8373 109.1888
+2 1.481164 110.8757 109.0882
 
 $vecm_ML_l1_LRtr_noCo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.490362 111.2475 108.1660
-[2,] 1.479211 111.2705 108.0622
+    dolcan   cpiUSA   cpiCAN
+1 1.490362 111.2475 108.1660
+2 1.479211 111.2705 108.0622
 
 $vecm_ML_l1_LRbo
-       dolcan   cpiUSA   cpiCAN
-[1,] 1.489512 111.1946 108.0790
-[2,] 1.478564 111.2296 107.9933
+    dolcan   cpiUSA   cpiCAN
+1 1.489512 111.1946 108.0790
+2 1.478564 111.2296 107.9933
 
 > 
 > ### rank test
@@ -2844,36 +2844,69 @@ r=3 -4758.653 -4768.659 -4778.556
 > ####### predict_rolling check
 > ###################################
 > n_ca<- nrow(barry)
+> as.M <- function(x) as.matrix(x)
 > 
 > #### VECM No refit lag=1
-> pred_vec_roll_l1 <- predict_rolling(object=VECM(barry, lag=1), nroll=10, n.ahead=1)
-> pred_vec_l1_1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-10,,drop=FALSE])
-> pred_vec_l1_2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-9,,drop=FALSE])
-> all.equal(rbind(pred_vec_l1_1, pred_vec_l1_2), head(pred_vec_roll_l1,2), check=FALSE)
+> mod_vecm_l1_full <- VECM(barry, lag=1)
+> mod_vecm_l1_sub <- VECM(tsDyn:::myHead(barry,n_ca-10), lag=1)
+> mod_vecm_l1_sub_ref5 <- VECM(tsDyn:::myHead(barry,n_ca-5), lag=1)
+> 
+> 
+> pred_l3_vecm_roll_12<-predict_rolling(object=mod_vecm_l1_full, nroll=10, n.ahead=1:2)
+> pred_l3_vecm_0_12_nd <- predict(mod_vecm_l1_sub, n.ahead=2, newdata=barry[n_ca-c(12:11),,drop=FALSE])
+> pred_l3_vecm_1_12_nd_ref5 <- predict(mod_vecm_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(6:5),,drop=FALSE])
+> pred_l3_vecm_0_12_nd_ref5 <- predict(mod_vecm_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(7:6),,drop=FALSE])
+> pred_l3_vecm_1_12_nd <- predict(mod_vecm_l1_sub, n.ahead=2, newdata=barry[n_ca-c(11:10),,drop=FALSE])
+> pred_l3_vecm_2_12_nd <- predict(mod_vecm_l1_sub, n.ahead=2, newdata=barry[n_ca-c(10:9),,drop=FALSE])
+> pred_l3_vecm_1_12 <- predict(mod_vecm_l1_sub, n.ahead=2)
+> all.equal(pred_l3_vecm_1_12_nd, pred_l3_vecm_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 [1] TRUE
-> all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[((n_ca-1):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll_l1,1), check=FALSE)
+> 
+> 
+> pred_l3_vecm_nd <- rbind(pred_l3_vecm_0_12_nd, pred_l3_vecm_1_12_nd, pred_l3_vecm_2_12_nd)
+> all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+[1] TRUE
+> all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
 [1] TRUE
 > 
 > 
 > 
 > #### VECM No refit lag=3
-> pred_vec_roll <- predict_rolling(object=VECM(barry, lag=3), nroll=10, n.ahead=1)
-> pred_vec1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-10,,drop=FALSE])
-> pred_vec2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-9,,drop=FALSE])
-> all.equal(rbind(pred_vec1, pred_vec2), head(pred_vec_roll,2), check=FALSE)
-[1] TRUE
-> all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-3):n_ca)-1,,drop=FALSE]), tail(pred_vec_roll,1), check=FALSE)
+> mod_var_l3_vecm_full <- VECM(barry, lag=3)
+> mod_var_l3_vecm_sub <- VECM(tsDyn:::myHead(barry,n_ca-10), lag=3)
+> mod_var_l3_vecm_sub_ref5 <- VECM(tsDyn:::myHead(barry,n_ca-6), lag=3)
+> 
+> pred_l3_vecm_roll_12<-predict_rolling(object=mod_var_l3_vecm_full, nroll=10, n.ahead=1:2)
+> pred_l3_vecm_0_12_nd <- predict(mod_var_l3_vecm_sub, n.ahead=2, newdata=barry[n_ca-c(14:11),,drop=FALSE])
+> pred_l3_vecm_1_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(6:9),,drop=FALSE])
+> pred_l3_vecm_0_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(7:10),,drop=FALSE])
+> pred_l3_vecm_1_12_nd <- predict(mod_var_l3_vecm_sub, n.ahead=2, newdata=barry[n_ca-c(13:10),,drop=FALSE])
+> pred_l3_vecm_2_12_nd <- predict(mod_var_l3_vecm_sub, n.ahead=2, newdata=barry[n_ca-c(12:9),,drop=FALSE])
+> pred_l3_vecm_1_12 <- predict(mod_var_l3_vecm_sub, n.ahead=2)
+> all.equal(pred_l3_vecm_1_12_nd, pred_l3_vecm_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 [1] TRUE
 > 
 > 
-> ### VECM Refit lag=1
-> pred_vec_ref<-predict_rolling(object=VECM(barry, lag=1), nroll=10, n.ahead=1, refit.every=1)
-> pred_vec_ref_1 <- predict(VECM(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1)
-> pred_vec_ref_2 <- predict(VECM(tsDyn:::myHead(barry,n_ca-9), lag=1), n.ahead=1)
-> all.equal(rbind(pred_vec_ref_1, pred_vec_ref_2), head(pred_vec_ref,2), check=FALSE)
+> pred_l3_vecm_nd <- rbind(pred_l3_vecm_0_12_nd, pred_l3_vecm_1_12_nd, pred_l3_vecm_2_12_nd)
+> all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
 [1] TRUE
-> all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-1), lag=1), n.ahead=1), tail(pred_vec_ref,1), check=FALSE)
+> all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
 [1] TRUE
+> 
+> 
+> ### VECM Refit lag=3
+> pred_l3_vecm_roll_12_ref<-predict_rolling(object=mod_var_l3_vecm_full, nroll=10, n.ahead=1:2, refit=5)
+> pred_l3_vecm_roll_12_ref_b<-predict_rolling(object=mod_var_l3_vecm_full, nroll=10, n.ahead=2, refit=5)
+> 
+> 
+> pred_l3_vecm_0_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(9:6),,drop=FALSE])
+> pred_l3_vecm_1_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(8:5),,drop=FALSE])
+> 
+> pred_l3_vecm_nd_ref5 <- rbind(pred_l3_vecm_0_12_nd_ref5, pred_l3_vecm_1_12_nd_ref5)
+> all.equal(pred_l3_vecm_nd_ref5[c(2,4),], as.M(pred_l3_vecm_roll_12_ref$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+[1] TRUE
+> 
+> 
 > 
 > proc.time()
 utilisateur     système      écoulé 
