@@ -9,7 +9,7 @@ accuracy_stat <- function(object, ...)
 
 accuracy_stat.default <- function(object, true, ...) accuracy_stat_simple(fit=object, true=true)
 
-accuracy_stat.pred_roll <- function(object, true, w, ...) {
+accuracy_stat.pred_roll <- function(object, w, ...) {
 
   is_multiH <- "n.ahead" %in% colnames(object$pred)
 
@@ -30,7 +30,7 @@ accuracy_stat.pred_roll <- function(object, true, w, ...) {
     res_withmeans <- rbind(res_raw, means)
 
   ## add horizont column:
-    res_withmeans$n.ahead <- rep(c(n.aheads,"all"), each=nvar+1)
+    res_withmeans[,"n.ahead"] <- rep(c(n.aheads,"all"), each=nvar+1)
     res <- res_withmeans
     res <- res[order(res$var, res$n.ahead),]
 
@@ -103,8 +103,13 @@ accuracy_stat(object=as.matrix(mod_ar_pred$pred), true=as.matrix(mod_ar_pred$tru
 data(barry)
 mod_var <- lineVar(barry, lag=1)
 
-mod_var_pred <-predict_rolling(object=mod_var, nroll=10, n.ahead=1)
+mod_var_pred <-predict_rolling(object=mod_var, nroll=10, n.ahead=1:3)
+accuracy_stat(object=mod_var_pred)
+accuracy_stat(object=mod_var_pred, w=c(0.7, 0.2, 0.1))
+
+
 accuracy_stat(object=mod_var_pred$pred, true=mod_var_pred$true)
+
 accuracy_stat(object=as.matrix(mod_var_pred$pred), true=as.matrix(mod_var_pred$true))
 accuracy_stat(object=mod_var_pred$pred[,1], true=mod_var_pred$true[,1])
 
