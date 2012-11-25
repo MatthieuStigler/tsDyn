@@ -19,7 +19,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
   include <- object$include
   T <- object$T
 
-## Refit function:
+## Create Refit (modfit) function:
   if(model=="VAR"){
     level <- attr(object, "varsLevel")
     modFit <- function(dat) lineVar(dat, lag=lag, include=include, I=level)
@@ -56,7 +56,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
       nroll <- nrow(newdata)
     }
     mod <- object
-}
+  }
 
 ## Refit model on smaller sample:
   R <- matrix(0, ncol=k, nrow=nroll)
@@ -76,15 +76,49 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
   ## pred
     R[i,] <- predict(mod, n.ahead=n.ahead, newdata=out)[n.ahead,]
 
+    lastPos <- T-nroll-n.ahead+i
+    lags <- c(0:max(0,lag-1+add))
+print(lastPos-lags)
+    dat <- origSerie[lastPos-lags,,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
+    R[i,] <- predict(mod, n.ahead=n.ahead, newdata=dat)[n.ahead,]
   }
 
 
 ## Return
-  res <- list(pred=R, true=outSerie)
+  res <- list(pred=as.data.frame(R), true=outSerie)
   return(res)
 
 }
 
+
+
+predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1:2, refit.every, newdata, ...){
+
+  morgAr <- list(object=object, nroll=nroll)
+  if(!missing(refit.every)) morgAr$refit.every <- refit.every
+  if(!missing(newdata)) morgAr$newdata <- newdata
+
+  if(length(n.ahead)==1){
+    if(missing(newdata)){
+      res_predroll <- predict_rolling_1step.nlVar(object, n.ahead=n.ahead, nroll=nroll, refit.every=refit.every,...)
+    } else {
+      res_predroll <- predict_rolling_1step.nlVar(object, n.ahead=n.ahead, nroll=nroll, newdata=newdata, refit.every=refit.every,...)
+    }
+    res <- res_predroll$pred
+    newdata <- res_predroll$true
+  } else {
+    res_map <- mapply(predict_rolling_1step.nlVar, n.ahead=n.ahead, MoreArgs=morgAr,SIMPLIFY = FALSE)
+    res_li <- lapply(res_map, function(x) x$pred)
+    if(missing(newdata)) newdata <- res_map[[1]]$true ## VECM case
+    res <- as.data.frame(simplify2df(res_li))
+
+    res$n.ahead <- rep(n.ahead, each=nrow(res)/length(n.ahead))
+  }
+
+## return result
+  res <- list(pred=res, true=data.frame(newdata))
+  return(res)
+}
 
 
 predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
@@ -125,34 +159,6 @@ predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
 
 
 
-
-predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1:2, refit.every, newdata, ...){
-
-  morgAr <- list(object=object, nroll=nroll)
-  if(!missing(refit.every)) morgAr$refit.every <- refit.every
-  if(!missing(newdata)) morgAr$newdata <- newdata
-
-  if(length(n.ahead)==1){
-    if(missing(newdata)){
-      res_predroll <- predict_rolling_1step.nlVar(object, n.ahead=n.ahead, nroll=nroll, refit.every=refit.every,...)
-    } else {
-      res_predroll <- predict_rolling_1step.nlVar(object, n.ahead=n.ahead, nroll=nroll, newdata=newdata, refit.every=refit.every,...)
-    }
-    res <- res_predroll$pred
-    newdata <- res_predroll$true
-  } else {
-    res_map <- mapply(predict_rolling_1step.nlVar, n.ahead=n.ahead, MoreArgs=morgAr,SIMPLIFY = FALSE)
-    res_li <- lapply(res_map, function(x) x$pred)
-    if(missing(newdata)) newdata <- res_map[[1]]$true ## VECM case
-    res <- as.data.frame(simplify2df(res_li))
-
-    res$n.ahead <- rep(n.ahead, each=nrow(res)/length(n.ahead))
-  }
-
-## return result
-  res <- list(pred=res, true=data.frame(newdata))
-  return(res)
-}
 
 
 simplify2df <- function(x) {
@@ -220,23 +226,55 @@ library(tsDyn)
 data(barry)
 n_ca<- nrow(barry)
 
-# environment(predict_rolling_1step.nlVar) <- environment(star)
+ environment(predict_rolling_1step.nlVar) <- environment(star)
 # environment(predict_rolling.nlVar) <- environment(star)
 # environment(predict_rolling.default) <- environment(star)
 # environment(predict_rolling) <- environment(star)
 
 #### No refit lag=1
-pred_roll<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1)
-pred_roll_vec_1<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1)
-pred_roll_vec_12<-predict_rolling(object=lineVar(barry, lag=1), nroll=10, n.ahead=1:2)
+as.M <- function(x) as.matrix(x)
+mod_var_1_full <- lineVar(barry, lag=1)
+mod_var_1_sub <- lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1)
 
-pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-10,,drop=FALSE])
-pred2 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-9,,drop=FALSE])
-all.equal(rbind(pred1, pred2), head(pred_roll$pred,2), check=FALSE)
 
-all.equal(predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=1), n.ahead=1, newdata=barry[n_ca-1,,drop=FALSE]), tail(pred_roll$pred,1), check=FALSE)
+pred_roll_1<-predict_rolling_1step.nlVar(object=mod_var_1_full, nroll=10, n.ahead=1)
+pred_roll_2 <-predict_rolling(object=mod_var_1_full, nroll=10, n.ahead=2)
+pred_roll_12<-predict_rolling(object=mod_var_1_full, nroll=10, n.ahead=1:2)
+all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+
+pred_0_12_nd <- predict(mod_var_1_sub, n.ahead=2, newdata=barry[n_ca-11,,drop=FALSE])
+pred_1_12_nd <- predict(mod_var_1_sub, n.ahead=2, newdata=barry[n_ca-10,,drop=FALSE])
+pred_2_12_nd <- predict(mod_var_1_sub, n.ahead=2, newdata=barry[n_ca-9,,drop=FALSE])
+pred_1_12 <- predict(mod_var_1_sub, n.ahead=2)
+all.equal(pred_1_12_nd, pred_1_12) ## minor: consistency in predict with/withotut newdata=dataset
+
+
+pred_nd <- rbind(pred_0_12_nd, pred_1_12_nd, pred_2_12_nd)
+all.equal(pred_nd[c(3,5),], as.M(pred_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_nd[c(2,4),], as.M(pred_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+
 
 #### No refit lag=3
+mod_var_l3_full <- lineVar(barry, lag=3)
+mod_var_l3_sub <- lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3)
+
+pred_roll_1<-predict_rolling_1step.nlVar(object=mod_var_l3_full, nroll=10, n.ahead=1)
+pred_roll_2 <-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=2)
+pred_roll_12<-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=1:2)
+all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+
+pred_0_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-c(13:11),,drop=FALSE])
+pred_1_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-(12:10),,drop=FALSE])
+pred_2_12_nd <- predict(mod_var_l3_sub, n.ahead=2, newdata=barry[n_ca-c(9:11),,drop=FALSE])
+pred_1_12 <- predict(mod_var_l3_sub, n.ahead=2)
+all.equal(pred_1_12_nd, pred_1_12) ## minor: consistency in predict with/withotut newdata=dataset
+
+
+pred_nd <- rbind(pred_0_12_nd, pred_1_12_nd, pred_2_12_nd)
+all.equal(pred_nd[c(3,5),], as.M(pred_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+all.equal(pred_nd[c(2,4),], as.M(pred_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+
+
 pred_roll<-predict_rolling(object=lineVar(barry, lag=3), nroll=10, n.ahead=1)
 
 pred1 <- predict(lineVar(tsDyn:::myHead(barry,n_ca-10), lag=3), n.ahead=1, newdata=barry[((n_ca-2):n_ca)-10,,drop=FALSE])
@@ -308,22 +346,27 @@ all.equal(predict(VECM(tsDyn:::myHead(barry,n_ca-1), lag=1), n.ahead=1), tail(pr
 ########### NLAR
 ############################
 
+#### linear
 mod_ar <- linear(lynx[1:100], m=1)
 
-predict_rolling(mod_ar, newdata=lynx[101:114])$pred[1,1]
-predict_rolling(mod_ar, newdata=lynx[101:114], n.ahead=2)$pred[2,1]
-predict_rolling(mod_ar, newdata=lynx[101:114], n.ahead=5)$pred[5,1]
-predict_rolling(mod_ar, newdata=lynx[101:114], n.ahead=1:5)$pred[c(1,14+2,4*14+5),]
+pr_ar_1 <- predict_rolling(mod_ar, newdata=log(lynx[101:114]), n.ahead=1)$pred
+pr_ar_2 <- predict_rolling(mod_ar, newdata=log(lynx[101:114]), n.ahead=2)$pred
 
-predict(mod_ar, n.ahead=5)
+pr_ar_12 <- predict_rolling(mod_ar, newdata=log(lynx[101:114]), n.ahead=1:2)$pred
+all.equal(c(pr_ar_1[,1],pr_ar_2[,1]), pr_ar_12[,1])
+all.equal(c(pr_ar_1[1,1],pr_ar_2[2,1]), predict(mod_ar, n.ahead=3)[1:2])
 
 
+
+#### setar
 mod_set <- setar(lynx[1:100], m=1)
-predict_rolling(mod_set, newdata=lynx[101:114])$pred[1,1]
-predict_rolling(mod_set, newdata=lynx[101:114], n.ahead=5)$pred [5,1]
-predict(mod_set, n.ahead=5)
 
-predict_rolling(mod_set, newdata=lynx[101:114], n.ahead=1:3)$pred[c(1,14,15, 29),]
+pr_set_1 <- predict_rolling(mod_set, newdata=log(lynx[101:114]), n.ahead=1)$pred
+pr_set_2 <- predict_rolling(mod_set, newdata=log(lynx[101:114]), n.ahead=2)$pred
+
+pr_set_12 <- predict_rolling(mod_set, newdata=log(lynx[101:114]), n.ahead=1:2)$pred
+all.equal(c(pr_set_1[,1],pr_set_2[,1]), pr_set_12[,1])
+all.equal(c(pr_set_1[1,1],pr_set_2[2,1]), predict(mod_set, n.ahead=3)[1:2])
 
 
 ############################
