@@ -83,6 +83,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 
 ## Return
   res <- list(pred=as.data.frame(R), true=myTail(origSerie, nroll))
+  class(res) <- "pred_roll"
   return(res)
 
 }
@@ -114,6 +115,7 @@ predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newda
 
 ## return result
   res <- list(pred=res, true=data.frame(newdata))
+  class(res) <- "pred_roll"
   return(res)
 }
 
@@ -148,6 +150,7 @@ predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
 
   ## Return object
   res <- list(pred=pred, true=as.data.frame(newdata))
+  class(res) <- "pred_roll"
   return(res)
 
 }
@@ -201,7 +204,7 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
 
 ## Return object
   res <- list(pred=pred, true= as.data.frame(newdata))#, model=mod_cl)
-#   class(res) <- "fcstpkg"
+  class(res) <- "pred_roll"
   return(res)
 }
 
