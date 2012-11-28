@@ -35,48 +35,57 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 
 
 ## Set refit.every
-  everys <-  if(!missing(refit.every)) seq(refit.every, by=refit.every, to=nroll) else 0
+  everys <-  if(!missing(refit.every)&&refit.every!=0) seq(refit.every, by=refit.every, to=nroll) else 0
 
 ## Fit initial model
   if(missing(newdata)){
+    newdat <- FALSE
     subSerie <- myHead(origSerie, -nroll)
     outSerie <- myTail(origSerie, nroll+lag+add)
     mod <- modFit(subSerie)
   } else {
+    newdat <- TRUE
     subSerie <- origSerie
     outSerie <- newdata
-    if(!isTRUE(all.equal(myHead(outSerie,lag+add),myTail(subSerie,lag+add), check.attributes=FALSE))) {
-      print(myHead(outSerie,lag))
-      print(myTail(subSerie,lag))
+
+    orig_pos_ok <- T-n.ahead+1
+    lags <- lag+add-1
+    if(!isTRUE(all.equal(origSerie[orig_pos_ok-c(lags:0),,drop=FALSE], myHead(outSerie,lag+add), check.attributes=FALSE))) {
+      cat("newdata:\n")
+      print(myHead(outSerie,lag+add))
+      cat("Last data used for estimation:\n")
+      print(origSerie[orig_pos_ok-c(lags:0),])
       warning("'newdata' should contain as first values the last values taken for estimation, as these will be the basis for first forecast")
-      outSerie <- rbind(myHead(subSerie,lag), outSerie)
+#       outSerie <- rbind(myHead(subSerie,lag), outSerie)
     }
     if(nrow(newdata)!=nroll+lag-1+add) {
-      warning("nroll adjusted to dimension of newdata")
+      warning("nroll adjusted to dimension of newdata: ", nrow(newdata))
       nroll <- nrow(newdata)
     }
     mod <- object
   }
+
+  n_out <- nrow(outSerie)
 
 ## Refit model on smaller sample:
   R <- matrix(0, ncol=k, nrow=nroll)
   colnames(R) <- colnames(origSerie)
 
   for(i in 1:nroll){
-
   ## model
     if(i%in%everys){
       subSerie <- myHead(origSerie, -nroll+i-1)
       mod <- modFit(subSerie)
-      out <- outSerie[i:(i+lag-1+add),,drop=FALSE]
-    } else {
-      out <- outSerie[(i):(i+lag-1+add),,drop=FALSE]
-    }
+    } 
 
   ## pred
-    lastPos <- T-nroll-n.ahead+i
-    lags <- c(0:max(0,lag-1+add))
-    dat <- origSerie[sort(lastPos-lags),,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
+    if(newdat){
+      dat <- outSerie[(i:(i+lag-1+add)),,drop=FALSE]
+    } else {
+      lastPos <- T-nroll-n.ahead+i
+      lags <- c(0:max(0,lag-1+add))
+      dat <- origSerie[sort(lastPos-lags),,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
+    }
     R[i,] <- predict(mod, n.ahead=n.ahead, newdata=dat)[n.ahead,]
   }
 
@@ -230,7 +239,7 @@ library(tsDyn)
 data(barry)
 n_ca<- nrow(barry)
 
- environment(predict_rolling_1step.nlVar) <- environment(star)
+#  environment(predict_rolling_1step.nlVar) <- environment(star)
 # environment(predict_rolling.nlVar) <- environment(star)
 # environment(predict_rolling.default) <- environment(star)
 # environment(predict_rolling) <- environment(star)
@@ -264,12 +273,22 @@ pred_l1_0_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_
 pred_l1_1_12_nd <- predict(mod_var_l1_sub, n.ahead=2, newdata=barry[n_ca-10,,drop=FALSE])
 pred_l1_2_12_nd <- predict(mod_var_l1_sub, n.ahead=2, newdata=barry[n_ca-9,,drop=FALSE])
 pred_l1_1_12 <- predict(mod_var_l1_sub, n.ahead=2)
+pred_l1_1_12_roll_newd <- predict_rolling(mod_var_l1_sub, nroll=10, newdata=barry[n_ca-c(10:1),])$pred
+pred_l1_1_12_roll_newd_b <- predict_rolling(mod_var_l1_sub, nroll=10, newdata=barry[n_ca-c(11:2),], n.ahead=2)$pred
+all.equal(pred_l1_1_12[1,,drop=FALSE], as.M(pred_l1_1_12_roll_newd[1, , drop=FALSE]), check=FALSE)
+all.equal(pred_l1_1_12[2,,drop=FALSE], as.M(pred_l1_1_12_roll_newd_b[2, , drop=FALSE]), check=FALSE)
 all.equal(pred_l1_1_12_nd, pred_l1_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 
 
 pred_l1_nd <- rbind(pred_l1_0_12_nd, pred_l1_1_12_nd, pred_l1_2_12_nd)
 all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
 all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+
+
+predict_rolling(a, nroll=3)$pred[1,]
+predict(a_sub, n.ahead=1)
+predict(a_sub, n.ahead=1, newdata=Canada[n_ca-c(4,3),])
+
 
 
 #### No refit lag=3
