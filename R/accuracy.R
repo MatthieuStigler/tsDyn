@@ -18,7 +18,7 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
     nvar <- ncol(object$true)
     li<-list()
     for(i in 1:length(n.aheads)){
-      li[[i]] <- accuracy_stat_simple(fit=subset(object$pred, n.ahead==n.aheads[i])[,1:nvar], true=object$true)
+      li[[i]] <- accuracy_stat_simple(fit=subset(object$pred, n.ahead==n.aheads[i])[,1:nvar,drop=FALSE], true=object$true)
     }
     res_raw <- simplify2df(li)
     res_raw <- data.frame(var=rownames(res_raw),res_raw, row.names=1:nrow(res_raw))
@@ -30,10 +30,9 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
     res_withmeans <- rbind(res_raw, means)
 
   ## add horizont column:
-    res_withmeans[,"n.ahead"] <- rep(c(n.aheads,"all"), each=nvar+1)
+    res_withmeans[,"n.ahead"] <- rep(c(n.aheads,"all"), each=if(nvar==1) 1 else nvar+1)
     res <- res_withmeans
     res <- res[order(res$var, res$n.ahead),]
-
 
   } else {
     res <- accuracy_stat_simple(fit=object$pred, true=object$true)
@@ -95,9 +94,13 @@ library(tsDyn)
 ## univariate
 mod_ar <- linear(lynx[1:100], m=1)
 mod_ar_pred <- predict_rolling(mod_ar, newdata=lynx[101:114])
+accuracy_stat(object=mod_ar_pred)
 accuracy_stat(object=mod_ar_pred$pred, true=mod_ar_pred$true)
 accuracy_stat(object=as.matrix(mod_ar_pred$pred), true=as.matrix(mod_ar_pred$true))
 
+
+mod_ar_pred_12 <- predict_rolling(mod_ar, newdata=lynx[101:114], n.ahead=1:2)
+accuracy_stat(object=mod_ar_pred_12)
 
 ## multivariate
 data(barry)
