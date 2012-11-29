@@ -93,6 +93,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 ## Return
   res <- list(pred=as.data.frame(R), true=myTail(origSerie, nroll))
   class(res) <- "pred_roll"
+  attr(res, "model") <- class(object)[1]
   return(res)
 
 }
@@ -125,6 +126,7 @@ predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newda
 ## return result
   res <- list(pred=res, true=data.frame(newdata))
   class(res) <- "pred_roll"
+  attr(res, "model") <- class(object)[1]
   return(res)
 }
 
@@ -164,6 +166,7 @@ predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
 ## Return object
   res <- list(pred=pred, true=trueDat)
   class(res) <- "pred_roll"
+  attr(res, "model") <- class(object)[1]
   return(res)
 
 }
@@ -223,11 +226,15 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
 
 
 predict_rolling.Arima <- function(object, n.ahead=1, newdata,  ...){
-  predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=forecast:::Arima,check=TRUE,  ...)
+  res <- predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=forecast:::Arima,check=TRUE,  ...)
+  attr(res, "model") <- "Arima"
+  return(res)
 }
 
 predict_rolling.ets <- function(object,  n.ahead=1, newdata,  ...){
-  predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=forecast:::ets, check=FALSE, ...)
+  res <- predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=forecast:::ets, check=FALSE, ...)
+  attr(res, "model") <- "ets"
+  return(res)
 }
 
 
