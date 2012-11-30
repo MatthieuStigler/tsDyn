@@ -17,7 +17,6 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
   origSerie <- object$model[,1:k]
   lag <- object$lag
   include <- object$include
-  T <- object$T
 
 ## Create Refit (modfit) function:
   if(model=="VAR"){
@@ -42,26 +41,15 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
     newdat <- FALSE
     subSerie <- myHead(origSerie, -nroll)
     outSerie <- myTail(origSerie, nroll+lag+add)
+    fullSerie <- origSerie
     mod <- modFit(subSerie)
+    T <- object$T
   } else {
     newdat <- TRUE
     subSerie <- origSerie
     outSerie <- newdata
-
-    orig_pos_ok <- T-n.ahead+1
-    lags <- lag+add-1
-    if(!isTRUE(all.equal(origSerie[orig_pos_ok-c(lags:0),,drop=FALSE], myHead(outSerie,lag+add), check.attributes=FALSE))) {
-      cat("newdata:\n")
-      print(myHead(outSerie,lag+add))
-      cat("Last data used for estimation:\n")
-      print(origSerie[orig_pos_ok-c(lags:0),])
-      warning("'newdata' should contain as first values the last values taken for estimation, as these will be the basis for first forecast")
-#       outSerie <- rbind(myHead(subSerie,lag), outSerie)
-    }
-    if(nrow(newdata)!=nroll+lag-1+add) {
-      warning("nroll adjusted to dimension of newdata: ", nrow(newdata))
-      nroll <- nrow(newdata)
-    }
+    fullSerie <- rbind(origSerie, newdata)
+    T <- nrow(fullSerie)
     mod <- object
   }
 
@@ -79,13 +67,9 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
     } 
 
   ## pred
-    if(newdat){
-      dat <- outSerie[(i:(i+lag-1+add)),,drop=FALSE]
-    } else {
-      lastPos <- T-nroll-n.ahead+i
-      lags <- c(0:max(0,lag-1+add))
-      dat <- origSerie[sort(lastPos-lags),,drop=FALSE] # old: #     dat <- myTail(origSerie[1:(T-nroll-n.ahead+1),], lag-1+add)
-    }
+    lastPos <- T-nroll-n.ahead+i ## determine position of last row of out data:: full sample, remove nroll, n ahead and correct by one
+    lags <- c(0:max(0,lag-1+add)) ## determine "width of out data: lags (add is 1 if VECM/diff)
+    dat <- fullSerie[sort(lastPos-lags),,drop=FALSE] 
     R[i,] <- predict(mod, n.ahead=n.ahead, newdata=dat)[n.ahead,]
   }
 
@@ -292,9 +276,9 @@ all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check=FALSE)
 all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
 
 
-predict_rolling(a, nroll=3)$pred[1,]
-predict(a_sub, n.ahead=1)
-predict(a_sub, n.ahead=1, newdata=Canada[n_ca-c(4,3),])
+# predict_rolling(a, nroll=3)$pred[1,]
+# predict(a_sub, n.ahead=1)
+# predict(a_sub, n.ahead=1, newdata=Canada[n_ca-c(4,3),])
 
 
 
