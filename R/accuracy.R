@@ -18,7 +18,7 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
     nvar <- ncol(object$true)
     li<-list()
     for(i in 1:length(n.aheads)){
-      li[[i]] <- accuracy_stat_simple(fit=subset(object$pred, n.ahead==n.aheads[i])[,1:nvar,drop=FALSE], true=object$true)
+      li[[i]] <- accuracy_stat_simple(fit=subset(as.data.frame(object$pred), n.ahead==n.aheads[i])[,1:nvar,drop=FALSE], true=object$true)
     }
     res_raw <- simplify2df(li)
     res_raw <- data.frame(var=rownames(res_raw),res_raw, row.names=1:nrow(res_raw))
@@ -106,7 +106,8 @@ accuracy_stat(object=mod_ar_pred_12)
 data(barry)
 mod_var <- lineVar(barry, lag=1)
 
-mod_var_pred <-predict_rolling(object=mod_var, nroll=10, n.ahead=1:3)
+
+mod_var_pred <-predict_rolling(object=mod_var, nroll=10, n.ahead=1)
 accuracy_stat(object=mod_var_pred)
 accuracy_stat(object=mod_var_pred, w=c(0.7, 0.2, 0.1))
 
@@ -115,6 +116,8 @@ accuracy_stat(object=mod_var_pred$pred, true=mod_var_pred$true)
 
 accuracy_stat(object=as.matrix(mod_var_pred$pred), true=as.matrix(mod_var_pred$true))
 accuracy_stat(object=mod_var_pred$pred[,1], true=mod_var_pred$true[,1])
+
+
 
 mod_var_pred_multih <-predict_rolling(object=mod_var, nroll=10, n.ahead=1:2)
 accuracy_stat(object=mod_var_pred_multih)
