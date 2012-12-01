@@ -200,10 +200,12 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
   } else {
     pred <- as.data.frame(pred)
   }
-  colnames(pred)[1] <- if(mod_cl=="Arima") object$series else deparse(object$call$y)
+
+  trueVal <- as.data.frame(newdata)
+  colnames(pred)[1] <- colnames(trueVal)[1] <- if(mod_cl=="Arima") object$series else deparse(object$call$y)
 
 ## Return object
-  res <- list(pred=pred, true= as.data.frame(newdata))#, model=mod_cl)
+  res <- list(pred=pred, true= trueVal)
   class(res) <- "pred_roll"
   return(res)
 }
