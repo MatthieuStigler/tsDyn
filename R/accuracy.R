@@ -36,6 +36,7 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
 
   } else {
     res <- accuracy_stat_simple(fit=object$pred, true=object$true)
+    res <- data.frame(var=rownames(res),res)
   }
 
 return(res)
