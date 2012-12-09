@@ -33,11 +33,12 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
   Y <- y[(m+1):T,] #
   Z <- embed(y, m+1)[, -seq_len(k)]	#Lags matrix
   a<-0
-  if(trend==TRUE){
-	  Z <- cbind(1,Z)
-	  a<-1}
-  else 
-	  warning("The test was currently implemented for a model with trend. Results could be altered without trend")
+  if(trend){
+    Z <- cbind(1,Z)
+    a<-1
+  } else {
+    warning("The test was currently implemented for a model with trend. Results could be altered without trend")
+  }
   npar <- ncol(Z)		
 
   cat("Warning: the thDelay values do not correspond to the univariate implementation in tsdyn\n")
@@ -242,10 +243,8 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
   LRtest13<-as.numeric(t*(log(det(Sigma))-log(det(Sigma_mod2thresh))))
   LRtest23<-as.numeric(t*(log(det(Sigma_mod1thresh))-log(det(Sigma_mod2thresh))))
   LRs<-matrix(c(LRtest12, LRtest13, LRtest23),ncol=3, dimnames=list("Test", c("1vs2", "1vs3", "2vs3")))
-  if(test=="1vs")
-    LRs<-LRs[,-3]
-  else
-    LRs<-LRs[,3]
+  LRs <- if(test=="1vs") LRs[,-3]  else LRs[,3]
+
 ##############################
 ###Bootstrap for the F test
 ##############################
