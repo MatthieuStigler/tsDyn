@@ -88,15 +88,17 @@ VARrep.VAR <- function(object, ...) {
 #       }
     }
   ## names
-  colnames(comat) <- paste(rep(origNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
+    colnames(comat) <- paste(rep(origNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
 
-  if(include!="none"){
-    inc_name <- switch(include, "none"=NULL, "const"="Intercept", "trend"="Trend", "both"=c("Intercept","Trend"))
-    comat <- cbind(co[,inc_name,drop=FALSE], comat)
+    if(include!="none"){
+      inc_name <- switch(include, "none"=NULL, "const"="Intercept", "trend"="Trend", "both"=c("Intercept","Trend"))
+      comat <- cbind(co[,inc_name,drop=FALSE], comat)
+    }
+    res <- comat
+
+  } else if(I=="ADF"){
+    stop("Sorry, VARrep not yet implemented for type=ADF. Please use corresponding level formulation with lag+1")
   }
-  res <- comat
-
-}
 
 ##
 return(res)
