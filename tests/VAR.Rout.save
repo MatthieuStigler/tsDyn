@@ -43,7 +43,7 @@ Loading required package: nlme
 > 
 > 
 > 
-> ## Test a few VECM models
+> ## Test a few VAR models
 > var_l1_co <-lineVar(barry, lag=1, include="const")
 > var_l1_tr <-lineVar(barry, lag=1, include="trend")
 > var_l1_bo <-lineVar(barry, lag=1, include="both")
@@ -78,7 +78,7 @@ Loading required package: nlme
 + 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no")
 > 
 > 
-> 
+> ## Check methods:
 > lapply(var_all, print)
                  Intercept   dolcan -1     cpiUSA -1     cpiCAN -1
 Equation dolcan 0.01606226  0.98184934  0.0006535181 -0.0005441472

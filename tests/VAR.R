@@ -7,7 +7,7 @@ data(barry)
 
 
 
-## Test a few VECM models
+## Test a few VAR models
 var_l1_co <-lineVar(barry, lag=1, include="const")
 var_l1_tr <-lineVar(barry, lag=1, include="trend")
 var_l1_bo <-lineVar(barry, lag=1, include="both")
@@ -42,7 +42,7 @@ names(var_all) <-c(
 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no")
 
 
-
+## Check methods:
 lapply(var_all, print)
 lapply(var_all, summary)
 
