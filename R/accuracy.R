@@ -18,7 +18,9 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
     nvar <- ncol(object$true)
     li<-list()
     for(i in 1:length(n.aheads)){
-      li[[i]] <- accuracy_stat_simple(fit=subset(as.data.frame(object$pred), n.ahead==n.aheads[i])[,1:nvar,drop=FALSE], true=object$true)
+      pred_df <- as.data.frame(object$pred)
+      sub <- pred_df[pred_df[,"n.ahead"]==n.aheads[i],1:nvar,drop=FALSE] ##simpler with subset() but did not pass R CMD check: r code for poss probs
+      li[[i]] <- accuracy_stat_simple(fit=sub, true=object$true)
     }
     res_raw <- simplify2df(li)
     res_raw <- data.frame(var=rownames(res_raw),res_raw, row.names=1:nrow(res_raw))
