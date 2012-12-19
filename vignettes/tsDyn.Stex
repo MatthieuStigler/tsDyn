@@ -61,8 +61,6 @@ autopairs(x, lag=, type=, h=)
 \end{Scode}
 All arguments (except the time series \texttt{x}) have default values.
 
-By default, if running in an interactive environment, the function displays a simple experimental cross-platform GUI, where you can change function parameters and watch interactively how the plot changes.
-
 Similar to \texttt{autopairs}, there is the \texttt{autotriples}
 function. This shows $x_t$ versus $(x_{t-lag1}, x_{t-lag2})$, so that
 the user has to specify time series $x$ and lags \texttt{lag1} and
@@ -372,8 +370,8 @@ box()
 Nonparametric regression function of $X_t$ versus $X_{t-1}$ and of $X_t$ versus $X_{t-3}$ (kernel estimation):
 \begin{Scode}{fig=TRUE,results=hide}
 par(mfrow=c(2,1), mar=c(2,2,0,0))
-autopairs(x, lag=1, type="regression", GUI=FALSE)
-autopairs(x, lag=3, type="regression", GUI=FALSE)
+autopairs(x, lag=1, type="regression")
+autopairs(x, lag=3, type="regression")
 \end{Scode}
 
 For lag 3 (bottom plot), a linear approximation for the regression function may be questionable.
