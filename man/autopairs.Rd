@@ -6,15 +6,13 @@ Bivariate time series plots: scatterplots, directed lines and kernel density est
 }
 \usage{
 autopairs(x, lag=1, h,
-type=c("levels","persp","image","lines","points","regression"),
-GUI=interactive())
+type=c("levels","persp","image","lines","points","regression"))
 }
 \arguments{
 \item{x}{ time series}
 \item{lag}{ time lag }
 \item{h}{ kernel window (useful only for kernel estimations) }
 \item{type}{ type of plot: contour levels, perspective plots, image, directed lines, points or points with superposed kernel regression }
-\item{GUI}{ should a GUI be displayed? }
 }
 \details{
   Bivariate time series plots: scatterplots, directed lines and kernel
@@ -24,8 +22,6 @@ GUI=interactive())
   \code{\link[sm]{sm.density}} is used, with smoothing parameter \code{h}
   defaulting to \code{\link[sm]{hnorm}}. For kernel regression, \code{\link[sm]{sm.regression}} is used.
 
-  If \code{GUI==TRUE}, a simple graphical user interface is displayed
-  to control graphical parameters.
 }
 \value{
 None. Plots are produced on the default graphical device.
@@ -39,5 +35,5 @@ For finer control on density estimation, consider using directly
 x <- log10(lynx)
 autopairs(x, lag=2, type="lines")
 }
-\author{ Wrappers to \pkg{sm} and GUI by Antonio, Fabio Di Narzo }
+\author{ Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo }
 \keyword{ ts }

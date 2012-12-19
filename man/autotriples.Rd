@@ -6,24 +6,20 @@ Trivariate time series plots: kernel autoregression using functions in the \pkg{
 }
 \usage{
 autotriples(x, lags=1:2, h,
-type=c("levels","persp","image", "lines", "points"),
-GUI=interactive())
+type=c("levels","persp","image", "lines", "points"))
 }
 \arguments{
 \item{x}{ time series}
 \item{lags}{ vector of regressors lags }
 \item{h}{ kernel window }
 \item{type}{ type of plot: contour levels, perspective plots, image }
-\item{GUI}{ should a GUI be displayed? }
 }
 \details{
   This function displays trivariate time series plots, i.e. kernel
   regression of \eqn{x[t-lags[1]], x[t-lags[2]]}{x_{t-l_1}, x_{t-l_2}}
   against \eqn{x[t]}{x_t} using functions in the package \pkg{sm}.
   In particular, \code{\link[sm]{sm.regression}} is used, with smoothing
-  parameter  defaulting to \code{\link[sm]{hnorm}(x)}.
-  If requested, a simple GUI is displayed, to change interactively
-  functions parameters and watching corresponding outputs.
+  parameter  defaulting to \code{\link[sm]{hnorm}(x)}.  
 }
 \value{
 None. Plots are produced on the default graphical device.
@@ -36,5 +32,5 @@ autotriples(log(lynx))
 autotriples(log(lynx), type="persp")
 autotriples(log(lynx), type="image")
 }
-\author{ Wrappers to \pkg{sm} and GUI by Antonio, Fabio Di Narzo  }
+\author{ Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo  }
 \keyword{ ts }
