@@ -22,6 +22,11 @@ accuracy_stat(object,...)
   \item{\dots}{ Not used currently. }
 }
 
+
+\details{
+The function works either for a simple data.frame or for objects \code{pred_roll}. For simple data.frames, the argument \code{true}, i.e. a data frame containing the true values, has to be provided. For \code{pred_roll} objects, the true values are contained in the object, so no need (nor possibility) to provide the true values. 
+}
+
 \value{
 A data-frame containing the forecasting accuracy measures. 
 }
@@ -46,4 +51,4 @@ accuracy_stat(object=mod_var_pred, w=c(0.7, 0.2, 0.1))
 \author{Matthieu Stigler}
 
 \keyword{ ts}
-\concept{forecast, accuracy}
+\concept{forecast, accuracy, cross-validation}
