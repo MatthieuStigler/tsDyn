@@ -63,27 +63,3 @@ selectNNET <- function(x, m, d=1, steps=d, size=1:(m+1), maxit=1e3, trace=FALSE)
 }
 
 
-showDialog.nnetTs <- function(x, ...) {
-	frRoot <- Frame()
-	vM <- tclVar(1)
-	vD <- tclVar(1)
-	vSteps <- tclVar(1)
-	vSize <- tclVar(1)
-	onFinish <- function() {
-		res <- nnetTs(x, m=as.numeric(tclObj(vM)), d=as.numeric(tclObj(vD)), steps=as.numeric(tclObj(vSteps)) , size=as.numeric(tclObj(vSize)))
-		tkdestroy(frRoot$tkvar)
-		assign("nlarModel", res, .GlobalEnv)
-	}
-	onCancel <- function()
-		tkdestroy(frRoot$tkvar)
-	frMain <- nlar.struct.Frame(vM, vD, vSteps)
-	add(frMain,
-		Widget(opts=list(type="label", text="Hidden units")),
-		Widget(opts=list(type="spinbox", from=1, to=100, increment=1, textvariable=vSize, width=4))
-	)
-	add(frRoot,
-		frMain,
-		makeButtonsFrame(list(Finish=onFinish, Cancel=onCancel))
-	)
-	buildDialog(title="linear model", frRoot)
-}

@@ -91,22 +91,3 @@ oneStep.aar <- function(object, newdata, ...){
   predict.gam(object$model.specific, data.frame(newdata))
 }
 
-showDialog.aar <- function(x, ...) {
-	frRoot <- Frame()
-	vM <- tclVar(1)
-	vD <- tclVar(1)
-	vSteps <- tclVar(1)
-	onFinish <- function() {
-		res <- aar(x, m=as.numeric(tclObj(vM)), d=as.numeric(tclObj(vD)), steps=as.numeric(tclObj(vSteps)) )
-		tkdestroy(frRoot$tkvar)
-		assign("nlarModel", res, .GlobalEnv)
-	}
-	onCancel <- function()
-		tkdestroy(frRoot$tkvar)
-	frMain <- nlar.struct.Frame(vM, vD, vSteps)
-	add(frRoot,
-		frMain,
-		makeButtonsFrame(list(Finish=onFinish, Cancel=onCancel))
-	)
-	buildDialog(title="additive autoregressive model", frRoot)
-}
