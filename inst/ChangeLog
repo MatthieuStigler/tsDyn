@@ -1,7 +1,12 @@
+Version 0.9-2: Matthieu Stigler (20/12/2012)
+-GUI: remove due to problems in assign(yy, globalEnv) not alowed anymore.
+-New function: accuracy_stat: give forecast accuracy either comparing two datasets, or giving a pred_roll object
+-Extend function: predict_rolling: allows to give rolling predictions for many models nlar, VAR/VECM, forecast
+
 Version 0.9-12: Matthieu Stigler (11/12/2012)
 -Correct bug: TVAR_LRtest now handles extern ThVar
 -Correct bug: TVAR had bug in naming arguments
--Minor: many very minor changes, check class in predict, Vadd message for ADF in VARrep, exclude lag <1 in lineVar
+-Minor: many very minor changes, check class in predict, add message for ADF in VARrep, exclude lag <1 in lineVar
 
 Version 0.9-1: Matthieu Stigler (05/11/2012)
 -Extend method: vcov.lstar
@@ -9,7 +14,7 @@ Version 0.9-1: Matthieu Stigler (05/11/2012)
 -Extend method: getTh.lstar
 -Extend method: regime.lstar
 -New argument: thInt as control for starting values of lstar()
--New argument: trae in selectLSTAR and selectNNET
+-New argument: trace in selectLSTAR and selectNNET
 -New argument: strategy for selectLSTAR: allows recovering previous optimal values for starting values in all LSTAR searches. 
 -Minor: changed procedure in lstar(), recover only parameters with optimHessian, instead of runnign second optim round. 
 -Correct bug: corrected bug in exporting fake ca.jo object, reported by Uwe Ligges. 

@@ -1,15 +1,15 @@
 Package: tsDyn
 Type: Package
 Title: Nonlinear time series models with regime switching
-Version: 0.9-12
-Date: 11/12/2012
+Version: 0.9-2
+Date: 20/12/2012
 Authors@R: c(person("Antonio Fabio", "Di Narzo",role = c("aut", "cre")),
              person("Jose Luis", "Aznarte",role = "ctb"),
              person("Matthieu", "Stigler", role = c("aut","cre"), email="Matthieu.Stigler@gmail.com"))
 Depends: mgcv, Matrix, snow, mnormt,foreach, MASS, nlme,methods
 Imports: nnet, tseriesChaos, tseries, utils, vars, urca, methods, forecast
 Suggests: sm, scatterplot3d, rgl, FinTS
-Extends: forecast
+Enhances: forecast
 Maintainer: Matthieu Stigler <Matthieu.Stigler@gmail.com>
 Description: Implements nonlinear autoregressive (AR) time series models. For univariate series, a non-parametric approach is available through additive nonlinear AR. Parametric modeling and testing for regime switching dynamics is available when the transition is either direct (TAR: threshold AR) or smooth (STAR: smooth transition AR, LSTAR). For multivariate series, one can estimate a range of TVAR or threshold cointegration TVECM models with two or three regimes. Tests can be conducted for TVAR as well as for TVECM (Hansen and Seo 2002 and Seo 2006). 
 License: GPL (>= 2)
