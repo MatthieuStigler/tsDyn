@@ -25,7 +25,7 @@ Fitted model data
 This function is just a wrapper for the \code{\link{lineVar}}, with model="VECM".
 
 More comprehensive functions for VECM are in package \pkg{vars}. A few differences appear in the VECM estimation:
-\itemize{
+\describe{
 \item{Engle-Granger estimator}{The Engle-Granger estimator is available}
 \item{Presentation}{Results are printed in a different ways, using a matrix form}
 \item{lateX export}{The matrix of coefficients can be exported to latex, with or without standard-values and significance stars}
