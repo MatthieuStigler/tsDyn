@@ -5,7 +5,7 @@
 Estimate either a  VECM by Engle-Granger or Johansen (MLE) method. 
 }
 \usage{
-VECM(data, lag,r=1, include = c( "const", "trend","none", "both"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
+VECM(data, lag,r=1, include = c( "const", "trend","none", "both"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"), exogen=NULL)
 }
 \value{
 Fitted model data
@@ -18,6 +18,7 @@ Fitted model data
 \item{beta}{for VECM only: cointegrating value. If null, will be estimated}
 \item{LRinclude}{Possibility to include in the long-run relationship and the ECT trend, constant... Can also be a matrix with exogeneous regressors}
 \item{estim}{Type of estimator for the VECM: '2OLS' for the two-step approach or 'ML' for Johansen MLE}
+\item{exogen}{Inclusion of exogenous variables (first row  being first=oldest value). Is either of same size than data (then automatically cut) or than end-sample.}
 
 }
 \details{
