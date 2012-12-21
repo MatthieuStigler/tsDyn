@@ -248,6 +248,8 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 	  lag=lag, 
 	  model=YnaX, 
 	  df.residual=t-npar/k, 
+	  exogen = !is.null(exogen),
+	  num_exogen = if(!is.null(exogen)) NCOL(exogen) else 0,
 	  model.specific=model.specific)
   if(model=="VAR"){
     class(z)<-c("VAR","nlVar")
