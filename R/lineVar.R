@@ -265,8 +265,8 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 
 #### VECM function: wrapper to lineVar
-VECM<-function(data, lag,r=1, include = c( "const", "trend","none", "both"), beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
-  lineVar(data, lag, r=r,include = include, model="VECM" ,beta=beta, estim=estim,LRinclude=LRinclude)
+VECM<-function(data, lag,r=1, include = c( "const", "trend","none", "both"), beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"), exogen=NULL)
+  lineVar(data, lag, r=r,include = include, model="VECM" ,beta=beta, estim=estim,LRinclude=LRinclude,exogen=exogen)
 
 
 
