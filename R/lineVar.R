@@ -73,12 +73,21 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   }
 
 ###Regressors matrix
-  if(include=="const")
-    Z<-cbind(1, Z)
-  else if(include=="trend")
-    Z<-cbind(seq_len(t), Z)
-  else if(include=="both")
-    Z<-cbind(rep(1,t),seq_len(t), Z)
+  Z <- switch(include,
+	      "none" = Z,  
+	      "const" = cbind(1, Z), 
+	      "trend" = cbind(seq_len(t), Z),
+	      "both"  = cbind(rep(1,t),seq_len(t), Z))
+
+  if(!is.null(exogen)){
+    n_exo <- NROW(exogen)
+    if(n_exo!=nrow(Z)){
+      if(n_exo!=T)  warning("exogen is of size ", n_exo, "while full/end-sample size is of size", T,"/", nrow(Z), "series shortened")
+      exogen <- myTail(exogen, nrow(Z))
+    }
+    Z <- cbind(Z, exogen)
+
+  }
 
 
 ##VECM: Long-run relationship OLS estimation
@@ -192,7 +201,13 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   ECT<- if(model=="VECM") paste("ECT", if(r>1) 1:r else NULL, sep="") else NULL
   Xminus1Names<- if(I=="ADF") paste(colnames(data),"-1",sep="") else NULL
   BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
-  Bnames<-c(ECT,BnamesInter,Xminus1Names, LagNames)
+  if(!is.null(exogen)){
+    exo_names <- colnames(as.matrix(exogen))
+    if(any(is.null(exo_names))) exo_names <- paste("exo", 1:NCOL(exogen), sep="_")
+  } else {
+    exo_names <- NULL
+  }
+  Bnames<-c(ECT,BnamesInter,Xminus1Names, LagNames, exo_names)
   colnames(B)<-Bnames
 
 ###Y and regressors matrix to be returned
@@ -456,4 +471,17 @@ summary(myVECM, digits=7)
 a<-ca.jo(dat, spec="trans")
 summary(a)
 #same answer also!
+
+set.seed(123)
+rn <- rnorm(2*nrow(dat))
+ex_1_n <- ex_1 <- rn[1:nrow(dat)]
+ex_2_n <- ex_2 <- matrix(rn, ncol=2)
+names(ex_1_n) <- "exoVar"
+colnames(ex_2_n) <- c("exoVar1", "exoVar2")
+
+lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_1)
+lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_2)
+lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_1_n)
+lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_2_n)
+
 }
