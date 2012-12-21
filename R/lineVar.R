@@ -1,250 +1,249 @@
-lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff", "ADF"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"))
-{
-y <- as.matrix(data)
-Torigin <- nrow(y) 	#Size of original sample
-T <- nrow(y) 		#Size of start sample
+lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), 
+		  I=c("level", "diff", "ADF"),beta=NULL, estim=c("2OLS", "ML"),
+		  LRinclude=c("none", "const", "trend","both"), exogen=NULL){
 
-if(length(lag)==1){
-  p <- lag
-  notAllLags<-FALSE
-  Lags<-1:p
-}
-else{
-  notAllLags<-TRUE
-  p<-max(lag)
-  Lags<-lag
-}
+  y <- as.matrix(data)
+  Torigin <- nrow(y) 	#Size of original sample
+  T <- nrow(y) 		#Size of start sample
 
-t <- T-p 		#Size of end sample
-k <- ncol(y) 		#Number of variables
-t<-T-p			#Size of end sample
+  if(length(lag)==1){
+    p <- lag
+    notAllLags<-FALSE
+    Lags<-1:p
+  } else {
+    notAllLags<-TRUE
+    p<-max(lag)
+    Lags<-lag
+  }
 
-if(is.null(colnames(data)))
-	colnames(data)<-paste("Var", c(1:k), sep="")
+  t <- T-p 		#Size of end sample
+  k <- ncol(y) 		#Number of variables
+  t<-T-p			#Size of end sample
+
+  if(is.null(colnames(data)))
+	  colnames(data)<-paste("Var", c(1:k), sep="")
 
 ###Check args
-include<-match.arg(include)
-LRinclude<-match.arg(LRinclude)
-if(lag<1) stop("Lag is minimum 1")
-if(LRinclude%in%c("const", "both"))  include<-"none"
-ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
-model<-match.arg(model)
-estim<-match.arg(estim)
-I<-match.arg(I)
-if(!r%in%1:(k-1)) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1\n")
-if(model=="VECM"&estim=="2OLS"&r>1){
-  warning("Estimation of more than 1 coint relationship is not possible with estim '2OLS'. Switched to Johansen 'ML'\n")
-  estim<-"ML"
-}
+  include<-match.arg(include)
+  LRinclude<-match.arg(LRinclude)
+  if(lag<1) stop("Lag is minimum 1")
+  if(LRinclude%in%c("const", "both"))  include<-"none"
+  ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
+  model<-match.arg(model)
+  estim<-match.arg(estim)
+  I<-match.arg(I)
+  if(!r%in%1:(k-1)) stop("Arg r, the number of cointegrating relationships, should be between 1 and K-1\n")
+  if(model=="VECM"&estim=="2OLS"&r>1){
+    warning("Estimation of more than 1 coint relationship is not possible with estim '2OLS'. Switched to Johansen 'ML'\n")
+    estim<-"ML"
+  }
 
-minPara<-p*k+ninclude
-if(!t>minPara) stop("Not enough observations. Try reducing lag number\n")
+  minPara<-p*k+ninclude
+  if(!t>minPara) stop("Not enough observations. Try reducing lag number\n")
 
 ###Construct variables
-Y <- y[(p+1):T,] #
-X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
+  Y <- y[(p+1):T,] #
+  X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 
-#Set up of dependant and independant variables matrices
-if(notAllLags)
-  X<-X[,sort(rep((Lags*k-k+1), k))+0:(k-1)]
+  #Set up of dependant and independant variables matrices
+  if(notAllLags)
+    X<-X[,sort(rep((Lags*k-k+1), k))+0:(k-1)]
 
-DeltaY<-diff(y)[(p+1):(T-1),]
-Xminus1<-embed(y,p+2)[,(k+1):(k+k)]
-DeltaX<-embed(diff(y),p+1)[,-(1:k)]
+  DeltaY<-diff(y)[(p+1):(T-1),]
+  Xminus1<-embed(y,p+2)[,(k+1):(k+k)]
+  DeltaX<-embed(diff(y),p+1)[,-(1:k)]
 
-# if(model=="VAR"){
-#   Z<-X
-#   Y<-Y}
-# if(model=="VECM"|I=="diff"){
-#   Z<-DeltaX
-#   Y<-DeltaY
-#   t<-t-1}
-
-if(model=="VAR"){
-  if(I=="level"){
-    Z<-X
-    Y<-Y
-  } else if(I=="diff"){
+  if(model=="VAR"){
+    if(I=="level"){
+      Z<-X
+      Y<-Y
+    } else if(I=="diff"){
+      Z<-DeltaX
+      Y<-DeltaY
+      t<-t-1
+    } else if(I=="ADF"){
+      Z<-cbind(Xminus1, DeltaX)
+      Y<-DeltaY
+      t<-t-1
+    }
+  } else if(model=="VECM"){
     Z<-DeltaX
     Y<-DeltaY
     t<-t-1
-  } else if(I=="ADF"){
-    Z<-cbind(Xminus1, DeltaX)
-    Y<-DeltaY
-    t<-t-1
   }
-} else if(model=="VECM"){
-  Z<-DeltaX
-  Y<-DeltaY
-  t<-t-1
-}
 
 ###Regressors matrix
-if(include=="const")
-  Z<-cbind(1, Z)
-else if(include=="trend")
-  Z<-cbind(seq_len(t), Z)
-else if(include=="both")
-  Z<-cbind(rep(1,t),seq_len(t), Z)
+  if(include=="const")
+    Z<-cbind(1, Z)
+  else if(include=="trend")
+    Z<-cbind(seq_len(t), Z)
+  else if(include=="both")
+    Z<-cbind(rep(1,t),seq_len(t), Z)
 
 
 ##VECM: Long-run relationship OLS estimation
-if(model=="VECM"&estim=="2OLS"){
-	#beta has to be estimated
-  beta.estimated<-if(is.null(beta)) TRUE else FALSE
-  if(is.null(beta) ){
+  if(model=="VECM"&estim=="2OLS"){
+	  #beta has to be estimated
+    beta.estimated<-if(is.null(beta)) TRUE else FALSE
+    if(is.null(beta) ){
 
-  ## build LRplus: deterministic/exogeneous regressor in coint
-    if(class(LRinclude)=="character"){
-      LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
-      LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
-      LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
-    } else if(class(LRinclude)%in%c("matrix", "numeric")) {
-      LRplus<-LRinclude
-    } else{
-      stop("Argument LRinclude badly given")
-    }
-  ## run coint regression
-    if(LRinclude=="none"){
-      cointLM<-lm(y[,1] ~  y[,-1]-1)
-    } else {
-      cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-      Xminus1 <- cbind(Xminus1, tail(LRplus,nrow(Xminus1)))
-    }
-    
-    betaLT<-coint<-c(1,-cointLM$coef)
-    betaLT_std <- c(1,summary(cointLM)$coef[,2])
-    names(betaLT_std)<-c(colnames(data), LRinc_name)
+    ## build LRplus: deterministic/exogeneous regressor in coint
+      if(class(LRinclude)=="character"){
+	LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
+	LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
+	LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
+      } else if(class(LRinclude)%in%c("matrix", "numeric")) {
+	LRplus<-LRinclude
+      } else{
+	stop("Argument LRinclude badly given")
+      }
+    ## run coint regression
+      if(LRinclude=="none"){
+	cointLM<-lm(y[,1] ~  y[,-1]-1)
+      } else {
+	cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
+	Xminus1 <- cbind(Xminus1, tail(LRplus,nrow(Xminus1)))
+      }
+      
+      betaLT<-coint<-c(1,-cointLM$coef)
+      betaLT_std <- c(1,summary(cointLM)$coef[,2])
+      names(betaLT_std)<-c(colnames(data), LRinc_name)
 
 ## case beta pre-estimated
-  } else {
-    if(length(beta)!=k-1) stop("Arg 'beta' should be of length k-1")
-    if(LRinclude!="none")
-      warning("Arg LRinclude not taken into account when beta is given by user")
-      LRinc_name <- NULL
-      LRinc_dim <- 0
-    coint<-c(1, -beta)
-    betaLT<-c(1,-beta)
-  }
+    } else {
+      if(length(beta)!=k-1) stop("Arg 'beta' should be of length k-1")
+      if(LRinclude!="none")
+	warning("Arg LRinclude not taken into account when beta is given by user")
+	LRinc_name <- NULL
+	LRinc_dim <- 0
+      coint<-c(1, -beta)
+      betaLT<-c(1,-beta)
+    }
 
-  coint_export<-matrix(coint, nrow=k+LRinc_dim , dimnames=list(c(colnames(data),LRinc_name), "r1"))
-  betaLT<-matrix(betaLT, nrow=k+LRinc_dim , dimnames=list(c(colnames(data),LRinc_name),"r1"))
-  ECTminus1<-Xminus1%*%betaLT
-  Z<-cbind(ECTminus1,Z)
-}
+    coint_export<-matrix(coint, nrow=k+LRinc_dim , dimnames=list(c(colnames(data),LRinc_name), "r1"))
+    betaLT<-matrix(betaLT, nrow=k+LRinc_dim , dimnames=list(c(colnames(data),LRinc_name),"r1"))
+    ECTminus1<-Xminus1%*%betaLT
+    Z<-cbind(ECTminus1,Z)
+  }
 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
-else if(model=="VECM"&estim=="ML"){
-beta.estimated<-if(is.null(beta)) TRUE else FALSE
-  if (is.null(beta)){
-    #Auxiliary regression 1
-    reg_res1<-lm.fit(Z,Y)
-    u<-residuals(reg_res1)
-    #Auxiliary regression 2
-    reg_res2<-lm.fit(Z,Xminus1)
-    v<-residuals(reg_res2)
-    #Auxiliary regression 3
-    if(LRinclude!="none"){
-      add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
-      reg_res3<-lm.fit(Z,add)
-      v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
+  else if(model=="VECM"&estim=="ML"){
+  beta.estimated<-if(is.null(beta)) TRUE else FALSE
+    if (is.null(beta)){
+      #Auxiliary regression 1
+      reg_res1<-lm.fit(Z,Y)
+      u<-residuals(reg_res1)
+      #Auxiliary regression 2
+      reg_res2<-lm.fit(Z,Xminus1)
+      v<-residuals(reg_res2)
+      #Auxiliary regression 3
+      if(LRinclude!="none"){
+	add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
+	reg_res3<-lm.fit(Z,add)
+	v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
+      }
+      #Moment matrices
+      S00<-crossprod(u)
+      S11<-crossprod(v)
+      S01<-crossprod(u,v)
+      SSSS<-solve(S11)%*%t(S01)%*%solve(S00)%*%S01
+      eig<-eigen(SSSS)
+      ve<-Re(eig$vectors)
+      va<-Re(eig$values)
+      #normalize eigenvectors
+      ve_no<-apply(ve,2, function(x) x/sqrt(t(x)%*%S11%*%x))
+      ve_2<-t(t(ve_no)/diag(ve_no)) 
+      ve_3<-ve_2[,1:r, drop=FALSE]
+      C2 <- matrix(0, nrow = nrow(ve_2) - r, ncol = r)
+      C <- rbind(diag(r), C2)
+      ve_4 <- ve_3 %*% solve(t(C) %*% ve_3)
+
+      #compute A (speed adjustment)
+      z0<-t(u)%*%v%*%ve_no[,1:r]%*%t(ve_no[,1:r])
+
+	###Slope parameters
+      if(LRinclude!="none"){
+	ECTminus1<-cbind(Xminus1,add)%*%ve_4
+      }else{
+	ECTminus1<-Xminus1%*%ve_4
+      }
+      Z<-cbind(ECTminus1,Z)
+      coin_ve_names <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
+      dimnames(ve_4)<-list(c(colnames(data), coin_ve_names), paste("r", 1:r, sep=""))
+      betaLT<-ve_4
+    }else{  #end beta to be estimated
+      betaLT<-beta
+      ECTminus1<-Xminus1%*%c(1,-betaLT)
+      Z<-cbind(ECTminus1,Z)
     }
-    #Moment matrices
-    S00<-crossprod(u)
-    S11<-crossprod(v)
-    S01<-crossprod(u,v)
-    SSSS<-solve(S11)%*%t(S01)%*%solve(S00)%*%S01
-    eig<-eigen(SSSS)
-    ve<-Re(eig$vectors)
-    va<-Re(eig$values)
-    #normalize eigenvectors
-    ve_no<-apply(ve,2, function(x) x/sqrt(t(x)%*%S11%*%x))
-    ve_2<-t(t(ve_no)/diag(ve_no)) 
-    ve_3<-ve_2[,1:r, drop=FALSE]
-    C2 <- matrix(0, nrow = nrow(ve_2) - r, ncol = r)
-    C <- rbind(diag(r), C2)
-    ve_4 <- ve_3 %*% solve(t(C) %*% ve_3)
-
-    #compute A (speed adjustment)
-    z0<-t(u)%*%v%*%ve_no[,1:r]%*%t(ve_no[,1:r])
-
-      ###Slope parameters
-    if(LRinclude!="none"){
-      ECTminus1<-cbind(Xminus1,add)%*%ve_4
-    }else{
-      ECTminus1<-Xminus1%*%ve_4
-    }
-    Z<-cbind(ECTminus1,Z)
-    coin_ve_names <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
-    dimnames(ve_4)<-list(c(colnames(data), coin_ve_names), paste("r", 1:r, sep=""))
-    betaLT<-ve_4
-  }else{  #end beta to be estimated
-    betaLT<-beta
-    ECTminus1<-Xminus1%*%c(1,-betaLT)
-    Z<-cbind(ECTminus1,Z)
-  }
-}#end model=="VECM"&estim=="ML"
-
+  }#end model=="VECM"&estim=="ML"
 
 
 ###Slope parameters, residuals and fitted
-B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
-fitted<-Z%*%t(B)
-res<-Y-fitted
+  B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
+  fitted<-Z%*%t(B)
+  res<-Y-fitted
 
 ###naming of variables and parameters
-npar<-ncol(B)*nrow(B)
-rownames(B)<-paste("Equation",colnames(data))
-LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
-if(I=="ADF") LagNames <- paste("D", LagNames,sep="_")
-ECT<- if(model=="VECM") paste("ECT", if(r>1) 1:r else NULL, sep="") else NULL
-Xminus1Names<- if(I=="ADF") paste(colnames(data),"-1",sep="") else NULL
-BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
-Bnames<-c(ECT,BnamesInter,Xminus1Names, LagNames)
-colnames(B)<-Bnames
-
+  npar<-ncol(B)*nrow(B)
+  rownames(B)<-paste("Equation",colnames(data))
+  LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
+  if(I=="ADF") LagNames <- paste("D", LagNames,sep="_")
+  ECT<- if(model=="VECM") paste("ECT", if(r>1) 1:r else NULL, sep="") else NULL
+  Xminus1Names<- if(I=="ADF") paste(colnames(data),"-1",sep="") else NULL
+  BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
+  Bnames<-c(ECT,BnamesInter,Xminus1Names, LagNames)
+  colnames(B)<-Bnames
 
 ###Y and regressors matrix to be returned
-naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=T-t), Z)
-rownames(naX)<-rownames(data)
-YnaX<-cbind(data, naX)
-colnames(YnaX)<-c(colnames(data),Bnames)
+  naX<-rbind(matrix(NA, ncol=ncol(Z), nrow=T-t), Z)
+  rownames(naX)<-rownames(data)
+  YnaX<-cbind(data, naX)
+  colnames(YnaX)<-c(colnames(data),Bnames)
 
 ###Return outputs
-model.specific<-list()
-model.specific$nthresh<-0
+  model.specific<-list()
+  model.specific$nthresh<-0
 
-if(model=="VECM"){
-  model.specific$beta<- betaLT
-  model.specific$r<-r
-  model.specific$estim<-estim
-  model.specific$LRinclude<-LRinclude
-  model.specific$beta.estimated<-beta.estimated
+  if(model=="VECM"){
+    model.specific$beta<- betaLT
+    model.specific$r<-r
+    model.specific$estim<-estim
+    model.specific$LRinclude<-LRinclude
+    model.specific$beta.estimated<-beta.estimated
 
-  if(estim=="ML"){
-    model.specific$S00<-S00
-    model.specific$lambda<-va
-    model.specific$coint<-ve_4
-    model.specific$estim<-"ML"
-  } else {
-    model.specific$r<-1
-    model.specific$coint<-coint_export
-    model.specific$estim<-"OLS"
+    if(estim=="ML"){
+      model.specific$S00<-S00
+      model.specific$lambda<-va
+      model.specific$coint<-ve_4
+      model.specific$estim<-"ML"
+    } else {
+      model.specific$r<-1
+      model.specific$coint<-coint_export
+      model.specific$estim<-"OLS"
+    }
   }
-}
 
 
-z<-list(residuals=res,  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", fitted.values=fitted, model.x=Z, include=include,lag=lag, model=YnaX, df.residual=t-npar/k, model.specific=model.specific)
-if(model=="VAR")
-  class(z)<-c("VAR","nlVar")
-else{
-  class(z)<-c("VECM","VAR", "nlVar")
-  I<-"diff"
-}
+  z<-list(residuals=res,  
+	  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", 
+	  fitted.values=fitted, 
+	  model.x=Z, 
+	  include=include,
+	  lag=lag, 
+	  model=YnaX, 
+	  df.residual=t-npar/k, 
+	  model.specific=model.specific)
+  if(model=="VAR"){
+    class(z)<-c("VAR","nlVar")
+  } else {
+    class(z)<-c("VECM","VAR", "nlVar")
+    I<-"diff"
+  }
 
-attr(z, "varsLevel")<-I
-attr(z, "model")<-model
-return(z)
+  attr(z, "varsLevel")<-I
+  attr(z, "model")<-model
+  return(z)
 }
 
 
