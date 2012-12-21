@@ -11,7 +11,7 @@ lineVar(data, lag,r=1, include = c( "const", "trend","none", "both"), model=c("V
 Fitted model data
 }
 \arguments{
-\item{data}{multivariate time series }
+\item{data}{multivariate time series (first row  being first=oldest value)}
 \item{lag}{Number of lags to include in each regime}
 \item{r}{Number of cointegrating relationships}
 \item{include}{Type of deterministic regressors to include}
