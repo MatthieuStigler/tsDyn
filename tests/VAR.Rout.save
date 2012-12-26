@@ -48,34 +48,39 @@ Loading required package: nlme
 > var_l1_tr <-lineVar(barry, lag=1, include="trend")
 > var_l1_bo <-lineVar(barry, lag=1, include="both")
 > var_l1_no <-lineVar(barry, lag=1, include="none")
+> var_l1_coAsExo <-lineVar(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
 > 
 > var_l3_co <-lineVar(barry, lag=3, include="const")
 > var_l3_tr <-lineVar(barry, lag=3, include="trend")
 > var_l3_bo <-lineVar(barry, lag=3, include="both")
 > var_l3_no <-lineVar(barry, lag=3, include="none")
+> var_l3_coAsExo <-lineVar(barry, lag=3, include="none", exogen=rep(1, nrow(barry)))
 > 
 > var_l2_diff_co <-lineVar(barry, lag=2, include="const", I="diff")
 > var_l2_diff_tr <-lineVar(barry, lag=2, include="trend", I="diff")
 > var_l2_diff_bo <-lineVar(barry, lag=2, include="both", I="diff")
 > var_l2_diff_no <-lineVar(barry, lag=2, include="none", I="diff")
+> var_l2_diff_coAsExo <-lineVar(barry, lag=2, include="none", I="diff", exogen=rep(1, nrow(barry)))
 > 
 > var_l2_adf_co <-lineVar(barry, lag=2, include="const", I="ADF")
 > var_l2_adf_tr <-lineVar(barry, lag=2, include="trend", I="ADF")
 > var_l2_adf_bo <-lineVar(barry, lag=2, include="both", I="ADF")
 > var_l2_adf_no <-lineVar(barry, lag=2, include="none", I="ADF")
+> var_l2_adf_coAsExo <-lineVar(barry, lag=2, include="none", I="ADF", exogen=rep(1, nrow(barry)))
+> 
 > 
 > var_all <- list(
-+ 		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, 
-+ 		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no,
-+ 		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no,
-+ 		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no)
++ 		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, var_l1_coAsExo,
++ 		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no, var_l3_coAsExo,
++ 		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no, var_l2_diff_coAsExo,
++ 		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no, var_l2_adf_coAsExo)
 > 
 > 
 > names(var_all) <-c(
-+ 		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", 
-+ 		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no",
-+ 		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no",
-+ 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no")
++ 		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", "var_l1_coAsExo",
++ 		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no", "var_l3_coAsExo",
++ 		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no", "var_l2_diff_coAsExo",
++ 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no","var_l2_adf_coAsExo")
 > 
 > 
 > ## Check methods:
@@ -100,6 +105,10 @@ Equation cpiCAN  0.9918856026
 Equation dolcan 0.9990246  0.0004597724 -4.232838e-04
 Equation cpiUSA 0.3347079  0.9977301171  3.123187e-05
 Equation cpiCAN 0.4371558 -0.0064386166  1.002389e+00
+                  dolcan -1     cpiUSA -1     cpiCAN -1      exo_1
+Equation dolcan  0.98184934  0.0006535181 -0.0005441472 0.01606226
+Equation cpiUSA -0.17515457  1.0034816358 -0.0035567095 0.47682275
+Equation cpiCAN  0.07511337 -0.0023545869  0.9998414195 0.33858157
                 Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
 Equation dolcan 0.0213132 1.1426667 -0.002923395 -5.319548e-05 -0.1947679
 Equation cpiUSA 0.2297914 0.6115380  1.473715592 -3.413037e-02 -1.2214788
@@ -136,6 +145,14 @@ Equation cpiCAN 0.5992614  0.288801153  0.9771280000 -0.7214129 -0.268875466
 Equation dolcan -0.006898937 0.04162504 -0.001380531  0.006343534
 Equation cpiUSA  0.110660533 0.64140684  0.005841242 -0.078099491
 Equation cpiCAN  0.196990414 0.40138450 -0.025092666 -0.171905123
+                dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2    cpiUSA -2
+Equation dolcan 1.1426667 -0.002923395 -5.319548e-05 -0.1947679  0.003242556
+Equation cpiUSA 0.6115380  1.473715592 -3.413037e-02 -1.2214788 -0.497252953
+Equation cpiCAN 0.4721442  0.279405970  9.752629e-01 -0.6781416 -0.269165140
+                   cpiCAN -2  dolcan -3     cpiUSA -3    cpiCAN -3     exo_1
+Equation dolcan -0.007019863 0.03224004  0.0002842096  0.006567983 0.0213132
+Equation cpiUSA  0.109356758 0.54022104  0.0237898926 -0.075679565 0.2297914
+Equation cpiCAN  0.196158934 0.33685344 -0.0136459471 -0.170361820 0.1465491
                   Intercept dolcan -1    cpiUSA -1     cpiCAN -1   dolcan -2
 Equation dolcan 0.003381125 0.1617849 -0.002353031 -0.0001260648 -0.03741108
 Equation cpiUSA 0.122912595 0.6790979  0.479686920 -0.0255459970 -0.57705874
@@ -168,6 +185,14 @@ Equation cpiCAN 0.8884244 0.421666484 0.06091587  0.01313794 0.120827387
 Equation dolcan -0.005201487
 Equation cpiUSA  0.151452883
 Equation cpiCAN  0.270975808
+                dolcan -1    cpiUSA -1     cpiCAN -1   dolcan -2    cpiUSA -2
+Equation dolcan 0.1617849 -0.002353031 -0.0001260648 -0.03741108  0.001311048
+Equation cpiUSA 0.6790979  0.479686920 -0.0255459970 -0.57705874 -0.020762565
+Equation cpiCAN 0.4349111  0.289182756  0.0073892530 -0.27376324  0.005901144
+                   cpiCAN -2       exo_1
+Equation dolcan -0.007055727 0.003381125
+Equation cpiUSA  0.084046495 0.122912595
+Equation cpiCAN  0.203559141 0.122931337
                 Intercept    dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
 Equation dolcan 0.0213132 -0.01986115  0.0006033709 -0.0005050753   0.1625279
 Equation cpiUSA 0.2297914 -0.06971973  0.0002525317 -0.0004531813   0.6812577
@@ -216,6 +241,18 @@ Equation cpiCAN  0.293968133 -0.0250852914 -0.40138450  0.025092665
 Equation dolcan -0.006343534
 Equation cpiUSA  0.078099491
 Equation cpiCAN  0.171905123
+                   dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan -0.01986115  0.0006033709 -0.0005050753   0.1625279
+Equation cpiUSA -0.06971973  0.0002525317 -0.0004531813   0.6812577
+Equation cpiCAN  0.13085606 -0.0034051167  0.0010599980   0.3412882
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2   D_cpiUSA -2
+Equation dolcan -0.003526765  0.0004518798 -0.03224004 -0.0002842096
+Equation cpiUSA  0.473463061 -0.0336771926 -0.54022104 -0.0237898926
+Equation cpiCAN  0.282811088 -0.0257971141 -0.33685344  0.0136459464
+                 D_cpiCAN -2     exo_1
+Equation dolcan -0.006567983 0.0213132
+Equation cpiUSA  0.075679565 0.2297914
+Equation cpiCAN  0.170361820 0.1465491
 $var_l1_co
                  Intercept   dolcan -1     cpiUSA -1     cpiCAN -1
 Equation dolcan 0.01606226  0.98184934  0.0006535181 -0.0005441472
@@ -243,6 +280,12 @@ $var_l1_no
 Equation dolcan 0.9990246  0.0004597724 -4.232838e-04
 Equation cpiUSA 0.3347079  0.9977301171  3.123187e-05
 Equation cpiCAN 0.4371558 -0.0064386166  1.002389e+00
+
+$var_l1_coAsExo
+                  dolcan -1     cpiUSA -1     cpiCAN -1      exo_1
+Equation dolcan  0.98184934  0.0006535181 -0.0005441472 0.01606226
+Equation cpiUSA -0.17515457  1.0034816358 -0.0035567095 0.47682275
+Equation cpiCAN  0.07511337 -0.0023545869  0.9998414195 0.33858157
 
 $var_l3_co
                 Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
@@ -288,6 +331,16 @@ Equation dolcan -0.006898937 0.04162504 -0.001380531  0.006343534
 Equation cpiUSA  0.110660533 0.64140684  0.005841242 -0.078099491
 Equation cpiCAN  0.196990414 0.40138450 -0.025092666 -0.171905123
 
+$var_l3_coAsExo
+                dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2    cpiUSA -2
+Equation dolcan 1.1426667 -0.002923395 -5.319548e-05 -0.1947679  0.003242556
+Equation cpiUSA 0.6115380  1.473715592 -3.413037e-02 -1.2214788 -0.497252953
+Equation cpiCAN 0.4721442  0.279405970  9.752629e-01 -0.6781416 -0.269165140
+                   cpiCAN -2  dolcan -3     cpiUSA -3    cpiCAN -3     exo_1
+Equation dolcan -0.007019863 0.03224004  0.0002842096  0.006567983 0.0213132
+Equation cpiUSA  0.109356758 0.54022104  0.0237898926 -0.075679565 0.2297914
+Equation cpiCAN  0.196158934 0.33685344 -0.0136459471 -0.170361820 0.1465491
+
 $var_l2_diff_co
                   Intercept dolcan -1    cpiUSA -1     cpiCAN -1   dolcan -2
 Equation dolcan 0.003381125 0.1617849 -0.002353031 -0.0001260648 -0.03741108
@@ -327,6 +380,16 @@ Equation cpiCAN 0.8884244 0.421666484 0.06091587  0.01313794 0.120827387
 Equation dolcan -0.005201487
 Equation cpiUSA  0.151452883
 Equation cpiCAN  0.270975808
+
+$var_l2_diff_coAsExo
+                dolcan -1    cpiUSA -1     cpiCAN -1   dolcan -2    cpiUSA -2
+Equation dolcan 0.1617849 -0.002353031 -0.0001260648 -0.03741108  0.001311048
+Equation cpiUSA 0.6790979  0.479686920 -0.0255459970 -0.57705874 -0.020762565
+Equation cpiCAN 0.4349111  0.289182756  0.0073892530 -0.27376324  0.005901144
+                   cpiCAN -2       exo_1
+Equation dolcan -0.007055727 0.003381125
+Equation cpiUSA  0.084046495 0.122912595
+Equation cpiCAN  0.203559141 0.122931337
 
 $var_l2_adf_co
                 Intercept    dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
@@ -383,6 +446,20 @@ Equation cpiCAN  0.293968133 -0.0250852914 -0.40138450  0.025092665
 Equation dolcan -0.006343534
 Equation cpiUSA  0.078099491
 Equation cpiCAN  0.171905123
+
+$var_l2_adf_coAsExo
+                   dolcan-1      cpiUSA-1      cpiCAN-1 D_dolcan -1
+Equation dolcan -0.01986115  0.0006033709 -0.0005050753   0.1625279
+Equation cpiUSA -0.06971973  0.0002525317 -0.0004531813   0.6812577
+Equation cpiCAN  0.13085606 -0.0034051167  0.0010599980   0.3412882
+                 D_cpiUSA -1   D_cpiCAN -1 D_dolcan -2   D_cpiUSA -2
+Equation dolcan -0.003526765  0.0004518798 -0.03224004 -0.0002842096
+Equation cpiUSA  0.473463061 -0.0336771926 -0.54022104 -0.0237898926
+Equation cpiCAN  0.282811088 -0.0257971141 -0.33685344  0.0136459464
+                 D_cpiCAN -2     exo_1
+Equation dolcan -0.006567983 0.0213132
+Equation cpiUSA  0.075679565 0.2297914
+Equation cpiCAN  0.170361820 0.1465491
 
 > lapply(var_all, summary)
 $var_l1_co
@@ -448,6 +525,23 @@ AIC -4851.887 	BIC -4817.888 	SSR 30.05131
 Equation dolcan 0.9990(0.0026)*** 0.0005(0.0003)      -0.0004(0.0003)    
 Equation cpiUSA 0.3347(0.0359)*** 0.9977(0.0043)***   3.1e-05(0.0041)    
 Equation cpiCAN 0.4372(0.0489)*** -0.0064(0.0059)     1.0024(0.0055)***  
+
+$var_l1_coAsExo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 12
+AIC -4867.939 	BIC -4822.608 	SSR 29.23749
+
+                dolcan -1           cpiUSA -1           cpiCAN -1          
+Equation dolcan 0.9818(0.0093)***   0.0007(0.0003)*     -0.0005(0.0003).   
+Equation cpiUSA -0.1752(0.1275)     1.0035(0.0044)***   -0.0036(0.0041)    
+Equation cpiCAN 0.0751(0.1770)      -0.0024(0.0062)     0.9998(0.0056)***  
+                exo_1            
+Equation dolcan 0.0161(0.0084).  
+Equation cpiUSA 0.4768(0.1147)***
+Equation cpiCAN 0.3386(0.1591)*  
 
 $var_l3_co
 #############
@@ -545,6 +639,31 @@ Equation dolcan 0.0416(0.0565)     -0.0014(0.0049)     0.0063(0.0031)*
 Equation cpiUSA 0.6414(0.6985)     0.0058(0.0601)      -0.0781(0.0390)*  
 Equation cpiCAN 0.4014(1.0453)     -0.0251(0.0899)     -0.1719(0.0583)** 
 
+$var_l3_coAsExo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 30
+AIC -4901.837 	BIC -4788.693 	SSR 25.40966
+
+                dolcan -1          cpiUSA -1           cpiCAN -1           
+Equation dolcan 1.1427(0.0563)***  -0.0029(0.0047)     -5.3e-05(0.0031)    
+Equation cpiUSA 0.6115(0.6982)     1.4737(0.0587)***   -0.0341(0.0386)     
+Equation cpiCAN 0.4721(1.0511)     0.2794(0.0884)**    0.9753(0.0581)***   
+                dolcan -2           cpiUSA -2          cpiCAN -2          
+Equation dolcan -0.1948(0.0851)*    0.0032(0.0080)     -0.0070(0.0044)    
+Equation cpiUSA -1.2215(1.0544)     -0.4973(0.0994)*** 0.1094(0.0544)*    
+Equation cpiCAN -0.6781(1.5874)     -0.2692(0.1497).   0.1962(0.0820)*    
+                dolcan -3          cpiUSA -3           cpiCAN -3         
+Equation dolcan 0.0322(0.0562)     0.0003(0.0049)      0.0066(0.0031)*   
+Equation cpiUSA 0.5402(0.6962)     0.0238(0.0603)      -0.0757(0.0388).  
+Equation cpiCAN 0.3369(1.0481)     -0.0136(0.0908)     -0.1704(0.0583)** 
+                exo_1             
+Equation dolcan 0.0213(0.0087)*   
+Equation cpiUSA 0.2298(0.1080)*   
+Equation cpiCAN 0.1465(0.1625)    
+
 $var_l2_diff_co
 #############
 ###Model VAR 
@@ -624,6 +743,27 @@ Equation cpiCAN 0.8884(1.0758)     0.4217(0.0861)***  0.0609(0.0580)
 Equation dolcan -0.0295(0.0564)     0.0045(0.0047)     -0.0052(0.0030).  
 Equation cpiUSA -0.2902(0.7362)     0.0941(0.0608)     0.1515(0.0389)*** 
 Equation cpiCAN 0.0131(1.0807)      0.1208(0.0893)     0.2710(0.0571)*** 
+
+$var_l2_diff_coAsExo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 21
+AIC -4902.876 	BIC -4823.675 	SSR 26.01173
+
+                dolcan -1          cpiUSA -1           cpiCAN -1          
+Equation dolcan 0.1618(0.0560)**   -0.0024(0.0047)     -0.0001(0.0031)    
+Equation cpiUSA 0.6791(0.6908)     0.4797(0.0585)***   -0.0255(0.0379)    
+Equation cpiCAN 0.4349(1.0514)     0.2892(0.0891)**    0.0074(0.0577)     
+                dolcan -2           cpiUSA -2           cpiCAN -2         
+Equation dolcan -0.0374(0.0561)     0.0013(0.0048)      -0.0071(0.0031)*  
+Equation cpiUSA -0.5771(0.6919)     -0.0208(0.0596)     0.0840(0.0379)*   
+Equation cpiCAN -0.2738(1.0531)     0.0059(0.0908)      0.2036(0.0577)*** 
+                exo_1            
+Equation dolcan 0.0034(0.0015)*  
+Equation cpiUSA 0.1229(0.0185)***
+Equation cpiCAN 0.1229(0.0282)***
 
 $var_l2_adf_co
 #############
@@ -721,6 +861,31 @@ Equation dolcan -0.0416(0.0565)     0.0014(0.0049)      -0.0063(0.0031)*
 Equation cpiUSA -0.6414(0.6985)     -0.0058(0.0601)     0.0781(0.0390)*   
 Equation cpiCAN -0.4014(1.0453)     0.0251(0.0899)      0.1719(0.0583)**  
 
+$var_l2_adf_coAsExo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 321
+Number of variables: 3 	Number of estimated slope parameters 30
+AIC -4901.837 	BIC -4788.693 	SSR 25.40966
+
+                dolcan-1            cpiUSA-1            cpiCAN-1           
+Equation dolcan -0.0199(0.0094)*    0.0006(0.0003).     -0.0005(0.0003).   
+Equation cpiUSA -0.0697(0.1163)     0.0003(0.0041)      -0.0005(0.0037)    
+Equation cpiCAN 0.1309(0.1751)      -0.0034(0.0061)     0.0011(0.0056)     
+                D_dolcan -1        D_cpiUSA -1         D_cpiCAN -1        
+Equation dolcan 0.1625(0.0559)**   -0.0035(0.0048)     0.0005(0.0031)     
+Equation cpiUSA 0.6813(0.6934)     0.4735(0.0589)***   -0.0337(0.0388)    
+Equation cpiCAN 0.3413(1.0439)     0.2828(0.0887)**    -0.0258(0.0585)    
+                D_dolcan -2         D_cpiUSA -2         D_cpiCAN -2       
+Equation dolcan -0.0322(0.0562)     -0.0003(0.0049)     -0.0066(0.0031)*  
+Equation cpiUSA -0.5402(0.6962)     -0.0238(0.0603)     0.0757(0.0388).   
+Equation cpiCAN -0.3369(1.0481)     0.0136(0.0908)      0.1704(0.0583)**  
+                exo_1             
+Equation dolcan 0.0213(0.0087)*   
+Equation cpiUSA 0.2298(0.1080)*   
+Equation cpiCAN 0.1465(0.1625)    
+
 > 
 > lapply(var_all, function(x) head(residuals(x), 3))
 $var_l1_co
@@ -747,6 +912,12 @@ $var_l1_no
 [2,]  0.0001247203 -0.0001046374 -0.24597407
 [3,]  0.0029312845 -0.0798621340 -0.02488375
 
+$var_l1_coAsExo
+           dolcan      cpiUSA      cpiCAN
+[1,] -0.005838096 -0.11723045 -0.20366013
+[2,] -0.001153241 -0.03804209 -0.27291264
+[3,]  0.001628365 -0.11854049 -0.05234842
+
 $var_l3_co
             dolcan      cpiUSA      cpiCAN
 [1,]  8.589724e-05 -0.09997021 -0.02038427
@@ -770,6 +941,12 @@ $var_l3_no
 [1,]  0.001981517 -0.07953230 -0.007350036
 [2,] -0.002985055 -0.03652607 -0.068066373
 [3,] -0.003198583 -0.02795678 -0.050553202
+
+$var_l3_coAsExo
+            dolcan      cpiUSA      cpiCAN
+[1,]  8.589736e-05 -0.09997020 -0.02038427
+[2,] -4.837982e-03 -0.05650368 -0.08080706
+[3,] -5.189144e-03 -0.04941830 -0.06424025
 
 $var_l2_diff_co
            dolcan      cpiUSA       cpiCAN
@@ -795,6 +972,12 @@ $var_l2_diff_no
 [2,] -0.002043534  0.01534729 0.03705792
 [3,] -0.002128709  0.02373660 0.05084444
 
+$var_l2_diff_coAsExo
+           dolcan      cpiUSA       cpiCAN
+[1,]  0.001685337 -0.07134359  0.057361248
+[2,] -0.003263559 -0.02900376 -0.007299898
+[3,] -0.003403099 -0.02259077  0.004510002
+
 $var_l2_adf_co
             dolcan      cpiUSA      cpiCAN
 [1,]  8.589731e-05 -0.09997020 -0.02038427
@@ -818,6 +1001,12 @@ $var_l2_adf_no
 [1,]  0.001981517 -0.07953230 -0.007350036
 [2,] -0.002985054 -0.03652607 -0.068066373
 [3,] -0.003198583 -0.02795677 -0.050553202
+
+$var_l2_adf_coAsExo
+            dolcan      cpiUSA      cpiCAN
+[1,]  8.589731e-05 -0.09997020 -0.02038427
+[2,] -4.837982e-03 -0.05650368 -0.08080706
+[3,] -5.189144e-03 -0.04941830 -0.06424025
 
 > lapply(var_all, function(x) head(fitted(x), 3))
 $var_l1_co
@@ -844,6 +1033,12 @@ $var_l1_no
 [2,] 0.9965753 28.44010 26.31597
 [3,] 0.9977687 28.70986 26.38488
 
+$var_l1_coAsExo
+        dolcan   cpiUSA   cpiCAN
+[1,] 1.0014381 28.28723 26.20366
+[2,] 0.9978532 28.47804 26.34291
+[3,] 0.9990716 28.74854 26.41235
+
 $var_l3_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.000614 28.72997 26.38038
@@ -867,6 +1062,12 @@ $var_l3_no
 [1,] 0.9987185 28.70953 26.36735
 [2,] 1.0037851 28.84653 26.61807
 [3,] 1.0015986 29.03796 26.84055
+
+$var_l3_coAsExo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.000614 28.72997 26.38038
+[2,] 1.005638 28.86650 26.63081
+[3,] 1.003589 29.05942 26.85424
 
 $var_l2_diff_co
           dolcan    cpiUSA    cpiCAN
@@ -892,6 +1093,12 @@ $var_l2_diff_no
 [2,]  0.0021435343 0.1646527 0.1529421
 [3,] -0.0002712910 0.1762634 0.1891556
 
+$var_l2_diff_coAsExo
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.002314663 0.2613436 0.2326388
+[2,] 0.003363559 0.2090038 0.1972999
+[3,] 0.001003099 0.2225908 0.2354900
+
 $var_l2_adf_co
           dolcan    cpiUSA    cpiCAN
 [1,] 0.003914103 0.2899702 0.3103843
@@ -916,69 +1123,87 @@ $var_l2_adf_no
 [2,] 0.003085054 0.2165261 0.2580664
 [3,] 0.000798583 0.2279568 0.2905532
 
+$var_l2_adf_coAsExo
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.003914103 0.2899702 0.3103843
+[2,] 0.004937982 0.2365037 0.2708071
+[3,] 0.002789144 0.2494183 0.3042403
+
 > sapply(var_all, deviance)
-     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
-      29.23749       28.55718       28.29124       30.05131       25.40966 
-     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
-      25.12657       24.90230       25.56968       26.01173       27.74863 
-var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
-      25.37086       28.20989       25.40966       25.12657       24.90230 
- var_l2_adf_no 
-      25.56968 
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+           29.23749            28.55718            28.29124            30.05131 
+     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+           29.23749            25.40966            25.12657            24.90230 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+           25.56968            25.40966            26.01173            27.74863 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+           25.37086            28.20989            26.01173            25.40966 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+           25.12657            24.90230            25.56968            25.40966 
 > 
 > 
 > ## logLik/AIC/BIC
 > sapply(var_all, logLik)
-     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
-      1071.018       1074.647       1079.742       1059.992       1114.481 
-     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
-      1117.300       1121.617       1108.957       1106.000       1087.205 
-var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
-      1111.747       1079.284       1114.481       1117.300       1121.617 
- var_l2_adf_no 
-      1108.957 
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+           1071.018            1074.647            1079.742            1059.992 
+     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+           1071.018            1114.481            1117.300            1121.617 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+           1108.957            1114.481            1106.000            1087.205 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+           1111.747            1079.284            1106.000            1114.481 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+           1117.300            1121.617            1108.957            1114.481 
 > sapply(var_all, AIC)
-     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
-     -4867.939      -4875.198      -4879.388      -4851.887      -4901.837 
-     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
-     -4907.476      -4910.109      -4896.790      -4902.876      -4865.286 
-var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
-     -4908.370      -4855.443      -4901.837      -4907.476      -4910.109 
- var_l2_adf_no 
-     -4896.790 
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+          -4867.939           -4875.198           -4879.388           -4851.887 
+     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -4867.939           -4901.837           -4907.476           -4910.109 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+          -4896.790           -4901.837           -4902.876           -4865.286 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+          -4908.370           -4855.443           -4902.876           -4901.837 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+          -4907.476           -4910.109           -4896.790           -4901.837 
 > sapply(var_all, AIC, fitMeasure="LL")
-     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
-     -2118.037      -2125.295      -2129.485      -2101.984      -2168.961 
-     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
-     -2174.601      -2177.233      -2163.914      -2170.000      -2132.411 
-var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
-     -2175.495      -2122.568      -2168.961      -2174.601      -2177.233 
- var_l2_adf_no 
-     -2163.914 
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+          -2118.037           -2125.295           -2129.485           -2101.984 
+     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -2118.037           -2168.961           -2174.601           -2177.233 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+          -2163.914           -2168.961           -2170.000           -2132.411 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+          -2175.495           -2122.568           -2170.000           -2168.961 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+          -2174.601           -2177.233           -2163.914           -2168.961 
 > sapply(var_all, BIC)
-     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
-     -4822.608      -4829.866      -4822.723      -4817.888      -4788.693 
-     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
-     -4794.333      -4785.651      -4794.961      -4823.675      -4786.086 
-var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
-     -4817.856      -4787.557      -4788.693      -4794.333      -4785.651 
- var_l2_adf_no 
-     -4794.961 
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+          -4822.608           -4829.866           -4822.723           -4817.888 
+     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -4822.608           -4788.693           -4794.333           -4785.651 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+          -4794.961           -4788.693           -4823.675           -4786.086 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+          -4817.856           -4787.557           -4823.675           -4788.693 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+          -4794.333           -4785.651           -4794.961           -4788.693 
 > sapply(var_all, BIC, fitMeasure="LL")
-     var_l1_co      var_l1_tr      var_l1_bo      var_l1_no      var_l3_co 
-     -2072.705      -2079.963      -2072.820      -2067.986      -2055.818 
-     var_l3_tr      var_l3_bo      var_l3_no var_l2_diff_co var_l2_diff_tr 
-     -2061.457      -2052.775      -2062.085      -2090.800      -2053.211 
-var_l2_diff_bo var_l2_diff_no  var_l2_adf_co  var_l2_adf_tr  var_l2_adf_bo 
-     -2084.980      -2054.682      -2055.818      -2061.457      -2052.775 
- var_l2_adf_no 
-     -2062.085 
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+          -2072.705           -2079.963           -2072.820           -2067.986 
+     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -2072.705           -2055.818           -2061.457           -2052.775 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+          -2062.085           -2055.818           -2090.800           -2053.211 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+          -2084.980           -2054.682           -2090.800           -2055.818 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+          -2061.457           -2052.775           -2062.085           -2055.818 
 > 
 > 
 > 
 > 
 > ### fevd
-> var_all_level <- var_all[-grep("diff|adf", names(var_all))]
+> var_all_level <- var_all[-grep("diff|adf|Exo", names(var_all))]
 > lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 $var_l1_co
            dolcan       cpiUSA      cpiCAN
@@ -1056,7 +1281,7 @@ $var_l3_no
 > 
 > 
 > ## predict
-> var_all_pred <- var_all[-grep("bo|no|adf|diff", names(var_all))]
+> var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo", names(var_all))]
 > lapply(var_all_pred, predict, n.ahead=2)
 $var_l1_co
       dolcan   cpiUSA   cpiCAN
@@ -1099,6 +1324,14 @@ $var_l1_no
 325 1.476254 110.6954 107.1881
 326 1.480338 110.9416 107.3768
 
+$var_l1_coAsExo
+[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Matrix B badly specified: expected 3 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 4\n\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Matrix B badly specified: expected 3 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 4
+>
+
 $var_l3_co
       dolcan   cpiUSA   cpiCAN
 325 1.478664 110.5527 107.0629
@@ -1119,6 +1352,14 @@ $var_l3_no
 325 1.478951 110.5558 107.0649
 326 1.483828 110.7233 107.1905
 
+$var_l3_coAsExo
+[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Matrix B badly specified: expected 9 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 10\n\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Matrix B badly specified: expected 9 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 10
+>
+
 $var_l2_diff_co
       dolcan   cpiUSA   cpiCAN
 325 1.477524 110.5696 107.1086
@@ -1138,6 +1379,11 @@ $var_l2_diff_no
       dolcan   cpiUSA   cpiCAN
 325 1.474305 110.4526 106.9916
 326 1.474002 110.4702 107.0212
+
+$var_l2_diff_coAsExo
+      dolcan   cpiUSA   cpiCAN
+325 1.474143 110.4467 106.9857
+326 1.473582 110.4525 107.0045
 
 $var_l2_adf_co
 [1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
@@ -1161,6 +1407,13 @@ attr(,"condition")
 <simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
 
 $var_l2_adf_no
+[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
+
+$var_l2_adf_coAsExo
 [1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
 attr(,"class")
 [1] "try-error"
@@ -1213,6 +1466,13 @@ attr(,"class")
 attr(,"condition")
 <simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
+$var_l1_coAsExo
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
 $var_l3_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.478664 110.5527 107.0629
@@ -1231,6 +1491,13 @@ attr(,"condition")
 <simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l3_no
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l3_coAsExo
 [1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
@@ -1265,6 +1532,13 @@ attr(,"class")
 attr(,"condition")
 <simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
+$var_l2_diff_coAsExo
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
 $var_l2_adf_co
 [1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
 attr(,"class")
@@ -1287,6 +1561,13 @@ attr(,"condition")
 <simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 $var_l2_adf_no
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l2_adf_coAsExo
 [1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
 attr(,"class")
 [1] "try-error"
@@ -1382,7 +1663,7 @@ $var_l3_no
 
 > 
 > ## boot
-> var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
+> var_all_boot <- var_all[-grep("adf|diff|Exo", names(var_all))]
 > lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 $var_l1_co
            [,1]     [,2]     [,3]

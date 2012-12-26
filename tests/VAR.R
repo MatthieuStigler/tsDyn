@@ -12,34 +12,39 @@ var_l1_co <-lineVar(barry, lag=1, include="const")
 var_l1_tr <-lineVar(barry, lag=1, include="trend")
 var_l1_bo <-lineVar(barry, lag=1, include="both")
 var_l1_no <-lineVar(barry, lag=1, include="none")
+var_l1_coAsExo <-lineVar(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
 
 var_l3_co <-lineVar(barry, lag=3, include="const")
 var_l3_tr <-lineVar(barry, lag=3, include="trend")
 var_l3_bo <-lineVar(barry, lag=3, include="both")
 var_l3_no <-lineVar(barry, lag=3, include="none")
+var_l3_coAsExo <-lineVar(barry, lag=3, include="none", exogen=rep(1, nrow(barry)))
 
 var_l2_diff_co <-lineVar(barry, lag=2, include="const", I="diff")
 var_l2_diff_tr <-lineVar(barry, lag=2, include="trend", I="diff")
 var_l2_diff_bo <-lineVar(barry, lag=2, include="both", I="diff")
 var_l2_diff_no <-lineVar(barry, lag=2, include="none", I="diff")
+var_l2_diff_coAsExo <-lineVar(barry, lag=2, include="none", I="diff", exogen=rep(1, nrow(barry)))
 
 var_l2_adf_co <-lineVar(barry, lag=2, include="const", I="ADF")
 var_l2_adf_tr <-lineVar(barry, lag=2, include="trend", I="ADF")
 var_l2_adf_bo <-lineVar(barry, lag=2, include="both", I="ADF")
 var_l2_adf_no <-lineVar(barry, lag=2, include="none", I="ADF")
+var_l2_adf_coAsExo <-lineVar(barry, lag=2, include="none", I="ADF", exogen=rep(1, nrow(barry)))
+
 
 var_all <- list(
-		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, 
-		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no,
-		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no,
-		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no)
+		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, var_l1_coAsExo,
+		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no, var_l3_coAsExo,
+		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no, var_l2_diff_coAsExo,
+		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no, var_l2_adf_coAsExo)
 
 
 names(var_all) <-c(
-		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", 
-		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no",
-		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no",
-		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no")
+		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", "var_l1_coAsExo",
+		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no", "var_l3_coAsExo",
+		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no", "var_l2_diff_coAsExo",
+		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no","var_l2_adf_coAsExo")
 
 
 ## Check methods:
@@ -62,13 +67,13 @@ sapply(var_all, BIC, fitMeasure="LL")
 
 
 ### fevd
-var_all_level <- var_all[-grep("diff|adf", names(var_all))]
+var_all_level <- var_all[-grep("diff|adf|Exo", names(var_all))]
 lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 
 
 
 ## predict
-var_all_pred <- var_all[-grep("bo|no|adf|diff", names(var_all))]
+var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo", names(var_all))]
 lapply(var_all_pred, predict, n.ahead=2)
 lapply(var_all, function(x) try(predict(x, n.ahead=2), silent=TRUE))
 lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
@@ -80,7 +85,7 @@ lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 lapply(var_all_level , function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ## boot
-var_all_boot <- var_all[-grep("adf|diff", names(var_all))]
+var_all_boot <- var_all[-grep("adf|diff|Exo", names(var_all))]
 lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 
 ## sim 
