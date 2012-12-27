@@ -203,6 +203,11 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
   if(!is.null(exogen)){
     exo_names <- colnames(as.matrix(exogen))
+    exp_res <- "-[0-9]+|\\.l[0-9]+|ECT|Intercept|Trend"
+    if(any(grepl(exp_res, exo_names))) {
+      warning("Exogen contains reserved names (", exp_res, ". Changed to exo_x")
+      exo_names[grepl(exp_res, exo_names)] <- paste("exo", 1:sum(grepl(exp_res, exo_names)), sep="_")
+    }
     if(any(is.null(exo_names))) exo_names <- paste("exo", 1:NCOL(exogen), sep="_")
   } else {
     exo_names <- NULL
@@ -276,6 +281,7 @@ if(FALSE) { #usage example
 library(tsDyn)
 environment(lineVar)<-environment(star)
 environment(summary.VAR)<-environment(star)
+environment(toLatex.VAR)<-environment(star)
 data(zeroyld)
 dat<-zeroyld
 
@@ -484,6 +490,12 @@ colnames(ex_2_n) <- c("exoVar1", "exoVar2")
 lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_1)
 lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_2)
 lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_1_n)
+lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_2_n)
+
+colnames(ex_2_n) <- c("exoVar1", "a -1")
+lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_2_n)
+
+colnames(ex_2_n) <- c("a.l2", "Trend")
 lineVar(dat, lag=1, include="both", model="VAR", exogen=ex_2_n)
 
 }
