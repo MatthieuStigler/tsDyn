@@ -15,6 +15,7 @@ vecm_OLS_l1_tr <-VECM(barry, lag=1, include="trend")
 vecm_OLS_l1_bo <-VECM(barry, lag=1, include="both")
 vecm_OLS_l1_no <-VECM(barry, lag=1, include="none")
 vecm_OLS_l1_coAsExo <-VECM(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
+vecm_OLS_l3_coAsExo <-VECM(barry, lag=3, include="none", exogen=rep(1, nrow(barry)))
 
 vecm_OLS_l1_LRco <-VECM(barry, lag=1, LRinclude="const")
 vecm_OLS_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend")
@@ -28,6 +29,7 @@ vecm_ML_l1_tr <-VECM(barry, lag=1, include="trend", estim="ML")
 vecm_ML_l1_bo <-VECM(barry, lag=1, include="both", estim="ML")
 vecm_ML_l1_no <-VECM(barry, lag=1, include="none", estim="ML")
 vecm_ML_l1_coAsExo <-VECM(barry, lag=1, include="none", exogen=rep(1, nrow(barry)), estim="ML")
+vecm_ML_l3_coAsExo <-VECM(barry, lag=3, include="none", exogen=rep(1, nrow(barry)), estim="ML")
 
 set.seed(1234)
 exoVar <- rnorm(n=nrow(barry))
@@ -41,17 +43,23 @@ vecm_ML_l1_LRbo_exo <-VECM(barry, lag=1, LRinclude="both", estim="ML", exogen=ex
 
 vecm_all <- list(
 		vecm_OLS_l1_co, vecm_OLS_l3_co, vecm_OLS_l3_co_betaGiven, vecm_OLS_l1_tr, 
-		vecm_OLS_l1_bo, vecm_OLS_l1_no, vecm_OLS_l1_coAsExo, vecm_OLS_l1_LRco, vecm_OLS_l1_LRtr, 
+		vecm_OLS_l1_bo, vecm_OLS_l1_no, vecm_OLS_l1_coAsExo, vecm_OLS_l3_coAsExo, 
+		vecm_OLS_l1_LRco, vecm_OLS_l1_LRtr, 
 		vecm_OLS_l1_LRtr_noCo, vecm_OLS_l1_LRbo, 
+
 		vecm_ML_l1_co, vecm_ML_l3_co,  vecm_ML_l1_tr, 
-		vecm_ML_l1_bo, vecm_ML_l1_no, vecm_ML_l1_coAsExo, vecm_ML_l1_LRco, vecm_ML_l1_LRc_exo, vecm_ML_l1_LRtr, vecm_ML_l1_LRtr_exo,
+		vecm_ML_l1_bo, vecm_ML_l1_no, vecm_ML_l1_coAsExo, vecm_ML_l3_coAsExo, 
+		vecm_ML_l1_LRco, vecm_ML_l1_LRc_exo, vecm_ML_l1_LRtr, vecm_ML_l1_LRtr_exo,
 		vecm_ML_l1_LRtr_noCo, vecm_ML_l1_LRbo, vecm_ML_l1_LRbo_exo)
 
 names(vecm_all) <-c("vecm_OLS_l1_co", "vecm_OLS_l3_co", "vecm_OLS_l3_co_betaGiven", "vecm_OLS_l1_tr", 
-		"vecm_OLS_l1_bo", "vecm_OLS_l1_no", "vecm_OLS_l1_coAsExo", "vecm_OLS_l1_LRco", "vecm_OLS_l1_LRtr", 
+		"vecm_OLS_l1_bo", "vecm_OLS_l1_no", "vecm_OLS_l1_coAsExo", "vecm_OLS_l3_coAsExo", 
+		"vecm_OLS_l1_LRco", "vecm_OLS_l1_LRtr", 
 		"vecm_OLS_l1_LRtr_noCo", "vecm_OLS_l1_LRbo", 
+
 		"vecm_ML_l1_co", "vecm_ML_l3_co", " vecm_ML_l1_tr", 
-		"vecm_ML_l1_bo", "vecm_ML_l1_no", "vecm_ML_l1_coAsExo","vecm_ML_l1_LRco", "vecm_ML_l1_LRc_exo","vecm_ML_l1_LRtr", "vecm_ML_l1_LRtr_exo",
+		"vecm_ML_l1_bo", "vecm_ML_l1_no", "vecm_ML_l1_coAsExo", "vecm_ML_l3_coAsExo",
+		"vecm_ML_l1_LRco", "vecm_ML_l1_LRc_exo","vecm_ML_l1_LRtr", "vecm_ML_l1_LRtr_exo",
 		"vecm_ML_l1_LRtr_noCo", "vecm_ML_l1_LRbo", "vecm_ML_l1_LRbo_exo")
 
 vecm_ML <- vecm_all[grep("ML", names(vecm_all))]
@@ -160,7 +168,9 @@ check.same <- function(x1, x2) {
 }
 
 check.same(x1=vecm_OLS_l1_co, x2=vecm_OLS_l1_coAsExo)
+check.same(x1=vecm_OLS_l3_co, x2=vecm_OLS_l3_coAsExo)
 check.same(x1=vecm_ML_l1_co, x2=vecm_ML_l1_coAsExo)
+check.same(x1=vecm_ML_l3_co, x2=vecm_ML_l3_coAsExo)
 
 
 
