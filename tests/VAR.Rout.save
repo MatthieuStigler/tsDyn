@@ -1199,7 +1199,151 @@ $var_l2_adf_coAsExo
       var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
           -2061.457           -2052.775           -2062.085           -2055.818 
 > 
-> 
+> ### VARrep
+> var_all_noADF <- var_all[-grep("adf", names(var_all))]
+> lapply(var_all_noADF, VARrep)
+$var_l1_co
+                 Intercept   dolcan -1     cpiUSA -1     cpiCAN -1
+Equation dolcan 0.01606226  0.98184934  0.0006535181 -0.0005441472
+Equation cpiUSA 0.47682275 -0.17515457  1.0034816358 -0.0035567095
+Equation cpiCAN 0.33858157  0.07511337 -0.0023545869  0.9998414195
+
+$var_l1_tr
+                        Trend  dolcan -1   cpiUSA -1     cpiCAN -1
+Equation dolcan -0.0001267674  0.9842553 0.001245808 -0.0006663591
+Equation cpiUSA -0.0031568297 -0.0330855 1.017304394 -0.0060219580
+Equation cpiCAN -0.0049290069 -0.1371091 0.024124244  0.9929378172
+
+$var_l1_bo
+                   Intercept         Trend   dolcan -1   cpiUSA -1
+Equation dolcan  0.007388597 -8.622274e-05  0.98107844 0.001083529
+Equation cpiUSA  0.355501243 -1.206028e-03 -0.18593743 1.009496344
+Equation cpiCAN -0.351032771 -6.855288e-03  0.01382157 0.031834151
+                    cpiCAN -1
+Equation dolcan -0.0006442119
+Equation cpiUSA -0.0049563493
+Equation cpiCAN  0.9918856026
+
+$var_l1_no
+                dolcan -1     cpiUSA -1     cpiCAN -1
+Equation dolcan 0.9990246  0.0004597724 -4.232838e-04
+Equation cpiUSA 0.3347079  0.9977301171  3.123187e-05
+Equation cpiCAN 0.4371558 -0.0064386166  1.002389e+00
+
+$var_l1_coAsExo
+                  dolcan -1     cpiUSA -1     cpiCAN -1      exo_1
+Equation dolcan  0.98184934  0.0006535181 -0.0005441472 0.01606226
+Equation cpiUSA -0.17515457  1.0034816358 -0.0035567095 0.47682275
+Equation cpiCAN  0.07511337 -0.0023545869  0.9998414195 0.33858157
+
+$var_l3_co
+                Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
+Equation dolcan 0.0213132 1.1426667 -0.002923395 -5.319548e-05 -0.1947679
+Equation cpiUSA 0.2297914 0.6115380  1.473715592 -3.413037e-02 -1.2214788
+Equation cpiCAN 0.1465491 0.4721442  0.279405970  9.752629e-01 -0.6781416
+                   cpiUSA -2    cpiCAN -2  dolcan -3     cpiUSA -3    cpiCAN -3
+Equation dolcan  0.003242556 -0.007019863 0.03224004  0.0002842096  0.006567983
+Equation cpiUSA -0.497252953  0.109356758 0.54022105  0.0237898927 -0.075679565
+Equation cpiCAN -0.269165140  0.196158934 0.33685344 -0.0136459470 -0.170361820
+
+$var_l3_tr
+                        Trend dolcan -1    cpiUSA -1    cpiCAN -1  dolcan -2
+Equation dolcan -0.0001881242 1.1378299 -0.002052382 -0.001345096 -0.1939782
+Equation cpiUSA -0.0009482088 0.6932990  1.485950589 -0.039084647 -1.2536289
+Equation cpiCAN -0.0033032731 0.1897148  0.280103019  0.949680615 -0.5970450
+                   cpiUSA -2    cpiCAN -2  dolcan -3    cpiUSA -3    cpiCAN -3
+Equation dolcan  0.002896672 -0.007040656 0.03788217 0.0006495858  0.007690921
+Equation cpiUSA -0.498754452  0.109946225 0.62254152 0.0160737109 -0.071308210
+Equation cpiCAN -0.275688576  0.194501980 0.33566340 0.0105541664 -0.148246352
+
+$var_l3_bo
+                   Intercept         Trend dolcan -1    cpiUSA -1   cpiCAN -1
+Equation dolcan  0.006752721 -0.0001508005 1.1366000 -0.002387016 -0.00112091
+Equation cpiUSA  0.296441336  0.0006902825 0.6393083  1.471260344 -0.02924296
+Equation cpiCAN -0.369694108 -0.0053466472 0.2570470  0.298423329  0.93740698
+                 dolcan -2    cpiUSA -2    cpiCAN -2  dolcan -3    cpiUSA -3
+Equation dolcan -0.1933896  0.002960305 -0.007050852 0.03565128 0.0007742571
+Equation cpiUSA -1.2277882 -0.495960965  0.109498610 0.52460627 0.0215467228
+Equation cpiCAN -0.6292711 -0.279172353  0.195060203 0.45779914 0.0037287342
+                   cpiCAN -3
+Equation dolcan  0.007494714
+Equation cpiUSA -0.079921633
+Equation cpiCAN -0.137504492
+
+$var_l3_no
+                dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2    cpiUSA -2
+Equation dolcan 1.1611539 -0.001557016  0.0002180556 -0.2010610  0.003284684
+Equation cpiUSA 0.8108598  1.488447400 -0.0312058402 -1.2893289 -0.496798740
+Equation cpiCAN 0.5992614  0.288801153  0.9771280000 -0.7214129 -0.268875466
+                   cpiCAN -2  dolcan -3    cpiUSA -3    cpiCAN -3
+Equation dolcan -0.006898937 0.04162504 -0.001380531  0.006343534
+Equation cpiUSA  0.110660533 0.64140684  0.005841242 -0.078099491
+Equation cpiCAN  0.196990414 0.40138450 -0.025092666 -0.171905123
+
+$var_l3_coAsExo
+                dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2    cpiUSA -2
+Equation dolcan 1.1426667 -0.002923395 -5.319548e-05 -0.1947679  0.003242556
+Equation cpiUSA 0.6115380  1.473715592 -3.413037e-02 -1.2214788 -0.497252953
+Equation cpiCAN 0.4721442  0.279405970  9.752629e-01 -0.6781416 -0.269165140
+                   cpiCAN -2  dolcan -3     cpiUSA -3    cpiCAN -3     exo_1
+Equation dolcan -0.007019863 0.03224004  0.0002842096  0.006567983 0.0213132
+Equation cpiUSA  0.109356758 0.54022104  0.0237898926 -0.075679565 0.2297914
+Equation cpiCAN  0.196158934 0.33685344 -0.0136459471 -0.170361820 0.1465491
+
+$var_l2_diff_co
+                  Intercept dolcan.l1    cpiUSA.l1     cpiCAN.l1  dolcan.l2
+Equation dolcan 0.003381125 1.1617849 -0.002353031 -0.0001260648 -0.1991959
+Equation cpiUSA 0.122912595 0.6790979  1.479686920 -0.0255459970 -1.2561567
+Equation cpiCAN 0.122931337 0.4349111  0.289182756  1.0073892530 -0.7086743
+                   cpiUSA.l2    cpiCAN.l2  dolcan.l3    cpiUSA.l3    cpiCAN.l3
+Equation dolcan  0.003664079 -0.006929662 0.03741108 -0.001311048  0.007055727
+Equation cpiUSA -0.500449485  0.109592492 0.57705874  0.020762565 -0.084046495
+Equation cpiCAN -0.283281612  0.196169888 0.27376324 -0.005901144 -0.203559141
+
+$var_l2_diff_tr
+                       Trend dolcan.l1     cpiUSA.l1   cpiCAN.l1  dolcan.l2
+Equation dolcan 6.881061e-06 1.1700795 -0.0000530234 0.001237383 -0.2028289
+Equation cpiUSA 2.664988e-04 0.9706962  1.5601041675 0.023760364 -1.3859678
+Equation cpiCAN 1.112911e-04 0.8208368  0.3999317151 1.059156879 -0.8599288
+                   cpiUSA.l2    cpiCAN.l2  dolcan.l3    cpiUSA.l3    cpiCAN.l3
+Equation dolcan  0.003200675 -0.006701704 0.03274944 -0.003147651  0.005464321
+Equation cpiUSA -0.517249088  0.117513141 0.41527155 -0.042855080 -0.141273505
+Equation cpiCAN -0.300523719  0.207567974 0.03909198 -0.099407996 -0.266724853
+
+$var_l2_diff_bo
+                  Intercept         Trend dolcan.l1    cpiUSA.l1   cpiCAN.l1
+Equation dolcan 0.004385404 -4.912709e-06 1.1610634 -0.002475913 -0.00048570
+Equation cpiUSA 0.151995174 -1.422654e-04 0.6582061  1.476128424 -0.03596055
+Equation cpiCAN 0.222507194 -4.871027e-04 0.3633795  0.276998818  0.97173086
+                 dolcan.l2    cpiUSA.l2    cpiCAN.l2  dolcan.l3    cpiUSA.l3
+Equation dolcan -0.1985127  0.003793592 -0.006933133 0.03744932 -0.001317679
+Equation cpiUSA -1.2363722 -0.496698962  0.109491967 0.57816617  0.020570538
+Equation cpiCAN -0.6409344 -0.270440193  0.195825700 0.27755496 -0.006558625
+                   cpiCAN.l3
+Equation dolcan  0.007418833
+Equation cpiUSA -0.073531416
+Equation cpiCAN -0.167556559
+
+$var_l2_diff_no
+     dolcan.l1   cpiUSA.l1  cpiCAN.l1  dolcan.l2    cpiUSA.l2    cpiCAN.l2
+[1,] 1.1742584 0.001290824 0.00134614 -0.2037785  0.003181175 -0.006547628
+[2,] 1.1325421 1.612150449 0.02797246 -1.4227434 -0.518004293  0.123480425
+[3,] 0.8884244 0.421666484 1.06091587 -0.8752864 -0.300839097  0.210059939
+       dolcan.l3    cpiUSA.l3    cpiCAN.l3
+[1,]  0.02952010 -0.004471999  0.005201487
+[2,]  0.29020130 -0.094146156 -0.151452883
+[3,] -0.01313794 -0.120827387 -0.270975808
+
+$var_l2_diff_coAsExo
+     dolcan.l1    cpiUSA.l1     cpiCAN.l1  dolcan.l2    cpiUSA.l2    cpiCAN.l2
+[1,] 1.1617849 -0.002353031 -0.0001260648 -0.1991959  0.003664079 -0.006929662
+[2,] 0.6790979  1.479686920 -0.0255459970 -1.2561567 -0.500449485  0.109592492
+[3,] 0.4349111  0.289182756  1.0073892530 -0.7086743 -0.283281612  0.196169888
+      dolcan.l3    cpiUSA.l3    cpiCAN.l3
+[1,] 0.03741108 -0.001311048  0.007055727
+[2,] 0.57705874  0.020762565 -0.084046495
+[3,] 0.27376324 -0.005901144 -0.203559141
+
 > 
 > 
 > ### fevd
