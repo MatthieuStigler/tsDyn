@@ -59,6 +59,13 @@ VARrep.VECM <- function(object, ...) {
     Amat <- cbind(Pi_deter,Amat)
   }
   rownames(Amat) <- gsub("Equation ","",rownames(co))
+
+## Add exogen terms
+  if(object$exogen){
+    co_exo <- co[,object$num_exogen]
+    Amat <- cbind(Amat, co_exo)
+  }
+
 ## res
   Amat
 }
@@ -67,8 +74,10 @@ VARrep.VAR <- function(object, ...) {
 
   I <- attr(object, "varsLevel")
 
-  if(I=="level"){
-    res <- object
+  if(I=="ADF"){
+    stop("Sorry, VARrep not yet implemented for type=ADF. Please use corresponding level formulation with lag+1")
+  } else if(I=="level"){
+    res <- coef(object)
   } else if(I=="diff"){
     lag <- object$lag
     k <- object$k
@@ -90,15 +99,20 @@ VARrep.VAR <- function(object, ...) {
   ## names
     colnames(comat) <- paste(rep(origNames, lag+1), rep(1:(lag+1), each=k), sep=".l")
 
+  ## add deterministic terms
     if(include!="none"){
       inc_name <- switch(include, "none"=NULL, "const"="Intercept", "trend"="Trend", "both"=c("Intercept","Trend"))
       comat <- cbind(co[,inc_name,drop=FALSE], comat)
     }
     res <- comat
+  ## Add exogen terms
+    if(object$exogen){
+      co_exo <- co[,object$num_exogen]
+      res <- cbind(res, co_exo)
+    }
 
-  } else if(I=="ADF"){
-    stop("Sorry, VARrep not yet implemented for type=ADF. Please use corresponding level formulation with lag+1")
-  }
+  } 
+
 
 ##
 return(res)

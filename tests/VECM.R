@@ -42,25 +42,34 @@ vecm_ML_l1_LRbo <-VECM(barry, lag=1, LRinclude="both", estim="ML")
 vecm_ML_l1_LRbo_exo <-VECM(barry, lag=1, LRinclude="both", estim="ML", exogen=exoVar)
 
 vecm_all <- list(
-		vecm_OLS_l1_co, vecm_OLS_l3_co, vecm_OLS_l3_co_betaGiven, vecm_OLS_l1_tr, 
-		vecm_OLS_l1_bo, vecm_OLS_l1_no, vecm_OLS_l1_coAsExo, vecm_OLS_l3_coAsExo, 
-		vecm_OLS_l1_LRco, vecm_OLS_l1_LRtr, 
-		vecm_OLS_l1_LRtr_noCo, vecm_OLS_l1_LRbo, 
+		vecm_OLS_l1_co=vecm_OLS_l1_co,
+		vecm_OLS_l3_co=vecm_OLS_l3_co,
+		vecm_OLS_l3_co_betaGiven=vecm_OLS_l3_co_betaGiven,
+		vecm_OLS_l1_tr=vecm_OLS_l1_tr, 
+		vecm_OLS_l1_bo=vecm_OLS_l1_bo,
+		vecm_OLS_l1_no=vecm_OLS_l1_no,
+		vecm_OLS_l1_coAsExo=vecm_OLS_l1_coAsExo,
+		vecm_OLS_l3_coAsExo=vecm_OLS_l3_coAsExo, 
+		vecm_OLS_l1_LRco=vecm_OLS_l1_LRco,
+		vecm_OLS_l1_LRtr=vecm_OLS_l1_LRtr, 
+		vecm_OLS_l1_LRtr_noCo=vecm_OLS_l1_LRtr_noCo, 
+		vecm_OLS_l1_LRbo=vecm_OLS_l1_LRbo, 
 
-		vecm_ML_l1_co, vecm_ML_l3_co,  vecm_ML_l1_tr, 
-		vecm_ML_l1_bo, vecm_ML_l1_no, vecm_ML_l1_coAsExo, vecm_ML_l3_coAsExo, 
-		vecm_ML_l1_LRco, vecm_ML_l1_LRc_exo, vecm_ML_l1_LRtr, vecm_ML_l1_LRtr_exo,
-		vecm_ML_l1_LRtr_noCo, vecm_ML_l1_LRbo, vecm_ML_l1_LRbo_exo)
+		vecm_ML_l1_co=vecm_ML_l1_co,
+		vecm_ML_l3_co=vecm_ML_l3_co,
+		vecm_ML_l1_tr=vecm_ML_l1_tr, 
+		vecm_ML_l1_bo=vecm_ML_l1_bo,
+		vecm_ML_l1_no=vecm_ML_l1_no,
+		vecm_ML_l1_coAsExo=vecm_ML_l1_coAsExo,
+		vecm_ML_l3_coAsExo=vecm_ML_l3_coAsExo, 
+		vecm_ML_l1_LRco=vecm_ML_l1_LRco,
+		vecm_ML_l1_LRc_exo=vecm_ML_l1_LRc_exo,
+		vecm_ML_l1_LRtr=vecm_ML_l1_LRtr,
+		vecm_ML_l1_LRtr_exo=vecm_ML_l1_LRtr_exo,
+		vecm_ML_l1_LRtr_noCo=vecm_ML_l1_LRtr_noCo,
+		vecm_ML_l1_LRbo=vecm_ML_l1_LRbo,
+		vecm_ML_l1_LRbo_exo=vecm_ML_l1_LRbo_exo)
 
-names(vecm_all) <-c("vecm_OLS_l1_co", "vecm_OLS_l3_co", "vecm_OLS_l3_co_betaGiven", "vecm_OLS_l1_tr", 
-		"vecm_OLS_l1_bo", "vecm_OLS_l1_no", "vecm_OLS_l1_coAsExo", "vecm_OLS_l3_coAsExo", 
-		"vecm_OLS_l1_LRco", "vecm_OLS_l1_LRtr", 
-		"vecm_OLS_l1_LRtr_noCo", "vecm_OLS_l1_LRbo", 
-
-		"vecm_ML_l1_co", "vecm_ML_l3_co", " vecm_ML_l1_tr", 
-		"vecm_ML_l1_bo", "vecm_ML_l1_no", "vecm_ML_l1_coAsExo", "vecm_ML_l3_coAsExo",
-		"vecm_ML_l1_LRco", "vecm_ML_l1_LRc_exo","vecm_ML_l1_LRtr", "vecm_ML_l1_LRtr_exo",
-		"vecm_ML_l1_LRtr_noCo", "vecm_ML_l1_LRbo", "vecm_ML_l1_LRbo_exo")
 
 vecm_ML <- vecm_all[grep("ML", names(vecm_all))]
 
@@ -109,7 +118,7 @@ vecm_irf <- vecm_all[-grep("l1_no|bo|exo|Exo", names(vecm_all))] ## does not wor
 lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
 ## predict
-vecm_all_pred <- vecm_all[-grep("_bo|_no|_noCo|LRbo|coAsExo", names(vecm_all))]
+vecm_all_pred <- vecm_all[-grep("_bo|_no|_noCo|LRbo|coAsExo|exo", names(vecm_all))]
 lapply(vecm_all_pred, predict,  n.ahead=2)
 lapply(vecm_all_pred, function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 
