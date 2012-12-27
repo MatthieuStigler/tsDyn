@@ -99,6 +99,23 @@ lapply(var_all_level, comp_tvar_sim, serie=barry)
 
 
 
+#### exogen: check equalities
+check.same <- function(x1, x2) {
+  co_x2 <- coef(x2)
+  t1 <- isTRUE(all.equal(coef(x1), co_x2[,c(ncol(co_x2),1:(ncol(co_x2)-1))], check.attributes=FALSE))
+  t2 <- isTRUE(all.equal(AIC(x1), AIC(x2), check.attributes=FALSE))
+  t3 <- isTRUE(all.equal(BIC(x1), BIC(x2), check.attributes=FALSE))
+  t4 <- isTRUE(all.equal(BIC(x1,fitMeasure="LL"), BIC(x2,fitMeasure="LL"), check.attributes=FALSE))
+  t5 <- isTRUE(all.equal(residuals(x1), residuals(x2), check.attributes=FALSE))
+  c(t1, t1, t3,t4, t5)
+}
+
+check.same(x1=var_l1_co, x2=var_l1_coAsExo)
+check.same(x1=var_l3_co, x2=var_l3_coAsExo)
+check.same(x1=var_l2_diff_co, x2=var_l2_diff_coAsExo)
+check.same(x1=var_l2_adf_co, x2=var_l2_adf_coAsExo)
+
+
 ###################################
 ####### predict_rolling check
 ###################################
