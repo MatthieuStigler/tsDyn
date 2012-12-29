@@ -109,7 +109,13 @@ check.same <- function(x1, x2) {
   t3 <- isTRUE(all.equal(BIC(x1), BIC(x2), check.attributes=FALSE))
   t4 <- isTRUE(all.equal(BIC(x1,fitMeasure="LL"), BIC(x2,fitMeasure="LL"), check.attributes=FALSE))
   t5 <- isTRUE(all.equal(residuals(x1), residuals(x2), check.attributes=FALSE))
-  c(t1, t1, t3,t4, t5)
+  if(attr(x1, "varsLevel")!="ADF"){
+    va_x2 <- VARrep(x2)
+    t6 <- isTRUE(all.equal(VARrep(x1), va_x2[,c(ncol(va_x2),1:(ncol(va_x2)-1))], check.attributes=FALSE))
+  } else {
+    t6 <- NULL
+  }
+  c(t1, t1, t3,t4, t5, t6)
 }
 
 check.same(x1=var_l1_co, x2=var_l1_coAsExo)
