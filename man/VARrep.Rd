@@ -14,7 +14,7 @@
 
 
 \arguments{
-\item{object}{An object of class \sQuote{VECM} created by \code{\link{VECM}}, or of class \sQuote{VAR} created by \code{\link{lineVar}}}.
+\item{object}{An object of class \sQuote{VECM} created by \code{\link{VECM}}, or of class \sQuote{VAR} created by \code{\link{lineVar}}}
 \item{\dots}{Currently not used}
 }
 
