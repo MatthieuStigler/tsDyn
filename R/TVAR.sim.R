@@ -236,7 +236,7 @@ environment(TVAR.boot)<-environment(star)
 
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),c(0.25283578, 0.09182279,  0.914763741, -0.0530613, 0.02248586, 0.94309347))
-sim<-TVAR.sim(B=B,nthresh=1,n=500, type="simul",mTh=1, Thresh=5, starting=matrix(c(5.2, 5.5), nrow=1))
+sim<-TVAR.sim(B=B,nthresh=1,n=500,mTh=1, Thresh=5, starting=matrix(c(5.2, 5.5), nrow=1))
 
 #estimate the new serie
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
@@ -246,11 +246,11 @@ TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 data(zeroyld)
 serie<-zeroyld
 
-TVAR.sim(data=serie,nthresh=0, type="sim")
-all(TVAR.sim(data=serie,nthresh=0, type="check", lag=1)==serie)
+# TVAR.sim(data=serie,nthresh=0)
+# all(TVAR.sim(data=serie,nthresh=0, type="check", lag=1)==serie)
 
 ##with two threshold (three regimes)
-TVAR.sim(data=serie,nthresh=2,type="boot",mTh=1, Thresh=c(7,9))
+# TVAR.sim(data=serie,nthresh=2,type="boot",mTh=1, Thresh=c(7,9))
 
 environment(TVAR.sim)<-environment(star)
 
@@ -319,8 +319,8 @@ all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=1, lag=2, trace=FALSE)
 all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=2, lag=1, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
 all.equal(tsDyn:::TVAR.gen(TVARobject=TVAR(serie, nthresh=2, lag=2, trace=FALSE),type="check"),as.matrix(serie), check.attributes=FALSE)
 
-a1 <- TVAR.boot(TVARobject=lineVar(serie, lag=1))
-a2 <- TVAR.boot(TVARobject=lineVar(serie, lag=2))
+a1 <- VAR.boot(VARobject=lineVar(serie, lag=1))
+a2 <- VAR.boot(VARobject=lineVar(serie, lag=2))
 a3 <- TVAR.boot(TVARobject=TVAR(serie, nthresh=1, lag=1, trace=FALSE))
 
 }
