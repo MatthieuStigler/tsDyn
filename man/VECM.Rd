@@ -12,12 +12,12 @@ Fitted model data
 }
 \arguments{
 \item{data}{multivariate time series (first row  being first=oldest value)}
-\item{lag}{Number of lags to include in each regime}
+\item{lag}{Number of lags (in the VECM representation, see Details)}
 \item{r}{Number of cointegrating relationships}
 \item{include}{Type of deterministic regressors to include}
-\item{beta}{for VECM only: cointegrating value. If null, will be estimated}
-\item{LRinclude}{Possibility to include in the long-run relationship and the ECT trend, constant... Can also be a matrix with exogeneous regressors}
-\item{estim}{Type of estimator for the VECM: '2OLS' for the two-step approach or 'ML' for Johansen MLE}
+\item{beta}{Possibility to impose a cointegrating value. By default is null, so values will be estimated}
+\item{LRinclude}{Type of deterministic regressors to include in the long-term relationship. Can also be a matrix with exogeneous regressors (2OLS only).}
+\item{estim}{Type of estimator: \code{2OLS} for the two-step approach or \code{ML} for Johansen MLE}
 \item{exogen}{Inclusion of exogenous variables (first row  being first=oldest value). Is either of same size than data (then automatically cut) or than end-sample.}
 
 }
@@ -30,11 +30,12 @@ More comprehensive functions for VECM are in package \pkg{vars}. A few differenc
 \item{Presentation}{Results are printed in a different ways, using a matrix form}
 \item{lateX export}{The matrix of coefficients can be exported to latex, with or without standard-values and significance stars}
 }
- Here, only one cointegrating relationship can be estimated. Two estimators are available: the Engle-Granger two step approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministics regressors (or external variables if LRinclude is of class numeric) can be added for the estimation of the cointegrating value and for the ECT. This is only working when the beta value is not pre-specified.
+
+Two estimators are available: the Engle-Granger two step approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministics regressors (or external variables if LRinclude is of class numeric) can be added for the estimation of the cointegrating value and for the ECT. This is only working when the beta value is not pre-specified.
 
 The arg beta is the cointegrating value, the cointegrating vector will be taken as: (1, -beta).
 
-Note that 
+Note that the lag specification corresponds to the lags in the VECM representation, not in the VAR (as is done in package vars or software GRETL). Basically, a VAR with 2 lags corresponds here to a VECM with 1 lag. Lag 0 in the VECM is not allowed. 
 }
 \seealso{
 \code{\link{lineVar}}
