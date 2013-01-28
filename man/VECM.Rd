@@ -7,9 +7,6 @@ Estimate either a  VECM by Engle-Granger or Johansen (MLE) method.
 \usage{
 VECM(data, lag,r=1, include = c( "const", "trend","none", "both"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"), exogen=NULL)
 }
-\value{
-Fitted model data
-}
 \arguments{
 \item{data}{multivariate time series (first row  being first=oldest value)}
 \item{lag}{Number of lags (in the VECM representation, see Details)}
@@ -26,9 +23,10 @@ This function is just a wrapper for the \code{\link{lineVar}}, with model="VECM"
 
 More comprehensive functions for VECM are in package \pkg{vars}. A few differences appear in the VECM estimation:
 \describe{
-\item{Engle-Granger estimator}{The Engle-Granger estimator is available}
-\item{Presentation}{Results are printed in a different ways, using a matrix form}
-\item{lateX export}{The matrix of coefficients can be exported to latex, with or without standard-values and significance stars}
+  \item{Engle-Granger estimator}{The Engle-Granger estimator is available}
+  \item{Presentation}{Results are printed in a different ways, using a matrix form}
+  \item{lateX export}{The matrix of coefficients can be exported to latex, with or without standard-values and significance stars}
+  \item{Prediction}{The \code{predict} method contains a \code{newdata} argument allowing to compute rolling forecasts.}
 }
 
 Two estimators are available: the Engle-Granger two step approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministics regressors (or external variables if LRinclude is of class numeric) can be added for the estimation of the cointegrating value and for the ECT. This is only working when the beta value is not pre-specified.
@@ -37,9 +35,19 @@ The arg beta is the cointegrating value, the cointegrating vector will be taken 
 
 Note that the lag specification corresponds to the lags in the VECM representation, not in the VAR (as is done in package vars or software GRETL). Basically, a VAR with 2 lags corresponds here to a VECM with 1 lag. Lag 0 in the VECM is not allowed. 
 }
+\value{
+An object of class \code{VECM} (and higher classes \code{VAR} and \code{nlVar}) with methods:
+  \describe{
+    \item{Usual methods}{Print, summary, plot, residuals, fitted, vcov}
+    \item{Fit criteria}{AIC, BIC, \code{\link{MAPE}}, \code{\link{mse}}, \code{\link[=logLik.VECM]{logLik}} (latter only for models estimated with MLE)}
+    \item{Prediction}{Predict and \code{\link{predict_rolling}}}
+    \item{VAR/VECM methods}{Impulse response function (\code{\link[=irf.nlVar]{irf}}) and forecast error variance decomposition (\code{\link[=fevd.nlVar]{fevd}})}
+    \item{LaTeX}{toLatex}
+  }
+}
 \seealso{
-\code{\link{lineVar}}
-\code{\link{TVAR}} and \code{\link{TVECM}} for the correspoding threshold models. \code{\link{linear}} for the univariate AR model.
+  \code{\link{lineVar}}
+  \code{\link{TVAR}} and \code{\link{TVECM}} for the correspoding threshold models. \code{\link{linear}} for the univariate AR model.
 }
 \author{Matthieu Stigler}
 \examples{
@@ -54,11 +62,13 @@ vecm.jo<-VECM(zeroyld, lag=2, estim="ML")
 
 #compare results with package vars:
 if(require(vars)) {
-data(finland)
-#check long coint values
-all.equal(VECM(finland, lag=2, estim="ML", r=2)$model.specific$coint, cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)$beta, check.attr=FALSE)
-# check OLS parameters
-all.equal(t(coefficients(VECM(finland, lag=2, estim="ML", r=2))), coefficients(cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)$rlm), check.attr=FALSE)
+  data(finland)
+  #check long coint values
+    all.equal(VECM(finland, lag=2, estim="ML", r=2)$model.specific$coint, 
+              cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)  $beta, check.attr=FALSE)
+  # check OLS parameters
+    all.equal(t(coefficients(VECM(finland, lag=2, estim="ML", r=2))), 
+              coefficients(cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)$rlm), check.attr=FALSE)
 
 }
 
