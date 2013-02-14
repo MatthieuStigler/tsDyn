@@ -52,9 +52,8 @@ summary(VAR)
 #compare results with package vars:
 if(require(vars)) {
 	a<-VAR(data, p=1)
-	vaco1<-coef(a)$short.run[c(3,1,2),1]
-	vaco2<-coef(a)$long.run[c(3,1,2),1]
-	round(coef(VAR),8)==round(rbind(vaco1, vaco2),8)
+	coef_vars <- t(sapply(coef(a), function(x) x[c(3,1,2),1]))
+	all.equal(coef(VAR),coef_vars, check=FALSE)
 }
 
 ###VECM
