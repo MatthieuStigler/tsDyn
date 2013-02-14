@@ -322,7 +322,7 @@ summary.VAR<-function(object, digits=4,...){
       cov.unscaled <- ginv(XX)
   }
   VarCovB<-cov.unscaled%x%Sigma
-  StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
+  StDevB<-matrix(sqrt(diag(VarCovB)), nrow=k)
   Tvalue<-x$coefficients/StDevB
   
   Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
