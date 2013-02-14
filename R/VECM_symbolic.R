@@ -52,6 +52,7 @@ VECM_symbolic <- function(alpha, beta, lags, inc, include = c("none", "const", "
   res$model.specific$beta <- beta
   res$coefficients <- co
   res$include <- include
+  res$exogen <- FALSE
   res$model.specific$LRinclude <- "none"
 
   class(res) <- c("VECM_symb", "VECM")
