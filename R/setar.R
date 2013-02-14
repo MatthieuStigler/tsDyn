@@ -606,7 +606,7 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
   (xL %*% phi1) * z + (xH %*% phi2) * (1-z)
 }
 
-toLatex.setar <- function(object, digits=3, ...) {
+toLatex.setar <- function(object, digits=3, label, ...) {
   obj <- object
   mod<-obj$model.specific
   if(mod$nthresh > 1 & mod$common!="none")
@@ -623,7 +623,8 @@ toLatex.setar <- function(object, digits=3, ...) {
   th <- formatSignedNum(getTh(coefficients(obj)), digits=digits, ...)
   res[1] <- "\\["
   Xt<-if(type=="level") " X_{t-" else " \\Delta X_{t-"
-  res[2] <- paste(Xt,steps,"} = \\left\\{\\begin{array}{lr}",sep="")
+  lab <- if(missing(label)) NULL else label
+  res[2] <- paste(Xt,steps,"} = \\left\\{\\begin{array}{lr}",lab,sep="")
   translateCoefs <- function(coefs, lags, type=c("level", "diff", "ADF")) {
     ans <- ""
     if(length(lags) == (length(coefs) - 1)) { #there is a constant term

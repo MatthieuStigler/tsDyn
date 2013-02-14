@@ -706,7 +706,7 @@ print.summary.TVECM<-function(x,...){
   cat("\nPercentage of Observations in each regime", percent(x$model.specific$nobs,digits=3,by100=TRUE), "\n")
 }
 
-toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
+toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),label, ...){
   x<-object
   Th<-x$model.specific$Thresh
   nthresh<-length(Th)
@@ -740,6 +740,8 @@ toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),...){
   res[3]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\left(\\begin{smallmatrix}}{\\end{smallmatrix}\\right)} %SMALL"
   res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
   res[5]<-"\\begin{equation}"
+  if(!missing(label)) res[5]<- paste(res[5], "\\label{", label, "}", sep="")
+
 ###Explained vector
   res[6]<- "\\begin{smatrix} %explained vector"
   res[7]<-TeXVec(paste("slashDelta X_{t}^{",seq(1, x$k),"}", sep=""))

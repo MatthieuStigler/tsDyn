@@ -366,7 +366,7 @@ vcov.VAR<-function(object, ...){
   so
 }
 
-toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
+toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue"), label){
   x<-object
   if(attr(x,"model")=="VECM"&&x$model.specific$LRinclude!="none") stop("toLatex not implemented now for models with arg 'LRinclude' different from 'none'") 
   parenthese<-match.arg(parenthese)
@@ -390,6 +390,7 @@ toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
   res[3]<-"%\\usepackage{amsmath} \\newenvironment{smatrix}{\\left(\\begin{smallmatrix}}{\\end{smallmatrix}\\right)} %SMALL"
   res[4]<-"%\\usepackage{nccmath} \\newenvironment{smatrix}{\\left(\\begin{mmatrix}}{\\end{mmatrix}\\right)} %MEDIUM"
   res[5]<-"\\begin{equation}"
+  if(!missing(label)) res[5]<- paste(res[5], "\\label{", label, "}", sep="")
   res[6]<- "\\begin{smatrix} %explained vector"
 
 ###explained vector
