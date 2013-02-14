@@ -318,8 +318,10 @@ summary.VAR<-function(object, digits=4,...){
   XX <- crossprod(x$model.x)
   cov.unscaled <- try(solve(XX), silent=TRUE)
   if(inherits(cov.unscaled, "try-error")) {
-      warning("Potential numerical unstability, beware of standard errors\n")
-      cov.unscaled <- ginv(XX)
+    Qr <- qr(x$model.x)
+    p1 <- 1:Qr$rank
+    cov.unscaled <- chol2inv(Qr$qr[p1, p1, drop = FALSE])
+    warning("Potential numerical unstability, beware of standard errors\n")
   }
   VarCovB<-cov.unscaled%x%Sigma
   StDevB<-matrix(sqrt(diag(VarCovB)), nrow=k)
