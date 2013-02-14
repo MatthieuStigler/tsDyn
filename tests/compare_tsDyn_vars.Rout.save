@@ -129,8 +129,8 @@ Loading required package: lmtest
 [2] "TRUE"                                  
 [3] "TRUE"                                  
 [4] "TRUE"                                  
-[5] "Mean relative difference: 2.719027e-08"
-[6] "Mean relative difference: 1.916757e-08"
+[5] "Mean relative difference: 2.719278e-08"
+[6] "Mean relative difference: 1.917397e-08"
 > print(sapply(all_models, comp_fitted)) 
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_predict)) # 5 and 6
@@ -235,48 +235,48 @@ Loading required package: lmtest
 [1] "TRUE"                                  
 [2] "Mean relative difference: 0.0001085181"
 [3] "TRUE"                                  
-[4] "Mean relative difference: 0.0001395301"
+[4] "Mean relative difference: 0.0001395315"
 > sapply(all_var_models, comp_var_logLik)
 [1] "TRUE"                                  
 [2] "Mean relative difference: 6.786063e-07"
 [3] "TRUE"                                  
-[4] "Mean relative difference: 1.354595e-07"
+[4] "Mean relative difference: 1.354507e-07"
 > sapply(all_var_models_noNoBo, comp_var_pred)
 [1] "TRUE"                                
 [2] "Mean relative difference: 0.01154805"
 [3] "TRUE"                                
-[4] "Mean relative difference: 0.01644698"
+[4] "Mean relative difference: 0.01644699"
 > sapply(all_var_models_noNoBo, comp_var_predOld)
 [1] "TRUE"                                
 [2] "Mean relative difference: 0.01188744"
 [3] "TRUE"                                
-[4] "Mean relative difference: 0.01739229"
+[4] "Mean relative difference: 0.0173923" 
 > sapply(all_var_models_noNoBo, comp_var_fevd)
 [1] "TRUE"                                  
-[2] "Mean relative difference: 1.261389e-05"
+[2] "Mean relative difference: 1.26139e-05" 
 [3] "TRUE"                                  
-[4] "Mean relative difference: 2.108834e-05"
+[4] "Mean relative difference: 2.108874e-05"
 > sapply(all_var_models_noNoBo, comp_var_IRF)
      [,1]                                               
 [1,] "Component 1: Mean relative difference: 0.03155347"
 [2,] "Component 2: Mean relative difference: 0.03155347"
 [3,] "Component 3: Mean relative difference: 0.03155347"
-[4,] "Component 4: Mean relative difference: 0.03155348"
+[4,] "Component 4: Mean relative difference: 0.03155347"
      [,2]                                               
 [1,] "Component 1: Mean relative difference: 0.03160114"
 [2,] "Component 2: Mean relative difference: 0.03154884"
 [3,] "Component 3: Mean relative difference: 0.0315109" 
 [4,] "Component 4: Mean relative difference: 0.03154268"
      [,3]                                               
-[1,] "Component 1: Mean relative difference: 0.09141032"
-[2,] "Component 2: Mean relative difference: 0.09141032"
+[1,] "Component 1: Mean relative difference: 0.09141031"
+[2,] "Component 2: Mean relative difference: 0.09141031"
 [3,] "Component 3: Mean relative difference: 0.09141031"
-[4,] "Component 4: Mean relative difference: 0.09141032"
+[4,] "Component 4: Mean relative difference: 0.09141031"
      [,4]                                               
-[1,] "Component 1: Mean relative difference: 0.09141319"
+[1,] "Component 1: Mean relative difference: 0.09141317"
 [2,] "Component 2: Mean relative difference: 0.09157098"
 [3,] "Component 3: Mean relative difference: 0.09115843"
-[4,] "Component 4: Mean relative difference: 0.09112954"
+[4,] "Component 4: Mean relative difference: 0.09112952"
 > 
 > 
 > proc.time()
