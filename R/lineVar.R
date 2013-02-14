@@ -315,7 +315,12 @@ summary.VAR<-function(object, digits=4,...){
   t<-x$t
   k<-x$k
   Sigma<-matrix(1/(object$df.residual)*crossprod(x$residuals),ncol=k)
-  cov.unscaled<-solve(crossprod(x$model.x))
+  XX <- crossprod(x$model.x)
+  cov.unscaled <- try(solve(XX), silent=TRUE)
+  if(inherits(cov.unscaled, "try-error")) {
+      warning("Potential numerical unstability, beware of standard errors\n")
+      cov.unscaled <- ginv(XX)
+  }
   VarCovB<-cov.unscaled%x%Sigma
   StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
   Tvalue<-x$coefficients/StDevB
