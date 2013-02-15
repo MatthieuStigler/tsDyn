@@ -355,7 +355,7 @@ plot.nlar <- function(x, ask = interactive(), ...) {
 oneStep <- function(object, newdata, ...)
   UseMethod("oneStep")
 
-toLatex.nlar <- function(object, ...) {
+toLatex.nlar <- function(object, digits, label,...) {
   obj <- object
   str <- obj$str
   m <- str$m
@@ -363,6 +363,7 @@ toLatex.nlar <- function(object, ...) {
   steps <- str$steps
   res <- character()
   res[1] <- "\\["
+  if(!missing(label)) res[1]<- paste(res[1], "\\label{", label, "}", sep="")
   res[2] <- paste("X_{t+",steps,"} = F( X_{t}",sep="")
   if(m>1) for(j in 2:m)
     res[2] <- paste(res[2], ", X_{t-",(j-1)*d,"}",sep="")

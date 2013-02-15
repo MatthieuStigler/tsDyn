@@ -24,14 +24,15 @@ Generic \sQuote{nlar} methods. Method \sQuote{nlar} is described in a separate p
 \method{residuals}{nlar}(object, \dots)
 \method{summary}{nlar}(object, \dots)
 \method{plot}{nlar}(x, ask=interactive(), \dots)
-\method{toLatex}{nlar}(object, \dots)
+\method{toLatex}{nlar}(object, digits, label, \dots)
 }
 
 \arguments{
   \item{x, object}{ fitted \sQuote{nlar} object }
   \item{ask}{ graphical option. See \code{\link{par}}}
-  \item{digits}{See \code{\link{printCoefmat}} }
+  \item{digits}{For print method, see \code{\link{printCoefmat}}.}
   \item{k}{ numeric, the penalty per parameter to be used; the default k = 2 is the classical AIC}
+  \item{label}{LaTeX label passed to the equation}
   \item{\dots}{ further arguments to be passed to and from other methods }
 }
 \details{

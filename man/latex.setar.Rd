@@ -5,12 +5,14 @@
 Latex representation of fitted setar models
 }
 \usage{
-\method{toLatex}{setar}(object, digits=3, \dots)
+\method{toLatex}{setar}(object, digits=3, label, \dots)
 }
 \arguments{
   \item{object}{fitted setar model (using \code{\link{nlar}})}
-  \item{digits, ...}{options to be passed to \code{\link{format}} for
+  \item{digits}{options to be passed to \code{\link{format}} for
     formatting numbers}
+  \item{label}{LaTeX label passed to the equation}
+  \item{\dots}{Not used}
 }
 \seealso{
 \code{\link{setar}}, \code{\link{nlar-methods}}
