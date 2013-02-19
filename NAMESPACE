@@ -10,6 +10,7 @@ importFrom(vars, fevd)
 importFrom(forecast, Arima)
 importFrom(forecast, ets)
 importFrom(forecast, forecast)
+importFrom(mgcv, gam , s, predict.gam, print.gam, print.summary.gam, plot.gam, PredictMat)
 
 importClassesFrom(urca, ca.jo)
 
