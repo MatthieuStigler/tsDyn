@@ -14,6 +14,7 @@ importFrom(forecast, forecast)
 importFrom(mgcv, gam , s, predict.gam, print.gam, print.summary.gam, plot.gam, PredictMat)
 importFrom(MASS, ginv)
 importFrom(foreach, foreach, "%dopar%", "%:%")
+importFrom(mnormt, rmnorm)
 
 importClassesFrom(urca, ca.jo)
 
