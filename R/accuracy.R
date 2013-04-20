@@ -15,7 +15,7 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
 
   if(is_multiH){
     n.aheads <- unique(object$pred[,"n.ahead"])
-    nvar <- ncol(object$true)
+    nvar <- NCOL(object$true)
     li<-list()
     for(i in 1:length(n.aheads)){
       pred_df <- as.data.frame(object$pred)
