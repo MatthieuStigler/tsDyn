@@ -5,19 +5,9 @@
 \description{
 Logistic Smooth Transition AutoRegressive model.
 }
-\synopsis{
+\usage{
 lstar(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay, 
           thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), control=list(), starting.control=list())
-}
-\usage{
-lstar(x, m, d=1, steps=d, series, mL, mH, thDelay, 
-          th, gamma, trace=TRUE, include="const", control=list(), starting.control=list(nTh=20))
-
-lstar(series, m, d, steps, mL, mH, mTh,
-    th, gamma, trace=TRUE, control=list())
-
-lstar(series, m, d, steps, mL=m, mH=m, thVar,
-    th, gamma, trace=TRUE, control=list())
 }
 \value{
   An object of class \code{nlar}, subclass \code{lstar}, i.e. a list
