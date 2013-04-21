@@ -6,10 +6,21 @@
 \usepackage{graphicx}
 \usepackage[authoryear]{natbib}
 \usepackage{Sweave}
+\usepackage{xcolor}
 \usepackage{url}
-\usepackage[unicode=true, pdfusetitle, backref=false,colorlinks=false, pdfborder={0 0 0}]{hyperref}
+\usepackage[unicode=true, pdfusetitle, backref=false,colorlinks=true, pdfborder={0 0 0}]{hyperref}
+
+\definecolor{chapcolor}{rgb}{0.21176471,0.37254903,0.5686275}
+\hypersetup{
+  linkcolor=chapcolor,
+  citecolor=chapcolor, 
+  urlcolor=chapcolor,
+  linktocpage=false
+}
+
 \newcommand{\tsDyn}{\texttt{tsDyn}}
 \newcommand{\pkg}[1]{\emph{#1}}
+\newcommand{\code}[1]{\emph{#1}}
 \newcommand{\Rarg}[1]{\texttt{#1}}
 \linespread{1.3}
 
@@ -31,38 +42,40 @@ options(prompt=" ", encoding="LATIN-9")
 
 
 \author{Matthieu Stigler\\
+\date{January 10, 2010}
 \textsf{\small Matthieu.Stigler at gmail.com}}
 
 \maketitle
 \begin{center}
-(Revision 4)
+(Revision 5: April 2013)
 \par\end{center}
 \begin{abstract}
 Purpose of this paper is twofold. It is first to offer a rough overview
 on the field of threshold cointegration, from the seminal paper of
-Balke and Fomby (1997) to the recent developments. Simultaneously,
+\citet{BalkeFomby1997} to the recent developments. Simultaneously,
 it is to describe the implementation of the main functionalities for
 the modeling in the open-source package \tsDyn. It provides hence
 a unique way to get an introduction on the threshold cointegration
 field allowing in the same time to conduct its own analysis. 
 
-Introduced by Engle and Granger (1987), the concept of cointegration
+Introduced by \citet{EngleGranger1987}, the concept of cointegration
 became a indispensable step in the analysis of non stationary time
 series. The underlying idea is that even if two variables (or more)
 are non-stationary, there can exist a combination of them which is
-stationary. This definition leads to interesting interpretations as the variables can then be interepreted to have a stable relationship (a long-run equilibrium), can be represented in an vector error-correction model, and share a common stochastic trend. 
+stationary. This definition leads to interesting interpretations as the variables can then be interpreted to have a stable relationship (a long-run equilibrium), can be represented in an vector error-correction model, and share a common stochastic trend. 
 
 However, implicit in the definition is the idea that every small deviation
 from the long-run equilibrium will lead instantaneously to error correction mechanisms.
 Threshold cointegration extends the linear cointegration case by allowing
 the adjustment to occur only after the deviation exceed some critical
-threshold , thus taking into account possibly transaction costs or
+threshold, thus taking into account possibly transaction costs or
 stickiness of the prices. Furthermore, it allows to capture asymmetries
 in the adjustment, where positive or negative deviations won't be
 corrected in the same manner. 
 \end{abstract}
+\begingroup \hypersetup{linkcolor=black}
 \tableofcontents{}\pagebreak{}
-
+\endgroup
 
 \section{Introduction: linear cointegration}
 
@@ -73,8 +86,8 @@ When dealing with time series, a main concern for statistical analysis
 is stationarity, the usual inference being based on that assumption.
 In its weak version, stationarity is defined as the finiteness and
 time-invariance of the expectation, variance and auto-covariance of
-a series. However, there are considerable theoretical (Samuelson \citeyear{Samuelson1965})
-and empirical (Nelson and Plosser\citeyear{NelsonPlosser1982}) arguments
+a series. However, there are considerable theoretical \citep{Samuelson1965}
+and empirical \citep{NelsonPlosser1982} arguments
 in favor of non-stationarity of economic series, especially for the
 difference-stationary type. A difference-stationary (or \emph{integrated})
 series is defined as a series that is non-stationary, but whose difference
@@ -86,7 +99,7 @@ $R^{2}$) which lead to the false conclusion of statistical dependence
 between the series (Granger and Newbold \citeyear{GrangerNewbold1974},
 Philipps \citeyear{Phillips1986}). An obvious remedy is to use differenced
 series, for which usual asymptotics apply. This approach has become
-the standard in the VAR framework popularized by Sims (1980). 
+the standard in the VAR framework popularized by \citet{Sims1980}. 
 
 
 \paragraph{Cointegration}
@@ -135,9 +148,8 @@ in the long-run representation and then plugging those estimates one
 the VECM representation%
 \footnote{This two-step approach has been justified afterwards by the fact that
 the estimator in the first step is super-consistent, i.e. converging
-to its true value at rate $n$ instead of usual rate $\sqrt{n}$ (Stock
-1988). %
-}. The related testing procedure taking absence of cointegration as
+to its true value at rate $n$ instead of usual rate $\sqrt{n}$ \citep{Stock1987}}. 
+The related testing procedure taking absence of cointegration as
 a null hypothesis consists in determining whether the residuals from
 the first step are stationary or not. Rejection of the stationarity
 is then interpreted as the rejection of the null hypothesis of cointegration.
@@ -159,13 +171,13 @@ and testing can be done using classical Wald tests (Horvath and Watson
 reduced-rank approach adopted by Johansen (1998, 1995) is able to
 estimate the potential cointegrating vectors and to test for their
 significance, allowing to determine the number of cointegration relationships.
-This is available in R with the ca.jo() function from package \pkg{vars}
+This is available in R with the \code{ca.jo()} function from package \pkg{vars}
 (\citealt{Pfaff2008vars}). 
 
 
 \section{The extension to threshold cointegration}
 
-Balke and Fomby (\citeyear{BalkeFomby1997}) note that in the concept
+\citet{BalkeFomby1997} note that in the concept
 of cointegration there is the implicit assumption that the adjustment
 of the deviations towards the long-run equilibrium is made instantaneously
 at each period. There are nevertheless serious arguments in economic
@@ -187,9 +199,8 @@ A second range of arguments that were raised in favour of nonlinear
 adjustment concerns the assumption of symmetry. In the linear cointegration
 context, increases or decreases of the deviations are deemed to be
 corrected in the same way. Again, several theoretical arguments may
-contest this assumption, such as the presence of menu costs (Lévy
-\citeyear{Levy}, Dutta \citeyear{Dutta}),  market power (Damania
-and Yang \citeyear{DamaniaYang1998}, Ward \citeyear{Ward}) or simply
+contest this assumption, such as the presence of menu costs (
+\citealp{Levy}, \citealp{Dutta}),  market power (\citealp{DamaniaYang1998}, \citealp{Ward}) or simply
 small country vs rest of the world effects. 
 
 Balke and Fomby (1997) introduced the concept of threshold cointegration,
@@ -229,7 +240,7 @@ they differ whether the variable was below the lower threshold $\theta_{L}$,
 between the lower $\theta_{L}$ and upper $\theta_{H}$ threshold,
 or above the higher $\theta_{H}$. This leads to some further remarks:
 \begin{itemize}
-\item The threshold effect is present when $\rho_{H}\neq\rho_{M}$and ,$\rho_{L}\neq\rho_{M}$
+\item The threshold effect is present when $\rho_{H}\neq\rho_{M}$and $\rho_{L}\neq\rho_{M}$
 and as long as $0<P(\epsilon<\theta_{b})<1\quad\text{where }b=L\text{ or }H$
 \item The SETAR model nest the AR when $\rho_{H}=\rho_{M}=\rho_{L}$. 
 \item The model can easily by extended by adding lags in each regime, as
@@ -279,7 +290,7 @@ residuals follow a multivariate SETAR process with p >1 lags, the
 lags in the TVECM do also have regime-specific components.
 
 Several other model specifications have been used in the literature.
-Gonzalo and Pittarakis\citeyearpar{GonzaloPitarakis2005} and Krischnakumar
+Gonzalo and Pittarakis\citeyearpar{GonzaloPitarakis2006a} and Krischnakumar
 and Netto (2009) use as transition variable not the deviations itself,
 but an external variable (that is, a TAR model, as we will see later).
 This has important implications as the stationarity conditions are
@@ -303,7 +314,7 @@ and Hansen \citeyearpar{GreHan}%
 but there exists a linear combination of them which is stationary.
 Note that in that case, the notion of integratedness is undefined
 and there is no corresponding VECM representation (Gonzalo and Pittarakis
-\citeyear{GonzaloPitarakis2005}). 
+\citeyear{GonzaloPitarakis2006a}). 
 
 
 \paragraph{Empirical applications}
@@ -496,10 +507,10 @@ one that minimize the SSR is taken as the estimator. This method has
 received different name in the literature such as \emph{concentrated
 LS}, \emph{conditional LS}. 
 
-This is implemented in package \tsDyn through the function \texttt{selectSETAR}.
-The range of value to search inside is specified by the argument \texttt{trim
-}specifying the percentage of extreme values to exclude and the argument
-\texttt{th}, which allows to search among fewer observations, search
+This is implemented in package \tsDyn through the function \code{selectSETAR}.
+The range of value to search inside is specified by the argument \Rarg{trim
+} specifying the percentage of extreme values to exclude and the argument
+\Rarg{th}, which allows to search among fewer observations, search
 inside an interval or around a value.
 
 \begin{Scode}{lib, echo=FALSE,results=hide}
@@ -530,7 +541,7 @@ out by Enders (\citeyear{Enders2004}), a strong threshold effect
 will result in a sharp U-shaped grid search. 
 
 Once the threshold has been estimated, it can be plugged into the
-\texttt{setar()} function. One can thus obtain the slope estimates
+\code{setar()} function. One can thus obtain the slope estimates
 and their asymptotic p-values%
 \footnote{based on student distribution%
 } :
@@ -540,15 +551,15 @@ set<-setar(lynx, m=1, thDelay=0, th=grid$th)
 summary(set)
 \end{Scode}
 
-It produces an object of class \texttt{setar} with specific methods
-such as \texttt{print()}, \texttt{summary(), plot()} and \texttt{toLatex()}
-and inherits from the class \texttt{nlar} with general methods for
-\texttt{AIC()}, \texttt{BIC()}, \texttt{coef()}, \texttt{deviance()},
-\texttt{fitted()}, \texttt{logLik()}, residuals(), \texttt{MAPE()},
-\texttt{mse()}, \texttt{predict()}. 
+It produces an object of class \Rarg{setar} with specific methods
+such as \code{print()}, \code{summary(), plot()} and \code{toLatex()}
+and inherits from the class \code{nlar} with general methods for
+\code{AIC()}, \code{BIC()}, \code{coef()}, \code{deviance()},
+\code{fitted()}, \code{logLik()}, residuals(), \code{MAPE()},
+\code{mse()}, \code{predict()}. 
 
-Note those two steps could have been done directly using \texttt{setar()}
-and without specification of the \texttt{th} argument. 
+Note those two steps could have been done directly using \code{setar()}
+and without specification of the \Rarg{th} argument. 
 
 
 \subsubsection{The two threshold case}
@@ -570,7 +581,7 @@ $n^{2}$ to $2\times n$ or $k\times n$ when some iterations are
 done, practice showing that after 2 or 3 iterations a maximum is reached. 
 
 Estimation of the second threshold is done in package \tsDyn
-by setting the parameter \texttt{nthresh} to 2:
+by setting the parameter \Rarg{nthresh} to 2:
 
 \begin{Scode}{grid2, eval=TRUE}
 selectSETAR(lynx, m=1, thDelay=0, trim=0.15, criterion="SSR", nthresh=2) 
@@ -708,14 +719,14 @@ This is a considerable extension of the dimension of the grid search,
 and usually one uses the restriction $k_{1}=k_{2}$. 
 
 This is possible in package \tsDyn by specifying the argument
-\texttt{criterion=AIC} in function \texttt{selectSETAR()}:
+\Rarg{criterion=AIC} in function \code{selectSETAR()}:
 
 \begin{Scode}{grid1, eval=TRUE}
 selectSETAR(lynx, m=6, thDelay=0, trim=0.15, criterion="AIC", same.lags=TRUE)
 \end{Scode}
 
 The argument same.lags restrict the search to have the same number
-of lags in each regime. Its default value, currently set to \texttt{FALSE}%
+of lags in each regime. Its default value, currently set to \Rarg{FALSE}%
 \footnote{This will probably be changed soon in future version.%
 }, search on all combinations of lags, that is, allows to have different
 lags in each regime.
@@ -776,21 +787,21 @@ allowing to obtain confidence intervals.
 
 \paragraph{Implementation in R}
 
-The function \texttt{TVECM()} in package \tsDyn allows to estimate
+The function \code{TVECM()} in package \tsDyn allows to estimate
 a bivariate TVECM with two or three regimes with the OLS like estimator.
 It should be emphasized here that in my view there is no difference,
 except in the starting value, between the OLS and MLE estimator, as
 conditional on the threshold and the cointegrating value, the MLE
-estimator is simply LS. The model can be specified either with a \texttt{constant}
-a \texttt{trend}, or \texttt{none}, (arg \texttt{include}) and the
-lags can be regime specific or not (arg\texttt{ common). }
+estimator is simply LS. The model can be specified either with a \Rarg{constant}
+a \Rarg{trend}, or \Rarg{none}, (arg \Rarg{include}) and the
+lags can be regime specific or not (arg \Rarg{common). }
 
-Procedure for the \texttt{TVECM()} differ from that of \texttt{setar()}
-as there is no corresponding \texttt{selectSETAR()} function. As the
+Procedure for the \code{TVECM()} differ from that of \code{setar()}
+as there is no corresponding \code{selectSETAR()} function. As the
 search is two dimensional and the cointegrating parameter take continuous
 values, it can be easily cumbersome and different options to restrict
-the search are given with arguments ngridBeta, \texttt{ngrid}Th, \texttt{gamma1},
-\texttt{gamma2}, \texttt{beta}%
+the search are given with arguments \Rarg{ngridBeta}, \Rarg{ngrid}, \Rarg{Th}, \Rarg{gamma1},
+\Rarg{gamma2}, \Rarg{beta}%
 \footnote{Name of this argument will probably be modified in further version
 of the package.%
 }.
@@ -809,11 +820,11 @@ tvecm<-TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=60, ngridTh=30, plot=TRUE,trim=
 \end{figure}
 
 
-It produces an object of class \texttt{TVECM} with specific methods
-such as \texttt{print()}, \texttt{summary()} and \texttt{toLatex()}
-and inherits from the class \texttt{nlVar} with general methods for
-\texttt{AIC()}, \texttt{BIC()}, \texttt{coef()}, \texttt{deviance()},
-\texttt{fitted()}, \texttt{logLik()}, \texttt{residuals()}. 
+It produces an object of class \code{TVECM()} with specific methods
+such as \code{print()}, \code{summary()} and \code{toLatex()}
+and inherits from the class \Rarg{nlVar} with general methods for
+\code{AIC()}, \code{BIC()}, \code{coef()}, \code{deviance()},
+\code{fitted()}, \code{logLik()}, \code{residuals()}. 
 
 Note that a plot of the search is given automatically as this has
 proved in practice to be a useful tool, experience showing that the
@@ -976,18 +987,18 @@ develops an extension of the testing procedure to test against two
 threshold, and to determinate the number of thresholds by testing
 the null of one threshold against two. 
 
-This test is available in \tsDyn with the function \texttt{setarTest()},
+This test is available in \tsDyn with the function \code{setarTest()},
 for which the homoskedastic bootstrap have been implemented. It takes
-as argument \texttt{nboot} the number of bootstrap replications and
-\texttt{test}=''\texttt{1vs}'' (1 regimes against 2) or ''\texttt{2vs3}''
+as argument \Rarg{nboot} the number of bootstrap replications and
+\Rarg{test}=''\Rarg{1vs}'' (1 regimes against 2) or ''\Rarg{2vs3}''
 (2 regimes against 3). 
 
 \begin{Scode}{eval=FALSE}
 Hansen.Test<-setarTest(lynx, m=1, nboot=1000)
 \end{Scode}
 
-Available methods are \texttt{print()}, \texttt{summary()} and \texttt{plot()},
-as well as an \texttt{extendBoot()} function to run new bootstrap
+Available methods are \code{print()}, \code{summary()} and \code{plot()},
+as well as an \code{extendBoot()} function to run new bootstrap
 replications and merge the result with the old ones. This can be useful
 for a preliminary test and to check how the result is influenced by
 new runs. 
@@ -1019,7 +1030,7 @@ literature and their use has been sometimes advocated rather than
 formal testing procedure (see for example Lètkephol\citeyear{Luetkepohl2007}).
 This is the case in the well-known selection of lags in time series
 models, but also for estimating the cointegrating rank (Gonzalo and
-Pittarakis \citeyear{GonzaloPitarakis1998}, Cheng and Phillips\citeyear{ChengPhillips2008}). 
+Pittarakis \citeyear{GonzaloPitarakis1998}, Cheng and Phillips\citeyear{ChengPhillips2009}). 
 
 This has been also applied for the determination of the number of
 regimes in a SETAR model by Gonzalo and Pittarakis (\citeyear{GonzaloPitarakis2002}).
@@ -1031,8 +1042,8 @@ studies that the AIC has big type one error compared to other BIC,
 while it has a smaller type II error. 
 
 This is easily implemented in package \tsDyn with the generic
-function \texttt{AIC()} and the similar \texttt{BIC()}. Furthermore,
-with the argument \texttt{k}, practically any penalty term can be
+function \code{AIC()} and the similar \code{BIC()}. Furthermore,
+with the argument \Rarg{k}, practically any penalty term can be
 used. Using the example of Hansen (1999):
 
 \begin{Scode}
@@ -1082,7 +1093,7 @@ is found to be the same as in the univariate case as in Hansen (1996). This
 distribution can't be tabulated due to the presence of nuisance parameters and hence 
 the authors suggest two bootstrap approaches, with either a fixed-regressor or a residual bootstrap. While in the paper the sup-LM tests is conditional on both the cointegrating and threshold value, the implementation of this test done by the authors takes the cointegrating vector as given, based on the value estimated from the linear VECM.  
 
-This is available in package \tsDyn using the function \texttt{TVECM.HStest()}. 
+This is available in package \tsDyn using the function \code{TVECM.HStest()}. 
 
 \subsection{No cointegration vs. threshold cointegration tests}
 
@@ -1294,7 +1305,7 @@ As the asymptotical distribution is seen to perform badly in small
 samples, Seo provide a residual based bootstrap and shows its asymptotic
 consistency. 
 
-This test is available in package \tsDyn as \texttt{TVECM.SeoTest()}. 
+This test is available in package \tsDyn as \code{TVECM.SeoTest()}. 
 
 \begin{Scode}{eval=FALSE}
 data(zeroyld)
@@ -1303,10 +1314,10 @@ testSeo<-TVECM.SeoTest(dat, lag=1, beta=1, nboot=1000)
 summary(testSeo)
 \end{Scode}
 
-It requires the argument \texttt{beta} for the cointegrating value
-and \texttt{nboot} for the number of bootstrap replications. The methods
-\texttt{print()}, \texttt{summary()} and \texttt{plot()} are available
-for objects issued by \texttt{TVECM.SeoTest()}. As the model specification
+It requires the argument \Rarg{beta} for the cointegrating value
+and \Rarg{nboot} for the number of bootstrap replications. The methods
+\code{print()}, \code{summary()} and \code{plot()} are available
+for objects issued by \code{TVECM.SeoTest()}. As the model specification
 is done for two thresholds, a two-dimensional grid search has been
 implemented. This is definitely very slow and a single test may take
 a few hours %
@@ -1420,15 +1431,21 @@ small negative deviations but differently from big ones.
 
 \subsection{Non linear impulse response functions}
 
-To be done. 
+Note that the package tsDyn does NOT provide generalised impulse response functions, altough it does provide standard imuplse response functions for the linear VAR/VECM only, 
+building on the function from package \pkg{vars}/\pkg{urca}. Several people have been asking for this functionality, but it should not be too difficult to do it with the existing
+functions, since tsDyn already implements a TVECM.sim() and TVECM.boot() functions. For more informations, see various discussions on the tsDyn mailing lists:
+\url{http://groups.google.com/group/tsdyn/t/5c517a94a3a3ab0c}
+
+
 \section{Running the functions on parallel CPUs}
 A major drawback of the threshold cointegration tools is that those, due to the probem of the unidentified parameter or the need of bootstrap replications, are heavily computer intensive. The test of Seo (2006) takes indeed a very long time to run. 
 
-To alleviate these problems, a possibility is to run the functions on parallel, ie. either on a unique computer with multiple-CPUs processor or on more complex computer clusters. Nowadays, it is quite common to find even laptops equiped with processors like Intel Dual-Core, and hence parallel functionalities can be used by practically everyone. Furthermore, it has become quite easy to do it in R thanks to packages like \pkg{foreach} which offer a great level of abstraction, requiring the user to do a minimal number of steps to get it running. Indeed, this package will function as a wrapper for other parallel packages, and allows the user to run it either on the protocol \texttt{MPI}, \texttt{nws} and \texttt{pvm}, or using the R internal \texttt{socket} system, as well as the \pkg{multicore}\footnote{For a review on R facilities for high performance computing, see \citet{SchmidbergerMorganEtAl2009}. There exist also a dedicated R mailing list, as well as a \emph{task view} \url{http://stat.ethz.ch/CRAN/web/views/HighPerformanceComputing.html} }. 
+To alleviate these problems, a possibility is to run the functions on parallel, ie. either on a unique computer with multiple-CPUs processor or on more complex computer clusters. Nowadays, it is quite common to find even laptops equiped with processors like Intel Dual-Core, and hence parallel functionalities can be used by practically everyone. Furthermore, it has become quite easy to do it in R thanks to packages like \pkg{foreach} which offer a great level of abstraction, requiring the user to do a minimal number of steps to get it running. 
+Indeed, this package will function as a wrapper for other parallel packages, and allows the user to run it either on the protocol \Rarg{MPI}, \Rarg{nws} and \Rarg{pvm}, or using the R internal \Rarg{socket} system, as well as the \pkg{multicore}\footnote{For a review on R facilities for high performance computing, see \citet{SchmidbergerMorganEtAl2009}. There exist also a dedicated R mailing list, as well as a \emph{task view} \url{http://stat.ethz.ch/CRAN/web/views/HighPerformanceComputing.html} }. 
 
 Furthermore, parallel computation is quite easy in the context of threshold cointegration as the grid search or the bootstrap replications are independant of each other and can easily be run on different nodes. 
 
-Parallel facilities are for now only available for the function \texttt{TVECM.HStest()}, through the argument \Rarg{hpc} (standing for high performance computing). When set to \Rarg{foreach}, the package will run the \pkg{foreach} package. It is then up to the user to choose a paralellisation protocol, the current choice being now between \pkg{doMC}, \pkg{doSNOW} (MPI, pvm and nws, as well as internal R sockets), \pkg{doMPI} and \pkg{doRedis}. We illustrate here with the easiest package, \pkg{multicore}, wich proved to be quite powerful, with the disadvantage nerverthless that it can pose problems when R is used within a GUI. 
+Parallel facilities are for now only available for the function \code{TVECM.HStest()}, through the argument \Rarg{hpc} (standing for high performance computing). When set to \Rarg{foreach}, the package will run the \pkg{foreach} package. It is then up to the user to choose a paralellisation protocol, the current choice being now between \pkg{doMC}, \pkg{doSNOW} (MPI, pvm and nws, as well as internal R sockets), \pkg{doMPI} and \pkg{doRedis}. We illustrate here with the easiest package, \pkg{multicore}, wich proved to be quite powerful, with the disadvantage nerverthless that it can pose problems when R is used within a GUI. 
 \begin{Scode}{eval=FALSE}
 system.time(test1<-TVECM.HStest(dat, lag=1, nboot=200))
 
