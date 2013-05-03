@@ -190,7 +190,7 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
   for(j in 1:length(n.ahead)){
     for(i in 1:nroll){
       mod <- model(full_samp[1:(n_estim_samp+i-n.ahead[j])], model=object,...)
-      pred[i+(j-1)*nroll] <- forecast(mod, n.ahead=n.ahead[j])$mean[n.ahead[j]] 
+      pred[i+(j-1)*nroll] <- forecast(mod, h=n.ahead[j], level=0.1)$mean[n.ahead[j]] #set only 1 level to reduce time
     }
   }
 
