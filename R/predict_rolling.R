@@ -175,7 +175,7 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
 
   mod_cl <- deparse(substitute(model))
   if(missing(newdata)) stop("Providing newdata required for objects ",  mod_cl, "!")
-  if(length(newdata) > length(object$x)) stop("newdta should not have leength bigger than sample used to estimate 'object'. Be careful not to provide first sub-sample in newdata!")
+  if(length(newdata) > length(object$x)) stop("newdta should not have length bigger than sample used to estimate 'object'. Be careful not to provide first sub-sample in newdata!")
  
 
   estim_samp <- object$x
@@ -189,7 +189,7 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
 
   for(j in 1:length(n.ahead)){
     for(i in 1:nroll){
-      mod <- model(full_samp[1:(n_estim_samp+i-n.ahead[j])], model=object)
+      mod <- model(full_samp[1:(n_estim_samp+i-n.ahead[j])], model=object,...)
       pred[i+(j-1)*nroll] <- forecast(mod, n.ahead=n.ahead[j])$mean[n.ahead[j]] 
     }
   }
