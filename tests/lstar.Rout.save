@@ -19,15 +19,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
-Loading required package: mgcv
-This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
-Loading required package: Matrix
-Loading required package: lattice
-Loading required package: snow
-Loading required package: mnormt
-Loading required package: foreach
-Loading required package: MASS
-Loading required package: nlme
 > 
 > mod.lstar <- lstar(log10(lynx), m=2, mTh=c(0,1), control=list(maxit=3000))
 Using maximum autoregressive order for low regime: mL = 2 

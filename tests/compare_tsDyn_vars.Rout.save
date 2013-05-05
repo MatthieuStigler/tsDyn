@@ -20,15 +20,6 @@ Type 'q()' to quit R.
 
 > 
 > library(tsDyn)
-Loading required package: mgcv
-This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
-Loading required package: Matrix
-Loading required package: lattice
-Loading required package: snow
-Loading required package: mnormt
-Loading required package: foreach
-Loading required package: MASS
-Loading required package: nlme
 > library(vars)
 Loading required package: strucchange
 Loading required package: zoo
