@@ -24,13 +24,6 @@ Loading required package: mgcv
 This is mgcv 1.7-22. For overview type 'help("mgcv-package")'.
 Loading required package: Matrix
 Loading required package: lattice
-
-Attaching package: ‘Matrix’
-
-The following object(s) are masked from ‘package:stats’:
-
-    toeplitz
-
 Loading required package: snow
 Loading required package: mnormt
 Loading required package: foreach
