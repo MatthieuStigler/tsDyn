@@ -34,7 +34,7 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
   ## add horizont column:
     res_withmeans[,"n.ahead"] <- rep(c(n.aheads,"all"), each=if(nvar==1) 1 else nvar+1)
     res <- res_withmeans
-    res <- res[order(res$var, res$n.ahead),]
+    res <- res[order(res$var, numerize(res$n.ahead)),]
 
   } else {
     res <- accuracy_stat_simple(fit=object$pred, true=object$true)
@@ -90,6 +90,11 @@ simplify2df <- function(x, res=c("matrix", "df")) {
   out
 }
 
+numerize<- function(x) {
+  x[x=="all"] <- Inf
+  as.numeric(x)
+}
+
 if(FALSE){
 library(tsDyn)
 
@@ -122,7 +127,7 @@ accuracy_stat(object=mod_var_pred$pred[,1], true=mod_var_pred$true[,1])
 
 
 
-mod_var_pred_multih <-predict_rolling(object=mod_var, nroll=10, n.ahead=1:2)
+mod_var_pred_multih <- predict_rolling(object=mod_var, nroll=10, n.ahead=1:2)
 accuracy_stat(object=mod_var_pred_multih)
 accuracy_stat(object=mod_var_pred_multih, w=c(1,0))
 
