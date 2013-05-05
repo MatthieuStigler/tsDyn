@@ -81,9 +81,13 @@ for(i in 1:length(gammas)){
 	for (j in 1:length(gammas)){
 		if(j>i+ninter){		
 			gam2<-gammas[j]
-			res<-loop(gam1=gam1,gam2=gam2,ECT=ECT, DeltaX=DeltaX,Y=Y,M=M)
-			store[i,j]<-res$Wald
-			store2[i,j]<-res$detSigma
+			res<-try(loop(gam1=gam1,gam2=gam2,ECT=ECT, DeltaX=DeltaX,Y=Y,M=M), silent=TRUE)
+			if(inherits(res, "try-error")) {
+			  store[i,j]<- store2[i,j] <- NA
+			} else {
+			  store[i,j]<-res$Wald
+			  store2[i,j]<-res$detSigma
+			}
 		} #End if
 	}	#End for j
 
@@ -177,13 +181,13 @@ storeb<-matrix(0, nrow=ng,ncol=ng)
     for (j in 1:length(gammasb)){
       if(j>i+ninter){		
         gam2<-gammasb[j]
-        res<-loop(gam1,gam2,ECT=ECTboot, DeltaX=DeltaXboot,Y=DeltaYboot,M=Mboot)
-        storeb[i,j]<-res$Wald
+        res<-try(loop(gam1,gam2,ECT=ECTboot, DeltaX=DeltaXboot,Y=DeltaYboot,M=Mboot), silent=TRUE)
+	storeb[i,j] <- if(inherits(res, "try-error")) NA else res$Wald
       } #End if
     }	#End for j
   }		#end for i
 
-supWaldboot<-max(storeb)
+supWaldboot<-max(storeb, na.rm=TRUE)
 return(supWaldboot)
 }#end of the bootstrap loop
 
@@ -245,5 +249,11 @@ data(zeroyld)
 data<-zeroyld
 
 
-TVECM.SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=1, plot=FALSE, check=TRUE)
+tv_test <- TVECM.SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=1, plot=FALSE, check=TRUE)
+print(tv_test)
+summary(tv_test)
+
+tv_test2 <- TVECM.SeoTest(data[1:100,],lag=1, beta=1.1, trim=0.15, nboot=5, plot=FALSE, check=FALSE)
+print(tv_test2)
+summary(tv_test2)
 }
