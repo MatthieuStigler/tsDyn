@@ -617,16 +617,18 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"),
 ##1 threshold
   if(nthresh==1){
     if(commonInter){
-      if(model=="TVAR")
+      if(model=="TVAR"){
         colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,2)),sep="")
-      else if(model=="TVECM")
+      } else if(model=="TVECM"){
         colnames(mat)<-c("ECT-","ECT+", sBnames)
+      }
       Blist<-mat
     }else{
       colnames(mat) <- paste(rep(addRegLetter, each=length(Bnames)),rep(Bnames,2),sep="")
       Bdown <- mat[,c(1:npar)]
       Bup <- mat[,-c(1:npar)]
-      Blist <- list(Bdown=Bdown, Bup=Bup)}
+      Blist <- list(Bdown=Bdown, Bup=Bup)
+    }
 ##2 thresholds
   } else{ 
     if(commonInter){
@@ -688,7 +690,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
     gammaMinus<-unique(allTh[seq(from=down+1, to=upInter)])
     #if only one unique value in middle regime
      if(allThUniq[which(allThUniq==allTh[upInter])+1]==allTh[wh.thresh]){
-       gammaMinus <- gammaMinus[- length(gammaMinus)]#cut last one
+       gammaMinus <- head(gammaMinus, -1)#cut last one
       }
     if(length(gammaMinus)>0)
       storeMinus <- mapply(fun,gam1=gammaMinus,gam2=threshRef, thDelay=delayRef, MoreArgs=More)
@@ -712,7 +714,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
     gammaPlus<-unique(allTh[seq(from=downInter, to=up)])
           #if only one unique value in middle regime
     if(allThUniq[which(allThUniq==allTh[downInter])-1]==allTh[wh.thresh]){
-      gammaPlus <- gammaPlus[-1]#cut last one
+      gammaPlus <- gammaPlus[-1]#cut first one
     }
     if(length(gammaPlus)>1)
       storePlus <- mapply(fun,gam1=threshRef,gam2=gammaPlus, thDelay=delayRef,MoreArgs=More)
