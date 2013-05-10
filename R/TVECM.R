@@ -24,7 +24,7 @@ k<-ncol(y) #k: Number of equations
 
 if(k>2 & is.null(beta$exact))
   stop("Sorry, the search is only possible with 2 variables. If more, please provide pre-specified beta values")
-if(is.null(colnames(data))==TRUE)
+if(is.null(colnames(data)))
   colnames(data)<-paste("Var", c(1:k), sep="")
 ndig<-getndp(y)
 
@@ -90,14 +90,12 @@ allpar<-ncol(B)*nrow(B)
 
 rownames(B)<-paste("Equation",colnames(data))
 LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
-if(include=="const")
-  colnames(B)<-c("ECT","Intercept",LagNames)
-else if(include=="trend")
-  colnames(B)<-c("ECT","Trend",LagNames)
-else if(include=="both")
-  colnames(B)<-c("ECT","Intercept","Trend",LagNames)
-else
-  colnames(B)<-c("ECT",LagNames)
+colnames(B)<-switch(include, 
+		    "const"=c("ECT","Intercept",LagNames),
+		    "trend"=c("ECT","Trend",LagNames), 
+		    "both"=c("ECT","Intercept","Trend",LagNames),
+		    "none"=c("ECT",LagNames))
+
 res<-Y-Z%*%t(B)
 
 Sigma<- matrix(1/t*crossprod(res),ncol=k,dimnames=list(colnames(data), colnames(data)))
@@ -109,9 +107,9 @@ Pval<-pt(abs(Tvalue), df=(t-ncol(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(t-n
 colnames(Pval)<-colnames(B)
 
 
-nlike<-log(det(Sigma)) # nlike=(t/2)*log(det(sige));
-aic<-t*nlike+2*(allpar)
-bic<-t*nlike+log(t)*(allpar) #bic #=nlike+log10(t)*4*(1+k); ###BIC
+# nlike<-log(det(Sigma)) # nlike=(t/2)*log(det(sige));
+# aic<-t*nlike+2*(allpar)
+# bic<-t*nlike+log(t)*(allpar) #bic #=nlike+log10(t)*4*(1+k); ###BIC
 #########################
 ###Set up of the grid
 #########################
@@ -272,7 +270,8 @@ oneSearch<-function(betas, gammas){
 ###Plot results of grid search
   if(is.null(gamma1$exact)==FALSE&is.null(beta$exact)==FALSE){plot<-FALSE}
 
-  if(plot==TRUE){
+
+  if(plot){
     if(!is.null(beta$exact)&is.null(gamma1$exact)){ #only gamma estimated
       plot(gammas,store, type="l", xlab="Threshold parameter gamma", ylab="Residual Sum of Squares", main="Grid Search")
       points(x=bestGamma1, y=min(store, na.rm=TRUE), col=2, cex=2)
@@ -322,8 +321,7 @@ if(nthresh==2){
     n1<-mean(d1) #Number of elements of the ECT under the threshold
     d2<-ifelse(ECTi>gam2,1,0)
     n2<-mean(d2)
-    if(is.na(n1)==TRUE) {n1<-0; n2<-0}
-                                        # print(c(n1, 1-n1-n2,n2))
+    if(is.na(n1)) n1<-n2<-0
     if (min(n1,n2,1-n1-n2)>trim) {
       ziUnder<-c(d1)*zi
       ziOver<-c(d2)*zi
@@ -349,7 +347,7 @@ if(nthresh==2){
     d2<-ifelse(ECTi>gam2,1,0)
     n2<-mean(d2)
 # print(c(n1, 1-n1-n2,n2))
-    if(is.na(n1)==TRUE) {n1<-0; n2<-0}
+    if(is.na(n1)) {n1<-0; n2<-0}
     if (min(n1,n2,1-n1-n2)>trim) {
       ectUnder<-c(d1)*ECTi
       ectOver<-c(d2)*ECTi
@@ -383,6 +381,7 @@ if(nthresh==2){
     wh.thresh <- which.min(abs(allgammas-bestThresh))
     ninter<-round(trim*nrow(Xminus1))
 
+### Conditional search without restriction
     if(restr=="none"){
 #search for a second threshold smaller than the first
       if(wh.thresh>2*ninter){
@@ -437,7 +436,7 @@ if(nthresh==2){
     
     if(trace)
       cat("Second best (conditionnal on the first one)", c(bestThresh,secondBestThresh), "\t SSR", min(store2, na.rm=TRUE), "\n")
-  }#end if ...many conditions
+  }#end if both th1 and th2 exact
   
   
 ###Iterative step
@@ -532,8 +531,7 @@ if(nthresh==2){
     Zover<-c(d2)*Z_temp
     Zmiddle<-(1-c(d1)-c(d2))*Z_temp
     Zbest<-cbind(Zunder,Zmiddle, Zover)
-  }
-  if(model=="only_ECT"){
+  }else if(model=="only_ECT"){
     Zunder<-c(d1)*ECT_best
     Zover<-c(d2)*ECT_best
     Zbest<-cbind(Zunder,Zover, DeltaX)
