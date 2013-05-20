@@ -1,22 +1,26 @@
 \name{mse}
 \alias{mse}
 \alias{mse.default}
-\title{ Mean Square Error }
-\description{
-  Generic function to compute the Mean Squared Error of a fitted model.
-}
+\title{Mean Square Error}
 \usage{
-mse(object, ...)
+  mse(object, ...)
 
-## Default S3 method:
-mse(object, ...)
+  \method{mse}{default} (object, ...)
 }
 \arguments{
-  \item{object}{ object of class \code{nlar.fit} }
-  \item{\dots}{ additional arguments to \code{mse} }
+  \item{object}{object of class \code{nlar.fit}}
+
+  \item{\dots}{additional arguments to \code{mse}}
 }
 \value{
   Computed MSE for the fitted model.
 }
-\author{Antonio, Fabio Di Narzo}
-\keyword{ ts }
+\description{
+  Generic function to compute the Mean Squared Error of a
+  fitted model.
+}
+\author{
+  Antonio, Fabio Di Narzo
+}
+\keyword{ts}
+

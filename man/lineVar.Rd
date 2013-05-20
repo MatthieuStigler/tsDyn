@@ -1,45 +1,73 @@
 \name{lineVar}
 \alias{lineVar}
 \title{Multivariate linear models: VAR and VECM}
-\description{
-Estimate either a VAR or a VECM.
-}
 \usage{
-lineVar(data, lag,r=1, include = c( "const", "trend","none", "both"), model=c("VAR", "VECM"), I=c("level", "diff", "ADF"),beta=NULL, estim=c("2OLS", "ML"),LRinclude=c("none", "const", "trend","both"), exogen=NULL)
-}
-\value{
-Fitted model data
+  lineVar(data, lag, r = 1,
+    include = c("const", "trend", "none", "both"),
+    model = c("VAR", "VECM"),
+    I = c("level", "diff", "ADF"), beta = NULL,
+    estim = c("2OLS", "ML"),
+    LRinclude = c("none", "const", "trend", "both"),
+    exogen = NULL)
 }
 \arguments{
-\item{data}{multivariate time series (first row  being first=oldest value)}
-\item{lag}{Number of lags to include in each regime}
-\item{r}{Number of cointegrating relationships}
-\item{include}{Type of deterministic regressors to include}
-\item{model}{Model to estimate. Either a VAR or a VECM}
-\item{I}{For VAR only: whether in the VAR the variables are to be taken in levels (original series) or in difference, or similarly to the univariate ADF case. }
-\item{beta}{for VECM only: cointegrating value. If null, will be estimated}
-\item{LRinclude}{Possibility to include in the long-run relationship and the ECT trend, constant... Can also be a matrix with exogeneous regressors}
-\item{estim}{Type of estimator for the VECM: '2OLS' for the two-step approach or 'ML' for Johansen MLE}
-\item{exogen}{Inclusion of exogenous variables (first row  being first=oldest value). Is either of same size than data (then automatically cut) or than end-sample.}
+  \item{data}{multivariate time series (first row being
+  first=oldest value)}
 
+  \item{lag}{Number of lags to include in each regime}
+
+  \item{r}{Number of cointegrating relationships}
+
+  \item{include}{Type of deterministic regressors to
+  include}
+
+  \item{model}{Model to estimate. Either a VAR or a VECM}
+
+  \item{I}{For VAR only: whether in the VAR the variables
+  are to be taken in levels (original series) or in
+  difference, or similarly to the univariate ADF case.}
+
+  \item{beta}{for VECM only: cointegrating value. If null,
+  will be estimated}
+
+  \item{LRinclude}{Possibility to include in the long-run
+  relationship and the ECT trend, constant... Can also be a
+  matrix with exogeneous regressors}
+
+  \item{estim}{Type of estimator for the VECM: '2OLS' for
+  the two-step approach or 'ML' for Johansen MLE}
+
+  \item{exogen}{Inclusion of exogenous variables (first row
+  being first=oldest value). Is either of same size than
+  data (then automatically cut) or than end-sample.}
+}
+\value{
+  Fitted model data
+}
+\description{
+  Estimate either a VAR or a VECM.
 }
 \details{
-This function provides basic functionalities for VAR and VECM models. More comprehensive functions are in package \pkg{vars}. A few differences appear in the VECM estimation:
-\itemize{
-\item{Engle-Granger estimator}{The Engle-Granger estimator is available}
-\item{Presentation}{Results are printed in a different ways, using a matrix form}
-\item{lateX export}{The matrix of coefficients can be exported to latex, with or without standard-values and significance stars}
-}
-Two estimators are available: the Engle-Granger two step approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministic regressors (or external variables if \code{LRinclude} is of class numeric) can be added for the estimation of the cointegrating value and for the ECT. This is only working when the beta value is not pre-specified.
+  This function provides basic functionalities for VAR and
+  VECM models. More comprehensive functions are in package
+  \pkg{vars}. A few differences appear in the VECM
+  estimation: \itemize{ \itemEngle-Granger estimatorThe
+  Engle-Granger estimator is available
+  \itemPresentationResults are printed in a different ways,
+  using a matrix form \itemlateX exportThe matrix of
+  coefficients can be exported to latex, with or without
+  standard-values and significance stars } Two estimators
+  are available: the Engle-Granger two step approach
+  (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS,
+  deterministic regressors (or external variables if
+  \code{LRinclude} is of class numeric) can be added for
+  the estimation of the cointegrating value and for the
+  ECT. This is only working when the beta value is not
+  pre-specified.
 
-The arg beta is the cointegrating value, the cointegrating vector will be taken as: (1, -beta).
+  The arg beta is the cointegrating value, the
+  cointegrating vector will be taken as: (1, -beta).
 }
-\seealso{
-\code{\link{VECM}} which is just a wrapper for \code{lineVar(...,model="VECM")}
-
-\code{\link{TVAR}} and \code{\link{TVECM}} for the corresponding threshold models. \code{\link{linear}} for the univariate AR model.
-}
-\author{Matthieu Stigler}
 \examples{
 data(zeroyld)
 data<-zeroyld
@@ -68,7 +96,7 @@ summary(VECM.ML)
 
 ###Check Johansen MLE
 myVECM<-lineVar(data, lag=1, include="const", model="VECM", estim="ML")
-summary(myVECM, digits=7) 
+summary(myVECM, digits=7)
 #comparing with vars package
 if(require(vars)){
 	a<-ca.jo(data, spec="trans")
@@ -82,9 +110,17 @@ toLatex(summary(VECM.EG))
 options("show.signif.stars"=FALSE)
 toLatex(summary(VECM.EG), parenthese="Pvalue")
 options("show.signif.stars"=TRUE)
-
-
 }
-\keyword{ ts }
+\author{
+  Matthieu Stigler
+}
+\seealso{
+  \code{\link{VECM}} which is just a wrapper for
+  \code{lineVar(...,model="VECM")}
 
+  \code{\link{TVAR}} and \code{\link{TVECM}} for the
+  corresponding threshold models. \code{\link{linear}} for
+  the univariate AR model.
+}
+\keyword{ts}
 

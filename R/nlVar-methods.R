@@ -51,6 +51,8 @@ print.nlVar<-function(object,...){
 #'VAR<-lineVar(data, lag=1)
 #'logLik(VAR)
 #'
+#' @method logLik nlVar
+#' @S3method logLik nlVar
 logLik.nlVar <- function(object,...){
 	resids<-object$residuals
 	k<-object$k
@@ -107,6 +109,8 @@ logLik.nlVar <- function(object,...){
 #'vecm<-VECM(data, lag=1,r=1, estim="ML")
 #'logLik(vecm)
 #'
+#' @method logLik VECM
+#' @S3method logLik VECM
 logLik.VECM <- function(object,r,...){
   t<-object$t
   k<-object$k

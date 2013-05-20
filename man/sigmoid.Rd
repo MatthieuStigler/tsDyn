@@ -1,17 +1,20 @@
 \name{sigmoid}
-\alias{sigmoid}
-\alias{dsigmoid}
 \alias{d2sigmoid}
+\alias{dsigmoid}
+\alias{sigmoid}
 \title{sigmoid functions}
-\description{
-Some sigmoid functions. See R sources for their definition
-}
 \usage{
-sigmoid(x)
-dsigmoid(x)
+  sigmoid(x)
 }
 \arguments{
-\item{x}{ numeric vector }
+  \item{x}{numeric vector}
 }
-\author{ J. L. Aznarte }
-\keyword{ ts }
+\description{
+  Some sigmoid functions. See R sources for their
+  definition
+}
+\author{
+  J. L. Aznarte
+}
+\keyword{ts}
+

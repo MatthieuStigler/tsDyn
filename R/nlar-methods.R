@@ -280,7 +280,9 @@ regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...
 getTh<- function (object, ...)  
   UseMethod("getTh")
 
-
+#' @rdname getTh
+#' @method getTh default
+#' @S3method getTh default
 getTh.default <- function(object, ...){
   allth<-object[grep("th",names(object))]
   if(length(grep("thD",names(allth)))!=0)
@@ -340,6 +342,10 @@ deviance.nlar<-function(object,...) crossprod(object$residuals)
 mse <- function (object, ...)  
   UseMethod("mse")
 
+
+#' @rdname mse
+#' @method mse default
+#' @S3method mse default
 mse.default <- function(object, ...)
   NULL
 
