@@ -169,6 +169,9 @@ lags.select <- function(data, lag.max=10, include = c( "const", "trend","none", 
   rank.select(data=data, lag.max=lag.max, r.max=0, include=include, fitMeasure=fitMeasure, sameSample=sameSample) 
 }
 
+#' @rdname rank.select
+#' @method print rank.select
+#' @S3method print rank.select
 print.rank.select <- function(x,...){
 
   AIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$AIC_min[1,"rank"])
@@ -180,6 +183,9 @@ print.rank.select <- function(x,...){
   cat("Best HQ :",  HQ_rank_info, " lag=", x$HQ_min[1,"lag"],  "\n")
 }
 
+#' @rdname rank.select
+#' @method summary rank.select
+#' @S3method summary rank.select
 summary.rank.select <- function(object,...){
 
   print.rank.select(object)
