@@ -6,7 +6,8 @@
 Automatic selection of model hyper-parameters
 }
 \usage{
-selectLSTAR(x, m, d=1, steps=d, mL = 1:m, mH = 1:m, thDelay=0:(m-1), fast=TRUE, trace=FALSE)
+selectLSTAR(x, m, d=1, steps=d, mL = 1:m, mH = 1:m, thDelay=0:(m-1), 
+            fast=TRUE, trace=FALSE)
 selectNNET(x, m, d=1, steps=d, size=1:(m+1), maxit=1e3, trace=FALSE)
 }
 

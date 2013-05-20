@@ -5,7 +5,10 @@
 Tests the null of linear cointegration against threshold cointegration following Hansen and Seo (2002). Fixed regressor anfd residual bootstrap are available. 
 }
 \usage{
-TVECM.HStest(data, lag=1, ngridTh=300, trim=0.05, nboot=100, fixed.beta=NULL,  intercept=TRUE, boot.type=c("FixedReg", "ResBoot"), hpc=c("none", "foreach"))
+TVECM.HStest(data, lag=1, ngridTh=300, trim=0.05, 
+ nboot=100, fixed.beta=NULL,  intercept=TRUE, 
+ boot.type=c("FixedReg", "ResBoot"), 
+ hpc=c("none", "foreach"))
 }
 
 \arguments{

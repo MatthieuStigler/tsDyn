@@ -9,7 +9,8 @@
 AR(m) model
 }
 \usage{
-	linear(x, m, d=1, steps=d, series, include = c( "const", "trend","none", "both"), type=c("level", "diff", "ADF"))
+	linear(x, m, d=1, steps=d, series, include = c( "const", "trend","none", "both"), 
+        type=c("level", "diff", "ADF"))
 }
 \value{
 	A \code{\link{nlar}} object, \code{linear} subclass.

@@ -7,7 +7,8 @@ Logistic Smooth Transition AutoRegressive model.
 }
 \usage{
 lstar(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay, 
-          thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), control=list(), starting.control=list())
+          thVar, th, gamma, trace=TRUE, include = c("const", "trend","none", "both"), 
+          control=list(), starting.control=list())
 }
 \value{
   An object of class \code{nlar}, subclass \code{lstar}, i.e. a list
@@ -109,8 +110,10 @@ mod.lstar
 mod.lstar2 <- lstar(log10(lynx), m=1,  include="none")
 mod.lstar2
 
-#Note in example below that the initial grid search seems to be to narrow. Extend it, and evaluate more values (slow!):
-mod.lstar3 <- lstar(log10(lynx), m=1,  include="none", starting.control=list(gammaInt=c(1,2000), nGamma=50))
+#Note in example below that the initial grid search seems to be to narrow. 
+# Extend it, and evaluate more values (slow!):
+controls <- list(gammaInt=c(1,2000), nGamma=50)
+mod.lstar3 <- lstar(log10(lynx), m=1,  include="none", starting.control=controls)
 mod.lstar3
 
 # a few methods for lstar:

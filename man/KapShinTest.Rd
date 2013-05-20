@@ -5,7 +5,9 @@
 \description{Test of unit root against a stationnary 3 regime SETAR alternative with random walk in the inner regime
 }
 \usage{
- KapShinTest(x, m=1, series, include = c("none","const", "trend", "both"), c=3, delta=0.5, points=NULL,minObsMid=10, trick=c("for", "apply", "mapply"), trace=FALSE)
+ KapShinTest(x, m=1, series, include = c("none","const", "trend", "both"), 
+  c=3, delta=0.5, points=NULL,minObsMid=10, 
+  trick=c("for", "apply", "mapply"), trace=FALSE)
 }
 
 

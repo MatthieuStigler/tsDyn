@@ -5,7 +5,8 @@
 \description{Test of linearity against threshold of Hansen (1999) with bootstrap distribution
 }
 \usage{
-setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), hpc=c("none", "foreach"),check=FALSE)
+setarTest(x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, 
+          test=c("1vs", "2vs3"), hpc=c("none", "foreach"),check=FALSE)
 }
 
 \value{A object of class "Hansen99Test" containing:
