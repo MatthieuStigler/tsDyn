@@ -87,19 +87,14 @@ Loading required package: lmtest
 > print(sapply(all_models, comp_teststat ))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_betas)) # 2 and 6
-[1] "TRUE"                                  
-[2] "Mean relative difference: 1.830196e-08"
-[3] "TRUE"                                  
-[4] "TRUE"                                  
-[5] "TRUE"                                  
-[6] "Mean relative difference: 1.551162e-08"
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_coefs)) # 5 and 6
 [1] "TRUE"                                  
 [2] "TRUE"                                  
 [3] "TRUE"                                  
 [4] "TRUE"                                  
-[5] "Mean relative difference: 0.0001434445"
-[6] "Mean relative difference: 0.001799332" 
+[5] "Mean relative difference: 0.0001434468"
+[6] "Mean relative difference: 0.001799345" 
 > print(sapply(all_models, comp_LL)) # 2 and 6
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_IRF))
@@ -109,12 +104,7 @@ Loading required package: lmtest
 > print(sapply(all_models, comp_FEVD))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_resid)) # 5 and 6
-[1] "TRUE"                                  
-[2] "TRUE"                                  
-[3] "TRUE"                                  
-[4] "TRUE"                                  
-[5] "Mean relative difference: 2.719278e-08"
-[6] "Mean relative difference: 1.917397e-08"
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_fitted)) 
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_predict)) # 5 and 6
@@ -138,16 +128,16 @@ Loading required package: lmtest
 [1] TRUE
 
 [[5]]
-[1] "Component 1: Mean relative difference: 4.087915e-05"
+[1] "Component 1: Mean relative difference: 4.087912e-05"
 [2] "Component 2: Mean relative difference: 0.0001349058"
-[3] "Component 3: Mean relative difference: 0.0003334996"
-[4] "Component 4: Mean relative difference: 0.007030107" 
+[3] "Component 3: Mean relative difference: 0.0003334992"
+[4] "Component 4: Mean relative difference: 0.007030102" 
 
 [[6]]
-[1] "Component 1: Mean relative difference: 5.3734e-05" 
-[2] "Component 2: Mean relative difference: 0.000208582"
-[3] "Component 3: Mean relative difference: 0.001637227"
-[4] "Component 4: Mean relative difference: 0.01815156" 
+[1] "Component 1: Mean relative difference: 5.373399e-05"
+[2] "Component 2: Mean relative difference: 0.0002085819"
+[3] "Component 3: Mean relative difference: 0.001637227" 
+[4] "Component 4: Mean relative difference: 0.01815156"  
 
 > 
 > #########################
@@ -222,9 +212,9 @@ Loading required package: lmtest
 [4] "Mean relative difference: 0.0001395315"
 > sapply(all_var_models, comp_var_logLik)
 [1] "TRUE"                                  
-[2] "Mean relative difference: 6.786063e-07"
+[2] "Mean relative difference: 6.786064e-07"
 [3] "TRUE"                                  
-[4] "Mean relative difference: 1.354507e-07"
+[4] "Mean relative difference: 1.354509e-07"
 > sapply(all_var_models_noNoBo, comp_var_pred)
 [1] "TRUE"                                
 [2] "Mean relative difference: 0.01154805"
@@ -237,7 +227,7 @@ Loading required package: lmtest
 [4] "Mean relative difference: 0.0173923" 
 > sapply(all_var_models_noNoBo, comp_var_fevd)
 [1] "TRUE"                                  
-[2] "Mean relative difference: 1.26139e-05" 
+[2] "Mean relative difference: 1.103716e-05"
 [3] "TRUE"                                  
 [4] "Mean relative difference: 2.108874e-05"
 > sapply(all_var_models_noNoBo, comp_var_IRF)
