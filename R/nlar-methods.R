@@ -375,9 +375,14 @@ BIC.nlar <- function(object, ...)
 #'@return Computed Mean Absolute Percent Error for the fitted model.
 #'@author Antonio, Fabio Di Narzo
 #'@keywords ts
+
+#' @export
 MAPE <- function(object, ...)
   UseMethod("MAPE")
 
+#' @rdname MAPE
+#' @method MAPE default
+#' @S3method MAPE default
 MAPE.default <- function(object, ...)
   NULL
 

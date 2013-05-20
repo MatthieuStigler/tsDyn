@@ -1,22 +1,27 @@
 \name{MAPE}
 \alias{MAPE}
 \alias{MAPE.default}
-\title{ Mean Absolute Percent Error }
-\description{
-  Generic function to compute the Mean Absolute Percent Error of a fitted model.
-}
+\title{Mean Absolute Percent Error}
 \usage{
-MAPE(object, ...)
+  MAPE(object, ...)
 
-## Default S3 method:
-MAPE(object, ...)
+  \method{MAPE}{default} (object, ...)
 }
 \arguments{
-  \item{object}{ object of class \code{nlar.fit} }
-  \item{\dots}{ additional arguments to \code{MAPE} }
+  \item{object}{object of class \code{nlar.fit}}
+
+  \item{\dots}{additional arguments to \code{MAPE}}
 }
 \value{
-  Computed Mean Absolute Percent Error for the fitted model.
+  Computed Mean Absolute Percent Error for the fitted
+  model.
 }
-\author{Antonio, Fabio Di Narzo}
-\keyword{ ts }
+\description{
+  Generic function to compute the Mean Absolute Percent
+  Error of a fitted model.
+}
+\author{
+  Antonio, Fabio Di Narzo
+}
+\keyword{ts}
+
