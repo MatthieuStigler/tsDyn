@@ -1,4 +1,28 @@
-
+#'Test of unit root against SETAR alternative
+#'
+#'Test of unit root against a stationnary three regime SETAR alternative
+#'
+#'TODO
+#'
+#'@param x time series
+#'@param m Number of lags under the alternative
+#'@param series time series name (optional)
+#'@param testStat Type of test statistic to use
+#'@param trim trimming parameter indicating the minimal percentage of
+#'observations in each regime
+#'@param grid Whether a minimal number of percentage or observations should be
+#'imposed. See details
+#'@return A object of class "BBC2004Test" containing:
+#'
+#'-The value of the sup Test
+#'
+#'-The version of test used (either Wald, LM or LR).
+#'@author Matthieu Stigler
+#'@seealso \code{\link{setarTest}} for a test with stationarity as a null.
+#'@examples
+#'
+#'BBCTest(lynx, m=3, test="Wald", grid="minPerc")
+#'
 BBCTest<-function(x, m, series, testStat=c("LR", "Wald", "LM"), trim=0.1, grid=c("minPerc", "minObs")){
 
 warning("This function should be considered as experimental. No consistency checks with original paper could be made\n")

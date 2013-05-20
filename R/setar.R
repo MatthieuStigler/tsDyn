@@ -606,6 +606,26 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
   (xL %*% phi1) * z + (xH %*% phi2) * (1-z)
 }
 
+
+
+#'Latex representation of fitted setar models
+#'
+#'Latex representation of fitted setar models
+#'
+#'
+#'@param object fitted setar model (using \code{\link{nlar}})
+#'@param digits options to be passed to \code{\link{format}} for formatting
+#'numbers
+#'@param label LaTeX label passed to the equation
+#'@param \dots Not used
+#'@author Antonio, Fabio Di Narzo
+#'@seealso \code{\link{setar}}, \code{\link{nlar-methods}}
+#'@keywords ts
+#'@examples
+#'
+#'mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
+#'toLatex(mod.setar)
+#'
 toLatex.setar <- function(object, digits=3, label, ...) {
   obj <- object
   mod<-obj$model.specific

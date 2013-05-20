@@ -6,6 +6,51 @@ print.nlVar<-function(object,...){
 }
 
 ### logLik.VAR see: Luetkepohl, 3.4.5 (p. 89), Juselius (2006) p. 56. Hamilton 11.1.10, p. 293 gives -t/2 log(solve(S))
+
+
+#'Extract Log-Likelihood
+#'
+#'Log-Likelihood method for VAR models.
+#'
+#'The Log-Likelihood is computed as in Luetkepohl (2006) equ. 3.4.5 (p. 89) and
+#'Juselius (2006) p. 56:
+#'
+#'\deqn{ LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| - (1/2) \sum^{T} \left [
+#'(y_t - A^{'}x_t)^{'} \Sigma^{-1} (y_t - A^{'}x_t) \right ] } Where
+#'\eqn{\Sigma} is the Variance matrix of residuals, and \eqn{x_t} is the matrix
+#'stacking the regressors (lags and deterministic).
+#'
+#'However, we use a computationally simpler version:
+#'
+#'\deqn{ LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| - (TK/2) }
+#'
+#'See Juselius (2006), p. 57.
+#'
+#'(Note that Hamilton (1994) 11.1.10, p. 293 gives \eqn{+ (T/2)
+#'\log|\Sigma^{-1}|}, which is the same as \eqn{-(T/2) \log|\Sigma|)}.
+#'
+#'@param object object of class \code{VAR} computed by \code{\link{lineVar}}.
+#'@param \dots additional arguments to \code{logLik}.
+#'@return Log-Likelihood value.
+#'@author Matthieu Stigler
+#'@references Hamilton (1994) \emph{Time Series Analysis}, Princeton University
+#'Press
+#'
+#'Juselius (2006) \emph{The Cointegrated VAR model: methodology and
+#'Applications}, Oxford Univesity Press
+#'
+#'Luetkepohl (2006) \emph{New Introduction to Multiple Time Series Analysis},
+#'Springer
+#'@keywords ts
+#'@examples
+#'
+#'data(zeroyld)
+#'data<-zeroyld
+#'
+#'#Fit a VAR
+#'VAR<-lineVar(data, lag=1)
+#'logLik(VAR)
+#'
 logLik.nlVar <- function(object,...){
 	resids<-object$residuals
 	k<-object$k
@@ -17,6 +62,51 @@ logLik.nlVar <- function(object,...){
 }
 
 ### logLik.VECM see Hamilton 20.2.10, p. 637
+
+
+#'Extract Log-Likelihood
+#'
+#'Log-Likelihood method for VECM models.
+#'
+#'The Log-Likelihood is computed in two dfferent ways, depending on whether the
+#'\code{VECM} was estimated with ML (Johansen) or 2OLS (Engle and Granger).
+#'
+#'When the model is estimated with ML, the LL is computed as in Hamilton (1994)
+#'20.2.10 (p. 637):
+#'
+#'\deqn{ LL = -(TK/2) \log(2\pi) - (TK/2) -(T/2) \log|\hat\Sigma_{UU}| - (T/2)
+#'\sum_{i=1}^{r} \log (1-\hat\lambda_{i}) } Where \eqn{\Sigma_{UU}} is the
+#'variance matrix of residuals from the first auxiliary regression, i.e.
+#'regressing \eqn{\Delta y_t} on a constant and lags, \eqn{\Delta y_{t-1},
+#'\ldots, \Delta y_{t-p}}. \eqn{\lambda_{i}} are the eigenvalues from the
+#'\eqn{\Sigma_{VV}^{-1}\Sigma_{VU}\Sigma_{UU}^{-1}\Sigma_{UV}}, see 20.2.9 in
+#'Hamilton (1994).
+#'
+#'When the model is estimated with 2OLS, the LL is computed as: \deqn{ LL =
+#'\log|\Sigma| }
+#'
+#'Where \eqn{\Sigma} is the variance matrix of residuals from the the VECM
+#'model. There is hence no correspondance between the LL from the VECM computed
+#'with 2OLS or ML.
+#'
+#'@param object object of class \code{VECM} computed by \code{\link{VECM}}.
+#'@param r The cointegrating rank. By default the rank specified in the call to
+#'\code{\link{VECM}}, but can be set differently by user.
+#'@param \dots additional arguments to \code{logLik}.
+#'@return Log-Likelihood value.
+#'@author Matthieu Stigler
+#'@references Hamilton (1994) \emph{Time Series Analysis}, Princeton University
+#'Press
+#'@keywords ts
+#'@examples
+#'
+#'data(zeroyld)
+#'data<-zeroyld
+#'
+#'#Fit a VAR
+#'vecm<-VECM(data, lag=1,r=1, estim="ML")
+#'logLik(vecm)
+#'
 logLik.VECM <- function(object,r,...){
   t<-object$t
   k<-object$k

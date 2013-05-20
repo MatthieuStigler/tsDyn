@@ -15,6 +15,42 @@
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
 
+
+
+#'delta test of conditional independence
+#'
+#'delta statistic of conditional independence and associated bootstrap test
+#'
+#'delta statistic of conditional independence and associated bootstrap test.
+#'For details, see Manzan(2003).
+#'
+#'@aliases delta delta.test
+#'@param x time series
+#'@param m vector of embedding dimensions
+#'@param d time delay
+#'@param eps vector of length scales
+#'@param B number of bootstrap replications
+#'@return \code{delta} returns the computed delta statistic. \code{delta.test}
+#'returns the bootstrap based 1-sided p-value.
+#'@section Warning: Results are sensible to the choice of the window
+#'\code{eps}. So, try the test for a grid of \code{m} and \code{eps} values.
+#'Also, be aware of the course of dimensionality: m can't be too high for
+#'relatively small time series. See references for further details.
+#'@author Antonio, Fabio Di Narzo
+#'@seealso BDS marginal independence test: \code{\link[tseries]{bds.test}} in
+#'package \pkg{tseries}
+#'
+#'Teraesvirta's neural network test for nonlinearity:
+#'\code{\link[tseries]{terasvirta.test}} in package \pkg{tseries}
+#'
+#'delta test for nonlinearity: \code{\link{delta.lin.test}}
+#'@references Sebastiano Manzan, Essays in Nonlinear Economic Dynamics, Thela
+#'Thesis (2003)
+#'@keywords ts
+#'@examples
+#'
+#'delta(log10(lynx), m=3, eps=sd(log10(lynx)))
+#'
 delta <- function(x, m, d=1, eps) {
 	if(m<2)
           stop("embedding dimension 'm' should be at least equal to 2")
@@ -35,6 +71,32 @@ delta.test <- function(x, m=2:3, d=1, eps = seq(0.5*sd(x),2*sd(x),length=4), B=4
 	return(p.value)
 }
 
+
+
+#'delta test of linearity
+#'
+#'delta test of linearity based on conditional mutual information
+#'
+#'delta test of linearity based on conditional mutual information
+#'
+#'@aliases delta.lin delta.lin.test
+#'@param x time series
+#'@param m vector of embedding dimensions
+#'@param d time delay
+#'@param eps vector of length scales
+#'@param B number of bootstrap replications
+#'@return \code{delta.lin} returns the parametrically estimated delta statistic
+#'for the given time series (assuming linearity). \code{delta.lin.test} returns
+#'the bootstrap based 1-sided p-value. The test statistic is the difference
+#'between the parametric and nonparametric delta estimators.
+#'@author Antonio, Fabio Di Narzo
+#'@references Sebastiano Manzan, Essays in Nonlinear Economic Dynamics, Thela
+#'Thesis (2003)
+#'@keywords ts
+#'@examples
+#'
+#'delta.lin(log10(lynx), m=3)
+#'
 delta.lin <- function(x, m, d=1) {
 	V1 <- var(embedd(x, m=m+1, d=d))
 	V2 <- var(embedd(x, m=m, d=d))

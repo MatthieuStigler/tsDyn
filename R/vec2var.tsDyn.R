@@ -1,6 +1,35 @@
-
-
 ########### VAR Representation
+
+
+#'VAR representation
+#'
+#'Show the VAR representation of a VECM
+#'
+#'
+#'@aliases VARrep VARrep.VECM VARrep.VAR
+#'@param object An object of class \sQuote{VECM} created by \code{\link{VECM}},
+#'or of class \sQuote{VAR} created by \code{\link{lineVar}}
+#'@param \dots Currently not used
+#'@return A matrix containing the parameters of the VECM under their VAR
+#'representation.
+#'@author Matthieu Stigler
+#'@references Hamilton (1994) \emph{Time Series Analysis}, Princeton University
+#'Press
+#'@keywords ts VECM VAR cointegration
+#'@examples
+#'
+#'
+#'data(barry)
+#'
+#'# VECM model:
+#'mod_vecm <- VECM(barry, lag=2, estim="ML")
+#'VARrep(mod_vecm)
+#'
+#'# VAR model:
+#'mod_var <- lineVar(barry, lag=2, I="diff")
+#'VARrep(mod_var)
+#'
+#'
 VARrep  <- function (object, ...)  
   UseMethod("VARrep")
 

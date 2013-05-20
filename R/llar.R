@@ -15,10 +15,6 @@
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
 
-#series: time series
-#m, d: embedding dimension and time delay
-#steps: forecasting steps
-#trace: tracing switch (0, 1 or >1)
 llar <- function(x, m, d=1, steps=d, series, eps.min=sd(x)/2, eps.max=diff(range(x)), neps=30, trace=0) {
 	if(missing(series))
 		series <- deparse(substitute(x))

@@ -1,3 +1,73 @@
+#'Multivariate Threshold Autoregressive model
+#'
+#'Estimate a multivariate Threshold VAR
+#'
+#'For fixed \code{th} and threshold variable, the model is linear, so
+#'estimation can be done directly by CLS (Conditional Least Squares). The
+#'search of the parameters values is made upon a grid of potential values. So
+#'it is pretty slow.
+#'
+#'nthresh=1: estimation of one threshold model (two regimes) upon a grid of
+#'\var{ngrid} values (default to ALL) possible thresholds and delays values.
+#'
+#'nthresh=2: estimation of two thresholds model (three regimes) Conditional on
+#'the threshold found in model where nthresh=1, the second threshold is
+#'searched. When both are found, a second grid search is made with 30 values
+#'around each threshold.
+#'
+#'nthresh=3: DOES NOT estimate a 3 thresholds model, but a 2 thresholds model
+#'with a whole grid over the thresholds parameters (so is really slow) with a
+#'given delay, is there rather to check the consistency of the method nthresh=2
+#'
+#'@aliases TVAR OlsTVAR
+#'@param data time series
+#'@param lag Number of lags to include in each regime
+#'@param include Type of deterministic regressors to include
+#'@param model Whether the transition variable is taken in levels (TAR) or
+#'difference (MTAR)
+#'@param commonInter Whether the deterministic regressors are regime specific
+#'(commonInter=FALSE) or not.
+#'@param nthresh Number of thresholds
+#'@param thDelay 'time delay' for the threshold variable (as multiple of
+#'embedding time delay d) PLEASE NOTE that the notation is currently different
+#'to univariate models in tsDyn. The left side variable is taken at time t, and
+#'not t+1 as in univariate cases.
+#'@param mTh combination of variables with same lag order for the transition
+#'variable. Either a single value (indicating which variable to take) or a
+#'combination
+#'@param thVar external transition variable
+#'@param trim trimming parameter indicating the minimal percentage of
+#'observations in each regime
+#'@param ngrid number of elements of the grid, especially for \code{nthresh=3}
+#'@param gamma prespecified threshold values
+#'@param around The grid search is restricted to \var{ngrid} values around this
+#'point. Especially useful for \code{nthresh=3}.
+#'@param plot Whether a plot showing the results of the grid search should be
+#'printed
+#'@param dummyToBothRegimes Whether the dummy in the one threshold model is
+#'applied to each regime or not.
+#'@param trace should additional infos be printed out?
+#'@param trick type of R function called: \code{for} or \code{mapply}
+#'@param max.iter Number of iterations for the algorithm
+#'@return An object of class TVAR, with standard methods.
+#'@author Matthieu Stigler
+#'@seealso \code{\link{lineVar}} for the linear VAR/VECM,
+#'\code{\link{TVAR.LRtest}} to test for TVAR, \code{\link{TVAR.sim}} to
+#'simulate/bootstrap a TVAR.
+#'@references Lo and Zivot (2001) "Threshold Cointegration and Nonlinear
+#'Adjustment to the Law of One Price," Macroeconomic Dynamics, Cambridge
+#'University Press, vol. 5(4), pages 533-76, September.
+#'@keywords ts
+#'@examples
+#'
+#'data(zeroyld)
+#'
+#'data<-zeroyld
+#'
+#'TVAR(data, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=TRUE)
+#'
+#'##The one threshold (two regimes) gives a value of 10.698 for the threshold and 1 for the delay. Conditional on this values, the search for a second threshold (three regimes) gives 8.129. Starting from this values, a full grid search finds the same values and confims the first step estimation. 
+#'
 TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=FALSE, dummyToBothRegimes=TRUE, trace=TRUE, trick="for", max.iter=2){
 y <- as.matrix(data)
 Torigin <- nrow(y) 	#Size of original sample

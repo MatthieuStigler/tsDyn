@@ -52,6 +52,24 @@ F <- function(phi1, phi2, x_t, s_t) {
   return(apply(local, 2, sum));
 }
 
+
+
+#'computeGradient
+#'
+#'Computes the gradient under the null hypothesis
+#'
+#'
+#'@param object fitted star model
+#'@param ... currently unused
+#'@return computed gradient
+#'@author J. L. Aznarte
+#'@seealso \code{\link{addRegime}}
+#'@references TODO
+#'@keywords ts internal
+#'@examples
+#'
+#'##TODO
+#'
 computeGradient <- function(object, ...)
   UseMethod("computeGradient")
 
@@ -220,6 +238,25 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   }
 }
   
+
+
+#'addRegime test
+#'
+#'addRegime test
+#'
+#'
+#'@param object fitted model object with at least 2 regimes
+#'@param ... arguments to and from other methods
+#'@return A list containing the p-value of the F statistic and a boolean, true
+#'if there is some remaining nonlinearity and false otherwise.
+#'@author J. L. Aznarte
+#'@seealso \code{\link{star}}
+#'@references TODO
+#'@keywords ts
+#'@examples
+#'
+#'##TODO
+#'
 addRegime <- function(object, ...)
   UseMethod("addRegime")
 

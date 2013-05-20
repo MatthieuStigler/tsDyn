@@ -4,6 +4,17 @@
 #
 #
 
+
+
+#'isLinear
+#'
+#'Generic NLAR linearity test
+#'
+#'
+#'@param object fitted time series model
+#'@param ... arguments to and from other methods
+#'@author A. F. Di Narzo
+#'@keywords ts
 isLinear <- function(object, ...)
   UseMethod("isLinear")
 

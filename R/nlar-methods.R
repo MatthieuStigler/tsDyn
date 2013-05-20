@@ -88,6 +88,48 @@ getNUsed.nlar <- function(obj, ...)
 	
 #non-linear autoregressive model fitting
 #str: result of a call to nlar.struct
+
+
+#'Non-linear time series model, base class definition
+#'
+#'Generic non-linear autogregressive model class constructor.
+#'
+#'Constructor for the generic \code{nlar} model class. On a fitted object you
+#'can call some generic methods. For a list of them, see
+#'\code{\link{nlar-methods}}.
+#'
+#'An object of the \code{nlar} class is a list of (at least) components:
+#'\describe{ \item{str}{ \code{\link{nlar.struct}} object, encapsulating
+#'general infos such as time series length, embedding parameters, forecasting
+#'steps, model design matrix } \item{coefficients}{ a named vector of model
+#'estimated/fixed coefficients } \item{k}{ total number of estimated
+#'coefficients } \item{fitted.values}{ model fitted values } \item{residuals}{
+#'model residuals } \item{model}{ data frame containing the variables used }
+#'\item{model.specific}{ (optional) model specific additional infos} }
+#'
+#'A \code{\link{nlar}} object normally should also have a model-specific
+#'subclass (i.e., \code{nlar} is a virtual class).
+#'
+#'Each subclass should define at least a \code{print} and, hopefully, a
+#'\code{oneStep} method, which is used by \code{\link{predict.nlar}} to
+#'iteratively extend ahead the time series.
+#'
+#'@param str a \code{nlar.struct} object, i.e. the result of a call to
+#'\code{\link{nlar.struct}}
+#'@param coefficients,fitted.values,residuals,k,model,model.specific internal
+#'structure
+#'@param \dots further model specific fields
+#'@return An object of class \code{nlar}. \link{nlar-methods} for a list of
+#'available methods.
+#'@author Antonio, Fabio Di Narzo
+#'@seealso \code{\link{availableModels}} for currently available built-in
+#'models.  \link{nlar-methods} for available \code{nlar} methods.
+#'@references Non-linear time series models in empirical finance, Philip Hans
+#'Franses and Dick van Dijk, Cambridge: Cambridge University Press (2000).
+#'
+#'Non-Linear Time Series: A Dynamical Systems Approach, Tong, H., Oxford:
+#'Oxford University Press (1990).
+#'@keywords ts internal
 nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                  model.specific=NULL, ...) {
   return(extend(list(), "nlar",
@@ -215,6 +257,26 @@ regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...
 
 
 #get the threshold for setar and nlVar
+
+
+#'Extract threshold(s) coefficient
+#'
+#'Extract threshold coefficient(s)
+#'
+#'
+#'@aliases getTh getTh.default
+#'@param object object of class \code{setar}, \code{summary.setar},
+#'\code{nlVar}
+#'@param \dots additional arguments to \code{getTh}
+#'@return Threshold value.
+#'@author Matthieu Stigler
+#'@keywords ts
+#'@examples
+#'
+#'set<-setar(lynx, m=3)
+#'getTh(set)
+#'getTh(summary(set))
+#'
 getTh<- function (object, ...)  
   UseMethod("getTh")
 
@@ -262,6 +324,19 @@ getTh.nlVar<-function(object,...){
 deviance.nlar<-function(object,...) crossprod(object$residuals)
 
 #Mean Square Error for the specified object
+
+
+#'Mean Square Error
+#'
+#'Generic function to compute the Mean Squared Error of a fitted model.
+#'
+#'
+#'@aliases mse mse.default
+#'@param object object of class \code{nlar.fit}
+#'@param \dots additional arguments to \code{mse}
+#'@return Computed MSE for the fitted model.
+#'@author Antonio, Fabio Di Narzo
+#'@keywords ts
 mse <- function (object, ...)  
   UseMethod("mse")
 
@@ -286,6 +361,20 @@ BIC.nlar <- function(object, ...)
 
 
 #Mean Absolute Percent Error
+
+
+#'Mean Absolute Percent Error
+#'
+#'Generic function to compute the Mean Absolute Percent Error of a fitted
+#'model.
+#'
+#'
+#'@aliases MAPE MAPE.default
+#'@param object object of class \code{nlar.fit}
+#'@param \dots additional arguments to \code{MAPE}
+#'@return Computed Mean Absolute Percent Error for the fitted model.
+#'@author Antonio, Fabio Di Narzo
+#'@keywords ts
 MAPE <- function(object, ...)
   UseMethod("MAPE")
 
@@ -352,6 +441,28 @@ plot.nlar <- function(x, ask = interactive(), ...) {
   invisible(x)
 }
 
+
+
+#'oneStep
+#'
+#'Doing one step forward within a \code{NLAR} model
+#'
+#'If in \code{object} is encapsulated the \code{NLAR} map, say, \code{F(X[t],
+#'X[t-d], ..., X[t-(m-1)d])}, this function should return the value of \code{F}
+#'(with already fitted parameters) applied to given new data, which can be a
+#'single vector of length \code{m} or a matrix with \code{m} columns.
+#'
+#'@param object fitted \sQuote{nlar} object
+#'@param newdata data from which to step forward
+#'@param \dots further arguments to be passed to and from other methods
+#'@return Computed value(s)
+#'@note This is an internal function, and should not be called by the user
+#'@author Antonio, Fabio Di Narzo
+#'@keywords internal ts
+#'@examples
+#'
+#'tsDyn:::oneStep.linear
+#'
 oneStep <- function(object, newdata, ...)
   UseMethod("oneStep")
 

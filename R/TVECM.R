@@ -1,3 +1,103 @@
+#'Threshold Vector Error Correction model (VECM)
+#'
+#'Estimate a Threshold Vector Error Correction model (VECM)
+#'
+#'For fixed threshold and cointegrating vector, the model is linear, so
+#'estimation of the regression parameters can be done directly by CLS
+#'(Conditional Least Squares). The search of the threshold and cointegrating
+#'parameters values which minimize the residual sum of squares (SSR) is made on
+#'a grid of potential values. For specification of the grids, see below.
+#'
+#'The function can estimate one as well as two thresholds:
+#'
+#'\describe{ \item{nthresh=1:}{ estimation of one threshold model (two regimes)
+#'upon a grid of \var{ngridTh} values (default to ALL) possible thresholds and
+#'delays values. }
+#'
+#'\item{nthresh=2:}{estimation of two thresholds model (three regimes).
+#'Conditional on the threshold found in model where nthresh=1, the second
+#'threshold is searched. When both are found, a second grid search is made with
+#'30 values around each threshold.} }
+#'
+#'The model can be either with a threshold effect on all variables ("All") or
+#'only on the error correction term (ECT) (argument "only ECT"). In the second
+#'case, the value for the middle threshold is taken a null, as in Balke and
+#'Fomby (1997).
+#'
+#'The grid for the threshold parameters can be set in different ways, through
+#'the argument \var{th1}, \var{th2} and \var{beta}:
+#'
+#'\describe{ \item{exact:}{Pre-specified value. } \item{int:}{Specify an
+#'interval (of length \var{ngridTh}) in which to search.}
+#'\item{around:}{Specify to take \var{ngridTh} points around the value given. }
+#'}
+#'
+#'The default is to do an interval search. Interval bounds for the threshold
+#'interval are simply the \var{trim} and 1-\var{trim} percents of the sorted
+#'error correction term.  For the cointegrating parameter, bounds of the
+#'interval are obtained from the (OLS) confidence interval of the linear
+#'cointegration case.  It is often found however that this interval is too
+#'tight. It is hence recommended to inspect the plot of the grid search.
+#'
+#'@param data time series
+#'@param lag Number of lags to include in each regime
+#'@param nthresh number of threshold (see details)
+#'@param trim trimming parameter indicating the minimal percentage of
+#'observations in each regime
+#'@param ngridBeta number of elements to search for the cointegrating value
+#'@param ngridTh number of elements to search for the threshold value
+#'@param plot Whether the grid with the SSR of each threshold should be ploted.
+#'@param th1 different possibilities to pre-specify an exact value, an interval
+#'or a central point for the search of the threshold (or first threshold if
+#'nthresh=2)
+#'@param th2 different possibilities to pre-specify an exact value or a central
+#'point for the search of the second threshold (used only if nthresh=2)
+#'@param beta different possibilities to pre-specify an exact value, an
+#'interval or a central point for the search of the cointegrating value
+#'@param restr Currently not avalaible
+#'@param common Whether the regime-specific dynamics are only for the ECT or
+#'for the ECT and the lags
+#'@param include Type of deterministic regressors to include
+#'@param dummyToBothRegimes Whether the dummy in the one threshold model is
+#'applied to each regime or not.
+#'@param beta0 Additional regressors to include in the cointegrating relation
+#'@param methodMapply only for programming. Is to make the choice between a for
+#'loop or \code{mapply} implementation
+#'@param trace should additional infos be printed? (logical)
+#'@return Fitted model data
+#'@author Matthieu Stigler
+#'@seealso \code{\link{VECM}} for the linear VECM, \code{\link{TVAR}} for the
+#'threshold VAR, \code{\link{TVECM.SeoTest}} to test for TVECM,
+#'\code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
+#'@references Hansen, B. and Seo, B. (2002), Testing for two-regime threshold
+#'cointegration in vector error-correction models, Journal of Econometrics,
+#'110, pages 293 - 318
+#'
+#'Seo, M. H. (2009) Estimation of non linear error-correction models, Working
+#'paper
+#'@keywords ts
+#'@examples
+#'
+#'
+#'data(zeroyld)
+#'data<-zeroyld
+#'
+#'##Estimate a TVECM (we use here minimal grid, it should be usually much bigger!)
+#'
+#'tv<-TVECM(data, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common="All")
+#'
+#'print(tv)
+#'summary(tv)
+#'
+#'#Obtain diverse infos:
+#'AIC(tv)
+#'BIC(tv)
+#'
+#'res.tv<-residuals(tv)
+#'
+#'#export the equations as Latex:
+#'toLatex(tv)
+#'
 TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=TRUE,  th1=list(exact=NULL, int=c("from","to"), around="val"), th2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), common=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),dummyToBothRegimes=TRUE,beta0=0,methodMapply=FALSE, trace=TRUE ) {
 
 ##check args

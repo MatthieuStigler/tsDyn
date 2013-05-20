@@ -1,6 +1,32 @@
-
-
-
+#'Virtua VECM model
+#'
+#'Pedagogical tool to create a symbolic VECM model, i.e. just for
+#'representation purpose.
+#'
+#'
+#'@param alpha Matrix of alpha speed adjustment coefficients.
+#'@param beta Matrix of alpha, cointegrating coefficients.
+#'@param lags Matrix containg the lags coefficients.
+#'@param inc Matrix containg the include (see following arg) coefficients.
+#'@param include Character indicating the type of deterministic term included,
+#'if any.
+#'@return An object of class \sQuote{VECM}, without however any data.
+#'@keywords ts VECM cointegration
+#'@examples
+#'
+#'
+#'  a<-matrix(c(-0.4, 0.1), ncol=1)
+#'  b<-matrix(c(1, -2), ncol=2)
+#'
+#'  # VECM_symb(alpha=a, beta=t(b))
+#'  d<- VECM_symbolic(alpha=a, beta=t(b))
+#'  VARrep(d)
+#'  d<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(0, ncol=2, nrow=2))
+#'  VARrep(d)
+#'  d3<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(c(0.1, 0.3, 0.1, 0.2), ncol=2, nrow=2), inc=matrix(c(0.5, 0.1), ncol=1), include="const")
+#'  VARrep(d3)
+#'
+#'
 VECM_symbolic <- function(alpha, beta, lags, inc, include = c("none", "const", "trend", "both")){
 
   include <- match.arg(include)

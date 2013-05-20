@@ -1,5 +1,68 @@
-
-
+#'Selection of the cointegrating rank with Information criterion.
+#'
+#'Selection of the cointegrating rank and the lags with Information criterion
+#'(AIC, BIC).
+#'
+#'This function estimates the AIC, BIC and Hannan-Quinn for each rank (up to
+#'\code{lags.max}) and lags (up to \code{lags.max}). This method has been shown
+#'to be useful to select simultaneously the rank and the lags, see references.
+#'
+#'@aliases rank.select print.rank.select summary.rank.select
+#'@param data multivariate time series.
+#'@param lag.max Maximum number of lags to investigate.
+#'@param r.max Maximum rank to investigate.
+#'@param include Type of deterministic regressors to innclude. See
+#'\code{\link{VECM}} or \code{\link{lineVar}}.
+#'@param fitMeasure Whether the AIC/BIC should be based on the full likelihood,
+#'or just the SSR. See explanations in \code{\link{logLik.VECM}}.
+#'@param sameSample Logical. Whether the data should be shortened so that the
+#'AIC/BIC are estimated on the same sample. Default to TRUE.
+#'@param returnModels Logical, default to FALSE. Whether the output should also
+#'contain the list of each model computed.
+#'@param x The output from \code{rank.select} for the print method.
+#'@param object The output from \code{rank.select} for the summary method.
+#'@param ... Unused.
+#'@return An object of class \sQuote{rank.select}, with \sQuote{print} and
+#'\sQuote{summary methods}, containing among other the matrices of AIC/BIC/HQ,
+#'the Likelihood, and best ranks according to each criterion.
+#'@author Matthieu Stigler
+#'@seealso \code{\link{VECM}} for estimating a VECM. \code{\link{rank.test}}
+#'(or \code{\link[urca]{ca.jo}} in package \pkg{urca}) for the classical
+#'Johansen cointegration test.
+#'@references - Aznar A and Salvador M (2002). Selecting The Rank Of The
+#'Cointegration Space And The Form Of The Intercept Using An Information
+#'Criterion. Econometric Theory, *18*(04), pp. 926-947. <URL:
+#'http://ideas.repec.org/a/cup/etheor/v18y2002i04p926-947_18.html>.
+#'
+#'-Cheng X and Phillips PCB (2009). Semiparametric cointegrating rank
+#'selection. Econometrics Journal , *12*(s1), pp. S83-S104. <URL:
+#'http://ideas.repec.org/a/ect/emjrnl/v12y2009is1ps83-s104.html>.
+#'
+#'- Gonzalo J and Pitarakis J (1998). Specification via model selection in
+#'vector error correction models. Economics Letters, *60*(3), pp. 321 - 328.
+#'ISSN 0165-1765, <URL: http://dx.doi.org/DOI: 10.1016/S0165-1765(98)00129-3>.
+#'
+#'- Kapetanios G (2004). The Asymptotic Distribution Of The Cointegration Rank
+#'Estimator Under The Akaike Information Criterion. Econometric Theory,
+#'*20*(04), pp. 735-742. <URL:
+#'http://ideas.repec.org/a/cup/etheor/v20y2004i04p735-742_20.html>.
+#'
+#'- Wang Z and Bessler DA (2005). A Monte Carlo Study On The Selection Of
+#'Cointegrating Rank Using Information Criteria. Econometric Theory, *21*(03),
+#'pp. 593-620. <URL:
+#'http://ideas.repec.org/a/cup/etheor/v21y2005i03p593-620_05.html>.
+#'@keywords ts VECM cointegration
+#'@examples
+#'
+#'
+#'data(barry)
+#'
+#'# 
+#'rk_sel <- rank.select(barry)
+#'rk_sel
+#'summary(rk_sel)
+#'
+#'
 rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE, returnModels=FALSE) {
 
   fitMeasure <- match.arg(fitMeasure)
@@ -67,6 +130,41 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include = c( "cons
 }
 
 
+
+
+#'Selection of the lag with Information criterion.
+#'
+#'Selection of the cointegrating rank and the lags with Information criterion
+#'(AIC, BIC).
+#'
+#'This function selects the lag according to AIC, BIC and Hannan-Quinn.
+#'
+#'@param data multivariate time series.
+#'@param lag.max Maximum number of lags to investigate.
+#'@param include Type of deterministic regressors to include.
+#'@param fitMeasure Whether the AIC/BIC should be based on the full likelihood,
+#'or just the SSR. See explanations in \code{\link{logLik.VECM}}.
+#'@param sameSample Logical. Whether the data should be shortened so that the
+#'AIC/BIC are estimated on the same sample. Default to TRUE.
+#'@return An object of class \code{\link{rank.select}}, with \sQuote{print} and
+#'\sQuote{summary methods}, containing among other the matrices of AIC/BIC/HQ.
+#'@author Matthieu Stigler
+#'@seealso \code{\link{rank.select}}, the underlying function, to estimate the
+#'rank also.
+#'
+#'\code{\link[vars]{VARselect}} in package \pkg{vars}, does basically the same.
+#'@keywords ts
+#'@examples
+#'
+#'
+#'data(barry)
+#'
+#'# 
+#'rk_sel <- lags.select(barry)
+#'rk_sel
+#'summary(rk_sel)
+#'
+#'
 lags.select <- function(data, lag.max=10, include = c( "const", "trend","none", "both"), fitMeasure=c("SSR", "LL"), sameSample=TRUE) {
   rank.select(data=data, lag.max=lag.max, r.max=0, include=include, fitMeasure=fitMeasure, sameSample=sameSample) 
 }

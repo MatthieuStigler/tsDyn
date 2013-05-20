@@ -30,6 +30,22 @@ extend.MyEnv <- function(this, subclass, ...) {
 	return(this)
 }
 
+
+
+#'Available models
+#'
+#'Available built-in time series models
+#'
+#'Return the list of built-in available \sQuote{nlar} time series models
+#'
+#'@return A character vector containing built-in time series models. For help
+#'on a specific model, type: \code{help(modelName)}.
+#'@author Antonio, Fabio Di Narzo
+#'@keywords ts
+#'@examples
+#'
+#'availableModels()
+#'
 availableModels <- function()
 	fitters
 
@@ -50,6 +66,17 @@ build <- function(...)
 add <- function(...)
 	UseMethod("add")
 
+
+
+#'sigmoid functions
+#'
+#'Some sigmoid functions. See R sources for their definition
+#'
+#'
+#'@aliases sigmoid dsigmoid d2sigmoid
+#'@param x numeric vector
+#'@author J. L. Aznarte
+#'@keywords ts
 sigmoid <- function(x) 1/(1 + exp(-x))
 
 dsigmoid <- function(x) x * (1 - x)
@@ -187,6 +214,32 @@ is.InUnitCircle<-function(B,ninc,m, nthresh){
 }
   
 isRoot<-function(coef, regime=c("L", "M", "H", "."), lags){
+
+
+#'Extract variable showing regime
+#'
+#'This function allows to extract the indicator variable specifying the regime
+#'in which the process is at time t.
+#'
+#'
+#'@aliases regime regime.default
+#'@param object object of class \code{setar} or \code{nlVar}
+#'@param initVal Logical. Whether the NA initial values should be returned.
+#'Default to TRUE.
+#'@param timeAttr Logical. Whether the time attributes should be returned.
+#'Default to TRUE.
+#'@param \dots additional arguments to \code{regime}
+#'@return Time series of same attributes as input to setar.
+#'@author Matthieu Stigler
+#'@keywords ts
+#'@examples
+#'
+#'set<-setar(lynx, m=3)
+#'regime(set)
+#'regime(set, time=FALSE, initVal=FALSE)
+#'
+#'plot(regime(set))
+#'
   regime<-match.arg(regime)
   coefName<-paste("phi", regime, sep="")
   phi<-coef[grep(coefName,names(coef))]

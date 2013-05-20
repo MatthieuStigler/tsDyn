@@ -1,3 +1,4 @@
+
 resVar<-function(x, adj=c("OLS", "ML")){
   if(!inherits(x, "setar"))
     stop("Object must be created by setar()")

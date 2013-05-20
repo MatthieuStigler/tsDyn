@@ -1,5 +1,3 @@
-
-
 ###tests
 #SSR of linear
  # check for stationarty
@@ -20,6 +18,7 @@
 #SSR of those models: SSR_1thresh / SSR_2threshCommon / SSR_2threshNoCommon
 
 #replicate()
+
 
 
 setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, test=c("1vs", "2vs3"), hpc=c("none", "foreach"), check=FALSE)
@@ -244,6 +243,40 @@ plot.Hansen99Test<-function(x,show.extended=TRUE, ...){
 }
 
 
+
+
+#'extension of the bootstrap replications
+#'
+#'This function updates an existing bootstrap test with new bootstrap
+#'replications.
+#'
+#'The plot function will draw the old and new distribution, hence allowing to
+#'test the sensitivity of the results obtained.
+#'
+#'@aliases extendBoot extendBoot
+#'@param x A object from setarTest (hence of class Hansen99Test)
+#'@param nboot The number of new bootstrap replications
+#'@return Returns an object of the same class with same objects but updated
+#'values.
+#'@returnItem updated The number of new bootstrap replications. Is null when
+#'the test is run the first time
+#'@author Matthieu Stigler
+#'@seealso \code{\link{BBCTest}} for a similar test. \code{\link{setarTest}}
+#'for a test with stationarity as a null.
+#'@examples
+#'
+#'
+#'\dontrun{
+#'# test with 10 bootstrap replications:
+#'a<-setarTest(sun[1:100], m=1, nboot=10)
+#'plot(a)
+#'
+#'#use old results and compue 20 new replications
+#'b<-extendBoot(a, n=20)
+#'#see the different distributions:
+#'plot(b)
+#'}
+#'
 extendBoot<-function(x, nboot){
   if(class(x)!="Hansen99Test")
     stop("Function only works for setarTest object")

@@ -1,4 +1,33 @@
 #Author: Antonio, Fabio Di Narzo. Last Modified 30 March 2011
+
+
+#'Trivariate time series plots
+#'
+#'Trivariate time series plots: kernel autoregression using functions in the
+#'\pkg{sm} package
+#'
+#'This function displays trivariate time series plots, i.e. kernel regression
+#'of \eqn{x[t-lags[1]], x[t-lags[2]]}{x_{t-l_1}, x_{t-l_2}} against
+#'\eqn{x[t]}{x_t} using functions in the package \pkg{sm}.  In particular,
+#'\code{\link[sm]{sm.regression}} is used, with smoothing parameter defaulting
+#'to \code{\link[sm]{hnorm}(x)}.
+#'
+#'@param x time series
+#'@param lags vector of regressors lags
+#'@param h kernel window
+#'@param type type of plot: contour levels, perspective plots, image
+#'@return None. Plots are produced on the default graphical device.
+#'@author Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo
+#'@seealso For finer control on kernel regression, consider using directly
+#'\code{\link[sm]{sm.regression}} and, especially,
+#'\code{\link[sm]{sm.autoregression}} in package \code{\link[sm]{sm}}.
+#'@keywords ts
+#'@examples
+#'
+#'autotriples(log(lynx))
+#'autotriples(log(lynx), type="persp")
+#'autotriples(log(lynx), type="image")
+#'
 autotriples <- function(x, lags=1:2, h, type=c("levels","persp","image", "lines", "points")) {
   require(sm) || stop("sm package is required for kernel density estimation")
   require(scatterplot3d) ||	stop("the scatterplot3d package is required for 3d visualization")
