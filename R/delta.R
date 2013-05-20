@@ -58,6 +58,8 @@ delta <- function(x, m, d=1, eps) {
 	return( 1 - ( (C[m])^2 /  (C[m-1]*C[m+1]) ) )
 }
 
+#' @rdname delta
+#' @export
 delta.test <- function(x, m=2:3, d=1, eps = seq(0.5*sd(x),2*sd(x),length=4), B=49) {
 	delta.b <- numeric(B)
 	p.value <- matrix(NA,length(m),length(eps))

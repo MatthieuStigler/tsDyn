@@ -1,8 +1,15 @@
-\name{TVECM.sim}
+\name{VECM.sim}
 \alias{TVECM.sim}
 \alias{VECM.sim}
 \title{Simulation and bootstrap of bivariate VECM/TVECM}
 \usage{
+  VECM.sim(data, B, VECMobject, beta, n = 200, lag = 1,
+    type = c("simul", "boot", "check"),
+    include = c("const", "trend", "none", "both"),
+    starting = NULL,
+    innov = rmnorm(n, mean = 0, varcov = varcov),
+    varcov = diag(1, k), show.parMat = FALSE)
+
   TVECM.sim(data, B, TVECMobject, nthresh = 1, Thresh,
     beta, n = 200, lag = 1,
     type = c("simul", "boot", "check"),

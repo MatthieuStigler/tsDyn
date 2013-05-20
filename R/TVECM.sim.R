@@ -1,3 +1,5 @@
+
+#' @rdname TVECM.sim
 VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
   k<- if(!missing(VECMobject)) VECMobject$k else if(!missing(B)) nrow(B) else if(!missing(data)) ncol(data)
   TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat)
