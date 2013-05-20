@@ -46,8 +46,14 @@
 accuracy_stat <- function(object, ...)
   UseMethod("accuracy_stat")
 
+#' @rdname accuracy_stat
+#' @method accuracy_stat default
+#' @S3method accuracy_stat default
 accuracy_stat.default <- function(object, true, ...) accuracy_stat_simple(fit=object, true=true)
 
+#' @rdname accuracy_stat
+#' @method accuracy_stat pred_roll
+#' @S3method accuracy_stat pred_roll
 accuracy_stat.pred_roll <- function(object, w, ...) {
 
   is_multiH <- "n.ahead" %in% colnames(object$pred)

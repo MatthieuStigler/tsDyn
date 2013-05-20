@@ -1,26 +1,32 @@
 \name{computeGradient}
 \alias{computeGradient}
 \title{computeGradient}
-\description{
-Computes the gradient under the null hypothesis
-}
 \usage{
-computeGradient(object, ...)
+  computeGradient(object, ...)
 }
 \arguments{
-\item{object}{ fitted star model }
-\item{...}{currently unused}
+  \item{object}{fitted star model}
+
+  \item{...}{currently unused}
 }
 \value{
-computed gradient
+  computed gradient
 }
-\seealso{\code{\link{addRegime}}}
-\author{ J. L. Aznarte }
+\description{
+  Computes the gradient under the null hypothesis
+}
 \examples{
 ##TODO
 }
-\keyword{ ts }
-\keyword{ internal }
-\references{
-TODO
+\author{
+  J. L. Aznarte
 }
+\references{
+  TODO
+}
+\seealso{
+  \code{\link{addRegime}}
+}
+\keyword{internal}
+\keyword{ts}
+
