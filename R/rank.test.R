@@ -180,6 +180,9 @@ rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
   return(res)
 }
 
+#' @rdname rank.test
+#' @method print rank.test
+#' @S3method print rank.test
 print.rank.test <- function(x, ...) {
 
   if(x$call$r_null=="unspec"){
@@ -191,6 +194,9 @@ print.rank.test <- function(x, ...) {
   invisible(x)
 }
 
+#' @rdname rank.test
+#' @method summary rank.test
+#' @S3method summary rank.test
 summary.rank.test <- function(object, ...) {
 
   x<- object$res_df
