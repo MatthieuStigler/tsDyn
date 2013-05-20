@@ -4,11 +4,14 @@
 #'
 #'This function provides basic functionalities for VAR and VECM models. More
 #'comprehensive functions are in package \pkg{vars}. A few differences appear
-#'in the VECM estimation: \itemize{ \itemEngle-Granger estimatorThe
-#'Engle-Granger estimator is available \itemPresentationResults are printed in
-#'a different ways, using a matrix form \itemlateX exportThe matrix of
-#'coefficients can be exported to latex, with or without standard-values and
-#'significance stars } Two estimators are available: the Engle-Granger two step
+#'in the VECM estimation: \describe{ 
+#' \item{Engle-Granger estimator}{The Engle-Granger estimator is available}
+#' \item{Presentation}{Results are printed in a different ways, using a matrix form}
+#' \item{lateX export}{The matrix of coefficients can be exported to latex, 
+#'        with or without standard-values and significance stars}
+#' } 
+#'
+#'Two estimators are available: the Engle-Granger two step
 #'approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS,
 #'deterministic regressors (or external variables if \code{LRinclude} is of
 #'class numeric) can be added for the estimation of the cointegrating value and
