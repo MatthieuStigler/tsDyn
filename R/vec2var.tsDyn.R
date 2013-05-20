@@ -1,6 +1,3 @@
-########### VAR Representation
-
-
 #'VAR representation
 #'
 #'Show the VAR representation of a VECM
@@ -30,10 +27,14 @@
 #'VARrep(mod_var)
 #'
 #'
+
+#' @export
 VARrep  <- function (object, ...)  
   UseMethod("VARrep")
 
-
+#' @rdname VARrep
+#' @method VARrep VECM
+#' @S3method VARrep VECM
 VARrep.VECM <- function(object, ...) {
 
   lag <- object$lag
@@ -99,6 +100,9 @@ VARrep.VECM <- function(object, ...) {
   Amat
 }
 
+#' @rdname VARrep
+#' @method VARrep VAR
+#' @S3method VARrep VAR
 VARrep.VAR <- function(object, ...) {
 
   I <- attr(object, "varsLevel")
