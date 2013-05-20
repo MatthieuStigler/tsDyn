@@ -57,6 +57,8 @@
 #'title("Comparison of true and rolling 1-ahead forecasts\n")
 #'
 #'
+
+#' @export
 predict_rolling  <- function (object, ...)  
   UseMethod("predict_rolling")
 
@@ -141,7 +143,9 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 }
 
 
-
+#' @rdname predict_rolling
+#' @method predict_rolling nlVar
+#' @S3method predict_rolling nlVar
 predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newdata, ...){
 
   morgAr <- list(object=object, nroll=nroll)
