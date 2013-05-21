@@ -327,7 +327,8 @@ buildConstants<-function(include=c("const", "trend","none", "both"), n){
 #'
 #'
 #'# 2 thresholds:
-#'selectSETAR(sun, m=3, th=MakeThSpec(ngrid="Half"),criterion="SSR", d=1, thDelay=0:2, plot=FALSE, nthresh=2)
+#'selectSETAR(sun, m=3, th=MakeThSpec(ngrid="Half"),criterion="SSR", d=1, thDelay=0:2,
+#'            plot=FALSE, nthresh=2)
 #'
 #'
 MakeThSpec<-function(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int=c("from","to"), around="val",...){

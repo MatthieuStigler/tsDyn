@@ -68,7 +68,8 @@
 #'
 #'##The one threshold (two regimes) gives a value of 10.698 for the threshold and 1 for the delay. 
 #' #Conditional on this values, the search for a second threshold (three regimes) gives 8.129. 
-#' #Starting from this values, a full grid search finds the same values and confims the first step estimation. 
+#' #Starting from this values, a full grid search finds the same values and confims 
+#' #the first step estimation. 
 #'
 TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model=c("TAR", "MTAR"), commonInter=FALSE, nthresh=1,thDelay=1, mTh=1,thVar, trim=0.1,ngrid, gamma=NULL,  around, plot=FALSE, dummyToBothRegimes=TRUE, trace=TRUE, trick="for", max.iter=2){
 y <- as.matrix(data)

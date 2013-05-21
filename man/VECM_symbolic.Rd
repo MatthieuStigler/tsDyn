@@ -36,7 +36,8 @@ a<-matrix(c(-0.4, 0.1), ncol=1)
  VARrep(d)
  d<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(0, ncol=2, nrow=2))
  VARrep(d)
- d3<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(c(0.1, 0.3, 0.1, 0.2), ncol=2, nrow=2), inc=matrix(c(0.5, 0.1), ncol=1), include="const")
+ LagMat <- matrix(c(0.1, 0.3, 0.1, 0.2), ncol=2, nrow=2)
+ d3<- VECM_symbolic(alpha=a, beta=t(b), lags=LagMat, inc=matrix(c(0.5, 0.1), ncol=1), include="const")
  VARrep(d3)
 }
 \keyword{cointegration}

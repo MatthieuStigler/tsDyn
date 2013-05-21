@@ -8,9 +8,10 @@ Self Exciting Threshold AutoRegressive model.
 }
 \usage{
 setar(x, m, d=1, steps=d, series, mL, mM, mH, thDelay=0, mTh, thVar, th, trace=FALSE, 
-      nested=FALSE, include = c( "const", "trend","none", "both"), common=c("none", "include","lags", "both"), 
-      model=c("TAR", "MTAR"), ML=seq_len(mL), MM=seq_len(mM), MH=seq_len(mH),nthresh=1,trim=0.15, 
-      type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") )
+      nested=FALSE, include = c( "const", "trend","none", "both"), 
+      common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL), 
+      MM=seq_len(mM), MH=seq_len(mH),nthresh=1,trim=0.15, type=c("level", "diff", "ADF"),
+      restriction=c("none","OuterSymAll","OuterSymTh") )
 }
 \value{
   An object of class \code{nlar}, subclass \code{setar}
