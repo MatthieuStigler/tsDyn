@@ -608,23 +608,23 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
 
 
 
-#'Latex representation of fitted setar models
+#' Latex representation of fitted setar models
 #'
-#'Latex representation of fitted setar models
+#' Produce LaTeX output of the SETAR model. 
 #'
 #'
-#'@param object fitted setar model (using \code{\link{nlar}})
-#'@param digits options to be passed to \code{\link{format}} for formatting
-#'numbers
-#'@param label LaTeX label passed to the equation
-#'@param \dots Not used
-#'@author Antonio, Fabio Di Narzo
-#'@seealso \code{\link{setar}}, \code{\link{nlar-methods}}
-#'@keywords ts
-#'@examples
+#' @param object fitted setar model (using \code{\link{nlar}})
+#' @param digits options to be passed to \code{\link{format}} for formatting
+#' numbers
+#' @param label LaTeX label passed to the equation
+#' @param \dots Not used
+#' @author Antonio, Fabio Di Narzo
+#' @seealso \code{\link{setar}}, \code{\link{nlar-methods}}
+#' @keywords ts
+#' @examples
 #'
-#'mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
-#'toLatex(mod.setar)
+#' mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
+#' toLatex(mod.setar)
 #'
 #' @method toLatex setar 
 #' @S3method toLatex setar 
