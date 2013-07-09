@@ -198,14 +198,14 @@ print.rank.test <- function(x, ...) {
 #' @method summary rank.test
 #' @S3method summary rank.test
 summary.rank.test <- function(object, ...) {
+  object$res_df
+}
 
-  x<- object$res_df
-  trace_pvalf <- format.pval(x$trace_pval, eps=1e-03,digits = max(1, getOption("digits") - 3))
-  trace_pval_Tf <- format.pval(x$trace_pval_T, eps=1e-03,digits = max(1, getOption("digits") - 3))
-  eigen_pvalf <- format.pval(x$eigen_pval, eps=1e-03,digits = max(1, getOption("digits") - 3))
-  x_show <- data.frame(r=x$r, trace=x$trace, trace_pval=trace_pvalf,trace_pval_T =trace_pval_Tf,  eigen=x$eigen, eigen_pval=eigen_pvalf)
+#' @S3method print summary.rank.test
+print.summary.rank.test <- function(object, digits=max(1, getOption("digits") - 3), ...) {
 
-  print(x_show)
+  object[, c(3,4,6)] <- sapply(object[, c(3,4,6)], function(x) format.pval(x, eps=1e-03,digits = digits))
+  print(object)
 
 }
 
