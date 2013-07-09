@@ -43,15 +43,16 @@
 #'
 #'# As the function takes long long time to be executed, we show in in don't run environement
 #'\dontrun{
-#'data(zeroyld)
+#' data(zeroyld)
 #'
-#'#can be useful to check whether the bootstrap is working: sithout sampling, results of boot should be same as original
-#'#this is indeed not always the case duye to floating point algorithm
-#'TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=2, plot=FALSE,check=TRUE)
+#' #can be useful to check whether the bootstrap is working: 
+#' #without sampling, results of boot should be same as original
+#' #this is indeed not always the case duye to floating point algorithm
+#' TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=2, plot=FALSE,check=TRUE)
 #'
-#'#then run the function:
-#'TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=100, plot=FALSE,check=FALSE)
-#'}
+#' #then run the function:
+#' TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=100, plot=FALSE,check=FALSE)
+#' }
 #'
 TVECM.SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, hpc=c("none", "foreach"), check=FALSE) {
 

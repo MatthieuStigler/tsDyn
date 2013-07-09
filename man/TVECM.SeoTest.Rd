@@ -62,7 +62,8 @@
 \dontrun{
 data(zeroyld)
 
-#can be useful to check whether the bootstrap is working: sithout sampling, results of boot should be same as original
+#can be useful to check whether the bootstrap is working:
+#without sampling, results of boot should be same as original
 #this is indeed not always the case duye to floating point algorithm
 TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=2, plot=FALSE,check=TRUE)
 
