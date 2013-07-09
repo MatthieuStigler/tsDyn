@@ -1,4 +1,4 @@
-\name{AAR}
+\name{aar}
 \alias{AAR}
 \alias{aar}
 \alias{summary.aar}
