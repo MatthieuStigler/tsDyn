@@ -9,7 +9,8 @@
 
   \method{print}{rank.test} (x, ...)
 
-  \method{summary}{rank.test} (object, ...)
+  \method{summary}{rank.test} (object,
+    digits = max(1, getOption("digits") - 3), ...)
 }
 \arguments{
   \item{vecm}{\sQuote{VECM} object computed with the
@@ -29,6 +30,9 @@
   summary method.}
 
   \item{...}{Unused.}
+
+  \item{digits}{The number of digits to use in
+  \code{\link{format.pval}}}
 }
 \value{
   An object of class \sQuote{rank.test}, with

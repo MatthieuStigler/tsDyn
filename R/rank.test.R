@@ -195,6 +195,7 @@ print.rank.test <- function(x, ...) {
 }
 
 #' @rdname rank.test
+#' @param digits The number of digits to use in \code{\link{format.pval}}
 #' @method summary rank.test
 #' @S3method summary rank.test
 summary.rank.test <- function(object, digits=max(1, getOption("digits") - 3), ...) {
@@ -204,13 +205,6 @@ summary.rank.test <- function(object, digits=max(1, getOption("digits") - 3), ..
   return(res)
 }
 
-# # # # #' @S3method print summary.rank.test
-# # # # print.summary.rank.test <- function(object, ...) {
-# # # # new <-object
-# # # #   
-# # # #   print(new)
-# # # # 
-# # # # }
 
 #############################################
 ############ P val approximation
