@@ -24,7 +24,8 @@
 #'  d<- VECM_symbolic(alpha=a, beta=t(b), lags=matrix(0, ncol=2, nrow=2))
 #'  VARrep(d)
 #'  LagMat <- matrix(c(0.1, 0.3, 0.1, 0.2), ncol=2, nrow=2)
-#'  d3<- VECM_symbolic(alpha=a, beta=t(b), lags=LagMat, inc=matrix(c(0.5, 0.1), ncol=1), include="const")
+#'  incMat <- matrix(c(0.5, 0.1), ncol=1)
+#'  d3<- VECM_symbolic(alpha=a, beta=t(b), lags=LagMat, inc=incMat, include="const")
 #'  VARrep(d3)
 #'
 #'
