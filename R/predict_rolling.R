@@ -246,7 +246,6 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
   full_samp <- c(estim_samp, newdata)
 
 ## Get in sample forecasts
-  slotMod<- switch(mod_cl, "Arima"="pred", "ets"="mean")
   pred <- vector("numeric",length=nroll*length(n.ahead))
 
   for(j in 1:length(n.ahead)){
@@ -264,7 +263,8 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
   }
 
   trueVal <- as.data.frame(newdata)
-  colnames(pred)[1] <- colnames(trueVal)[1] <- if(mod_cl=="Arima") object$series else deparse(object$call$y)
+  nam <- if(grepl("Arima", mod_cl)) object$series else deparse(object$call$y)
+  colnames(pred)[1] <- colnames(trueVal)[1] <- nam
 
 ## Return object
   res <- list(pred=pred, true= trueVal)
