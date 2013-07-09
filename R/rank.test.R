@@ -197,17 +197,20 @@ print.rank.test <- function(x, ...) {
 #' @rdname rank.test
 #' @method summary rank.test
 #' @S3method summary rank.test
-summary.rank.test <- function(object, ...) {
-  object$res_df
+summary.rank.test <- function(object, digits=max(1, getOption("digits") - 3), ...) {
+  res <- object$res_df
+  rownames(res) <- NULL
+  res[, c(3,4,6)] <- sapply(res[, c(3,4,6)], function(x) format.pval(x, eps=1e-03,digits = digits))
+  return(res)
 }
 
-#' @S3method print summary.rank.test
-print.summary.rank.test <- function(object, digits=max(1, getOption("digits") - 3), ...) {
-
-  object[, c(3,4,6)] <- sapply(object[, c(3,4,6)], function(x) format.pval(x, eps=1e-03,digits = digits))
-  print(object)
-
-}
+# # # # #' @S3method print summary.rank.test
+# # # # print.summary.rank.test <- function(object, ...) {
+# # # # new <-object
+# # # #   
+# # # #   print(new)
+# # # # 
+# # # # }
 
 #############################################
 ############ P val approximation
