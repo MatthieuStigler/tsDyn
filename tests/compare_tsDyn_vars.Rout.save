@@ -70,31 +70,41 @@ Loading required package: lmtest
 + 		    list(vecm_l1_LRtr_var, vecm_l1_LRtr_tsD),
 + 		    list(vecm_l3_LRtr_var, vecm_l3_LRtr_tsD))
 > 
-> comp_teststat <- function(x) all.equal(x[[1]]@teststat, rev(rank.test(x[[2]])$res_df[,"eigen"]), check.attributes=FALSE)
-> comp_betas <- function(x) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$coint, check.attributes=FALSE)
-> comp_coefs <- function(x) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE)
+> deftol <- .Machine$double.eps ^ 0.5
+> lowtol <- 1.e-07
+> lowlowtol <- 1.e-06
+> comp_teststat <- function(x, tol=deftol) all.equal(x[[1]]@teststat, rev(rank.test(x[[2]])$res_df[,"eigen"]), check.attributes=FALSE, tolerance=tol)
+> comp_betas <- function(x, tol=deftol) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$coint, check.attributes=FALSE, tolerance=tol)
+> comp_coefs <- function(x, tol=deftol) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE, tolerance=tol)
 > comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attributes=FALSE)
 > comp_IRF <- function(x) all.equal(irf(vec2var(x[[1]]), boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
 > comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$irf, irf(x[[2]], runs=2, seed=1234)$irf, check.attributes=FALSE)
 > comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
-> comp_resid <- function(x) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE)
+> comp_resid <- function(x, tol=deftol) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE, tolerance=tol)
 > comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
 > comp_predictOld <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, tsDyn:::predictOld.VECM(x[[2]])$fcst, check.attributes=FALSE)
 > comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
+> 
+> ### Small function to print nicely:
+> 
+> roundAll.Equal <- function(x, round=8){
++   isFALSE <- x!="TRUE"
++   xFalse <- x[isFALSE]
++   xf<- round(as.numeric(gsub("(Component [0-9]+: )?Mean relative difference: ", "", xFalse)),round)
++   x[isFALSE] <- paste("Mean relative difference: ", xf, sep="")
++   x
++ }
 > 
 > 
 > ### Compare VECM methods:
 > print(sapply(all_models, comp_teststat ))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> print(sapply(all_models, comp_betas)) # 2 and 6
+> print(sapply(all_models, comp_betas, tol=lowtol)) # 2 and 6
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> print(sapply(all_models, comp_coefs)) # 5 and 6
-[1] "TRUE"                                  
-[2] "TRUE"                                  
-[3] "TRUE"                                  
-[4] "TRUE"                                  
-[5] "Mean relative difference: 0.0001434468"
-[6] "Mean relative difference: 0.001799345" 
+> roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
+[1] "TRUE"                                "TRUE"                               
+[3] "TRUE"                                "TRUE"                               
+[5] "Mean relative difference: 0.0001434" "Mean relative difference: 0.0017993"
 > print(sapply(all_models, comp_LL)) # 2 and 6
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_IRF))
@@ -103,41 +113,37 @@ Loading required package: lmtest
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_FEVD))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> print(sapply(all_models, comp_resid)) # 5 and 6
+> print(sapply(all_models, comp_resid, tol=lowtol)) # 5 and 6
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_fitted)) 
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> print(sapply(all_models, comp_predict)) # 5 and 6
-[1] "TRUE"                                 
-[2] "TRUE"                                 
-[3] "TRUE"                                 
-[4] "TRUE"                                 
-[5] "Mean relative difference: 0.007418979"
-[6] "Mean relative difference: 0.009120457"
-> print(sapply(all_models, comp_predictOld)) # 5 and 6
+> roundAll.Equal(sapply(all_models, comp_predict)) # 5 and 6
+[1] "TRUE"                                
+[2] "TRUE"                                
+[3] "TRUE"                                
+[4] "TRUE"                                
+[5] "Mean relative difference: 0.00741898"
+[6] "Mean relative difference: 0.00912046"
+> lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=7) # 5 and 6
 [[1]]
-[1] TRUE
+[1] "TRUE"
 
 [[2]]
-[1] TRUE
+[1] "TRUE"
 
 [[3]]
-[1] TRUE
+[1] "TRUE"
 
 [[4]]
-[1] TRUE
+[1] "TRUE"
 
 [[5]]
-[1] "Component 1: Mean relative difference: 4.087912e-05"
-[2] "Component 2: Mean relative difference: 0.0001349058"
-[3] "Component 3: Mean relative difference: 0.0003334992"
-[4] "Component 4: Mean relative difference: 0.007030102" 
+[1] "Mean relative difference: 4.09e-05"  "Mean relative difference: 0.0001349"
+[3] "Mean relative difference: 0.0003335" "Mean relative difference: 0.0070301"
 
 [[6]]
-[1] "Component 1: Mean relative difference: 5.373399e-05"
-[2] "Component 2: Mean relative difference: 0.0002085819"
-[3] "Component 3: Mean relative difference: 0.001637227" 
-[4] "Component 4: Mean relative difference: 0.01815156"  
+[1] "Mean relative difference: 5.37e-05"  "Mean relative difference: 0.0002086"
+[3] "Mean relative difference: 0.0016372" "Mean relative difference: 0.0181516"
 
 > 
 > #########################
@@ -196,13 +202,15 @@ Loading required package: lmtest
 +   return(res)
 + }
 > 
+> 
+> 
 > comp_var_coefs <- function(x) all.equal(coef_to_vars (x[[1]]), t(sapply(coef(x[[2]]), function(x) x[,"Estimate"])), check.attributes=FALSE)
-> comp_var_logLik <- function(x) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE)
+> comp_var_logLik <- function(x, tol=deftol) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE, tolerance=tol)
 > 
 > comp_var_pred <- function(x) all.equal(predict(x[[1]]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 > comp_var_predOld <- function(x) all.equal(sapply(tsDyn:::predictOld.VAR(x[[1]], n.ahead=5)$fcst, function(x) x[,"fcst"]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 > comp_var_fevd <- function(x) all.equal(sapply(fevd(x[[1]]), head,2), sapply(fevd(x[[2]]), head,2), check.attributes=FALSE)
-> comp_var_IRF <- function(x) all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+> comp_var_IRF <- function(x) isTRUE(all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE))
 > 
 > ### Compare VECM methods:
 > sapply(all_var_models, comp_var_coefs)
@@ -210,49 +218,18 @@ Loading required package: lmtest
 [2] "Mean relative difference: 0.0001085181"
 [3] "TRUE"                                  
 [4] "Mean relative difference: 0.0001395315"
-> sapply(all_var_models, comp_var_logLik)
-[1] "TRUE"                                  
-[2] "Mean relative difference: 6.786064e-07"
-[3] "TRUE"                                  
-[4] "Mean relative difference: 1.354509e-07"
-> sapply(all_var_models_noNoBo, comp_var_pred)
-[1] "TRUE"                                
-[2] "Mean relative difference: 0.01154805"
-[3] "TRUE"                                
-[4] "Mean relative difference: 0.01644699"
-> sapply(all_var_models_noNoBo, comp_var_predOld)
-[1] "TRUE"                                
-[2] "Mean relative difference: 0.01188744"
-[3] "TRUE"                                
-[4] "Mean relative difference: 0.0173923" 
-> sapply(all_var_models_noNoBo, comp_var_fevd)
-[1] "TRUE"                                  
-[2] "Mean relative difference: 1.103716e-05"
-[3] "TRUE"                                  
-[4] "Mean relative difference: 2.108874e-05"
+> sapply(all_var_models, comp_var_logLik, tol=lowlowtol)
+[1] TRUE TRUE TRUE TRUE
+> roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),4)
+[1] "TRUE"                             "Mean relative difference: 0.0115"
+[3] "TRUE"                             "Mean relative difference: 0.0164"
+> roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_predOld),7)
+[1] "TRUE"                                "Mean relative difference: 0.0118874"
+[3] "TRUE"                                "Mean relative difference: 0.0173923"
 > sapply(all_var_models_noNoBo, comp_var_IRF)
-     [,1]                                               
-[1,] "Component 1: Mean relative difference: 0.03155347"
-[2,] "Component 2: Mean relative difference: 0.03155347"
-[3,] "Component 3: Mean relative difference: 0.03155347"
-[4,] "Component 4: Mean relative difference: 0.03155347"
-     [,2]                                               
-[1,] "Component 1: Mean relative difference: 0.03160114"
-[2,] "Component 2: Mean relative difference: 0.03154884"
-[3,] "Component 3: Mean relative difference: 0.0315109" 
-[4,] "Component 4: Mean relative difference: 0.03154268"
-     [,3]                                               
-[1,] "Component 1: Mean relative difference: 0.09141031"
-[2,] "Component 2: Mean relative difference: 0.09141031"
-[3,] "Component 3: Mean relative difference: 0.09141031"
-[4,] "Component 4: Mean relative difference: 0.09141031"
-     [,4]                                               
-[1,] "Component 1: Mean relative difference: 0.09141317"
-[2,] "Component 2: Mean relative difference: 0.09157098"
-[3,] "Component 3: Mean relative difference: 0.09115843"
-[4,] "Component 4: Mean relative difference: 0.09112952"
+[1] FALSE FALSE FALSE FALSE
 > 
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      5.290       0.050       5.402 
+      6.300       0.140       6.677 

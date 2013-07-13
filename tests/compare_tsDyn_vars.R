@@ -38,31 +38,44 @@ all_models <- list(
 		    list(vecm_l1_LRtr_var, vecm_l1_LRtr_tsD),
 		    list(vecm_l3_LRtr_var, vecm_l3_LRtr_tsD))
 
-comp_teststat <- function(x) all.equal(x[[1]]@teststat, rev(rank.test(x[[2]])$res_df[,"eigen"]), check.attributes=FALSE)
-comp_betas <- function(x) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$coint, check.attributes=FALSE)
-comp_coefs <- function(x) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE)
+deftol <- .Machine$double.eps ^ 0.5
+lowtol <- 1.e-07
+lowlowtol <- 1.e-06
+comp_teststat <- function(x, tol=deftol) all.equal(x[[1]]@teststat, rev(rank.test(x[[2]])$res_df[,"eigen"]), check.attributes=FALSE, tolerance=tol)
+comp_betas <- function(x, tol=deftol) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$coint, check.attributes=FALSE, tolerance=tol)
+comp_coefs <- function(x, tol=deftol) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE, tolerance=tol)
 comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attributes=FALSE)
 comp_IRF <- function(x) all.equal(irf(vec2var(x[[1]]), boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
 comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$irf, irf(x[[2]], runs=2, seed=1234)$irf, check.attributes=FALSE)
 comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
-comp_resid <- function(x) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE)
+comp_resid <- function(x, tol=deftol) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE, tolerance=tol)
 comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
 comp_predictOld <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, tsDyn:::predictOld.VECM(x[[2]])$fcst, check.attributes=FALSE)
 comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
 
+### Small function to print nicely:
+
+roundAll.Equal <- function(x, round=8){
+  isFALSE <- x!="TRUE"
+  xFalse <- x[isFALSE]
+  xf<- round(as.numeric(gsub("(Component [0-9]+: )?Mean relative difference: ", "", xFalse)),round)
+  x[isFALSE] <- paste("Mean relative difference: ", xf, sep="")
+  x
+}
+
 
 ### Compare VECM methods:
 print(sapply(all_models, comp_teststat ))
-print(sapply(all_models, comp_betas)) # 2 and 6
-print(sapply(all_models, comp_coefs)) # 5 and 6
+print(sapply(all_models, comp_betas, tol=lowtol)) # 2 and 6
+roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
 print(sapply(all_models, comp_LL)) # 2 and 6
 print(sapply(all_models, comp_IRF))
 print(sapply(all_models, comp_IRF_rand))
 print(sapply(all_models, comp_FEVD))
-print(sapply(all_models, comp_resid)) # 5 and 6
+print(sapply(all_models, comp_resid, tol=lowtol)) # 5 and 6
 print(sapply(all_models, comp_fitted)) 
-print(sapply(all_models, comp_predict)) # 5 and 6
-print(sapply(all_models, comp_predictOld)) # 5 and 6
+roundAll.Equal(sapply(all_models, comp_predict)) # 5 and 6
+lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=7) # 5 and 6
 
 #########################
 ##### VAR #####
@@ -120,19 +133,20 @@ coef_to_vars <- function(x){
   return(res)
 }
 
+
+
 comp_var_coefs <- function(x) all.equal(coef_to_vars (x[[1]]), t(sapply(coef(x[[2]]), function(x) x[,"Estimate"])), check.attributes=FALSE)
-comp_var_logLik <- function(x) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE)
+comp_var_logLik <- function(x, tol=deftol) all.equal(logLik(x[[1]]), as.numeric(logLik(x[[2]])), check.attributes=FALSE, tolerance=tol)
 
 comp_var_pred <- function(x) all.equal(predict(x[[1]]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 comp_var_predOld <- function(x) all.equal(sapply(tsDyn:::predictOld.VAR(x[[1]], n.ahead=5)$fcst, function(x) x[,"fcst"]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 comp_var_fevd <- function(x) all.equal(sapply(fevd(x[[1]]), head,2), sapply(fevd(x[[2]]), head,2), check.attributes=FALSE)
-comp_var_IRF <- function(x) all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+comp_var_IRF <- function(x) isTRUE(all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE))
 
 ### Compare VECM methods:
 sapply(all_var_models, comp_var_coefs)
-sapply(all_var_models, comp_var_logLik)
-sapply(all_var_models_noNoBo, comp_var_pred)
-sapply(all_var_models_noNoBo, comp_var_predOld)
-sapply(all_var_models_noNoBo, comp_var_fevd)
+sapply(all_var_models, comp_var_logLik, tol=lowlowtol)
+roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),4)
+roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_predOld),7)
 sapply(all_var_models_noNoBo, comp_var_IRF)
 
