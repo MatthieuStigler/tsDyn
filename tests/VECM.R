@@ -108,7 +108,7 @@ sapply(vecm_all, function(x) x$model.specific$coint )
 sapply(vecm_all, function(x) x$model.specific$beta)
 
 ### VARrep
-lapply(vecm_all, VARrep)
+lapply(vecm_all, function(x) round(VARrep(x),9))
 
 ### fevd
 lapply(vecm_all, function(x) sapply(fevd(x, n.ahead=2), head))
