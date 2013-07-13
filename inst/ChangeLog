@@ -1,9 +1,12 @@
+Version 0.9-32: Matthieu Stigler (13/7/2013)
+-change some tests to avoid difference in outputs depending on platform/architecture
+-remove the data(x) used at bottom of many scripts
+
 Version 0.9-31: Matthieu Stigler (12/7/2013)
 -adopt half roxygen documentation
 -minor correction in rank.test: add print.summary()
 -minor correction in predict_rolling for forecast objects. 
 -changes in tests/lstar and /compareVecm to lower printing digits, to reduce changes in architecture/platform
-
 
 Version 0.9-3: Matthieu Stigler (5/5/2013)
 -change: package loading: put most packages from depends to import
