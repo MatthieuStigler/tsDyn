@@ -707,7 +707,7 @@ return(z)
 
 if(FALSE) {
 library(tsDyn)
-data(zeroyld)
+#data(zeroyld)
 dat<-zeroyld
 
 environment(TVECM)<-environment(star)

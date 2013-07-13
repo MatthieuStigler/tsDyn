@@ -564,7 +564,7 @@ summary.TVARtest<-function(object,...){
 
 if(FALSE){ #usage example
 environment(TVAR.LRtest)<-environment(star)
-data(zeroyld)
+#data(zeroyld)
 data<-zeroyld[1:150,]
 
 test<-TVAR.LRtest(data, lag=3, mTh=c(1,1),thDelay=1:2, nboot=2, plot=FALSE, trim=0.1, test="1vs", model="TAR")

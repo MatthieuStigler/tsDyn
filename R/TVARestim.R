@@ -872,7 +872,7 @@ grid<-function(gammasUp, gammasDown, fun, trace=TRUE, method=c("for", "apply", "
 if(FALSE) { #usage example
 ###Hansen Seo data
 library(tsDyn)
-data(zeroyld)
+#data(zeroyld)
 dat<-zeroyld
 environment(TVAR)<-environment(star)
 environment(summary.TVAR)<-environment(star)

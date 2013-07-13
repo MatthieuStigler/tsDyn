@@ -516,7 +516,7 @@ library(tsDyn)
 environment(lineVar)<-environment(star)
 environment(summary.VAR)<-environment(star)
 environment(toLatex.VAR)<-environment(star)
-data(zeroyld)
+#data(zeroyld)
 dat<-zeroyld
 
 #tests
@@ -679,7 +679,7 @@ if(FALSE){
 if(FALSE) { #usage example
 ###Hansen Seo data
 library(tsDyn)
-data(zeroyld)
+#data(zeroyld)
 dat<-zeroyld
 environment(lineVar)<-environment(star)
 environment(summary.VAR)<-environment(star)

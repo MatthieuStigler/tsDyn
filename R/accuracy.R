@@ -156,7 +156,7 @@ mod_ar_pred_12 <- predict_rolling(mod_ar, newdata=lynx[101:114], n.ahead=1:2)
 accuracy_stat(object=mod_ar_pred_12)
 
 ## multivariate
-data(barry)
+# data(barry)
 mod_var <- lineVar(barry, lag=1)
 
 

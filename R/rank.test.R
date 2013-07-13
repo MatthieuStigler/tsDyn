@@ -364,8 +364,8 @@ library(urca)
 
 environment(rank.test) <- environment(star)
 
-data(Canada)
-data(denmark)
+#data(Canada)
+#data(denmark)
 
 ve_can <- VECM(Canada, lag=1, estim="ML")
 ve_can_l2 <- VECM(Canada, lag=2, estim="ML")

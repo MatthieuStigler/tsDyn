@@ -209,7 +209,7 @@ summary.rank.select <- function(object,...){
 if(FALSE){
 library(tsDyn)
 library(vars)
-data(Canada)
+#data(Canada)
 
 
 resu <- rank.select(Canada, sameSample=TRUE)

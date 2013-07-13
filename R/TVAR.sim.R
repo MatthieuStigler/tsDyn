@@ -363,7 +363,7 @@ TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 
 
 ##Bootstrap a TVAR 
-data(zeroyld)
+#data(zeroyld)
 serie<-zeroyld
 
 # TVAR.sim(data=serie,nthresh=0)
@@ -384,7 +384,7 @@ comp_tvar_sim <- function(mod, serie){
 }
 
 
-data(barry)
+#data(barry)
 var_l1_co <-lineVar(barry, lag=1, include="const")
 var_l1_tr <-lineVar(barry, lag=1, include="trend")
 var_l1_bo <-lineVar(barry, lag=1, include="both")

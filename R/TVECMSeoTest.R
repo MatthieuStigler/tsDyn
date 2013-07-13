@@ -301,7 +301,7 @@ plot.TVECMSeo06Test<-function(x,...){
 
 if(FALSE) {#usage example
 
-data(zeroyld)
+#data(zeroyld)
 data<-zeroyld
 
 

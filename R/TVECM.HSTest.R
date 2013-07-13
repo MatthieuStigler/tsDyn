@@ -309,7 +309,7 @@ plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){
 if(FALSE) {#usage example
 ###Test
 library(tsDyn)
-data(zeroyld)
+#data(zeroyld)
 data<-zeroyld
 
 ## Test against paper:

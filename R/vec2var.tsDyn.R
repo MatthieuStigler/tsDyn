@@ -379,7 +379,7 @@ if(FALSE){
 
 library(tsDyn)
 
-data(zeroyld)
+#data(zeroyld)
 vec1 <- VECM(zeroyld, lag=2, estim="ML")
 predict(vec1 )
 tsDyn:::predictOld.VECM(vec1, n.ahead=5)
@@ -391,7 +391,7 @@ varpToDf <- function(x) matrix(sapply(x$fcst, function(x) x[,"fcst"]), nrow=nrow
 
 ### Comparisons
 library(vars)
-data(Canada)
+#data(Canada)
 n <- nrow(Canada)
 
 VECM_tsD <- VECM(Canada, lag=2, estim="ML")
@@ -428,7 +428,7 @@ all.equal(predict(VECM_tsD)$endog,predict(VECM_vars)$endog)
 
 
 ### compare VARrep
-data(denmark)
+#data(denmark)
 dat_examp <- denmark[,2:3]
 
 

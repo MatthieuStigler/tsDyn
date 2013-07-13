@@ -291,7 +291,7 @@ predict_rolling.ets <- function(object,  n.ahead=1, newdata,  ...){
 ##############################################################
 if(FALSE){
 library(tsDyn)
-data(barry)
+#data(barry)
 n_ca<- nrow(barry)
 
 #  environment(predict_rolling_1step.nlVar) <- environment(star)

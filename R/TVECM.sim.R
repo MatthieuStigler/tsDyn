@@ -316,7 +316,7 @@ sim<-TVECM.sim(B=B,beta=1, nthresh=1,n=500, type="simul",Thresh=5, starting=c(5.
 TVECM(sim, lag=1)
 
 ##Bootstrap a TVAR with two threshold (three regimes)
-data(zeroyld)
+#data(zeroyld)
 dat<-zeroyld
 TVECMobject<-TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1),th2=list(exact=1))
 TVECMobject<-TVECM(dat, lag=1, nthresh=2)#, plot=FALSE, trace=FALSE, th1=list(exact=7),th2=list(exact=9))
