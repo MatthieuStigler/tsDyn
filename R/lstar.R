@@ -120,7 +120,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
   ## Set grid search values
     interv.Th <- quantile(as.ts(z), c(start.con$trim, 1-start.con$trim)) # "trim" percentil of z
-    if(is.na(start.con$thInt)) interv.Th <- c(min(start.con$thInt[1], interv.Th[1], na.rm=TRUE), min(start.con$thInt[2], interv.Th[2], na.rm=TRUE))
+    if(any(is.na(start.con$thInt))) interv.Th <- c(min(start.con$thInt[1], interv.Th[1], na.rm=TRUE), min(start.con$thInt[2], interv.Th[2], na.rm=TRUE))
     Gammas <- seq(start.con$gammaInt[1], start.con$gammaInt[2], length.out=start.con$nGamma)
     ths <- seq(interv.Th[1], interv.Th[2], length.out=start.con$nTh) 
 
