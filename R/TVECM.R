@@ -553,8 +553,6 @@ if(nthresh==2){
   bigThresh <- max(bestThresh,secondBestThresh)
   gammasUp <- aroundGrid(around=bigThresh,allgammas,ngrid=30, trim=trim, trace=trace)
   
-  storeIter <- matrix(NA,ncol=length(gammasUp), nrow=length(gammasDown))
-  
   if(!is.null(gamma2$exact)){
     if(gamma2$exact<bestThresh)
       gammasDown<-gamma2$exact
@@ -564,16 +562,18 @@ if(nthresh==2){
   
   if(!is.null(gamma1$exact)){
     if(gamma1$exact<secondBestThresh)
-      gammasDown<-gamma2$exact
+      gammasDown<-gamma1$exact
     if(gamma1$exact>secondBestThresh)
-      gammasUp<-gamma2$exact
+      gammasUp<-gamma1$exact
   }
+
+  storeIter <- matrix(NA,ncol=length(gammasUp), nrow=length(gammasDown))
   
   
 #Grid search
-  for(i in seq_len(length(gammasDown))){
+  for(i in seq_along(gammasDown)){
     gam1 <- gammasDown[i]
-    for(j in 1: length(gammasUp)){
+    for(j in seq_along(gammasUp)){
       gam2 <- gammasUp[j]
       storeIter[i,j] <- func(gam1=gam1, gam2=gam2, beta=bestBeta)
     }
