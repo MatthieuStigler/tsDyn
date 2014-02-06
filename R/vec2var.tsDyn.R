@@ -92,7 +92,7 @@ VARrep.VECM <- function(object, ...) {
 
 ## Add exogen terms
   if(object$exogen){
-    co_exo <- co[,object$num_exogen]
+    co_exo <- co[,(ncol(co) - object$num_exogen): ncol(co)]
     Amat <- cbind(Amat, co_exo)
   }
 
@@ -140,7 +140,7 @@ VARrep.VAR <- function(object, ...) {
     res <- comat
   ## Add exogen terms
     if(object$exogen){
-      co_exo <- co[,object$num_exogen]
+      co_exo <- co[,(ncol(co) - object$num_exogen): ncol(co)]
       res <- cbind(res, co_exo)
     }
 
