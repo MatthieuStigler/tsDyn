@@ -32,11 +32,27 @@ resVar<-function(x, adj=c("OLS", "ML")){
     resH<-isH*x$res
     sigL<-crossprod(na.omit(resL))/(sum(isL)-ML-nc)
     sigM<-crossprod(na.omit(resM))/(sum(isM)-MM-nc)
-    sigH<-crossprod(na.omit(resH))/(sum(isH)-MM-nc)
+    sigH<-crossprod(na.omit(resH))/(sum(isH)-MH-nc)
     sigReg<-c(sigL, sigM, sigH)
     names(sigReg)<-c("L", "M","H")
   }
 c(sigGen,sigReg)
+}
+
+## Method for nlVar, in case resVar made once as method
+## Problems now: use n-1 instead of either n or n-k
+resVar.nlVar <- function(x){
+  
+  nobs <- x$nobs*x$t  
+  
+  ##extract regime and residuals:
+  resid <- residuals(x)
+  regs <- regime(x, initVal=FALSE, timeAttr=FALSE)
+  
+  vars <- aggregate(x=resid, list(regs), var)
+  colnames(vars)[1]<- "Regime"
+  
+  vars
 }
 
 
