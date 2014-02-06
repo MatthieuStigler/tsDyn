@@ -82,7 +82,7 @@ summary(VAR)
 if(require(vars)) {
 	a<-VAR(data, p=1)
 	coef_vars <- t(sapply(coef(a), function(x) x[c(3,1,2),1]))
-	all.equal(coef(VAR),coef_vars, check=FALSE)
+	all.equal(coef(VAR),coef_vars, check.attributes=FALSE)
 }
 
 ###VECM

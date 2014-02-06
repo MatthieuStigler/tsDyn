@@ -1706,7 +1706,7 @@ attr(,"condition")
 <simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 > 
-> all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check=FALSE)
+> all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
 [1] "Component 2: Mean relative difference: 7.363527e-05"
 [2] "Component 4: Mean relative difference: 0.0001044433"
 > 
@@ -1921,9 +1921,9 @@ $var_l3_no
 > 
 > 
 > pred_l1_nd <- rbind(pred_l1_0_12_nd, pred_l1_1_12_nd, pred_l1_2_12_nd)
-> all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+> all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
 [1] TRUE
-> all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+> all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 [1] TRUE
 > 
 > 
@@ -1941,9 +1941,9 @@ $var_l3_no
 >   
 > pred_l3_roll_12<-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=1:2)
 > pred_l3_nd <- rbind(pred_l3_0_12_nd, pred_l3_1_12_nd, pred_l3_2_12_nd)
-> all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+> all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
 [1] TRUE
-> all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+> all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 [1] TRUE
 > 
 > 
@@ -1955,11 +1955,11 @@ $var_l3_no
 > pred_l1_0_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-6,,drop=FALSE])
 > 
 > pred_l1_nd_ref5 <- rbind(pred_l1_0_12_nd_ref5, pred_l1_1_12_nd_ref5)
-> all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_ref_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+> all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_ref_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
 [1] TRUE
-> all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_ref_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+> all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_ref_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 [1] TRUE
-> all.equal(pred_l1_nd_ref5[c(2,4),], as.M(pred_l1_ref_roll_12$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+> all.equal(pred_l1_nd_ref5[c(2,4),], as.M(pred_l1_ref_roll_12$pred[16:17,1:3]), check.attributes=FALSE) ## check refited2 ahead
 [1] TRUE
 > 
 > 
@@ -1968,16 +1968,16 @@ $var_l3_no
 > 
 > pred_l3_ref_roll_12<-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=1:2, refit=5)
 > 
-> all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_ref_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+> all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_ref_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
 [1] TRUE
-> all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_ref_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+> all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_ref_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 [1] TRUE
 > 
 > 
 > pred_l3_0_12_nd_ref5 <- predict(mod_var_l3_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(8:6),,drop=FALSE])
 > pred_l3_1_12_nd_ref5 <- predict(mod_var_l3_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(7:5),,drop=FALSE])
 > pred_l3_nd_ref5 <- rbind(pred_l3_0_12_nd_ref5, pred_l3_1_12_nd_ref5)
-> all.equal(pred_l3_nd_ref5[c(2,4),], as.M(pred_l3_ref_roll_12$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+> all.equal(pred_l3_nd_ref5[c(2,4),], as.M(pred_l3_ref_roll_12$pred[16:17,1:3]), check.attributes=FALSE) ## check refited2 ahead
 [1] TRUE
 > 
 > 
@@ -1998,9 +1998,9 @@ $var_l3_no
 > 
 > 
 > pred_l1_diff_nd <- rbind(pred_l1_diff_0_12_nd, pred_l1_diff_1_12_nd, pred_l1_diff_2_12_nd)
-> all.equal(pred_l1_diff_nd[c(3,5),], as.M(pred_l1_diff_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
+> all.equal(pred_l1_diff_nd[c(3,5),], as.M(pred_l1_diff_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
 [1] TRUE
-> all.equal(pred_l1_diff_nd[c(2,4),], as.M(pred_l1_diff_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+> all.equal(pred_l1_diff_nd[c(2,4),], as.M(pred_l1_diff_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 [1] TRUE
 > 
 > 

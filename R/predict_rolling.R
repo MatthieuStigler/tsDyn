@@ -310,14 +310,14 @@ int_check <- function(object=mod_var_l1_full){
   pred_roll_1<-tsDyn:::predict_rolling_1step.nlVar(object=object, nroll=10, n.ahead=1)
   pred_roll_2 <-predict_rolling(object=object, nroll=10, n.ahead=2)
   pred_roll_12<-predict_rolling(object=object, nroll=10, n.ahead=1:2)
-  all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+  all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check.attributes=FALSE) ## internal consistency
 }
 
 int_check_refit <- function(object=mod_var_l1_full, refit=5){
   pred_roll_1<-tsDyn:::predict_rolling_1step.nlVar(object=object, nroll=10, n.ahead=1, refit=refit)
   pred_roll_2 <-predict_rolling(object=object, nroll=10, n.ahead=2, refit=refit)
   pred_roll_12<-predict_rolling(object=object, nroll=10, n.ahead=1:2, refit=refit)
-  all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check=FALSE) ## internal consistency
+  all.equal(rbind(pred_roll_1$pred, pred_roll_2$pred), pred_roll_12$pred[,-4], check.attributes=FALSE) ## internal consistency
 }
 int_check(object=mod_var_l1_full)
 
@@ -330,14 +330,14 @@ pred_l1_2_12_nd <- predict(mod_var_l1_sub, n.ahead=2, newdata=barry[n_ca-9,,drop
 pred_l1_1_12 <- predict(mod_var_l1_sub, n.ahead=2)
 pred_l1_1_12_roll_newd <- predict_rolling(mod_var_l1_sub, nroll=10, newdata=barry[n_ca-c(10:1),])$pred
 pred_l1_1_12_roll_newd_b <- predict_rolling(mod_var_l1_sub, nroll=10, newdata=barry[n_ca-c(11:2),], n.ahead=2)$pred
-all.equal(pred_l1_1_12[1,,drop=FALSE], as.M(pred_l1_1_12_roll_newd[1, , drop=FALSE]), check=FALSE)
-all.equal(pred_l1_1_12[2,,drop=FALSE], as.M(pred_l1_1_12_roll_newd_b[2, , drop=FALSE]), check=FALSE)
+all.equal(pred_l1_1_12[1,,drop=FALSE], as.M(pred_l1_1_12_roll_newd[1, , drop=FALSE]), check.attributes=FALSE)
+all.equal(pred_l1_1_12[2,,drop=FALSE], as.M(pred_l1_1_12_roll_newd_b[2, , drop=FALSE]), check.attributes=FALSE)
 all.equal(pred_l1_1_12_nd, pred_l1_1_12) ## minor: consistency in predict with/withotut newdata=dataset
 
 
 pred_l1_nd <- rbind(pred_l1_0_12_nd, pred_l1_1_12_nd, pred_l1_2_12_nd)
-all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 
 
 # predict_rolling(a, nroll=3)$pred[1,]
@@ -360,8 +360,8 @@ all.equal(pred_l3_1_12_nd, pred_l3_1_12) ## minor: consistency in predict with/w
   
 pred_l3_roll_12<-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=1:2)
 pred_l3_nd <- rbind(pred_l3_0_12_nd, pred_l3_1_12_nd, pred_l3_2_12_nd)
-all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 
 
 ### Refit lag=1
@@ -374,9 +374,9 @@ pred_l1_1_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_
 pred_l1_0_12_nd_ref5 <- predict(mod_var_l1_sub_ref5, n.ahead=2, newdata=barry[n_ca-6,,drop=FALSE])
 
 pred_l1_nd_ref5 <- rbind(pred_l1_0_12_nd_ref5, pred_l1_1_12_nd_ref5)
-all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_ref_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_ref_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
-all.equal(pred_l1_nd_ref5[c(2,4),], as.M(pred_l1_ref_roll_12$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+all.equal(pred_l1_nd[c(3,5),], as.M(pred_l1_ref_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l1_nd[c(2,4),], as.M(pred_l1_ref_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
+all.equal(pred_l1_nd_ref5[c(2,4),], as.M(pred_l1_ref_roll_12$pred[16:17,1:3]), check.attributes=FALSE) ## check refited2 ahead
 
 
 ### Refit lag=3
@@ -385,14 +385,14 @@ mod_var_l3_sub_ref5 <- lineVar(tsDyn:::myHead(barry,n_ca-6), lag=3)
 
 pred_l3_ref_roll_12<-predict_rolling(object=mod_var_l3_full, nroll=10, n.ahead=1:2, refit=5)
 
-all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_ref_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_ref_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l3_nd[c(3,5),], as.M(pred_l3_ref_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l3_nd[c(2,4),], as.M(pred_l3_ref_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 
 
 pred_l3_0_12_nd_ref5 <- predict(mod_var_l3_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(8:6),,drop=FALSE])
 pred_l3_1_12_nd_ref5 <- predict(mod_var_l3_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(7:5),,drop=FALSE])
 pred_l3_nd_ref5 <- rbind(pred_l3_0_12_nd_ref5, pred_l3_1_12_nd_ref5)
-all.equal(pred_l3_nd_ref5[c(2,4),], as.M(pred_l3_ref_roll_12$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+all.equal(pred_l3_nd_ref5[c(2,4),], as.M(pred_l3_ref_roll_12$pred[16:17,1:3]), check.attributes=FALSE) ## check refited2 ahead
 
 
 #### No refit: VAR diff,  lag=1
@@ -414,8 +414,8 @@ all.equal(pred_l1_diff_1_12_nd, pred_l1_diff_1_12) ## minor: consistency in pred
 
 
 pred_l1_diff_nd <- rbind(pred_l1_diff_0_12_nd, pred_l1_diff_1_12_nd, pred_l1_diff_2_12_nd)
-all.equal(pred_l1_diff_nd[c(3,5),], as.M(pred_l1_diff_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l1_diff_nd[c(2,4),], as.M(pred_l1_diff_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l1_diff_nd[c(3,5),], as.M(pred_l1_diff_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l1_diff_nd[c(2,4),], as.M(pred_l1_diff_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 
 
 
@@ -438,8 +438,8 @@ all.equal(pred_l3_vecm_1_12_nd, pred_l3_vecm_1_12) ## minor: consistency in pred
 
 
 pred_l3_vecm_nd <- rbind(pred_l3_vecm_0_12_nd, pred_l3_vecm_1_12_nd, pred_l3_vecm_2_12_nd)
-all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 
 
 
@@ -462,8 +462,8 @@ all.equal(pred_l3_vecm_1_12_nd, pred_l3_vecm_1_12) ## minor: consistency in pred
 
 
 pred_l3_vecm_nd <- rbind(pred_l3_vecm_0_12_nd, pred_l3_vecm_1_12_nd, pred_l3_vecm_2_12_nd)
-all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check=FALSE) ## check 1-ahead
-all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check=FALSE) ## check 2 ahead
+all.equal(pred_l3_vecm_nd[c(3,5),], as.M(pred_l3_vecm_roll_12$pred[1:2,1:3]), check.attributes=FALSE) ## check 1-ahead
+all.equal(pred_l3_vecm_nd[c(2,4),], as.M(pred_l3_vecm_roll_12$pred[11:12,1:3]), check.attributes=FALSE) ## check 2 ahead
 
 
 ### VECM Refit lag=3
@@ -476,7 +476,7 @@ pred_l3_vecm_0_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdat
 pred_l3_vecm_1_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdata=barry[n_ca-c(8:5),,drop=FALSE])
 
 pred_l3_vecm_nd_ref5 <- rbind(pred_l3_vecm_0_12_nd_ref5, pred_l3_vecm_1_12_nd_ref5)
-all.equal(pred_l3_vecm_nd_ref5[c(2,4),], as.M(pred_l3_vecm_roll_12_ref$pred[16:17,1:3]), check=FALSE) ## check refited2 ahead
+all.equal(pred_l3_vecm_nd_ref5[c(2,4),], as.M(pred_l3_vecm_roll_12_ref$pred[16:17,1:3]), check.attributes=FALSE) ## check refited2 ahead
 
 
 ############################
