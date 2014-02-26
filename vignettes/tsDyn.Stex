@@ -3,7 +3,7 @@
 \usepackage[latin9]{inputenc}
 \usepackage{verbatim}
 \usepackage{amsmath}
-\usepackage{Sweave}
+\usepackage{SweaveCustom}
 \SweaveOpts{eps=FALSE}
 \newcommand{\tsDyn}{\texttt{tsDyn} }
 \linespread{1.3}
