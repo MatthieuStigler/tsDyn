@@ -1323,10 +1323,10 @@ $var_l2_diff_coAsExo
 Equation dolcan 1.1617849 -0.002353031 -0.0001260648 -0.1991959  0.003664079
 Equation cpiUSA 0.6790979  1.479686920 -0.0255459970 -1.2561567 -0.500449485
 Equation cpiCAN 0.4349111  0.289182756  1.0073892530 -0.7086743 -0.283281612
-                   cpiCAN.l2  dolcan.l3    cpiUSA.l3    cpiCAN.l3    co_exo
-Equation dolcan -0.006929662 0.03741108 -0.001311048  0.007055727 0.1617849
-Equation cpiUSA  0.109592492 0.57705874  0.020762565 -0.084046495 0.6790979
-Equation cpiCAN  0.196169888 0.27376324 -0.005901144 -0.203559141 0.4349111
+                   cpiCAN.l2  dolcan.l3    cpiUSA.l3    cpiCAN.l3      co_exo
+Equation dolcan -0.006929662 0.03741108 -0.001311048  0.007055727 0.003381125
+Equation cpiUSA  0.109592492 0.57705874  0.020762565 -0.084046495 0.122912595
+Equation cpiCAN  0.196169888 0.27376324 -0.005901144 -0.203559141 0.122931337
 
 > 
 > 
@@ -1894,7 +1894,7 @@ $var_l3_no
 > check.same(x1=var_l3_co, x2=var_l3_coAsExo)
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > check.same(x1=var_l2_diff_co, x2=var_l2_diff_coAsExo)
-[1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
 > check.same(x1=var_l2_adf_co, x2=var_l2_adf_coAsExo)
 [1] TRUE TRUE TRUE TRUE TRUE
 > 
