@@ -35,7 +35,7 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
 	      "block-bootstrap" = sample.block(resid, block.size= block.size))
     if(boot1Zero) innov[1] <- 0
     for(i in n.used + (1:n.ahead)) {
-      res[i] <- tsDyn:::oneStep(object, newdata = t(as.matrix(res[i - xrange])),
+      res[i] <- oneStep(object, newdata = t(as.matrix(res[i - xrange])),
 			itime=(i - n.used), ...)
       res[i] <- res[i] + innov[i-n.used]
     }
