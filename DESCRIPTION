@@ -7,7 +7,7 @@ Authors@R: c(person("Antonio Fabio", "Di Narzo",role = c("aut", "cre")),
              person("Jose Luis", "Aznarte",role = "ctb"),
              person("Matthieu", "Stigler", role = c("aut","cre"), email="Matthieu.Stigler@gmail.com"))
 Depends:  methods
-Imports: mnormt, mgcv, nnet, tseriesChaos, tseries, utils, vars, urca, methods, forecast, nlme, MASS, Matrix, foreach
+Imports: mnormt, mgcv, nnet, tseriesChaos, tseries, utils, vars, urca, forecast, nlme, MASS, Matrix, foreach
 Suggests: sm, scatterplot3d, rgl, FinTS
 Enhances: forecast
 Maintainer: Matthieu Stigler <Matthieu.Stigler@gmail.com>
