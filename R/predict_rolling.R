@@ -274,13 +274,13 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
 
 
 predict_rolling.Arima <- function(object, n.ahead=1, newdata,  ...){
-  res <- predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=forecast:::Arima,check=TRUE,  ...)
+  res <- predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=Arima,check=TRUE,  ...)
   attr(res, "model") <- "Arima"
   return(res)
 }
 
 predict_rolling.ets <- function(object,  n.ahead=1, newdata,  ...){
-  res <- predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=forecast:::ets, check=FALSE, ...)
+  res <- predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=ets, check=FALSE, ...)
   attr(res, "model") <- "ets"
   return(res)
 }
