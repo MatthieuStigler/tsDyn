@@ -53,13 +53,16 @@ comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], lev
 comp_predictOld <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, tsDyn:::predictOld.VECM(x[[2]])$fcst, check.attributes=FALSE)
 comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
 
-### Small function to print nicely:
+### Small function to print nicely output of all.equal, rounding the number:
 
 roundAll.Equal <- function(x, round=8){
   isFALSE <- x!="TRUE"
   xFalse <- x[isFALSE]
-  xf<- round(as.numeric(gsub("(Component [0-9]+: )?Mean relative difference: ", "", xFalse)),round)
-  x[isFALSE] <- paste("Mean relative difference: ", xf, sep="")
+  # extract the number (i.e remove all the rest)
+  xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
+            "", xFalse)
+  xf2<- round(as.numeric(xf),round)
+  x[isFALSE] <- paste("Mean relative difference: ", xf2, sep="")
   x
 }
 
