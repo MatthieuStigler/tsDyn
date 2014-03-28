@@ -1,3 +1,10 @@
+Version 0.9-33: Matthieu Stigler (28/3/2014)
+-minor: correct use of partial naming in all.equal(), which resulted in package being taken out of CRAN
+-bug correction: correct VARrep in presence of external regressors. Reported by Paul Schreck
+-bug correction: correct resVar
+-minor: removed various calls of :::
+-minor: change package call, most notably remove the enhance forecast, as forecast already in Imports
+
 Version 0.9-32: Matthieu Stigler (13/7/2013)
 -change some tests to avoid difference in outputs depending on platform/architecture
 -remove the data(x) used at bottom of many scripts
