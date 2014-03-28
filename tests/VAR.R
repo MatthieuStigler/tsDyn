@@ -94,7 +94,7 @@ lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 comp_tvar_sim <- function(mod, serie){
   ns <- nrow(serie)
   sim_mod <- TVAR.sim(B=coef(mod), lag=mod$lag, include=mod$include,nthresh=0, n=ns-mod$lag, innov=residuals(mod), starting=serie[1:mod$lag,,drop=FALSE])
-  all.equal(sim_mod, as.matrix(serie)[-c(1:mod$lag),], check.attr=FALSE)
+  all.equal(sim_mod, as.matrix(serie)[-c(1:mod$lag),], check.attributes=FALSE)
 }
 
 lapply(var_all_level, comp_tvar_sim, serie=barry)
