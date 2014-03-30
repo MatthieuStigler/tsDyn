@@ -35,12 +35,12 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 print.nnetTs <- function(x, ...) {
 	NextMethod(...)
 	cat("\nNNET time series model\n")
-	nnet:::print.nnet(x$model.specific, ...)
+	print(x$model.specific, ...)
 	invisible(x)
 }
 
 oneStep.nnetTs <- function(object, newdata, ...)
-	nnet:::predict.nnet(object$model.specific, newdata)
+	predict(object$model.specific, newdata)
 
 selectNNET <- function(x, m, d=1, steps=d, size=1:(m+1), maxit=1e3, trace=FALSE) {
 	IDS <- as.matrix( size )
