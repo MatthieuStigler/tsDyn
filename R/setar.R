@@ -501,6 +501,13 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 	invisible(x)
 }
 
+#Coef() method: hyperCo=FALSE won't show the threshold coef
+coef.setar <- function(object, hyperCo=TRUE, ...){
+  co <- object$coefficients
+  if(!hyperCo) co <- head(co, -length(getTh(object)))
+  co
+}
+
 vcov.setar <- function(object,withTh=TRUE, ...){
   mod <- object$model.specific
   
