@@ -501,6 +501,34 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 	invisible(x)
 }
 
+vcov.setar <- function(object,withTh=TRUE, ...){
+  mod <- object$model.specific
+  
+  nthresh<-mod$nthresh
+  n <- length(object$str$x)
+  coef <- object$coef[seq_len(length(object$coef)-nthresh)] #all coeffients except of the threshold
+  p <- length(coef)    	#Number of slope coefficients
+  
+  # residual variance
+  resvar <- mse(object) * n / (n-p)
+  
+  # (X'X)^(-1)
+  Qr <- mod$qr
+  p1 <- 1:p
+  est <- coef[Qr$pivot[p1]]
+  R <- chol2inv(Qr$qr[p1, p1, drop = FALSE]) #compute (X'X)^(-1) from the (R part) of the QR decomposition of X.
+  
+  ## result
+  res <- R*resvar
+  
+  if(withTh){
+    res <- cbind(rbind(res,0),0)
+  }
+  
+  return(res)
+}
+
+
 plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop, ...) {
   op <- par(no.readonly=TRUE)
   on.exit(par(op))
