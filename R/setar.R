@@ -462,7 +462,7 @@ summary.setar <- function(object, ...) {
   ans$externThVar <- mod$externThVar
   ans$lowRegProp <- mod$lowRegProp
   n <- getNUsed(object$str)
-  coef <- object$coef[seq_len(length(object$coef)-nthresh)] #all coeffients except of the threshold
+  coef <- coef(object, hyperCo=FALSE) #all coeffients except of the threshold
   p <- length(coef)			#Number of slope coefficients
   resvar <- mse(object) * n / (n-p)
   Qr <- mod$qr
@@ -514,7 +514,7 @@ vcov.setar <- function(object,withTh=TRUE, ...){
   
   nthresh<-mod$nthresh
   n <- length(object$str$x)
-  coef <- object$coef[seq_len(length(object$coef)-nthresh)] #all coeffients except of the threshold
+  coef <- coef(object$coef, hyperCo=FALSE)#all coeffients except of the threshold
   p <- length(coef)    	#Number of slope coefficients
   
   # residual variance
