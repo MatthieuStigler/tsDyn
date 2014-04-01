@@ -304,6 +304,7 @@ z<-as.matrix(z)
   }
   
   names(res$coefficients) <- na.omit(co)
+  colnames(xxLH) <- head(na.omit(co), -nthresh)
 
 ###check for unit roots
   if(type=="level"){

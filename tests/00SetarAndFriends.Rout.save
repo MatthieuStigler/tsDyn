@@ -90,18 +90,18 @@ Variable: Z(t) = + (0) X(t) + (1) X(t-1)
 Value: 3.25 (fixed)
 > 
 > set0 <- setar(lynx,m=2)
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > set1 <- setar(lynx,m=2, th=1426,trace=TRUE,thDelay=1)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.8477 2.7487 
 > set2 <- setar(lynx,m=2, th=c(600,1426),trace=TRUE)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
 Using maximum autoregressive order for middle regime: mM = 2 
-Messages d'avis :
+Warning messages:
 1: Possible unit root in the low  regime. Roots are: 0.506 5.4704 
 2: Possible unit root in the medium  regime. Roots are: 0.508 3.9149 
 > set3 <- setar(lynx,m=2, trace=TRUE,nthresh=1)
@@ -111,7 +111,7 @@ Searching on 74 possible threshold values within regimes with sufficient ( 15% )
 Searching on 74 combinations of thresholds (74) and thDelay (1) 
 Selected threshold:  1388 
 Selected delay:  0 
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > set4 <- setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
 Using maximum autoregressive order for low regime: mL = 2 
@@ -125,7 +125,7 @@ Second best: 3465 (conditionnal on th= 1388 and Delay= 0 ) 	 SSR/AIC: 53987715
 Second best: 1388 (conditionnal on th= 3465 and Delay= 0 ) 	 SSR/AIC: 53987715
 Selected threshold:  1388 3465 
 Selected delay:  0 
-Message d'avis :
+Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
 > 
 > set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4)
@@ -434,29 +434,29 @@ Frequency = 1
 > 
 > sapply(set_all, function(x) head(x$model,2))
 $set0
-   yy const V1.0 V1..1 const.1 V1.0.1 V1..1.1
-1 585     1  321   269       0      0       0
-2 871     1  585   321       0      0       0
+   yy const.L phiL.1 phiL.2 const.H phiH.1 phiH.2
+1 585       1    321    269       0      0      0
+2 871       1    585    321       0      0      0
 
 $set1
-   yy const V1.0 V1..1 const.1 V1.0.1 V1..1.1
-1 585     1  321   269       0      0       0
-2 871     1  585   321       0      0       0
+   yy const.L phiL.1 phiL.2 const.H phiH.1 phiH.2
+1 585       1    321    269       0      0      0
+2 871       1    585    321       0      0      0
 
 $set2
-   yy const V1.0 V1..1 const.1 V1.0.1 V1..1.1 const.2 V1.0.2 V1..1.2
-1 585     1  321   269       0      0       0       0      0       0
-2 871     1  585   321       0      0       0       0      0       0
+   yy const.L phiL.1 phiL.2 const.M phiM.1 phiM.2 const.H phiH.1 phiH.2
+1 585       1    321    269       0      0      0       0      0      0
+2 871       1    585    321       0      0      0       0      0      0
 
 $set3
-   yy const V1.0 V1..1 const.1 V1.0.1 V1..1.1
-1 585     1  321   269       0      0       0
-2 871     1  585   321       0      0       0
+   yy const.L phiL.1 phiL.2 const.H phiH.1 phiH.2
+1 585       1    321    269       0      0      0
+2 871       1    585    321       0      0      0
 
 $set4
-   yy const V1.0 V1..1 const.1 V1.0.1 V1..1.1 const.2 V1.0.2 V1..1.2
-1 585     1  321   269       0      0       0       0      0       0
-2 871     1  585   321       0      0       0       0      0       0
+   yy const.L phiL.1 phiL.2 const.M phiM.1 phiM.2 const.H phiH.1 phiH.2
+1 585       1    321    269       0      0      0       0      0      0
+2 871       1    585    321       0      0      0       0      0      0
 
 > 
 > ###SelectSetar
