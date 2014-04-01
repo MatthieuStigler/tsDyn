@@ -266,6 +266,9 @@ Frequency = 1
   -2.4440208    2.3330905   -0.4206083 1465.1336611    1.0441036   -0.7419930 
           th 
 1388.0000000 
+> coef(mod.set, hyperCo=FALSE)
+     const L       phiL.1       phiL.2      const H       phiH.1       phiH.2 
+  -2.4440208    2.3330905   -0.4206083 1465.1336611    1.0441036   -0.7419930 
 > regime(mod.set)
 Time Series:
 Start = 1821 
