@@ -453,6 +453,14 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   invisible(x)
 }
 
+#Coef() method: hyperCo=FALSE won't show the threshold/slope coef
+coef.lstar <- function(object, hyperCo=TRUE, ...){
+  co <- object$coefficients
+  if(!hyperCo) co <- head(co, -2)
+  co
+}
+
+
 vcov.lstar <- function(object, ...){
   n <- object$str$n.used
   coef<- object$coefficients
