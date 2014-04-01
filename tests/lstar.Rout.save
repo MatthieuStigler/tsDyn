@@ -231,6 +231,43 @@ Value: 2.56
 > c(AIC(mod.lstar3),BIC(mod.lstar3))
 [1] -350.8272 -328.9377
 > 
+> 
+> mod.lstar_ALL <- list(mod.lstar=mod.lstar, mod.lstar2=mod.lstar2, 
++                       mod.lstar_noConst=mod.lstar_noConst,mod.lstar_trend=mod.lstar_trend,
++                       mod.lstar_both=mod.lstar_both,mod.lstar3=mod.lstar3)
+> 
+> sapply(mod.lstar_ALL, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
+           mod.lstar mod.lstar2 mod.lstar_noConst mod.lstar_trend
+AIC      -356.650870 -239.10818       -346.580507     -343.217691
+BIC      -334.761283 -222.69098       -330.163316     -321.328104
+deviance    4.337643   12.59746          4.907455        4.880102
+         mod.lstar_both  mod.lstar3
+AIC         -346.437120 -350.827247
+BIC         -319.075136 -328.937660
+deviance       4.580635    4.564987
+> sapply(mod.lstar_ALL, function(x) tail(coef(x),4))
+        mod.lstar  mod.lstar2 mod.lstar_noConst mod.lstar_trend mod.lstar_both
+phi2.1  0.4232669  -0.6726318         0.7660504       0.7390089      0.3034501
+phi2.2 -0.2546088   0.1331190        -1.0552844      -1.0305204     -0.6346480
+gamma  11.1538344 100.0031347         2.4569077       2.5756715    100.0001072
+th      3.3391985   3.2356515         2.7078431       2.6979737      2.5680627
+        mod.lstar3
+phi2.1   0.3009462
+phi2.2  -0.6246129
+gamma  871.9230770
+th       2.5603319
+> sapply(mod.lstar_ALL, function(x) tail(coef(x,hyperCo=FALSE),4))
+        mod.lstar mod.lstar2 mod.lstar_noConst mod.lstar_trend mod.lstar_both
+phi1.2 -0.3664328  0.2884595         1.4005126   -0.2333263130   0.7981219886
+const2 -1.0240758  0.9280287        -0.2253725    0.0006932109   0.0001995693
+phi2.1  0.4232669 -0.6726318         0.7660504    0.7390089035   0.3034500606
+phi2.2 -0.2546088  0.1331190        -1.0552844   -1.0305204430  -0.6346479944
+       mod.lstar3
+phi1.2 -0.3316956
+const2  0.7821303
+phi2.1  0.3009462
+phi2.2 -0.6246129
+> 
 > proc.time()
    user  system elapsed 
   7.850   0.070   7.906 

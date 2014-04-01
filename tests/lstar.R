@@ -33,3 +33,12 @@ mod.lstar3 <- lstar(log10(lynx), m=2, control=list(maxit=3000), starting.control
 mod.lstar3
 deviance(mod.lstar3)
 c(AIC(mod.lstar3),BIC(mod.lstar3))
+
+
+mod.lstar_ALL <- list(mod.lstar=mod.lstar, mod.lstar2=mod.lstar2, 
+                      mod.lstar_noConst=mod.lstar_noConst,mod.lstar_trend=mod.lstar_trend,
+                      mod.lstar_both=mod.lstar_both,mod.lstar3=mod.lstar3)
+
+sapply(mod.lstar_ALL, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
+sapply(mod.lstar_ALL, function(x) tail(coef(x),4))
+sapply(mod.lstar_ALL, function(x) tail(coef(x,hyperCo=FALSE),4))
