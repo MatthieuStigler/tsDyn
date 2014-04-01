@@ -9,23 +9,28 @@ mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
 mod.setar
 summary(mod.setar)
 
-setar(lynx,m=2, th=1426,trace=TRUE,thDelay=1)
-setar(lynx,m=2, th=c(600,1426),trace=TRUE)
-setar(lynx,m=2, trace=TRUE,nthresh=1)
-setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
+set0 <- setar(lynx,m=2)
+set1 <- setar(lynx,m=2, th=1426,trace=TRUE,thDelay=1)
+set2 <- setar(lynx,m=2, th=c(600,1426),trace=TRUE)
+set3 <- setar(lynx,m=2, trace=TRUE,nthresh=1)
+set4 <- setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
 
-mod.set<-setar(lynx,m=2)
-deviance(mod.set)
-AIC(mod.set)
-residuals(mod.set)
-fitted(mod.set)
-coef(mod.set)
-coef(mod.set, hyperCo=FALSE)
-regime(mod.set)
-regime(mod.set, initVal=FALSE)
-regime(mod.set, time=FALSE)
-regime(mod.set, time=FALSE, initVal=FALSE)
+set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4)
 
+set_all
+sapply(set_all, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
+sapply(set_all, function(x) tail(coef(x),4))
+sapply(set_all, function(x) tail(coef(x, hyperCo=FALSE),4))
+
+lapply(set_all, function(x) window(residuals(x), end=c(1830)))
+lapply(set_all, function(x) window(fitted(x), end=c(1830)))
+
+lapply(set_all, function(x) window(regime(x), end=c(1830)))
+lapply(set_all, function(x) window(regime(x, initVal=FALSE), end=c(1830)))
+sapply(set_all, function(x) head(regime(x, time=FALSE),10))
+sapply(set_all, function(x) head(regime(x, initVal=FALSE, time=FALSE),10))
+
+sapply(set_all, function(x) head(x$model,2))
 
 ###SelectSetar
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
