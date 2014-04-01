@@ -19,6 +19,7 @@ set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4)
 
 set_all
 sapply(set_all, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
+lapply(set_all, summary)
 sapply(set_all, function(x) tail(coef(x),4))
 sapply(set_all, function(x) tail(coef(x, hyperCo=FALSE),4))
 

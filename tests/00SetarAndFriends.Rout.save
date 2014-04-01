@@ -239,6 +239,236 @@ Proportion of points in low regime: 58.93% 	 Middle regime: 28.57% 	 High regime
 AIC          1529.069     1536.758     1535.870     1529.069     1511.760
 BIC          1548.223     1553.175     1560.495     1548.223     1541.858
 deviance 67408457.868 73387794.089 69084780.571 67408457.868 53987715.118
+> lapply(set_all, summary)
+$set0
+
+Non linear autoregressive model
+
+SETAR model ( 2 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    const L 
+ 2.3330905 -0.4206083 -2.4440208 
+
+High regime:
+     phiH.1      phiH.2     const H 
+   1.044104   -0.741993 1465.133661 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
+-Value: 1388
+Proportion of points in low regime: 58.93% 	 High regime: 41.07% 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2533.437  -323.543   -36.164   210.631  3003.094 
+
+Fit:
+residuals variance = 591302,  AIC = 1529, MAPE = 57.57%
+
+Coefficient(s):
+
+           Estimate  Std. Error  t value  Pr(>|t|)    
+const L   -2.444021  170.387877  -0.0143 0.9885821    
+phiL.1     2.333090    0.308262   7.5685 1.342e-11 ***
+phiL.2    -0.420608    0.110718  -3.7989 0.0002406 ***
+const H 1465.133661  292.918295   5.0019 2.213e-06 ***
+phiH.1     1.044104    0.102162  10.2201 < 2.2e-16 ***
+phiH.2    -0.741993    0.085797  -8.6483 5.393e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 1388
+
+$set1
+
+Non linear autoregressive model
+
+SETAR model ( 2 regimes)
+Coefficients:
+Low regime:
+     phiL.1      phiL.2     const L 
+  1.5434194  -0.4291513 315.6983921 
+
+High regime:
+      phiH.1       phiH.2      const H 
+   0.9830795   -0.6362265 1292.8489487 
+
+Threshold:
+-Variable: Z(t) = + (0) X(t)+ (1)X(t-1)
+-Value: 1426 (fixed)
+Proportion of points in low regime: 60.71% 	 High regime: 39.29% 
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2487.76  -316.22  -109.01   318.48  3205.77 
+
+Fit:
+residuals variance = 643753,  AIC = 1537, MAPE = 90.3%
+
+Coefficient(s):
+
+           Estimate  Std. Error  t value  Pr(>|t|)    
+const L  315.698392  168.539138   1.8731 0.0637521 .  
+phiL.1     1.543419    0.179481   8.5994 6.946e-14 ***
+phiL.2    -0.429151    0.429384  -0.9995 0.3198068    
+const H 1292.848949  320.827540   4.0297 0.0001042 ***
+phiH.1     0.983080    0.081078  12.1251 < 2.2e-16 ***
+phiH.2    -0.636226    0.100881  -6.3067 6.391e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (0) X(t) + (1) X(t-1)
+
+Value: 1426 (fixed)
+
+$set2
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    const L 
+ 2.1592162 -0.3612925 37.7065835 
+
+Mid regime:
+    phiM.1     phiM.2    const M 
+ 2.2239335 -0.5028274 55.9687980 
+
+High regime:
+     phiH.1      phiH.2     const H 
+   1.030366   -0.737548 1507.797242 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2537.305  -261.684   -36.323   197.926  2998.700 
+
+Fit:
+residuals variance = 606007,  AIC = 1536, MAPE = 60.66%
+
+Coefficient(s):
+
+           Estimate  Std. Error  t value  Pr(>|t|)    
+const L   37.706583  240.232605   0.1570  0.875579    
+phiL.1     2.159216    0.817575   2.6410  0.009528 ** 
+phiL.2    -0.361293    0.180146  -2.0056  0.047477 *  
+const M   55.968798  782.900043   0.0715  0.943145    
+phiM.1     2.223933    0.749353   2.9678  0.003715 ** 
+phiM.2    -0.502827    0.161151  -3.1202  0.002334 ** 
+const H 1507.797242  307.396717   4.9051 3.426e-06 ***
+phiH.1     1.030366    0.106872   9.6411 3.918e-16 ***
+phiH.2    -0.737548    0.088338  -8.3492 2.984e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value:  600 1426 (fixed)
+
+$set3
+
+Non linear autoregressive model
+
+SETAR model ( 2 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    const L 
+ 2.3330905 -0.4206083 -2.4440208 
+
+High regime:
+     phiH.1      phiH.2     const H 
+   1.044104   -0.741993 1465.133661 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
+-Value: 1388
+Proportion of points in low regime: 58.93% 	 High regime: 41.07% 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2533.437  -323.543   -36.164   210.631  3003.094 
+
+Fit:
+residuals variance = 591302,  AIC = 1529, MAPE = 57.57%
+
+Coefficient(s):
+
+           Estimate  Std. Error  t value  Pr(>|t|)    
+const L   -2.444021  170.387877  -0.0143 0.9885821    
+phiL.1     2.333090    0.308262   7.5685 1.342e-11 ***
+phiL.2    -0.420608    0.110718  -3.7989 0.0002406 ***
+const H 1465.133661  292.918295   5.0019 2.213e-06 ***
+phiH.1     1.044104    0.102162  10.2201 < 2.2e-16 ***
+phiH.2    -0.741993    0.085797  -8.6483 5.393e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 1388
+
+$set4
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    const L 
+ 2.3330905 -0.4206083 -2.4440208 
+
+Mid regime:
+   phiM.1    phiM.2   const M 
+ 1.878627 -0.942074 48.082499 
+
+High regime:
+     phiH.1      phiH.2     const H 
+  1.0524925  -0.4482403 -60.0542362 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value: 1388 3465
+Proportion of points in low regime: 58.93% 	 Middle regime: 28.57% 	 High regime: 12.5% 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2098.854  -248.316   -20.981   297.686  3133.350 
+
+Fit:
+residuals variance = 473576,  AIC = 1512, MAPE = 55.94%
+
+Coefficient(s):
+
+         Estimate  Std. Error  t value  Pr(>|t|)    
+const L  -2.44402   154.64867  -0.0158 0.9874210    
+phiL.1    2.33309     0.27979   8.3388 3.146e-13 ***
+phiL.2   -0.42061     0.10049  -4.1855 5.927e-05 ***
+const M  48.08250   522.60383   0.0920 0.9268689    
+phiM.1    1.87863     0.21895   8.5803 9.184e-14 ***
+phiM.2   -0.94207     0.11164  -8.4386 1.893e-13 ***
+const H -60.05424   831.14056  -0.0723 0.9425363    
+phiH.1    1.05249     0.16398   6.4185 4.061e-09 ***
+phiH.2   -0.44824     0.11390  -3.9354 0.0001495 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value: 1388 3465
+
 > sapply(set_all, function(x) tail(coef(x),4))
                set0         set1        set2        set3         set4
 const H 1465.133661 1292.8489487    1.030366 1465.133661    1.0524925
