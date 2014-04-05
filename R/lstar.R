@@ -231,7 +231,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   SS_2 <- function(p) {
     phi1 <- p[grep("const\\.L|phiL|trend\\.L",names(p))]	#Extract parms from vector p
     phi2 <- p[grep("const\\.H|phiH|trend\\.H",names(p))]	#Extract parms from vector p
-    y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p["gamma"], p["th"])
+    y.hat <- F(phi1, phi2, g=p["gamma"], th=p["th"])
     crossprod(yy - y.hat)
   }
   res$par <- c(phi_2,res$par)
