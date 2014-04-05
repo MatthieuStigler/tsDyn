@@ -284,7 +284,14 @@ getTh<- function (object, ...)
 #' @method getTh default
 #' @S3method getTh default
 getTh.default <- function(object, ...){
+  # look first just in object
   allth<-object[grep("th",names(object))]
+  # look then in coef(object)
+  if(length(allth)==0){
+    allth<-coef(object)[grep("th",names(coef(object)))]
+  }
+  if(length(allth)==0) allth <- NULL
+  # remove thD if there
   if(length(grep("thD",names(allth)))!=0)
     allth<-allth[-grep("thD",names(allth))]
   return(allth)
