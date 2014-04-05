@@ -361,8 +361,8 @@ getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
   regime <- match.arg(regime)
   x <- x$coef
   x1 <- x[grep(paste("phi", regime, "\\.", sep=""), names(x))]
-  x2 <- x[grep(paste("^const ", regime, "$", sep=""), names(x))]
-  x3 <- x[grep(paste("^trend ", regime, "$", sep=""), names(x))]
+  x2 <- x[grep(paste("^const\\.", regime, "$", sep=""), names(x))]
+  x3 <- x[grep(paste("^trend\\.", regime, "$", sep=""), names(x))]
   return(c(x1, x2, x3))
 }
 
@@ -372,7 +372,7 @@ getIncNames<-function(inc,ML){
   ninc<-length(inc)
   letter<-deparse(substitute(ML))
   letter<-sub("M","",letter)
-  paste(inc, rep(letter,ninc))
+  paste(inc, rep(letter,ninc), sep=".")
 }
 
 #get a vector with names of the coefficients

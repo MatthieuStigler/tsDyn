@@ -35,11 +35,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  1.2538064 -0.4184042  0.5908673 
 
 High regime:
-   phiH.1    phiH.2   const H 
+   phiH.1    phiH.2   const.H 
  1.526853 -1.238662  2.232671 
 
 Threshold:
@@ -53,11 +53,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  1.2538064 -0.4184042  0.5908673 
 
 High regime:
-   phiH.1    phiH.2   const H 
+   phiH.1    phiH.2   const.H 
  1.526853 -1.238662  2.232671 
 
 Threshold:
@@ -75,10 +75,10 @@ residuals variance = 0.04053,  AIC = -353, MAPE = 5.76%
 Coefficient(s):
 
          Estimate  Std. Error  t value  Pr(>|t|)    
-const L  0.590867    0.152011   3.8870 0.0001755 ***
+const.L  0.590867    0.152011   3.8870 0.0001755 ***
 phiL.1   1.253806    0.071265  17.5936 < 2.2e-16 ***
 phiL.2  -0.418404    0.087630  -4.7746 5.690e-06 ***
-const H  2.232671    0.801695   2.7849 0.0063238 ** 
+const.H  2.232671    0.801695   2.7849 0.0063238 ** 
 phiH.1   1.526853    0.103082  14.8121 < 2.2e-16 ***
 phiH.2  -1.238662    0.255539  -4.8473 4.219e-06 ***
 ---
@@ -138,11 +138,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.3330905 -0.4206083 -2.4440208 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
    1.044104   -0.741993 1465.133661 
 
 Threshold:
@@ -157,11 +157,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-     phiL.1      phiL.2     const L 
+     phiL.1      phiL.2     const.L 
   1.5434194  -0.4291513 315.6983921 
 
 High regime:
-      phiH.1       phiH.2      const H 
+      phiH.1       phiH.2      const.H 
    0.9830795   -0.6362265 1292.8489487 
 
 Threshold:
@@ -176,15 +176,15 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.1592162 -0.3612925 37.7065835 
 
 Mid regime:
-    phiM.1     phiM.2    const M 
+    phiM.1     phiM.2    const.M 
  2.2239335 -0.5028274 55.9687980 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
    1.030366   -0.737548 1507.797242 
 
 Threshold:
@@ -199,11 +199,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.3330905 -0.4206083 -2.4440208 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
    1.044104   -0.741993 1465.133661 
 
 Threshold:
@@ -218,15 +218,15 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.3330905 -0.4206083 -2.4440208 
 
 Mid regime:
-   phiM.1    phiM.2   const M 
+   phiM.1    phiM.2   const.M 
  1.878627 -0.942074 48.082499 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
   1.0524925  -0.4482403 -60.0542362 
 
 Threshold:
@@ -247,11 +247,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.3330905 -0.4206083 -2.4440208 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
    1.044104   -0.741993 1465.133661 
 
 Threshold:
@@ -269,10 +269,10 @@ residuals variance = 591302,  AIC = 1529, MAPE = 57.57%
 Coefficient(s):
 
            Estimate  Std. Error  t value  Pr(>|t|)    
-const L   -2.444021  170.387877  -0.0143 0.9885821    
+const.L   -2.444021  170.387877  -0.0143 0.9885821    
 phiL.1     2.333090    0.308262   7.5685 1.342e-11 ***
 phiL.2    -0.420608    0.110718  -3.7989 0.0002406 ***
-const H 1465.133661  292.918295   5.0019 2.213e-06 ***
+const.H 1465.133661  292.918295   5.0019 2.213e-06 ***
 phiH.1     1.044104    0.102162  10.2201 < 2.2e-16 ***
 phiH.2    -0.741993    0.085797  -8.6483 5.393e-14 ***
 ---
@@ -290,11 +290,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-     phiL.1      phiL.2     const L 
+     phiL.1      phiL.2     const.L 
   1.5434194  -0.4291513 315.6983921 
 
 High regime:
-      phiH.1       phiH.2      const H 
+      phiH.1       phiH.2      const.H 
    0.9830795   -0.6362265 1292.8489487 
 
 Threshold:
@@ -312,10 +312,10 @@ residuals variance = 643753,  AIC = 1537, MAPE = 90.3%
 Coefficient(s):
 
            Estimate  Std. Error  t value  Pr(>|t|)    
-const L  315.698392  168.539138   1.8731 0.0637521 .  
+const.L  315.698392  168.539138   1.8731 0.0637521 .  
 phiL.1     1.543419    0.179481   8.5994 6.946e-14 ***
 phiL.2    -0.429151    0.429384  -0.9995 0.3198068    
-const H 1292.848949  320.827540   4.0297 0.0001042 ***
+const.H 1292.848949  320.827540   4.0297 0.0001042 ***
 phiH.1     0.983080    0.081078  12.1251 < 2.2e-16 ***
 phiH.2    -0.636226    0.100881  -6.3067 6.391e-09 ***
 ---
@@ -333,15 +333,15 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.1592162 -0.3612925 37.7065835 
 
 Mid regime:
-    phiM.1     phiM.2    const M 
+    phiM.1     phiM.2    const.M 
  2.2239335 -0.5028274 55.9687980 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
    1.030366   -0.737548 1507.797242 
 
 Threshold:
@@ -359,13 +359,13 @@ residuals variance = 606007,  AIC = 1536, MAPE = 60.66%
 Coefficient(s):
 
            Estimate  Std. Error  t value  Pr(>|t|)    
-const L   37.706583  240.232605   0.1570  0.875579    
+const.L   37.706583  240.232605   0.1570  0.875579    
 phiL.1     2.159216    0.817575   2.6410  0.009528 ** 
 phiL.2    -0.361293    0.180146  -2.0056  0.047477 *  
-const M   55.968798  782.900043   0.0715  0.943145    
+const.M   55.968798  782.900043   0.0715  0.943145    
 phiM.1     2.223933    0.749353   2.9678  0.003715 ** 
 phiM.2    -0.502827    0.161151  -3.1202  0.002334 ** 
-const H 1507.797242  307.396717   4.9051 3.426e-06 ***
+const.H 1507.797242  307.396717   4.9051 3.426e-06 ***
 phiH.1     1.030366    0.106872   9.6411 3.918e-16 ***
 phiH.2    -0.737548    0.088338  -8.3492 2.984e-13 ***
 ---
@@ -383,11 +383,11 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.3330905 -0.4206083 -2.4440208 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
    1.044104   -0.741993 1465.133661 
 
 Threshold:
@@ -405,10 +405,10 @@ residuals variance = 591302,  AIC = 1529, MAPE = 57.57%
 Coefficient(s):
 
            Estimate  Std. Error  t value  Pr(>|t|)    
-const L   -2.444021  170.387877  -0.0143 0.9885821    
+const.L   -2.444021  170.387877  -0.0143 0.9885821    
 phiL.1     2.333090    0.308262   7.5685 1.342e-11 ***
 phiL.2    -0.420608    0.110718  -3.7989 0.0002406 ***
-const H 1465.133661  292.918295   5.0019 2.213e-06 ***
+const.H 1465.133661  292.918295   5.0019 2.213e-06 ***
 phiH.1     1.044104    0.102162  10.2201 < 2.2e-16 ***
 phiH.2    -0.741993    0.085797  -8.6483 5.393e-14 ***
 ---
@@ -426,15 +426,15 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const L 
+    phiL.1     phiL.2    const.L 
  2.3330905 -0.4206083 -2.4440208 
 
 Mid regime:
-   phiM.1    phiM.2   const M 
+   phiM.1    phiM.2   const.M 
  1.878627 -0.942074 48.082499 
 
 High regime:
-     phiH.1      phiH.2     const H 
+     phiH.1      phiH.2     const.H 
   1.0524925  -0.4482403 -60.0542362 
 
 Threshold:
@@ -452,13 +452,13 @@ residuals variance = 473576,  AIC = 1512, MAPE = 55.94%
 Coefficient(s):
 
          Estimate  Std. Error  t value  Pr(>|t|)    
-const L  -2.44402   154.64867  -0.0158 0.9874210    
+const.L  -2.44402   154.64867  -0.0158 0.9874210    
 phiL.1    2.33309     0.27979   8.3388 3.146e-13 ***
 phiL.2   -0.42061     0.10049  -4.1855 5.927e-05 ***
-const M  48.08250   522.60383   0.0920 0.9268689    
+const.M  48.08250   522.60383   0.0920 0.9268689    
 phiM.1    1.87863     0.21895   8.5803 9.184e-14 ***
 phiM.2   -0.94207     0.11164  -8.4386 1.893e-13 ***
-const H -60.05424   831.14056  -0.0723 0.9425363    
+const.H -60.05424   831.14056  -0.0723 0.9425363    
 phiH.1    1.05249     0.16398   6.4185 4.061e-09 ***
 phiH.2   -0.44824     0.11390  -3.9354 0.0001495 ***
 ---
@@ -471,14 +471,14 @@ Value: 1388 3465
 
 > sapply(set_all, function(x) tail(coef(x),4))
                set0         set1        set2        set3         set4
-const H 1465.133661 1292.8489487    1.030366 1465.133661    1.0524925
+const.H 1465.133661 1292.8489487    1.030366 1465.133661    1.0524925
 phiH.1     1.044104    0.9830795   -0.737548    1.044104   -0.4482403
 phiH.2    -0.741993   -0.6362265  600.000000   -0.741993 1388.0000000
 th      1388.000000 1426.0000000 1426.000000 1388.000000 3465.0000000
 > sapply(set_all, function(x) tail(coef(x, hyperCo=FALSE),4))
                 set0         set1         set2         set3        set4
 phiL.2    -0.4206083   -0.4291513   -0.5028274   -0.4206083  -0.9420740
-const H 1465.1336611 1292.8489487 1507.7972420 1465.1336611 -60.0542362
+const.H 1465.1336611 1292.8489487 1507.7972420 1465.1336611 -60.0542362
 phiH.1     1.0441036    0.9830795    1.0303664    1.0441036   1.0524925
 phiH.2    -0.7419930   -0.6362265   -0.7375480   -0.7419930  -0.4482403
 > 

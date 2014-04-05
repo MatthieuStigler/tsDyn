@@ -58,7 +58,7 @@ $linear
  1.0576005  1.3842377 -0.7477757 
 
 $setar
-   const L     phiL.1     phiL.2    const H     phiH.1     phiH.2         th 
+   const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2         th 
  0.5884369  1.2642793 -0.4284292  1.1656919  1.5992541 -1.0115755  3.3100557 
 
 $lstar
