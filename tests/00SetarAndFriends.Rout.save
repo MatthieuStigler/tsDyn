@@ -1043,6 +1043,46 @@ $set7
 2 871    585    321      0      0      0      0
 
 > 
+> lapply(set_all[c(1,2,4)], toLatex)
+$set0
+\[
+ X_{t-1} = \left\{\begin{array}{lr}
+- 2.444 + 2.333 X_{t-0}- 0.421 X_{t-1}& Z_t \leq + 1388\\
++ 1465.134 +    1.044 X_{t-0}-    0.742 X_{t-1}& Z_t > + 1388\\
+\end{array}\right.
+\]
+
+\[
+Z_t =  X_{t-0} 
+\]
+
+
+$set1
+\[
+ X_{t-1} = \left\{\begin{array}{lr}
++ 315.698 +   1.543 X_{t-0}-   0.429 X_{t-1}& Z_t \leq + 1426\\
++ 1292.849 +    0.983 X_{t-0}-    0.636 X_{t-1}& Z_t > + 1426\\
+\end{array}\right.
+\]
+
+\[
+Z_t =  X_{t-1} 
+\]
+
+
+$set3
+\[
+ X_{t-1} = \left\{\begin{array}{lr}
+- 2.444 + 2.333 X_{t-0}- 0.421 X_{t-1}& Z_t \leq + 1388\\
++ 1465.134 +    1.044 X_{t-0}-    0.742 X_{t-1}& Z_t > + 1388\\
+\end{array}\right.
+\]
+
+\[
+Z_t =  X_{t-0} 
+\]
+
+
 > ###SelectSetar
 > selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 Using maximum autoregressive order for low regime: mL = 2 

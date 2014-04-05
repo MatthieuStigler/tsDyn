@@ -37,6 +37,7 @@ sapply(set_all, function(x) head(regime(x, initVal=FALSE, time=FALSE),10))
 
 sapply(set_all, function(x) head(x$model,2))
 
+lapply(set_all[c(1,2,4)], toLatex)
 ###SelectSetar
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
