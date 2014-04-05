@@ -35,12 +35,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 1.2538064 -0.4184042  0.5908673 
+   const.L     phiL.1     phiL.2 
+ 0.5908673  1.2538064 -0.4184042 
 
 High regime:
-   phiH.1    phiH.2   const.H 
- 1.526853 -1.238662  2.232671 
+  const.H    phiH.1    phiH.2 
+ 2.232671  1.526853 -1.238662 
 
 Threshold:
 -Variable: Z(t) = + (0) X(t)+ (1)X(t-1)
@@ -53,12 +53,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 1.2538064 -0.4184042  0.5908673 
+   const.L     phiL.1     phiL.2 
+ 0.5908673  1.2538064 -0.4184042 
 
 High regime:
-   phiH.1    phiH.2   const.H 
- 1.526853 -1.238662  2.232671 
+  const.H    phiH.1    phiH.2 
+ 2.232671  1.526853 -1.238662 
 
 Threshold:
 -Variable: Z(t) = + (0) X(t)+ (1)X(t-1)
@@ -151,12 +151,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.3330905 -0.4206083 -2.4440208 
+   const.L     phiL.1     phiL.2 
+-2.4440208  2.3330905 -0.4206083 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-   1.044104   -0.741993 1465.133661 
+    const.H      phiH.1      phiH.2 
+1465.133661    1.044104   -0.741993 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
@@ -170,12 +170,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-     phiL.1      phiL.2     const.L 
-  1.5434194  -0.4291513 315.6983921 
+    const.L      phiL.1      phiL.2 
+315.6983921   1.5434194  -0.4291513 
 
 High regime:
-      phiH.1       phiH.2      const.H 
-   0.9830795   -0.6362265 1292.8489487 
+     const.H       phiH.1       phiH.2 
+1292.8489487    0.9830795   -0.6362265 
 
 Threshold:
 -Variable: Z(t) = + (0) X(t)+ (1)X(t-1)
@@ -189,16 +189,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.1592162 -0.3612925 37.7065835 
+   const.L     phiL.1     phiL.2 
+37.7065835  2.1592162 -0.3612925 
 
 Mid regime:
-    phiM.1     phiM.2    const.M 
- 2.2239335 -0.5028274 55.9687980 
+   const.M     phiM.1     phiM.2 
+55.9687980  2.2239335 -0.5028274 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-   1.030366   -0.737548 1507.797242 
+    const.H      phiH.1      phiH.2 
+1507.797242    1.030366   -0.737548 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -212,12 +212,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.3330905 -0.4206083 -2.4440208 
+   const.L     phiL.1     phiL.2 
+-2.4440208  2.3330905 -0.4206083 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-   1.044104   -0.741993 1465.133661 
+    const.H      phiH.1      phiH.2 
+1465.133661    1.044104   -0.741993 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
@@ -231,16 +231,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.3330905 -0.4206083 -2.4440208 
+   const.L     phiL.1     phiL.2 
+-2.4440208  2.3330905 -0.4206083 
 
 Mid regime:
-   phiM.1    phiM.2   const.M 
- 1.878627 -0.942074 48.082499 
+  const.M    phiM.1    phiM.2 
+48.082499  1.878627 -0.942074 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-  1.0524925  -0.4482403 -60.0542362 
+    const.H      phiH.1      phiH.2 
+-60.0542362   1.0524925  -0.4482403 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -254,16 +254,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    trend.L 
- 2.2065858 -0.3636897  0.4213327 
+   trend.L     phiL.1     phiL.2 
+ 0.4213327  2.2065858 -0.3636897 
 
 Mid regime:
-    phiM.1     phiM.2    trend.M 
- 2.1436900 -0.5015428  2.0483498 
+   trend.M     phiM.1     phiM.2 
+ 2.0483498  2.1436900 -0.5015428 
 
 High regime:
-    phiH.1     phiH.2    trend.H 
- 1.2787370 -0.6923989  7.8172099 
+   trend.H     phiH.1     phiH.2 
+ 7.8172099  1.2787370 -0.6923989 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -277,16 +277,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L    trend.L 
- 2.1655117 -0.3623979 24.5729061  0.2258515 
+   const.L    trend.L     phiL.1     phiL.2 
+24.5729061  0.2258515  2.1655117 -0.3623979 
 
 Mid regime:
-     phiM.1      phiM.2     const.M     trend.M 
-  2.1913128  -0.4960353 -66.8766900   2.2453966 
+    const.M     trend.M      phiM.1      phiM.2 
+-66.8766900   2.2453966   2.1913128  -0.4960353 
 
 High regime:
-       phiH.1        phiH.2       const.H       trend.H 
-   1.03036944   -0.73752250 1509.18429228   -0.02568549 
+      const.H       trend.H        phiH.1        phiH.2 
+1509.18429228   -0.02568549    1.03036944   -0.73752250 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -333,12 +333,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.3330905 -0.4206083 -2.4440208 
+   const.L     phiL.1     phiL.2 
+-2.4440208  2.3330905 -0.4206083 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-   1.044104   -0.741993 1465.133661 
+    const.H      phiH.1      phiH.2 
+1465.133661    1.044104   -0.741993 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
@@ -376,12 +376,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-     phiL.1      phiL.2     const.L 
-  1.5434194  -0.4291513 315.6983921 
+    const.L      phiL.1      phiL.2 
+315.6983921   1.5434194  -0.4291513 
 
 High regime:
-      phiH.1       phiH.2      const.H 
-   0.9830795   -0.6362265 1292.8489487 
+     const.H       phiH.1       phiH.2 
+1292.8489487    0.9830795   -0.6362265 
 
 Threshold:
 -Variable: Z(t) = + (0) X(t)+ (1)X(t-1)
@@ -419,16 +419,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.1592162 -0.3612925 37.7065835 
+   const.L     phiL.1     phiL.2 
+37.7065835  2.1592162 -0.3612925 
 
 Mid regime:
-    phiM.1     phiM.2    const.M 
- 2.2239335 -0.5028274 55.9687980 
+   const.M     phiM.1     phiM.2 
+55.9687980  2.2239335 -0.5028274 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-   1.030366   -0.737548 1507.797242 
+    const.H      phiH.1      phiH.2 
+1507.797242    1.030366   -0.737548 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -469,12 +469,12 @@ Non linear autoregressive model
 SETAR model ( 2 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.3330905 -0.4206083 -2.4440208 
+   const.L     phiL.1     phiL.2 
+-2.4440208  2.3330905 -0.4206083 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-   1.044104   -0.741993 1465.133661 
+    const.H      phiH.1      phiH.2 
+1465.133661    1.044104   -0.741993 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)
@@ -512,16 +512,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L 
- 2.3330905 -0.4206083 -2.4440208 
+   const.L     phiL.1     phiL.2 
+-2.4440208  2.3330905 -0.4206083 
 
 Mid regime:
-   phiM.1    phiM.2   const.M 
- 1.878627 -0.942074 48.082499 
+  const.M    phiM.1    phiM.2 
+48.082499  1.878627 -0.942074 
 
 High regime:
-     phiH.1      phiH.2     const.H 
-  1.0524925  -0.4482403 -60.0542362 
+    const.H      phiH.1      phiH.2 
+-60.0542362   1.0524925  -0.4482403 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -562,16 +562,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    trend.L 
- 2.2065858 -0.3636897  0.4213327 
+   trend.L     phiL.1     phiL.2 
+ 0.4213327  2.2065858 -0.3636897 
 
 Mid regime:
-    phiM.1     phiM.2    trend.M 
- 2.1436900 -0.5015428  2.0483498 
+   trend.M     phiM.1     phiM.2 
+ 2.0483498  2.1436900 -0.5015428 
 
 High regime:
-    phiH.1     phiH.2    trend.H 
- 1.2787370 -0.6923989  7.8172099 
+   trend.H     phiH.1     phiH.2 
+ 7.8172099  1.2787370 -0.6923989 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
@@ -612,16 +612,16 @@ Non linear autoregressive model
 SETAR model ( 3 regimes)
 Coefficients:
 Low regime:
-    phiL.1     phiL.2    const.L    trend.L 
- 2.1655117 -0.3623979 24.5729061  0.2258515 
+   const.L    trend.L     phiL.1     phiL.2 
+24.5729061  0.2258515  2.1655117 -0.3623979 
 
 Mid regime:
-     phiM.1      phiM.2     const.M     trend.M 
-  2.1913128  -0.4960353 -66.8766900   2.2453966 
+    const.M     trend.M      phiM.1      phiM.2 
+-66.8766900   2.2453966   2.1913128  -0.4960353 
 
 High regime:
-       phiH.1        phiH.2       const.H       trend.H 
-   1.03036944   -0.73752250 1509.18429228   -0.02568549 
+      const.H       trend.H        phiH.1        phiH.2 
+1509.18429228   -0.02568549    1.03036944   -0.73752250 
 
 Threshold:
 -Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)

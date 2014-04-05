@@ -358,13 +358,15 @@ z<-as.matrix(z)
 }
 
 getSetarXRegimeCoefs <- function(x, regime=c("L","M","H")) {
-  regime <- match.arg(regime)
-  x <- x$coef
-  x1 <- x[grep(paste("phi", regime, "\\.", sep=""), names(x))]
-  x2 <- x[grep(paste("^const\\.", regime, "$", sep=""), names(x))]
-  x3 <- x[grep(paste("^trend\\.", regime, "$", sep=""), names(x))]
-  return(c(x1, x2, x3))
+  reg <- match.arg(regime)
+  
+  #generate vector of "^phiL|^const.L|^trend.L"
+  nam1 <- paste(c("^phi", "^const.", "^trend."), reg, sep="")
+  nam2 <- paste(nam1, collapse="|")
+  # select that vector into coefficients
+  x$coef[grep(nam2, names(x$coef))]
 }
+
 
 
 #gets a vector with names of the arg inc
