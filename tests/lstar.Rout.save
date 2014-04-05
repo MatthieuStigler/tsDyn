@@ -34,11 +34,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-    const1     phi1.1     phi1.2 
+   const.L     phiL.1     phiL.2 
  0.4891014  1.2465399 -0.3664328 
 
 High regime:
-    const2     phi2.1     phi2.2 
+   const.H     phiH.1     phiH.2 
 -1.0240758  0.4232669 -0.2546088 
 
 Smoothing parameter: gamma = 11.15 
@@ -70,11 +70,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-   const1    phi1.1 
+  const.L    phiL.1 
 0.2884595 0.9280287 
 
 High regime:
-    const2     phi2.1 
+   const.H     phiH.1 
 -0.6726318  0.1331190 
 
 Smoothing parameter: gamma = 100 
@@ -105,11 +105,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-    phi1.1     phi1.2 
+    phiL.1     phiL.2 
  1.4005126 -0.2253725 
 
 High regime:
-    phi2.1     phi2.2 
+    phiH.1     phiH.2 
  0.7660504 -1.0552844 
 
 Smoothing parameter: gamma = 2.457 
@@ -140,11 +140,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-       trend1        phi1.1        phi1.2 
+      trend.L        phiL.1        phiL.2 
  1.825193e-05  1.403688e+00 -2.333263e-01 
 
 High regime:
-       trend2        phi2.1        phi2.2 
+      trend.H        phiH.1        phiH.2 
  0.0006932109  0.7390089035 -1.0305204430 
 
 Smoothing parameter: gamma = 2.576 
@@ -177,11 +177,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-       const1        trend1        phi1.1        phi1.2 
+      const.L       trend.L        phiL.1        phiL.2 
  0.3869417359  0.0002595822  1.2409824738 -0.3277026131 
 
 High regime:
-       const2        trend2        phi2.1        phi2.2 
+      const.H       trend.H        phiH.1        phiH.2 
  0.7981219886  0.0001995693  0.3034500606 -0.6346479944 
 
 Smoothing parameter: gamma = 100 
@@ -212,11 +212,11 @@ Non linear autoregressive model
 LSTAR model
 Coefficients:
 Low regime:
-    const1     phi1.1     phi1.2 
+   const.L     phiL.1     phiL.2 
  0.3992404  1.2466373 -0.3316956 
 
 High regime:
-    const2     phi2.1     phi2.2 
+   const.H     phiH.1     phiH.2 
  0.7821303  0.3009462 -0.6246129 
 
 Smoothing parameter: gamma = 871.9 
@@ -247,59 +247,59 @@ BIC         -319.075136 -328.937660
 deviance       4.580635    4.564987
 > sapply(mod.lstar_ALL, function(x) tail(coef(x),4))
         mod.lstar  mod.lstar2 mod.lstar_noConst mod.lstar_trend mod.lstar_both
-phi2.1  0.4232669  -0.6726318         0.7660504       0.7390089      0.3034501
-phi2.2 -0.2546088   0.1331190        -1.0552844      -1.0305204     -0.6346480
+phiH.1  0.4232669  -0.6726318         0.7660504       0.7390089      0.3034501
+phiH.2 -0.2546088   0.1331190        -1.0552844      -1.0305204     -0.6346480
 gamma  11.1538344 100.0031347         2.4569077       2.5756715    100.0001072
 th      3.3391985   3.2356515         2.7078431       2.6979737      2.5680627
         mod.lstar3
-phi2.1   0.3009462
-phi2.2  -0.6246129
+phiH.1   0.3009462
+phiH.2  -0.6246129
 gamma  871.9230770
 th       2.5603319
 > sapply(mod.lstar_ALL, function(x) tail(coef(x,hyperCo=FALSE),4))
-        mod.lstar mod.lstar2 mod.lstar_noConst mod.lstar_trend mod.lstar_both
-phi1.2 -0.3664328  0.2884595         1.4005126   -0.2333263130   0.7981219886
-const2 -1.0240758  0.9280287        -0.2253725    0.0006932109   0.0001995693
-phi2.1  0.4232669 -0.6726318         0.7660504    0.7390089035   0.3034500606
-phi2.2 -0.2546088  0.1331190        -1.0552844   -1.0305204430  -0.6346479944
-       mod.lstar3
-phi1.2 -0.3316956
-const2  0.7821303
-phi2.1  0.3009462
-phi2.2 -0.6246129
+         mod.lstar mod.lstar2 mod.lstar_noConst mod.lstar_trend mod.lstar_both
+phiL.2  -0.3664328  0.2884595         1.4005126   -0.2333263130   0.7981219886
+const.H -1.0240758  0.9280287        -0.2253725    0.0006932109   0.0001995693
+phiH.1   0.4232669 -0.6726318         0.7660504    0.7390089035   0.3034500606
+phiH.2  -0.2546088  0.1331190        -1.0552844   -1.0305204430  -0.6346479944
+        mod.lstar3
+phiL.2  -0.3316956
+const.H  0.7821303
+phiH.1   0.3009462
+phiH.2  -0.6246129
 > sapply(mod.lstar_ALL, function(x) head(x$model,2))
 $mod.lstar
-        yy const1   phi1.1   phi1.2       const2       phi2.1       phi2.2
-1 2.767156      1 2.506505 2.429752 3.931706e-05 0.0000985484 9.553071e-05
-2 2.940018      1 2.767156 2.506505 9.254479e-05 0.0002560859 2.319640e-04
+        yy const.L   phiL.1   phiL.2      const.H       phiH.1       phiH.2
+1 2.767156       1 2.506505 2.429752 3.931706e-05 0.0000985484 9.553071e-05
+2 2.940018       1 2.767156 2.506505 9.254479e-05 0.0002560859 2.319640e-04
 
 $mod.lstar2
-        yy const1   phi1.1       const2       phi2.1
-1 2.506505      1 2.429752 9.980313e-36 2.424969e-35
-2 2.767156      1 2.506505 2.150693e-32 5.390722e-32
+        yy const.L   phiL.1      const.H       phiH.1
+1 2.506505       1 2.429752 9.980313e-36 2.424969e-35
+2 2.767156       1 2.506505 2.150693e-32 5.390722e-32
 
 $mod.lstar_noConst
-        yy   phi1.1   phi1.2    phi2.1    phi2.2
+        yy   phiL.1   phiL.2    phiH.1    phiH.2
 1 2.767156 2.506505 2.429752 0.9494498 0.9203763
 2 2.940018 2.767156 2.506505 1.4842116 1.3444070
 
 $mod.lstar_trend
-        yy trend1   phi1.1   phi1.2    trend2    phi2.1   phi2.2
-1 2.767156      1 2.506505 2.429752 0.3791494 0.9503398 0.921239
-2 2.940018      2 2.767156 2.506505 1.0888603 1.5065231 1.364617
+        yy trend.L   phiL.1   phiL.2   trend.H    phiH.1   phiH.2
+1 2.767156       1 2.506505 2.429752 0.3791494 0.9503398 0.921239
+2 2.940018       2 2.767156 2.506505 1.0888603 1.5065231 1.364617
 
 $mod.lstar_both
-        yy const1 trend1   phi1.1   phi1.2      const2      trend2     phi2.1
-1 2.767156      1      1 2.506505 2.429752 0.002116716 0.002116716 0.00530556
-2 2.940018      1      2 2.767156 2.506505 0.999999998 1.999999995 2.76715586
-       phi2.2
+        yy const.L trend.L   phiL.1   phiL.2     const.H     trend.H     phiH.1
+1 2.767156       1       1 2.506505 2.429752 0.002116716 0.002116716 0.00530556
+2 2.940018       1       2 2.767156 2.506505 0.999999998 1.999999995 2.76715586
+       phiH.2
 1 0.005143096
 2 2.506505027
 
 $mod.lstar3
-        yy const1   phi1.1   phi1.2       const2       phi2.1       phi2.2
-1 2.767156      1 2.506505 2.429752 4.142784e-21 1.038391e-20 1.006594e-20
-2 2.940018      1 2.767156 2.506505 1.000000e+00 2.767156e+00 2.506505e+00
+        yy const.L   phiL.1   phiL.2      const.H       phiH.1       phiH.2
+1 2.767156       1 2.506505 2.429752 4.142784e-21 1.038391e-20 1.006594e-20
+2 2.940018       1 2.767156 2.506505 1.000000e+00 2.767156e+00 2.506505e+00
 
 > 
 > proc.time()

@@ -219,15 +219,15 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
   }
   phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
-  coefnames<-c(if(ninc>0) paste(incNames,"1",sep=""), paste("phi1", 1:mL, sep="."),
-                               if(ninc>0) paste(incNames,"2",sep=""), paste("phi2", 1:mH, sep="."))
+  coefnames<-c(if(ninc>0) paste(incNames,"L",sep="."), paste("phiL", 1:mL, sep="."),
+                               if(ninc>0) paste(incNames,"H",sep="."), paste("phiH", 1:mH, sep="."))
   names(phi_2) <-coefnames
   names(res$par) <- c("gamma", "th")
 
   ## Optimization: second quick step to get hessian for all parameters ########
   SS_2 <- function(p) {
-    phi1 <- p[grep("const1|phi1|trend1",names(p))]	#Extract parms from vector p
-    phi2 <- p[grep("const2|phi2|trend2",names(p))]	#Extract parms from vector p
+    phi1 <- p[grep("const\\.L|phiL|trend\\.L",names(p))]	#Extract parms from vector p
+    phi2 <- p[grep("const\\.H|phiH|trend\\.H",names(p))]	#Extract parms from vector p
     y.hat <-(xxL %*% phi1) + (xxH %*% phi2) * G(z, p["gamma"], p["th"])
     crossprod(yy - y.hat)
   }
@@ -263,7 +263,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     res$mTh <- mTh
   }
   res$thVar <- c(rep(NA, length(x)-length(z)),z)
-  res$fitted <- F(coefs[grep("phi1|const1|trend1", names(coefs))], coefs[grep("phi2|const2|trend2", names(coefs))], gamma, th)
+  res$fitted <- F(coefs[grep("phiL|const\\.L|trend\\.L", names(coefs))], 
+                  coefs[grep("phiH|const\\.H|trend\\.H", names(coefs))], gamma, th)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
@@ -299,8 +300,8 @@ print.lstar <- function(x, ...) {
   ninc<-x$ninc
   order.L <- x$mL
   order.H <- x$mH
-  lowCoef <- x$coef[grep("phi1|const1|trend1", names(x$coef))]
-  highCoef <- x$coef[grep("phi2|const2|trend2", names(x$coef))]
+  lowCoef <- x$coef[grep("phiL|const\\.L|trend\\.L", names(x$coef))]
+  highCoef <- x$coef[grep("phiH|const\\.H|trend\\.H", names(x$coef))]
   gammaCoef <- x$coef["gamma"]
   thCoef <- x$coef["th"]
   externThVar <- x$externThVar
@@ -492,8 +493,8 @@ oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   mL <- object$model.specific$mL
   mH <- object$model.specific$mH
   coefs<-object$coefficients
-  phi1 <- coefs[grep("const1|trend1|phi1", names(coefs))]
-  phi2 <- coefs[grep("const2|trend2|phi2", names(coefs))]
+  phi1 <- coefs[grep("const\\.L|trend\\.L|phiL", names(coefs))]
+  phi2 <- coefs[grep("const\\.H|trend\\.H|phiH", names(coefs))]
   gamma <- coefs["gamma"]
   c <- coefs["th"]
   ext <- object$model.specific$externThVar
