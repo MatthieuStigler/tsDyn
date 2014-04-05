@@ -96,6 +96,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     xxL %*% phi1 + (xxH %*% phi2) * G(z, g, th)
   }
 
+  F_bind <- function(xxL, xxH, g, th){
+    cbind(xxL, xxH * G(z, g, th))
+  }
 #Automatic starting values####################
   if(missing(th) || missing(gamma)) {
     if (trace)
@@ -137,7 +140,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     for(i in 1:nrow(IDS)){
 
       # We fix the linear parameters.
-      cost <- crossprod(lm.fit(cbind(xxL, xxH * G(z, IDS[i,1], IDS[i,2])), yy)$residuals)
+      cost <- crossprod(lm.fit(F_bind(xxL, xxH, g=IDS[i,1], th=IDS[i,2]), yy)$residuals)
 
       if(cost <= bestCost) {
 	bestCost <- cost;
@@ -196,7 +199,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     pen <- if(min(m_trans, 1-m_trans, na.rm=TRUE)< 0.05) 1/(0.05-m_trans) else 0
 
     # First fix the linear parameters
-    xx <- cbind(xxL, xxH * trans)
+    xx <- F_bind(xxL, xxH, g=gamma, th=th)
     if(any(is.na(as.vector(xx)))) {
       message('lstar: missing value during computations')
       return (Inf)
@@ -218,7 +221,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       cat("Optimization algorithm converged\n")
     }
   }
-  phi_2<- lm.fit(cbind(xxL, xxH * G(z, res$par[1], res$par[2])), yy)$coefficients
+  phi_2<- lm.fit(F_bind(xxL, xxH, g=res$par[1],th= res$par[2]), yy)$coefficients
   coefnames<-c(if(ninc>0) paste(incNames,"L",sep="."), paste("phiL", 1:mL, sep="."),
                                if(ninc>0) paste(incNames,"H",sep="."), paste("phiH", 1:mH, sep="."))
   names(phi_2) <-coefnames
@@ -272,7 +275,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   res$include<-include
   res$timeAttributes <- attributes(x)
 
-  mod.return <- data.frame(yy,xxL, xxH * G(z, gamma, th))
+  mod.return <- data.frame(yy,F_bind(xxL, xxH, g=gamma, th=th))
   colnames(mod.return) <- c("yy", coefnames)
 
 ################################
