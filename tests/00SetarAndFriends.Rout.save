@@ -127,8 +127,21 @@ Selected threshold:  1388 3465
 Selected delay:  0 
 Warning message:
 Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
+> set5 <- setar(lynx,m=2, th=c(600,1426),include="trend")
+Warning messages:
+1: Possible unit root in the low  regime. Roots are: 0.4933 5.5739 
+2: Possible unit root in the medium  regime. Roots are: 0.5329 3.7413 
+> set6 <- setar(lynx,m=2, th=c(600,1426),include="both")
+Warning messages:
+1: Possible unit root in the low  regime. Roots are: 0.5044 5.4712 
+2: Possible unit root in the medium  regime. Roots are: 0.5168 3.9008 
+> set7 <- setar(lynx,m=2, th=c(600,1426),include="none")
+Warning messages:
+1: Possible unit root in the low  regime. Roots are: 0.4791 5.7623 
+2: Possible unit root in the medium  regime. Roots are: 0.4929 4.0747 
 > 
-> set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4)
+> set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4,
++                 set5=set5, set6=set6, set7=set7)
 > 
 > set_all
 $set0
@@ -234,11 +247,84 @@ Threshold:
 -Value: 1388 3465
 Proportion of points in low regime: 58.93% 	 Middle regime: 28.57% 	 High regime: 12.5% 
 
+$set5
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    trend.L 
+ 2.2065858 -0.3636897  0.4213327 
+
+Mid regime:
+    phiM.1     phiM.2    trend.M 
+ 2.1436900 -0.5015428  2.0483498 
+
+High regime:
+    phiH.1     phiH.2    trend.H 
+ 1.2787370 -0.6923989  7.8172099 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
+$set6
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    const.L    trend.L 
+ 2.1655117 -0.3623979 24.5729061  0.2258515 
+
+Mid regime:
+     phiM.1      phiM.2     const.M     trend.M 
+  2.1913128  -0.4960353 -66.8766900   2.2453966 
+
+High regime:
+       phiH.1        phiH.2       const.H       trend.H 
+   1.03036944   -0.73752250 1509.18429228   -0.02568549 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
+$set7
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2 
+ 2.2609406 -0.3622496 
+
+Mid regime:
+    phiM.1     phiM.2 
+ 2.2743042 -0.4979271 
+
+High regime:
+    phiH.1     phiH.2 
+ 1.3766159 -0.6640694 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
 > sapply(set_all, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
                  set0         set1         set2         set3         set4
 AIC          1529.069     1536.758     1535.870     1529.069     1511.760
 BIC          1548.223     1553.175     1560.495     1548.223     1541.858
 deviance 67408457.868 73387794.089 69084780.571 67408457.868 53987715.118
+                 set5         set6         set7
+AIC          1553.182     1541.727     1553.416
+BIC          1577.807     1574.561     1569.833
+deviance 80414426.423 68998167.617 84934338.081
 > lapply(set_all, summary)
 $set0
 
@@ -469,18 +555,178 @@ Variable: Z(t) = + (1) X(t) + (0) X(t-1)
 
 Value: 1388 3465
 
+$set5
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    trend.L 
+ 2.2065858 -0.3636897  0.4213327 
+
+Mid regime:
+    phiM.1     phiM.2    trend.M 
+ 2.1436900 -0.5015428  2.0483498 
+
+High regime:
+    phiH.1     phiH.2    trend.H 
+ 1.2787370 -0.6923989  7.8172099 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2848.237  -227.684   -11.999   293.292  3266.908 
+
+Fit:
+residuals variance = 705390,  AIC = 1553, MAPE = 57.92%
+
+Coefficient(s):
+
+         Estimate  Std. Error  t value  Pr(>|t|)    
+trend.L  0.421333    3.031449   0.1390  0.889726    
+phiL.1   2.206586    0.664890   3.3187  0.001244 ** 
+phiL.2  -0.363690    0.194522  -1.8697  0.064318 .  
+trend.M  2.048350    6.198638   0.3305  0.741717    
+phiM.1   2.143690    0.481644   4.4508 2.138e-05 ***
+phiM.2  -0.501543    0.157732  -3.1797  0.001938 ** 
+trend.H  7.817210    3.253418   2.4028  0.018026 *  
+phiH.1   1.278737    0.095676  13.3653 < 2.2e-16 ***
+phiH.2  -0.692399    0.094663  -7.3143 5.364e-11 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value:  600 1426 (fixed)
+
+$set6
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2    const.L    trend.L 
+ 2.1655117 -0.3623979 24.5729061  0.2258515 
+
+Mid regime:
+     phiM.1      phiM.2     const.M     trend.M 
+  2.1913128  -0.4960353 -66.8766900   2.2453966 
+
+High regime:
+       phiH.1        phiH.2       const.H       trend.H 
+   1.03036944   -0.73752250 1509.18429228   -0.02568549 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-2536.340  -282.233   -43.187   209.251  2998.392 
+
+Fit:
+residuals variance = 605247,  AIC = 1542, MAPE = 59.07%
+
+Coefficient(s):
+
+           Estimate  Std. Error  t value  Pr(>|t|)    
+const.L   24.572906  332.282801   0.0740  0.941194    
+trend.L    0.225852    3.886426   0.0581  0.953772    
+phiL.1     2.165512    0.836039   2.5902  0.010995 *  
+phiL.2    -0.362398    0.183649  -1.9733  0.051165 .  
+const.M  -66.876690  866.759950  -0.0772  0.938650    
+trend.M    2.245397    6.360819   0.3530  0.724814    
+phiM.1     2.191313    0.765415   2.8629  0.005095 ** 
+phiM.2    -0.496035    0.164531  -3.0149  0.003244 ** 
+const.H 1509.184292  367.490470   4.1067 8.110e-05 ***
+trend.H   -0.025685    3.605047  -0.0071  0.994329    
+phiH.1     1.030369    0.108365   9.5083 9.981e-16 ***
+phiH.2    -0.737523    0.089643  -8.2274 6.550e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value:  600 1426 (fixed)
+
+$set7
+
+Non linear autoregressive model
+
+SETAR model ( 3 regimes)
+Coefficients:
+Low regime:
+    phiL.1     phiL.2 
+ 2.2609406 -0.3622496 
+
+Mid regime:
+    phiM.1     phiM.2 
+ 2.2743042 -0.4979271 
+
+High regime:
+    phiH.1     phiH.2 
+ 1.3766159 -0.6640694 
+
+Threshold:
+-Variable: Z(t) = + (1) X(t)+ (0)X(t-1)+ (1)X(t-0)
+-Value:  600 1426 (fixed)
+Proportion of points in low regime: 42.86% 	 Middle regime: 16.96% 	 High regime: 40.18% 
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-2799.5014  -217.0299    -6.1145   318.8831  3240.8095 
+
+Fit:
+residuals variance = 745038,  AIC = 1553, MAPE = 59.38%
+
+Coefficient(s):
+
+        Estimate  Std. Error  t value  Pr(>|t|)    
+phiL.1  2.260941    0.544890   4.1493 6.670e-05 ***
+phiL.2 -0.362250    0.196838  -1.8403   0.06846 .  
+phiM.1  2.274304    0.278901   8.1545 6.854e-13 ***
+phiM.2 -0.497927    0.159452  -3.1227   0.00230 ** 
+phiH.1  1.376616    0.087726  15.6922 < 2.2e-16 ***
+phiH.2 -0.664069    0.095180  -6.9770 2.535e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Threshold
+Variable: Z(t) = + (1) X(t) + (0) X(t-1)
+
+Value:  600 1426 (fixed)
+
 > sapply(set_all, function(x) tail(coef(x),4))
                set0         set1        set2        set3         set4
 const.H 1465.133661 1292.8489487    1.030366 1465.133661    1.0524925
 phiH.1     1.044104    0.9830795   -0.737548    1.044104   -0.4482403
 phiH.2    -0.741993   -0.6362265  600.000000   -0.741993 1388.0000000
 th      1388.000000 1426.0000000 1426.000000 1388.000000 3465.0000000
+                set5         set6         set7
+const.H    1.2787370    1.0303694    1.3766159
+phiH.1    -0.6923989   -0.7375225   -0.6640694
+phiH.2   600.0000000  600.0000000  600.0000000
+th      1426.0000000 1426.0000000 1426.0000000
 > sapply(set_all, function(x) tail(coef(x, hyperCo=FALSE),4))
                 set0         set1         set2         set3        set4
 phiL.2    -0.4206083   -0.4291513   -0.5028274   -0.4206083  -0.9420740
 const.H 1465.1336611 1292.8489487 1507.7972420 1465.1336611 -60.0542362
 phiH.1     1.0441036    0.9830795    1.0303664    1.0441036   1.0524925
 phiH.2    -0.7419930   -0.6362265   -0.7375480   -0.7419930  -0.4482403
+              set5          set6       set7
+phiL.2  -0.5015428 1509.18429228  2.2743042
+const.H  7.8172099   -0.02568549 -0.4979271
+phiH.1   1.2787370    1.03036944  1.3766159
+phiH.2  -0.6923989   -0.73752250 -0.6640694
 > 
 > lapply(set_all, function(x) window(residuals(x), end=c(1830)))
 $set0
@@ -523,6 +769,30 @@ Frequency = 1
  [1]         NA         NA  -48.33439 -356.39864 -308.62192  822.48884
  [7]  -30.13067 3133.34951  515.77911   91.10833
 
+$set5
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1]         NA         NA  -25.90285 -303.95097 -104.89652 1506.67363
+ [7] 1302.88544 2826.47540   15.48885  299.64132
+
+$set6
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1]         NA         NA  -37.44301 -304.51927  -83.31229  434.50563
+ [7]  600.11764 2467.22964  214.49832  350.78870
+
+$set7
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1]         NA         NA  -43.31677 -335.36810 -214.63159 1368.89606
+ [7] 1024.06904 2408.99270 -622.76342 -290.68403
+
 > lapply(set_all, function(x) window(fitted(x), end=c(1830)))
 $set0
 Time Series:
@@ -564,6 +834,30 @@ Frequency = 1
  [1]        NA        NA  633.3344 1227.3986 1783.6219 1998.5112 3958.1307
  [8] 2809.6505 4434.2209 2485.8917
 
+$set5
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1]        NA        NA  610.9028 1174.9510 1579.8965 1314.3264 2625.1146
+ [8] 3116.5246 4934.5111 2277.3587
+
+$set6
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1]       NA       NA  622.443 1175.519 1558.312 2386.494 3327.882 3475.770
+ [9] 4735.502 2226.211
+
+$set7
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1]        NA        NA  628.3168 1206.3681 1689.6316 1452.1039 2903.9310
+ [8] 3534.0073 5572.7634 2867.6840
+
 > 
 > lapply(set_all, function(x) window(regime(x), end=c(1830)))
 $set0
@@ -601,6 +895,27 @@ End = 1830
 Frequency = 1 
  [1] NA NA  1  1  1  2  2  3  3  3
 
+$set5
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1] NA NA  1  1  2  3  3  3  3  3
+
+$set6
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1] NA NA  1  1  2  3  3  3  3  3
+
+$set7
+Time Series:
+Start = 1821 
+End = 1830 
+Frequency = 1 
+ [1] NA NA  1  1  2  3  3  3  3  3
+
 > lapply(set_all, function(x) window(regime(x, initVal=FALSE), end=c(1830)))
 $set0
 Time Series:
@@ -637,30 +952,51 @@ End = 1830
 Frequency = 1 
 [1] 1 1 1 2 2 3 3 3
 
+$set5
+Time Series:
+Start = 1823 
+End = 1830 
+Frequency = 1 
+[1] 1 1 2 3 3 3 3 3
+
+$set6
+Time Series:
+Start = 1823 
+End = 1830 
+Frequency = 1 
+[1] 1 1 2 3 3 3 3 3
+
+$set7
+Time Series:
+Start = 1823 
+End = 1830 
+Frequency = 1 
+[1] 1 1 2 3 3 3 3 3
+
 > sapply(set_all, function(x) head(regime(x, time=FALSE),10))
-      set0 set1 set2 set3 set4
- [1,]   NA   NA   NA   NA   NA
- [2,]   NA   NA   NA   NA   NA
- [3,]    1    1    1    1    1
- [4,]    1    1    1    1    1
- [5,]    1    1    2    1    1
- [6,]    2    1    3    2    2
- [7,]    2    2    3    2    2
- [8,]    2    2    3    2    3
- [9,]    2    2    3    2    3
-[10,]    2    2    3    2    3
+      set0 set1 set2 set3 set4 set5 set6 set7
+ [1,]   NA   NA   NA   NA   NA   NA   NA   NA
+ [2,]   NA   NA   NA   NA   NA   NA   NA   NA
+ [3,]    1    1    1    1    1    1    1    1
+ [4,]    1    1    1    1    1    1    1    1
+ [5,]    1    1    2    1    1    2    2    2
+ [6,]    2    1    3    2    2    3    3    3
+ [7,]    2    2    3    2    2    3    3    3
+ [8,]    2    2    3    2    3    3    3    3
+ [9,]    2    2    3    2    3    3    3    3
+[10,]    2    2    3    2    3    3    3    3
 > sapply(set_all, function(x) head(regime(x, initVal=FALSE, time=FALSE),10))
-      set0 set1 set2 set3 set4
- [1,]    1    1    1    1    1
- [2,]    1    1    1    1    1
- [3,]    1    1    2    1    1
- [4,]    2    1    3    2    2
- [5,]    2    2    3    2    2
- [6,]    2    2    3    2    3
- [7,]    2    2    3    2    3
- [8,]    2    2    3    2    3
- [9,]    2    2    3    2    2
-[10,]    1    2    1    1    1
+      set0 set1 set2 set3 set4 set5 set6 set7
+ [1,]    1    1    1    1    1    1    1    1
+ [2,]    1    1    1    1    1    1    1    1
+ [3,]    1    1    2    1    1    2    2    2
+ [4,]    2    1    3    2    2    3    3    3
+ [5,]    2    2    3    2    2    3    3    3
+ [6,]    2    2    3    2    3    3    3    3
+ [7,]    2    2    3    2    3    3    3    3
+ [8,]    2    2    3    2    3    3    3    3
+ [9,]    2    2    3    2    2    3    3    3
+[10,]    1    2    1    1    1    1    1    1
 > 
 > sapply(set_all, function(x) head(x$model,2))
 $set0
@@ -687,6 +1023,24 @@ $set4
    yy const.L phiL.1 phiL.2 const.M phiM.1 phiM.2 const.H phiH.1 phiH.2
 1 585       1    321    269       0      0      0       0      0      0
 2 871       1    585    321       0      0      0       0      0      0
+
+$set5
+   yy trend.L phiL.1 phiL.2 trend.M phiM.1 phiM.2 trend.H phiH.1 phiH.2
+1 585       1    321    269       0      0      0       0      0      0
+2 871       2    585    321       0      0      0       0      0      0
+
+$set6
+   yy const.L trend.L phiL.1 phiL.2 const.M trend.M phiM.1 phiM.2 const.H
+1 585       1       1    321    269       0       0      0      0       0
+2 871       1       2    585    321       0       0      0      0       0
+  trend.H phiH.1 phiH.2
+1       0      0      0
+2       0      0      0
+
+$set7
+   yy phiL.1 phiL.2 phiM.1 phiM.2 phiH.1 phiH.2
+1 585    321    269      0      0      0      0
+2 871    585    321      0      0      0      0
 
 > 
 > ###SelectSetar
@@ -1815,5 +2169,5 @@ Equation long.run  0.0667(0.0684)     -0.0273(0.1185)     -0.0702(0.0672)
 \end{equation}
 > 
 > proc.time()
-   user  system elapsed 
-  5.390   0.070   5.506 
+utilisateur     système      écoulé 
+      4.008       0.312       4.314 

@@ -14,8 +14,12 @@ set1 <- setar(lynx,m=2, th=1426,trace=TRUE,thDelay=1)
 set2 <- setar(lynx,m=2, th=c(600,1426),trace=TRUE)
 set3 <- setar(lynx,m=2, trace=TRUE,nthresh=1)
 set4 <- setar(lynx,m=2, trace=TRUE,nthresh=2, trim=0.05)
+set5 <- setar(lynx,m=2, th=c(600,1426),include="trend")
+set6 <- setar(lynx,m=2, th=c(600,1426),include="both")
+set7 <- setar(lynx,m=2, th=c(600,1426),include="none")
 
-set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4)
+set_all <- list(set0=set0, set1=set1, set2=set2, set3=set3, set4=set4,
+                set5=set5, set6=set6, set7=set7)
 
 set_all
 sapply(set_all, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
