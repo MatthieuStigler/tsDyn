@@ -271,6 +271,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   res$include<-include
   res$timeAttributes <- attributes(x)
 
+  mod.return <- data.frame(yy,xxL, xxH * G(z, gamma, th))
+  colnames(mod.return) <- c("yy", coefnames)
+
 ################################
 
   return(extend(nlar(str, 
@@ -278,7 +281,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
                      fitted.values =res$fitted,
                      residuals =res$residuals,
                      k   =res$k,
-		     model = data.frame(yy,xxL, xxH * G(z, gamma, th)),
+		     model = mod.return,
                      model.specific=res),
                 "lstar"))
 }

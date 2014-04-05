@@ -42,3 +42,4 @@ mod.lstar_ALL <- list(mod.lstar=mod.lstar, mod.lstar2=mod.lstar2,
 sapply(mod.lstar_ALL, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
 sapply(mod.lstar_ALL, function(x) tail(coef(x),4))
 sapply(mod.lstar_ALL, function(x) tail(coef(x,hyperCo=FALSE),4))
+sapply(mod.lstar_ALL, function(x) head(x$model,2))
