@@ -222,15 +222,17 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
   }
   phi_2<- lm.fit(F_bind(xxL, xxH, g=res$par[1],th= res$par[2]), yy)$coefficients
-  coefnames<-c(if(ninc>0) paste(incNames,"L",sep="."), paste("phiL", 1:mL, sep="."),
-                               if(ninc>0) paste(incNames,"H",sep="."), paste("phiH", 1:mH, sep="."))
+  coefnames_L <- c(if(ninc>0) paste(incNames,"L",sep="."), paste("phiL", 1:mL, sep="."))
+  coefnames_H <- c(if(ninc>0) paste(incNames,"H",sep="."), paste("phiH", 1:mH, sep="."))
+  coefnames <- c(coefnames_L, coefnames_H)
+
   names(phi_2) <-coefnames
   names(res$par) <- c("gamma", "th")
 
   ## Optimization: second quick step to get hessian for all parameters ########
   SS_2 <- function(p) {
-    phi1 <- p[grep("const\\.L|phiL|trend\\.L",names(p))]	#Extract parms from vector p
-    phi2 <- p[grep("const\\.H|phiH|trend\\.H",names(p))]	#Extract parms from vector p
+    phi1 <- p[coefnames_L]	#Extract parms from vector p
+    phi2 <- p[coefnames_H]	#Extract parms from vector p
     y.hat <- F(phi1, phi2, g=p["gamma"], th=p["th"])
     crossprod(yy - y.hat)
   }
@@ -266,8 +268,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     res$mTh <- mTh
   }
   res$thVar <- c(rep(NA, length(x)-length(z)),z)
-  res$fitted <- F(coefs[grep("phiL|const\\.L|trend\\.L", names(coefs))], 
-                  coefs[grep("phiH|const\\.H|trend\\.H", names(coefs))], gamma, th)
+  res$fitted <- F(coefs[coefnames_L], 
+                  coefs[coefnames_H], gamma, th)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
