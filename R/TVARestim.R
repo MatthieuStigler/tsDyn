@@ -204,9 +204,8 @@ loop1_twodummy <- function(gam1, thDelay){
 	ndown<-mean(d1)
 	##SSR
 	if(min(ndown, 1-ndown)>=trim){
-		Z1 <- t(cbind(d1 * Z, (1-d1)*Z))		# dim k(p+1) x t
-		B1 <- tcrossprod(Y_t,Z1) %*% solve(tcrossprod(Z1))
-		res<-crossprod(c( Y_t - B1 %*% Z1))
+	  Z1 <- cbind(d1 * Z, (1-d1)*Z)    # dim k(p+1) x t
+	  res <- crossprod(c(lm.fit(x=Z1, y=Y)$resid))
 	}	else{
 		res<-NA
 	}
@@ -219,11 +218,11 @@ loop1_twodummy_oneIntercept <- function(gam1, thDelay){
 	d1<-ifelse(trans[,thDelay]<=gam1, 1,0)
 	ndown<-mean(d1)
 	if(min(ndown, 1-ndown)>=trim){
-		Z1 <- t(cbind(1,d1 * Z[,-1], (1-d1)*Z[,-1]))		# dim k(p+1) x t
-		B1 <- tcrossprod(Y_t,Z1) %*% solve(tcrossprod(Z1))
-		res<-crossprod(c( Y_t - B1 %*% Z1))}
-	else
+		Z1 <- cbind(1,d1 * Z[,-1], (1-d1)*Z[,-1])		# dim k(p+1) x t
+		res <- crossprod(c(lm.fit(x=Z1, y=Y)$resid)) 
+	} else {
 		res<-NA
+	}
 	return(res)
 } #end of the function
 
@@ -243,8 +242,8 @@ loop2 <- function(gam1, gam2,thDelay){
 	##SSR from TVAR(3)
 	#print(c(ndown,1-nup-ndown,nup))
 	if(min(nup, ndown, 1-nup-ndown)>trim){
-		Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
-		res <- crossprod(c( Y_t - tcrossprod(Y_t,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+		Z2 <- cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup)		# dim k(p+1) x t
+		res <- crossprod(c(lm.fit(x=Z2, y=Y)$resid)) 
 	}
 	else
 		res <- NA
@@ -262,8 +261,8 @@ loop2_oneIntercept <- function(gam1, gam2,thDelay){
 	##SSR from TVAR(3)
 	#print(c(ndown,1-nup-ndown,nup))
 	if(min(nup, ndown, 1-nup-ndown)>trim){
-		Z2 <- t(cbind(1,regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
-		res <- crossprod(c( Y_t - tcrossprod(Y_t,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+		Z2 <- cbind(1,regimedown, (1-dummydown-dummyup)*Z, regimeup)		# dim k(p+1) x t	
+		res <- crossprod(c(lm.fit(x=Z2, y=Y)$resid)) 
 	}
 	else
 		res <- NA
@@ -389,9 +388,9 @@ if(nthresh==1){
 		regimeUp<-dummyup*Z[,-val]
 	else regimeUp<-Z
 	if(commonInter)
-		Zbest<-t(cbind(1,regimeDown,regimeUp))
+		Zbest<-cbind(1,regimeDown,regimeUp)
 	else
-		Zbest <- t(cbind(regimeDown,regimeUp))		# dim k(p+1) x t
+		Zbest <- cbind(regimeDown,regimeUp)		# dim k(p+1) x t
 }
 
 if(nthresh==2|nthresh==3){
@@ -403,18 +402,22 @@ if(nthresh==2|nthresh==3){
 	regimeup <- dummyup*Z[,-val]
 	dummymid<-1-dummydown-dummyup
 	if(commonInter)
-		Zbest <- t(cbind(1,regimedown,dummymid*Z[,-1], regimeup))	# dim k(p+1) x t
+		Zbest <- cbind(1,regimedown,dummymid*Z[,-1], regimeup)	# dim k(p+1) x t
 	else
-		Zbest <- t(cbind(regimedown,dummymid*Z, regimeup))	# dim k(p+1) x t
+		Zbest <- cbind(regimedown,dummymid*Z, regimeup)	# dim k(p+1) x t
 }
 
+Zbest_t <- t(Zbest)
 reg<-if(nthresh==1) dummydown+2*dummyup else dummydown+2*dummymid+3*dummyup
 regime <- c(rep(NA, T-t), reg)
 
 
-Bbest <- Y_t %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
-fitted<-Bbest %*% Zbest
-resbest <- t(Y_t - fitted)
+final <- lm.fit(x=Zbest, y=Y)
+
+Bbest <- t(final$coef)
+fitted <- t(final$fitted)
+resbest <- final$residuals
+
 SSRbest <- as.numeric(crossprod(c(resbest)))
 nparbest<-nrow(Bbest)*ncol(Bbest)
 
@@ -437,7 +440,7 @@ else if (nthresh==2)
 	nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
 
 ###Y and regressors matrix
-tZbest<-t(Zbest)
+tZbest<-Zbest
 naX<-rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
 YnaX<-cbind(data, naX)
 BlistMod<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar,sameName=FALSE )
