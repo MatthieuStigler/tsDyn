@@ -160,8 +160,10 @@ if(!missing(ngrid)){
 }
 if(!missing(gamma)){
 	gammas<-gamma
-	plot<-FALSE}
-Y<-t(Y)					#dim k x t
+	plot<-FALSE
+}
+
+Y_t<-t(Y)					#dim k x t
 
 if(!missing(around)){
 	if(missing(ngrid)) ngrid<-20
@@ -186,10 +188,11 @@ loop1_onedummy <- function(gam1, thDelay){
 	##SSR
 	if(min(ndown, 1-ndown)>=trim){
 		Z1 <- t(cbind(regimeDown, Z))		# dim k(p+1) x t
-		B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
-		res<-crossprod(c( Y - B1 %*% Z1))}
-	else
+		B1 <- tcrossprod(Y_t,Z1) %*% solve(tcrossprod(Z1))
+		res<-crossprod(c( Y_t - B1 %*% Z1))
+	}	else {
 		res<-NA
+	}
 	return(res)
 } #end of the function
 
@@ -202,10 +205,11 @@ loop1_twodummy <- function(gam1, thDelay){
 	##SSR
 	if(min(ndown, 1-ndown)>=trim){
 		Z1 <- t(cbind(d1 * Z, (1-d1)*Z))		# dim k(p+1) x t
-		B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
-		res<-crossprod(c( Y - B1 %*% Z1))}
-	else
+		B1 <- tcrossprod(Y_t,Z1) %*% solve(tcrossprod(Z1))
+		res<-crossprod(c( Y_t - B1 %*% Z1))
+	}	else{
 		res<-NA
+	}
 	return(res)
 } #end of the function
 
@@ -216,8 +220,8 @@ loop1_twodummy_oneIntercept <- function(gam1, thDelay){
 	ndown<-mean(d1)
 	if(min(ndown, 1-ndown)>=trim){
 		Z1 <- t(cbind(1,d1 * Z[,-1], (1-d1)*Z[,-1]))		# dim k(p+1) x t
-		B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
-		res<-crossprod(c( Y - B1 %*% Z1))}
+		B1 <- tcrossprod(Y_t,Z1) %*% solve(tcrossprod(Z1))
+		res<-crossprod(c( Y_t - B1 %*% Z1))}
 	else
 		res<-NA
 	return(res)
@@ -240,7 +244,7 @@ loop2 <- function(gam1, gam2,thDelay){
 	#print(c(ndown,1-nup-ndown,nup))
 	if(min(nup, ndown, 1-nup-ndown)>trim){
 		Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
-		res <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+		res <- crossprod(c( Y_t - tcrossprod(Y_t,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
 	}
 	else
 		res <- NA
@@ -259,7 +263,7 @@ loop2_oneIntercept <- function(gam1, gam2,thDelay){
 	#print(c(ndown,1-nup-ndown,nup))
 	if(min(nup, ndown, 1-nup-ndown)>trim){
 		Z2 <- t(cbind(1,regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
-		res <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+		res <- crossprod(c( Y_t - tcrossprod(Y_t,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
 	}
 	else
 		res <- NA
@@ -408,9 +412,9 @@ reg<-if(nthresh==1) dummydown+2*dummyup else dummydown+2*dummymid+3*dummyup
 regime <- c(rep(NA, T-t), reg)
 
 
-Bbest <- Y %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
+Bbest <- Y_t %*% t(Zbest) %*% solve(Zbest %*% t(Zbest))
 fitted<-Bbest %*% Zbest
-resbest <- t(Y - fitted)
+resbest <- t(Y_t - fitted)
 SSRbest <- as.numeric(crossprod(c(resbest)))
 nparbest<-nrow(Bbest)*ncol(Bbest)
 
