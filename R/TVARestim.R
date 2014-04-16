@@ -415,7 +415,7 @@ regime <- c(rep(NA, T-t), reg)
 final <- lm.fit(x=Zbest, y=Y)
 
 Bbest <- t(final$coef)
-fitted <- t(final$fitted)
+fitted <- final$fitted
 resbest <- final$residuals
 
 SSRbest <- as.numeric(crossprod(c(resbest)))
