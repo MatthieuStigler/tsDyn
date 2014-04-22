@@ -316,9 +316,9 @@ pooledAIC <- function(parms) {
     if(hpc=="none"){ 
       computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild))
     } else {
-      computedCriterion <- foreach(i = th, .combine="c") %:% foreach(j = thDelay, .combine="c") %dopar% {
-	 SSR_1thresh(gam1=i,thDelay=j,xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild)
-      }
+      computedCriterion <- foreach(i = th, .combine="c", .export="SSR_1thresh") %:% 
+        foreach(j = thDelay, .combine="c", .export="SSR_1thresh") %dopar% 
+        SSR_1thresh(gam1=i,thDelay=j,xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild)
     }
   }
 
