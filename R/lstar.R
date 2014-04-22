@@ -92,12 +92,21 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   #c: threshold value
   #Model covariates are 'xxL', 'xxH' and 'x', as defined in the
   #   beginning of that function
-  F <- function(phi1, phi2, g, th){
-    xxL %*% phi1 + (xxH %*% phi2) * G(z, g, th)
+  F <- function(phi1, phi2, g, th, type=1){
+    if(type==1){
+      xxL %*% phi1 + (xxH %*% phi2) * G(z, g, th)
+    } else {
+      (xxL %*% phi1)* (1-G(z, g, th)) + (xxH %*% phi2) * G(z, g, th)
+    }
   }
 
-  F_bind <- function(xxL, xxH, g, th){
-    cbind(xxL, xxH * G(z, g, th))
+  F_bind <- function(xxL, xxH, g, th, type=1){
+    if(type==1){
+      cbind(xxL , xxH * G(z, g, th))
+    } else {
+      cbind(xxL * (1- G(z, g, th)), xxH * G(z, g, th))
+    }
+    
   }
 #Automatic starting values####################
   if(missing(th) || missing(gamma)) {
@@ -269,7 +278,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   }
   res$thVar <- c(rep(NA, length(x)-length(z)),z)
   res$fitted <- F(coefs[coefnames_L], 
-                  coefs[coefnames_H], gamma, th)
+                  coefs[coefnames_H], gamma, th, type=1)
   res$residuals <- yy - res$fitted
   dim(res$residuals) <- NULL	#this should be a vector, not a matrix
   res$k <- length(res$coefficients)
