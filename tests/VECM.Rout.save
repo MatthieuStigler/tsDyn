@@ -482,7 +482,7 @@ $vecm_OLS_l1_co
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 15
 AIC -4919.687 	BIC -4855.52 	SSR 26.25525
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -503,7 +503,7 @@ $vecm_OLS_l3_co
 Full sample size: 324 	End sample size: 320
 Number of variables: 3 	Number of estimated slope parameters 33
 AIC -4877.297 	BIC -4745.405 	SSR 24.94378
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -561,7 +561,7 @@ $vecm_OLS_l1_tr
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 15
 AIC -4900.538 	BIC -4836.371 	SSR 27.1164
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -582,7 +582,7 @@ $vecm_OLS_l1_bo
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 18
 AIC -4922.766 	BIC -4847.274 	SSR 26.09641
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -603,7 +603,7 @@ $vecm_OLS_l1_no
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 12
 AIC -4844.226 	BIC -4791.382 	SSR 30.34056
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -624,7 +624,7 @@ $vecm_OLS_l1_coAsExo
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 15
 AIC -4919.687 	BIC -4855.52 	SSR 26.25525
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -645,7 +645,7 @@ $vecm_OLS_l3_coAsExo
 Full sample size: 324 	End sample size: 320
 Number of variables: 3 	Number of estimated slope parameters 33
 AIC -4877.297 	BIC -4745.405 	SSR 24.94378
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA    cpiCAN
 r1      1 -0.05710189 0.0410196
 
@@ -674,7 +674,7 @@ $vecm_OLS_l1_LRco
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 12
 AIC -4836.039 	BIC -4783.195 	SSR 31.24289
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA      cpiCAN      const
 r1      1 -0.01481749 0.009676475 -0.8645183
 
@@ -695,7 +695,7 @@ $vecm_OLS_l1_LRtr
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 15
 AIC -4913.714 	BIC -4849.547 	SSR 26.96383
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA     cpiCAN       trend
 r1      1 -0.05387941 0.01945208 0.007610433
 
@@ -716,7 +716,7 @@ $vecm_OLS_l1_LRtr_noCo
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 12
 AIC -4836.533 	BIC -4783.69 	SSR 31.25622
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA     cpiCAN       trend
 r1      1 -0.05387941 0.01945208 0.007610433
 
@@ -737,7 +737,7 @@ $vecm_OLS_l1_LRbo
 Full sample size: 324 	End sample size: 322
 Number of variables: 3 	Number of estimated slope parameters 12
 AIC -4835.724 	BIC -4782.88 	SSR 31.26287
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    dolcan      cpiUSA     cpiCAN      const       trend
 r1      1 -0.01903992 0.01062753 -0.7707046 0.000864578
 
@@ -1740,177 +1740,6 @@ $vecm_ML_l1_LRbo_exo
 > 
 > 
 > ## coint
-> sapply(vecm_all, function(x) x$model.specific$coint )
-$vecm_OLS_l1_co
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l3_co
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l3_co_betaGiven
-          r1
-dolcan  1.00
-cpiUSA -0.10
-cpiCAN  0.05
-
-$vecm_OLS_l1_tr
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l1_bo
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l1_no
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l1_coAsExo
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l3_coAsExo
-                r1
-dolcan  1.00000000
-cpiUSA -0.05710189
-cpiCAN  0.04101960
-
-$vecm_OLS_l1_LRco
-                 r1
-dolcan  1.000000000
-cpiUSA -0.014817492
-cpiCAN  0.009676475
-const  -0.864518262
-
-$vecm_OLS_l1_LRtr
-                 r1
-dolcan  1.000000000
-cpiUSA -0.053879406
-cpiCAN  0.019452076
-trend   0.007610433
-
-$vecm_OLS_l1_LRtr_noCo
-                 r1
-dolcan  1.000000000
-cpiUSA -0.053879406
-cpiCAN  0.019452076
-trend   0.007610433
-
-$vecm_OLS_l1_LRbo
-                 r1
-dolcan  1.000000000
-cpiUSA -0.019039918
-cpiCAN  0.010627527
-const  -0.770704602
-trend   0.000864578
-
-$vecm_ML_l1_co
-                r1
-dolcan  1.00000000
-cpiUSA -0.03933803
-cpiCAN  0.02054510
-
-$vecm_ML_l3_co
-                r1
-dolcan  1.00000000
-cpiUSA -0.03537088
-cpiCAN  0.04022154
-
-$vecm_ML_l1_tr
-                r1
-dolcan  1.00000000
-cpiUSA -0.22538833
-cpiCAN  0.06081836
-
-$vecm_ML_l1_bo
-              r1
-dolcan  1.000000
-cpiUSA  1.650717
-cpiCAN -0.428511
-
-$vecm_ML_l1_no
-                r1
-dolcan  1.00000000
-cpiUSA -0.01751714
-cpiCAN  0.00875961
-
-$vecm_ML_l1_coAsExo
-                r1
-dolcan  1.00000000
-cpiUSA -0.03933803
-cpiCAN  0.02054510
-
-$vecm_ML_l3_coAsExo
-                r1
-dolcan  1.00000000
-cpiUSA -0.03537088
-cpiCAN  0.04022154
-
-$vecm_ML_l1_LRco
-                 r1
-dolcan  1.000000000
-cpiUSA  0.011300229
-cpiCAN  0.008267995
-const  -6.144517684
-
-$vecm_ML_l1_LRc_exo
-                  r1
-dolcan  1.0000000000
-cpiUSA -0.0009857241
-cpiCAN  0.0148118803
-const  -4.8758170001
-
-$vecm_ML_l1_LRtr
-               r1
-dolcan  1.0000000
-cpiUSA  1.0186548
-cpiCAN -0.2419007
-trend  -0.2245410
-
-$vecm_ML_l1_LRtr_exo
-               r1
-dolcan  1.0000000
-cpiUSA  3.0139347
-cpiCAN -0.7507985
-trend  -0.6519786
-
-$vecm_ML_l1_LRtr_noCo
-                r1
-dolcan  1.00000000
-cpiUSA -0.25336947
-cpiCAN  0.06841211
-trend   0.05395278
-
-$vecm_ML_l1_LRbo
-                r1
-dolcan  1.00000000
-cpiUSA -0.19989838
-cpiCAN  0.05533385
-const  -0.41752374
-trend   0.04217450
-
-$vecm_ML_l1_LRbo_exo
-                r1
-dolcan  1.00000000
-cpiUSA -0.16661529
-cpiCAN  0.05084623
-const  -0.59319456
-trend   0.03362924
-
 > sapply(vecm_all, function(x) x$model.specific$beta)
 $vecm_OLS_l1_co
                 r1
@@ -3764,5 +3593,5 @@ r=3 -4758.653 -4768.659 -4778.556
 > 
 > 
 > proc.time()
-   user  system elapsed 
-   9.73    0.13    9.99 
+utilisateur     système      écoulé 
+      5.240       0.544       5.780 

@@ -2066,7 +2066,7 @@ Equation long.run   -0.02727195 -0.07024155
 Full sample size: 482 	End sample size: 479
 Number of variables: 2 	Number of estimated slope parameters 12
 AIC -2144.536 	BIC -2090.304 	SSR 175.0327
-Cointegrating vector (estimated by OLS):
+Cointegrating vector (estimated by 2OLS):
    short.run  long.run
 r1         1 -1.059351
 
@@ -2140,4 +2140,4 @@ Equation long.run  0.0667(0.0684)     -0.0273(0.1185)     -0.0702(0.0672)
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      4.008       0.312       4.314 
+      3.624       0.372       3.992 

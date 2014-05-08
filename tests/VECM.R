@@ -104,7 +104,6 @@ sapply(vecm_ML, BIC, r=0, fitMeasure="LL")
 
 
 ## coint
-sapply(vecm_all, function(x) x$model.specific$coint )
 sapply(vecm_all, function(x) x$model.specific$beta)
 
 ### VARrep
