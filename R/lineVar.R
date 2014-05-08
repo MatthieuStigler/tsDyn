@@ -323,34 +323,31 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
   if(model=="VECM"){
     model.specific$beta<- betaLT
+    model.specific$coint <- betaLT
     model.specific$r<-r
     model.specific$estim<-estim
     model.specific$LRinclude<-LRinclude
     model.specific$beta.estimated<-beta.estimated
     model.specific$estim <- estim
     
-    if(estim=="ML"){
-      if(beta.estimated){
-        model.specific$S00<-S00
-        model.specific$lambda<-va
-      }
-    } else {
-      model.specific$r<-1
-    }
+    if(estim=="ML" && beta.estimated){
+      model.specific$S00<-S00
+      model.specific$lambda<-va
+    } 
   }
 
 
   z<-list(residuals=res,  
-	  coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", 
-	  fitted.values=fitted, 
-	  model.x=Z, 
-	  include=include,
-	  lag=lag, 
-	  model=YnaX, 
-	  df.residual=t-npar/k, 
-	  exogen = !is.null(exogen),
-	  num_exogen = if(!is.null(exogen)) NCOL(exogen) else 0,
-	  model.specific=model.specific)
+          coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", 
+          fitted.values=fitted, 
+          model.x=Z, 
+          include=include,
+          lag=lag, 
+          model=YnaX, 
+          df.residual=t-npar/k, 
+          exogen = !is.null(exogen),
+          num_exogen = if(!is.null(exogen)) NCOL(exogen) else 0,
+          model.specific=model.specific)
   if(model=="VAR"){
     class(z)<-c("VAR","nlVar")
   } else {
