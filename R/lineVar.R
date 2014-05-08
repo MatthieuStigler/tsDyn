@@ -190,20 +190,20 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
     ## build LRplus: deterministic/exogeneous regressor in coint
       if(class(LRinclude)=="character"){
-	LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
-	LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
-	LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
+        LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
+        LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
+        LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
       } else if(class(LRinclude)%in%c("matrix", "numeric")) {
-	LRplus<-LRinclude
+        LRplus<-LRinclude
       } else{
-	stop("Argument LRinclude badly given")
+        stop("Argument LRinclude badly given")
       }
     ## run coint regression
       if(LRinclude=="none"){
-	cointLM<-lm(y[,1] ~  y[,-1]-1)
+        cointLM<-lm(y[,1] ~  y[,-1]-1)
       } else {
-	cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-	Xminus1 <- cbind(Xminus1, tail(LRplus,nrow(Xminus1)))
+        cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
+        Xminus1 <- cbind(Xminus1, tail(LRplus,nrow(Xminus1)))
       }
       
       betaLT<-coint<-c(1,-cointLM$coef)
@@ -214,9 +214,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     } else {
       if(length(beta)!=k-1) stop("Arg 'beta' should be of length k-1")
       if(LRinclude!="none")
-	warning("Arg LRinclude not taken into account when beta is given by user")
-	LRinc_name <- NULL
-	LRinc_dim <- 0
+        warning("Arg LRinclude not taken into account when beta is given by user")
+      LRinc_name <- NULL
+      LRinc_dim <- 0
       coint<-c(1, -beta)
       betaLT<-c(1,-beta)
     }
@@ -229,7 +229,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
   else if(model=="VECM"&estim=="ML"){
-  beta.estimated<-if(is.null(beta)) TRUE else FALSE
+    beta.estimated<-if(is.null(beta)) TRUE else FALSE
     if (is.null(beta)){
       #Auxiliary regression 1
       reg_res1<-lm.fit(Z,Y)
@@ -239,9 +239,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
       v<-residuals(reg_res2)
       #Auxiliary regression 3
       if(LRinclude!="none"){
-	add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
-	reg_res3<-lm.fit(Z,add)
-	v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
+        add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
+        reg_res3<-lm.fit(Z,add)
+        v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
       }
       #Moment matrices
       S00<-crossprod(u)
@@ -264,9 +264,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 	###Slope parameters
       if(LRinclude!="none"){
-	ECTminus1<-cbind(Xminus1,add)%*%ve_4
+        ECTminus1<-cbind(Xminus1,add)%*%ve_4
       }else{
-	ECTminus1<-Xminus1%*%ve_4
+        ECTminus1<-Xminus1%*%ve_4
       }
       Z<-cbind(ECTminus1,Z)
       coin_ve_names <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
