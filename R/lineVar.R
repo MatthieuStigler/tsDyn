@@ -273,8 +273,11 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
       dimnames(ve_4)<-list(c(colnames(data), coin_ve_names), paste("r", 1:r, sep=""))
       betaLT<-ve_4
     }else{  #end beta to be estimated
-      betaLT<-beta
-      ECTminus1<-Xminus1%*%c(1,-betaLT)
+      betaLT <- as.matrix(beta)
+      if(ncol(betaLT)!=r) stop("Argument 'beta' should have as many columns as 'r'")
+      if(ncol(betaLT)==1&&nrow(betaLT)==k-1) betaLT <- rbind(1,betaLT)
+      if(nrow(betaLT)!=k) stop("Argument 'beta' should have as many rows as 'k'")
+      ECTminus1<-Xminus1%*%betaLT  
       Z<-cbind(ECTminus1,Z)
     }
   }#end model=="VECM"&estim=="ML"
@@ -324,16 +327,15 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     model.specific$estim<-estim
     model.specific$LRinclude<-LRinclude
     model.specific$beta.estimated<-beta.estimated
-
+    model.specific$estim <- estim
+    
     if(estim=="ML"){
-      model.specific$S00<-S00
-      model.specific$lambda<-va
-      model.specific$coint<-ve_4
-      model.specific$estim<-"ML"
+      if(beta.estimated){
+        model.specific$S00<-S00
+        model.specific$lambda<-va
+      }
     } else {
       model.specific$r<-1
-      model.specific$coint<-coint_export
-      model.specific$estim<-"OLS"
     }
   }
 
@@ -436,7 +438,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #'if(require(vars)) {
 #'  data(finland)
 #'  #check long coint values
-#'    all.equal(VECM(finland, lag=2, estim="ML", r=2)$model.specific$coint, 
+#'    all.equal(VECM(finland, lag=2, estim="ML", r=2)$model.specific$beta, 
 #'              cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)  $beta, check.attr=FALSE)
 #' # check OLS parameters
 #'   all.equal(t(coefficients(VECM(finland, lag=2, estim="ML", r=2))), 
