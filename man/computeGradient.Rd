@@ -2,7 +2,7 @@
 \alias{computeGradient}
 \title{computeGradient}
 \usage{
-  computeGradient(object, ...)
+computeGradient(object, ...)
 }
 \arguments{
   \item{object}{fitted star model}
@@ -10,22 +10,22 @@
   \item{...}{currently unused}
 }
 \value{
-  computed gradient
+computed gradient
 }
 \description{
-  Computes the gradient under the null hypothesis
+Computes the gradient under the null hypothesis
 }
 \examples{
 ##TODO
 }
 \author{
-  J. L. Aznarte
+J. L. Aznarte
 }
 \references{
-  TODO
+TODO
 }
 \seealso{
-  \code{\link{addRegime}}
+\code{\link{addRegime}}
 }
 \keyword{internal}
 \keyword{ts}

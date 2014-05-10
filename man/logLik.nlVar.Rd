@@ -2,7 +2,7 @@
 \alias{logLik.nlVar}
 \title{Extract Log-Likelihood}
 \usage{
-  \method{logLik}{nlVar} (object, ...)
+\method{logLik}{nlVar}(object, ...)
 }
 \arguments{
   \item{object}{object of class \code{VAR} computed by
@@ -11,31 +11,31 @@
   \item{\dots}{additional arguments to \code{logLik}.}
 }
 \value{
-  Log-Likelihood value.
+Log-Likelihood value.
 }
 \description{
-  Log-Likelihood method for VAR models.
+Log-Likelihood method for VAR models.
 }
 \details{
-  The Log-Likelihood is computed as in Luetkepohl (2006)
-  equ. 3.4.5 (p. 89) and Juselius (2006) p. 56:
+The Log-Likelihood is computed as in Luetkepohl (2006) equ.
+3.4.5 (p. 89) and Juselius (2006) p. 56:
 
-  \deqn{ LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| -
-  (1/2) \sum^{T} \left [ (y_t - A^{'}x_t)^{'} \Sigma^{-1}
-  (y_t - A^{'}x_t) \right ] } Where \eqn{\Sigma} is the
-  Variance matrix of residuals, and \eqn{x_t} is the matrix
-  stacking the regressors (lags and deterministic).
+\deqn{ LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| - (1/2)
+\sum^{T} \left [ (y_t - A^{'}x_t)^{'} \Sigma^{-1} (y_t -
+A^{'}x_t) \right ] } Where \eqn{\Sigma} is the Variance
+matrix of residuals, and \eqn{x_t} is the matrix stacking
+the regressors (lags and deterministic).
 
-  However, we use a computationally simpler version:
+However, we use a computationally simpler version:
 
-  \deqn{ LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| -
-  (TK/2) }
+\deqn{ LL = -(TK/2) \log(2\pi) - (T/2) \log|\Sigma| -
+(TK/2) }
 
-  See Juselius (2006), p. 57.
+See Juselius (2006), p. 57.
 
-  (Note that Hamilton (1994) 11.1.10, p. 293 gives \eqn{+
-  (T/2) \log|\Sigma^{-1}|}, which is the same as
-  \eqn{-(T/2) \log|\Sigma|)}.
+(Note that Hamilton (1994) 11.1.10, p. 293 gives \eqn{+
+(T/2) \log|\Sigma^{-1}|}, which is the same as \eqn{-(T/2)
+\log|\Sigma|)}.
 }
 \examples{
 data(zeroyld)
@@ -46,17 +46,17 @@ VAR<-lineVar(data, lag=1)
 logLik(VAR)
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \references{
-  Hamilton (1994) \emph{Time Series Analysis}, Princeton
-  University Press
+Hamilton (1994) \emph{Time Series Analysis}, Princeton
+University Press
 
-  Juselius (2006) \emph{The Cointegrated VAR model:
-  methodology and Applications}, Oxford Univesity Press
+Juselius (2006) \emph{The Cointegrated VAR model:
+methodology and Applications}, Oxford Univesity Press
 
-  Luetkepohl (2006) \emph{New Introduction to Multiple Time
-  Series Analysis}, Springer
+Luetkepohl (2006) \emph{New Introduction to Multiple Time
+Series Analysis}, Springer
 }
 \keyword{ts}
 

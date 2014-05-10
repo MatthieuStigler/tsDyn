@@ -2,8 +2,8 @@
 \alias{BBCTest}
 \title{Test of unit root against SETAR alternative}
 \usage{
-  BBCTest(x, m, series, testStat = c("LR", "Wald", "LM"),
-    trim = 0.1, grid = c("minPerc", "minObs"))
+BBCTest(x, m, series, testStat = c("LR", "Wald", "LM"), trim = 0.1,
+  grid = c("minPerc", "minObs"))
 }
 \arguments{
   \item{x}{time series}
@@ -21,27 +21,27 @@
   observations should be imposed. See details}
 }
 \value{
-  A object of class "BBC2004Test" containing:
+A object of class "BBC2004Test" containing:
 
-  -The value of the sup Test
+-The value of the sup Test
 
-  -The version of test used (either Wald, LM or LR).
+-The version of test used (either Wald, LM or LR).
 }
 \description{
-  Test of unit root against a stationnary three regime
-  SETAR alternative
+Test of unit root against a stationnary three regime SETAR
+alternative
 }
 \details{
-  TODO
+TODO
 }
 \examples{
 BBCTest(lynx, m=3, test="Wald", grid="minPerc")
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \seealso{
-  \code{\link{setarTest}} for a test with stationarity as a
-  null.
+\code{\link{setarTest}} for a test with stationarity as a
+null.
 }
 

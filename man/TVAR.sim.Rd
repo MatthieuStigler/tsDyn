@@ -3,12 +3,11 @@
 \alias{VAR.sim}
 \title{Simulation of a multivariate Threshold Autoregressive model (TVAR)}
 \usage{
-  TVAR.sim(B, Thresh, nthresh = 1, n = 200, lag = 1,
-    include = c("const", "trend", "none", "both"),
-    thDelay = 1, thVar = NULL, mTh = 1, starting = NULL,
-    innov = rmnorm(n, mean = 0, varcov = varcov),
-    varcov = diag(1, nrow(B)), show.parMat = FALSE,
-    round = FALSE, seed, ...)
+TVAR.sim(B, Thresh, nthresh = 1, n = 200, lag = 1, include = c("const",
+  "trend", "none", "both"), thDelay = 1, thVar = NULL, mTh = 1,
+  starting = NULL, innov = rmnorm(n, mean = 0, varcov = varcov),
+  varcov = diag(1, nrow(B)), show.parMat = FALSE, round = FALSE, seed,
+  ...)
 }
 \arguments{
   \item{B}{Matrix of coefficients to simulate}
@@ -60,36 +59,35 @@
   (un-exported) \code{TVAR.gen} function}
 }
 \value{
-  A matrix with the simulated/bootstraped series.
+A matrix with the simulated/bootstraped series.
 }
 \description{
-  Simulate a multivariate Threshold VAR (TVAR)
+Simulate a multivariate Threshold VAR (TVAR)
 }
 \details{
-  This function offers the possibility to generate series
-  following a TVAR.
+This function offers the possibility to generate series
+following a TVAR.
 
-  By giving a matrix of coefficients, on can only simulate
-  a VAR (nthresh=0) or TVAR (nthresh=1 or 2). One can have
-  a specification with constant (default), trend, both or
-  none (see arg include). Order in parameters is
-  include/lags (VECM) and include/lags/include/lags for
-  TVECM, hence, a matrix for a TVECM with 3 regimes, a
-  const and a 2 lags would have 2 lines and 2*(1+4)
-  columns. The innovations can be given by the user (a
-  matrix of dim nxk, here n does not include the starting
-  values!), by default it uses a multivariate normal
-  distribution, with covariance matrix specified by varcov.
-  The starting values (of dim lags x k) can be given. The
-  user should take care for their choice, since it is not
-  sure that the simulated values will cross the threshold
-  even once.
+By giving a matrix of coefficients, on can only simulate a
+VAR (nthresh=0) or TVAR (nthresh=1 or 2). One can have a
+specification with constant (default), trend, both or none
+(see arg include). Order in parameters is include/lags
+(VECM) and include/lags/include/lags for TVECM, hence, a
+matrix for a TVECM with 3 regimes, a const and a 2 lags
+would have 2 lines and 2*(1+4) columns. The innovations can
+be given by the user (a matrix of dim nxk, here n does not
+include the starting values!), by default it uses a
+multivariate normal distribution, with covariance matrix
+specified by varcov. The starting values (of dim lags x k)
+can be given. The user should take care for their choice,
+since it is not sure that the simulated values will cross
+the threshold even once.
 
-  The matrix \sQuote{B} has to be in the form: constant,
-  trend, lags, then repeated if many regimes. In case of
-  uncertainty, using \code{who.parMat=TRUE} will print the
-  matrix as interpreted by the function, helping the user
-  to feed the right input.
+The matrix \sQuote{B} has to be in the form: constant,
+trend, lags, then repeated if many regimes. In case of
+uncertainty, using \code{who.parMat=TRUE} will print the
+matrix as interpreted by the function, helping the user to
+feed the right input.
 }
 \examples{
 ##simulate VAR as in Enders 2004, p 268
@@ -114,12 +112,12 @@ sim<-TVAR.sim(B=B,nthresh=1,n=500, mTh=1, Thresh=5, starting=matrix(c(5.2, 5.5),
 TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \seealso{
-  \code{\link{TVAR}} to estimate a TVAR,
-  \code{\link{VAR.sim}} to simulate/bootstrap a VAR,
-  \code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
+\code{\link{TVAR}} to estimate a TVAR,
+\code{\link{VAR.sim}} to simulate/bootstrap a VAR,
+\code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
 }
 \keyword{bootstrap}
 \keyword{ts}

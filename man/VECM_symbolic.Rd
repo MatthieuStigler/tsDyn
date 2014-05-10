@@ -2,8 +2,8 @@
 \alias{VECM_symbolic}
 \title{Virtua VECM model}
 \usage{
-  VECM_symbolic(alpha, beta, lags, inc,
-    include = c("none", "const", "trend", "both"))
+VECM_symbolic(alpha, beta, lags, inc, include = c("none", "const", "trend",
+  "both"))
 }
 \arguments{
   \item{alpha}{Matrix of alpha speed adjustment
@@ -20,12 +20,11 @@
   deterministic term included, if any.}
 }
 \value{
-  An object of class \sQuote{VECM}, without however any
-  data.
+An object of class \sQuote{VECM}, without however any data.
 }
 \description{
-  Pedagogical tool to create a symbolic VECM model, i.e.
-  just for representation purpose.
+Pedagogical tool to create a symbolic VECM model, i.e. just
+for representation purpose.
 }
 \examples{
 a<-matrix(c(-0.4, 0.1), ncol=1)
@@ -41,7 +40,7 @@ a<-matrix(c(-0.4, 0.1), ncol=1)
  d3<- VECM_symbolic(alpha=a, beta=t(b), lags=LagMat, inc=incMat, include="const")
  VARrep(d3)
 }
+\keyword{VECM}
 \keyword{cointegration}
 \keyword{ts}
-\keyword{VECM}
 

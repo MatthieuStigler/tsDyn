@@ -4,17 +4,16 @@
 \alias{sigmoid}
 \title{sigmoid functions}
 \usage{
-  sigmoid(x)
+sigmoid(x)
 }
 \arguments{
   \item{x}{numeric vector}
 }
 \description{
-  Some sigmoid functions. See R sources for their
-  definition
+Some sigmoid functions. See R sources for their definition
 }
 \author{
-  J. L. Aznarte
+J. L. Aznarte
 }
 \keyword{ts}
 

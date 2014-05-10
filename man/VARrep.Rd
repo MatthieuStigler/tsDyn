@@ -4,11 +4,11 @@
 \alias{VARrep.VECM}
 \title{VAR representation}
 \usage{
-  VARrep(object, ...)
+VARrep(object, ...)
 
-  \method{VARrep}{VECM} (object, ...)
+\method{VARrep}{VECM}(object, ...)
 
-  \method{VARrep}{VAR} (object, ...)
+\method{VARrep}{VAR}(object, ...)
 }
 \arguments{
   \item{object}{An object of class \sQuote{VECM} created by
@@ -18,11 +18,11 @@
   \item{\dots}{Currently not used}
 }
 \value{
-  A matrix containing the parameters of the VECM under
-  their VAR representation.
+A matrix containing the parameters of the VECM under their
+VAR representation.
 }
 \description{
-  Show the VAR representation of a VECM
+Show the VAR representation of a VECM
 }
 \examples{
 data(barry)
@@ -36,14 +36,14 @@ mod_var <- lineVar(barry, lag=2, I="diff")
 VARrep(mod_var)
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \references{
-  Hamilton (1994) \emph{Time Series Analysis}, Princeton
-  University Press
+Hamilton (1994) \emph{Time Series Analysis}, Princeton
+University Press
 }
-\keyword{cointegration}
-\keyword{ts}
 \keyword{VAR}
 \keyword{VECM}
+\keyword{cointegration}
+\keyword{ts}
 

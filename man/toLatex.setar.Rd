@@ -2,7 +2,7 @@
 \alias{toLatex.setar}
 \title{Latex representation of fitted setar models}
 \usage{
-  \method{toLatex}{setar} (object, digits = 3, label, ...)
+\method{toLatex}{setar}(object, digits = 3, label, ...)
 }
 \arguments{
   \item{object}{fitted setar model (using
@@ -16,17 +16,17 @@
   \item{\dots}{Not used}
 }
 \description{
-  Latex representation of fitted setar models
+Produce LaTeX output of the SETAR model.
 }
 \examples{
 mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
 toLatex(mod.setar)
 }
 \author{
-  Antonio, Fabio Di Narzo
+Antonio, Fabio Di Narzo
 }
 \seealso{
-  \code{\link{setar}}, \code{\link{nlar-methods}}
+\code{\link{setar}}, \code{\link{nlar-methods}}
 }
 \keyword{ts}
 

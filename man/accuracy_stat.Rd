@@ -4,11 +4,11 @@
 \alias{accuracy_stat.pred_roll}
 \title{Forecasting accuracy measures.}
 \usage{
-  accuracy_stat(object, ...)
+accuracy_stat(object, ...)
 
-  \method{accuracy_stat}{default} (object, true, ...)
+\method{accuracy_stat}{default}(object, true, ...)
 
-  \method{accuracy_stat}{pred_roll} (object, w, ...)
+\method{accuracy_stat}{pred_roll}(object, w, ...)
 }
 \arguments{
   \item{object}{A data-frame, matrix, or object of class
@@ -26,21 +26,20 @@
   \item{\dots}{Not used currently.}
 }
 \value{
-  A data-frame containing the forecasting accuracy
-  measures.
+A data-frame containing the forecasting accuracy measures.
 }
 \description{
-  Compute forecasting accuracies. This is very similar ot
-  the \code{\link[forecast]{accuracy}} method form
-  \pkg{forecast}.
+Compute forecasting accuracies. This is very similar ot the
+\code{\link[forecast]{accuracy}} method form
+\pkg{forecast}.
 }
 \details{
-  The function works either for a simple data.frame or for
-  objects \code{pred_roll}. For simple data.frames, the
-  argument \code{true}, i.e. a data frame containing the
-  true values, has to be provided. For \code{pred_roll}
-  objects, the true values are contained in the object, so
-  no need (nor possibility) to provide the true values.
+The function works either for a simple data.frame or for
+objects \code{pred_roll}. For simple data.frames, the
+argument \code{true}, i.e. a data frame containing the true
+values, has to be provided. For \code{pred_roll} objects,
+the true values are contained in the object, so no need
+(nor possibility) to provide the true values.
 }
 \examples{
 ## univariate:
@@ -57,7 +56,7 @@ accuracy_stat(object=mod_var_pred)
 accuracy_stat(object=mod_var_pred, w=c(0.7, 0.2, 0.1))
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \keyword{ts}
 

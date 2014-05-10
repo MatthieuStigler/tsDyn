@@ -2,16 +2,14 @@
 \alias{TVECM}
 \title{Threshold Vector Error Correction model (VECM)}
 \usage{
-  TVECM(data, lag = 1, nthresh = 1, trim = 0.05,
-    ngridBeta = 50, ngridTh = 50, plot = TRUE,
-    th1 = list(exact = NULL, int = c("from", "to"), around = "val"),
-    th2 = list(exact = NULL, int = c("from", "to"), around = "val"),
-    beta = list(exact = NULL, int = c("from", "to"), around = c("val", "by")),
-    restr = c("none", "equal", "signOp"),
-    common = c("All", "only_ECT"),
-    include = c("const", "trend", "none", "both"),
-    dummyToBothRegimes = TRUE, beta0 = 0,
-    methodMapply = FALSE, trace = TRUE)
+TVECM(data, lag = 1, nthresh = 1, trim = 0.05, ngridBeta = 50,
+  ngridTh = 50, plot = TRUE, th1 = list(exact = NULL, int = c("from",
+  "to"), around = "val"), th2 = list(exact = NULL, int = c("from", "to"),
+  around = "val"), beta = list(exact = NULL, int = c("from", "to"), around =
+  c("val", "by")), restr = c("none", "equal", "signOp"), common = c("All",
+  "only_ECT"), include = c("const", "trend", "none", "both"),
+  dummyToBothRegimes = TRUE, beta0 = 0, methodMapply = FALSE,
+  trace = TRUE)
 }
 \arguments{
   \item{data}{time series}
@@ -67,55 +65,55 @@
   (logical)}
 }
 \value{
-  Fitted model data
+Fitted model data
 }
 \description{
-  Estimate a Threshold Vector Error Correction model (VECM)
+Estimate a Threshold Vector Error Correction model (VECM)
 }
 \details{
-  For fixed threshold and cointegrating vector, the model
-  is linear, so estimation of the regression parameters can
-  be done directly by CLS (Conditional Least Squares). The
-  search of the threshold and cointegrating parameters
-  values which minimize the residual sum of squares (SSR)
-  is made on a grid of potential values. For specification
-  of the grids, see below.
+For fixed threshold and cointegrating vector, the model is
+linear, so estimation of the regression parameters can be
+done directly by CLS (Conditional Least Squares). The
+search of the threshold and cointegrating parameters values
+which minimize the residual sum of squares (SSR) is made on
+a grid of potential values. For specification of the grids,
+see below.
 
-  The function can estimate one as well as two thresholds:
+The function can estimate one as well as two thresholds:
 
-  \describe{ \item{nthresh=1:}{ estimation of one threshold
-  model (two regimes) upon a grid of \var{ngridTh} values
-  (default to ALL) possible thresholds and delays values. }
+\describe{ \item{nthresh=1:}{ estimation of one threshold
+model (two regimes) upon a grid of \var{ngridTh} values
+(default to ALL) possible thresholds and delays values. }
 
-  \item{nthresh=2:}{estimation of two thresholds model
-  (three regimes). Conditional on the threshold found in
-  model where nthresh=1, the second threshold is searched.
-  When both are found, a second grid search is made with 30
-  values around each threshold.} }
+\item{nthresh=2:}{estimation of two thresholds model (three
+regimes). Conditional on the threshold found in model where
+nthresh=1, the second threshold is searched. When both are
+found, a second grid search is made with 30 values around
+each threshold.} }
 
-  The model can be either with a threshold effect on all
-  variables ("All") or only on the error correction term
-  (ECT) (argument "only ECT"). In the second case, the
-  value for the middle threshold is taken a null, as in
-  Balke and Fomby (1997).
+The model can be either with a threshold effect on all
+variables ("All") or only on the error correction term
+(ECT) (argument "only ECT"). In the second case, the value
+for the middle threshold is taken a null, as in Balke and
+Fomby (1997).
 
-  The grid for the threshold parameters can be set in
-  different ways, through the argument \var{th1}, \var{th2}
-  and \var{beta}:
+The grid for the threshold parameters can be set in
+different ways, through the argument \var{th1}, \var{th2}
+and \var{beta}:
 
-  \describe{ \item{exact:}{Pre-specified value. }
-  \item{int:}{Specify an interval (of length \var{ngridTh})
-  in which to search.} \item{around:}{Specify to take
-  \var{ngridTh} points around the value given. } }
+\describe{ \item{exact:}{Pre-specified value. }
+\item{int:}{Specify an interval (of length \var{ngridTh})
+in which to search.} \item{around:}{Specify to take
+\var{ngridTh} points around the value given. } }
 
-  The default is to do an interval search. Interval bounds
-  for the threshold interval are simply the \var{trim} and
-  1-\var{trim} percents of the sorted error correction
-  term.  For the cointegrating parameter, bounds of the
-  interval are obtained from the (OLS) confidence interval
-  of the linear cointegration case.  It is often found
-  however that this interval is too tight. It is hence
-  recommended to inspect the plot of the grid search.
+The default is to do an interval search. Interval bounds
+for the threshold interval are simply the \var{trim} and
+1-\var{trim} percents of the sorted error correction term.
+For the cointegrating parameter, bounds of the interval are
+obtained from the (OLS) confidence interval of the linear
+cointegration case.  It is often found however that this
+interval is too tight. It is hence recommended to inspect
+the plot of the grid search.
 }
 \examples{
 data(zeroyld)
@@ -138,21 +136,21 @@ res.tv<-residuals(tv)
 toLatex(tv)
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \references{
-  Hansen, B. and Seo, B. (2002), Testing for two-regime
-  threshold cointegration in vector error-correction
-  models, Journal of Econometrics, 110, pages 293 - 318
+Hansen, B. and Seo, B. (2002), Testing for two-regime
+threshold cointegration in vector error-correction models,
+Journal of Econometrics, 110, pages 293 - 318
 
-  Seo, M. H. (2009) Estimation of non linear
-  error-correction models, Working paper
+Seo, M. H. (2009) Estimation of non linear error-correction
+models, Working paper
 }
 \seealso{
-  \code{\link{VECM}} for the linear VECM,
-  \code{\link{TVAR}} for the threshold VAR,
-  \code{\link{TVECM.SeoTest}} to test for TVECM,
-  \code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
+\code{\link{VECM}} for the linear VECM, \code{\link{TVAR}}
+for the threshold VAR, \code{\link{TVECM.SeoTest}} to test
+for TVECM, \code{\link{TVECM.sim}} to simulate/bootstrap a
+TVECM.
 }
 \keyword{ts}
 

@@ -2,7 +2,7 @@
 \alias{addRegime}
 \title{addRegime test}
 \usage{
-  addRegime(object, ...)
+addRegime(object, ...)
 }
 \arguments{
   \item{object}{fitted model object with at least 2
@@ -11,24 +11,24 @@
   \item{...}{arguments to and from other methods}
 }
 \value{
-  A list containing the p-value of the F statistic and a
-  boolean, true if there is some remaining nonlinearity and
-  false otherwise.
+A list containing the p-value of the F statistic and a
+boolean, true if there is some remaining nonlinearity and
+false otherwise.
 }
 \description{
-  addRegime test
+addRegime test
 }
 \examples{
 ##TODO
 }
 \author{
-  J. L. Aznarte
+J. L. Aznarte
 }
 \references{
-  TODO
+TODO
 }
 \seealso{
-  \code{\link{star}}
+\code{\link{star}}
 }
 \keyword{ts}
 

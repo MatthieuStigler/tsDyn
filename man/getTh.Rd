@@ -3,9 +3,9 @@
 \alias{getTh.default}
 \title{Extract threshold(s) coefficient}
 \usage{
-  getTh(object, ...)
+getTh(object, ...)
 
-  \method{getTh}{default} (object, ...)
+\method{getTh}{default}(object, ...)
 }
 \arguments{
   \item{object}{object of class \code{setar},
@@ -14,10 +14,10 @@
   \item{\dots}{additional arguments to \code{getTh}}
 }
 \value{
-  Threshold value.
+Threshold value.
 }
 \description{
-  Extract threshold coefficient(s)
+Extract threshold coefficient(s)
 }
 \examples{
 set<-setar(lynx, m=3)
@@ -25,7 +25,7 @@ getTh(set)
 getTh(summary(set))
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \keyword{ts}
 

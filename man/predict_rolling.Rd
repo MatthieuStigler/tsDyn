@@ -3,10 +3,10 @@
 \alias{predict_rolling.nlVar}
 \title{Rolling forecasts}
 \usage{
-  predict_rolling(object, ...)
+predict_rolling(object, ...)
 
-  \method{predict_rolling}{nlVar} (object, nroll = 10,
-    n.ahead = 1, refit.every, newdata, ...)
+\method{predict_rolling}{nlVar}(object, nroll = 10, n.ahead = 1,
+  refit.every, newdata, ...)
 }
 \arguments{
   \item{object}{A linear object of class
@@ -30,37 +30,36 @@
   \item{\dots}{Currently not used.}
 }
 \value{
-  A matrix containing the forecasts.
+A matrix containing the forecasts.
 }
 \description{
-  Forecasts a VAR or VECM by discarding a part of the
-  sample, and generating a series of updated forecasts.
+Forecasts a VAR or VECM by discarding a part of the sample,
+and generating a series of updated forecasts.
 }
 \details{
-  This function allows to check the out-of sample
-  forecasting accuracy by estimating the model on a
-  sub-sample of the original, then making \code{nroll}
-  forcasts of horizont \code{n.ahead}, each time by
-  updating the sample. In other words, with a given model
-  estimated on 100 observations, the function will estimate
-  it on say 90 first obs (\code{nroll=10}), generate a say
-  1 step-ahead \code{n.ahead=1} from obs 90, then using
-  true value 91, 92,... till full sample.
+This function allows to check the out-of sample forecasting
+accuracy by estimating the model on a sub-sample of the
+original, then making \code{nroll} forcasts of horizont
+\code{n.ahead}, each time by updating the sample. In other
+words, with a given model estimated on 100 observations,
+the function will estimate it on say 90 first obs
+(\code{nroll=10}), generate a say 1 step-ahead
+\code{n.ahead=1} from obs 90, then using true value 91,
+92,... till full sample.
 
-  Unlike usual \command{predict()} methods, specifiying
-  \code{n.ahead=2} will not generate a 1 step-ahead and a 2
-  step-ahead forecasts, but only \code{nroll} 2 step-ahead
-  forecasts.
+Unlike usual \command{predict()} methods, specifiying
+\code{n.ahead=2} will not generate a 1 step-ahead and a 2
+step-ahead forecasts, but only \code{nroll} 2 step-ahead
+forecasts.
 
-  Note that while the forecasts are updated with new
-  values, the model estimation is (by default) not updated.
-  This can however be done with the argument
-  \code{fit.every}, specifiying at which frequency the
-  model should be re-estimated. By setting it to 1 for
-  example, each time a new observation is taken, the model
-  is reestimated. This is similar to the
-  \code{\link[rugarch]{ugarchroll}} in package
-  \pkg{rugarch}.
+Note that while the forecasts are updated with new values,
+the model estimation is (by default) not updated. This can
+however be done with the argument \code{fit.every},
+specifiying at which frequency the model should be
+re-estimated. By setting it to 1 for example, each time a
+new observation is taken, the model is reestimated. This is
+similar to the \code{\link[rugarch]{ugarchroll}} in package
+\pkg{rugarch}.
 }
 \examples{
 data(barry)
@@ -79,11 +78,11 @@ legend("bottomright", lty=c(1,2), col=1:2, leg=c("True", "Fitted"))
 title("Comparison of true and rolling 1-ahead forecasts\\n")
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \seealso{
-  \code{\link{predict.nlar}} for the standard predict
-  function.
+\code{\link{predict.nlar}} for the standard predict
+function.
 }
 \keyword{predict}
 

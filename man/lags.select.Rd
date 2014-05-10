@@ -2,9 +2,8 @@
 \alias{lags.select}
 \title{Selection of the lag with Information criterion.}
 \usage{
-  lags.select(data, lag.max = 10,
-    include = c("const", "trend", "none", "both"),
-    fitMeasure = c("SSR", "LL"), sameSample = TRUE)
+lags.select(data, lag.max = 10, include = c("const", "trend", "none",
+  "both"), fitMeasure = c("SSR", "LL"), sameSample = TRUE)
 }
 \arguments{
   \item{data}{multivariate time series.}
@@ -23,17 +22,17 @@
   sample. Default to TRUE.}
 }
 \value{
-  An object of class \code{\link{rank.select}}, with
-  \sQuote{print} and \sQuote{summary methods}, containing
-  among other the matrices of AIC/BIC/HQ.
+An object of class \code{\link{rank.select}}, with
+\sQuote{print} and \sQuote{summary methods}, containing
+among other the matrices of AIC/BIC/HQ.
 }
 \description{
-  Selection of the cointegrating rank and the lags with
-  Information criterion (AIC, BIC).
+Selection of the cointegrating rank and the lags with
+Information criterion (AIC, BIC).
 }
 \details{
-  This function selects the lag according to AIC, BIC and
-  Hannan-Quinn.
+This function selects the lag according to AIC, BIC and
+Hannan-Quinn.
 }
 \examples{
 data(barry)
@@ -44,14 +43,14 @@ rk_sel
 summary(rk_sel)
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \seealso{
-  \code{\link{rank.select}}, the underlying function, to
-  estimate the rank also.
+\code{\link{rank.select}}, the underlying function, to
+estimate the rank also.
 
-  \code{\link[vars]{VARselect}} in package \pkg{vars}, does
-  basically the same.
+\code{\link[vars]{VARselect}} in package \pkg{vars}, does
+basically the same.
 }
 \keyword{ts}
 

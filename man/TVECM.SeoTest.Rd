@@ -2,9 +2,8 @@
 \alias{TVECM.SeoTest}
 \title{No cointegration vs threshold cointegration test}
 \usage{
-  TVECM.SeoTest(data, lag, beta, trim = 0.1, nboot,
-    plot = FALSE, hpc = c("none", "foreach"),
-    check = FALSE)
+TVECM.SeoTest(data, lag, beta, trim = 0.1, nboot, plot = FALSE,
+  hpc = c("none", "foreach"), check = FALSE)
 }
 \arguments{
   \item{data}{time series}
@@ -29,33 +28,32 @@
   original data}
 }
 \value{
-  A list cointaining diverse informations:
+A list cointaining diverse informations:
 
-  Estimated threshold parameters and usual slope
-  parameters.
+Estimated threshold parameters and usual slope parameters.
 
-  Value of the test.
+Value of the test.
 
-  Critical and Pvalue from bootstrap distribution.
+Critical and Pvalue from bootstrap distribution.
 }
 \description{
-  Test the null of no cointegration against threshold
-  cointegration with bootstrap distribution of Seo (2006)
+Test the null of no cointegration against threshold
+cointegration with bootstrap distribution of Seo (2006)
 }
 \details{
-  For this test, the cointegrating value has to be
-  specified by the user.
+For this test, the cointegrating value has to be specified
+by the user.
 
-  The model used is one where the threshold effect concerns
-  only the cointegrating vector, and only in the outer
-  regimes.
+The model used is one where the threshold effect concerns
+only the cointegrating vector, and only in the outer
+regimes.
 
-  Due to the presence of parameters unidentified under the
-  null hypothesis, the test employed is a Sup-Wald test,
-  that means that for each combination of the thresholds, a
-  Wald Test is computed and the supremum of all tests is
-  taken. For each bootstrap replication, this approach is
-  taken, so that the test is really slow.
+Due to the presence of parameters unidentified under the
+null hypothesis, the test employed is a Sup-Wald test, that
+means that for each combination of the thresholds, a Wald
+Test is computed and the supremum of all tests is taken.
+For each bootstrap replication, this approach is taken, so
+that the test is really slow.
 }
 \examples{
 # As the function takes long long time to be executed, we show in in don't run environement
@@ -72,17 +70,17 @@ TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=100, plot=FALSE,check=FALSE)
 }
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \references{
-  Seo, Myunghwan, 2006. "Bootstrap testing for the null of
-  no cointegration in a threshold vector error correction
-  model," Journal of Econometrics, vol. 127(1), pages
-  129-150, September.
+Seo, Myunghwan, 2006. "Bootstrap testing for the null of no
+cointegration in a threshold vector error correction
+model," Journal of Econometrics, vol. 127(1), pages
+129-150, September.
 }
 \seealso{
-  \code{\link{TVECM}} for estimating a TVECM,
-  \code{\link{TVECM.sim}} for simulating/bootstrap a TVECM,
+\code{\link{TVECM}} for estimating a TVECM,
+\code{\link{TVECM.sim}} for simulating/bootstrap a TVECM,
 }
 \keyword{ts}
 
