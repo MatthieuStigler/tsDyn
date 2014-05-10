@@ -62,7 +62,7 @@ approach (\code{2OLS}) or the Johansen (\code{ML}). For the
 estimation of the cointegrating value and for the ECT. This
 is only working when the beta value is not pre-specified.
 
-The argument \code{beta} is only for \link{\code{VECM},
+The argument \code{beta} is only for \code{\link{VECM}},
 look at the specific help page for more details.
 }
 \examples{

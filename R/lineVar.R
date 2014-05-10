@@ -17,7 +17,7 @@
 #'class numeric) can be added for the estimation of the cointegrating value and
 #'for the ECT. This is only working when the beta value is not pre-specified.
 #'
-#' The argument \code{beta} is only for \link{\code{VECM}, look at the specific help page for more details. 
+#' The argument \code{beta} is only for \code{\link{VECM}}, look at the specific help page for more details. 
 #'
 #'@param data multivariate time series (first row being first=oldest value)
 #'@param lag Number of lags to include in each regime
