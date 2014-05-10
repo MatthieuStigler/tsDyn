@@ -97,10 +97,10 @@ if(require(vars)) {
  data(finland)
  #check long coint values
    all.equal(VECM(finland, lag=2, estim="ML", r=2)$model.specific$beta,
-             cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)  $beta, check.attr=FALSE)
+             cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)  $beta, check.attributes=FALSE)
 # check OLS parameters
   all.equal(t(coefficients(VECM(finland, lag=2, estim="ML", r=2))),
-    coefficients(cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)$rlm), check.attr=FALSE)
+    coefficients(cajorls(ca.jo(finland, K=3, spec="transitory"), r=2)$rlm), check.attributes=FALSE)
 
 }
 
