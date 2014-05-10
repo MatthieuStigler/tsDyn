@@ -2,13 +2,10 @@
 \alias{lineVar}
 \title{Multivariate linear models: VAR and VECM}
 \usage{
-  lineVar(data, lag, r = 1,
-    include = c("const", "trend", "none", "both"),
-    model = c("VAR", "VECM"),
-    I = c("level", "diff", "ADF"), beta = NULL,
-    estim = c("2OLS", "ML"),
-    LRinclude = c("none", "const", "trend", "both"),
-    exogen = NULL)
+lineVar(data, lag, r = 1, include = c("const", "trend", "none", "both"),
+  model = c("VAR", "VECM"), I = c("level", "diff", "ADF"), beta = NULL,
+  estim = c("2OLS", "ML"), LRinclude = c("none", "const", "trend", "both"),
+  exogen = NULL)
 }
 \arguments{
   \item{data}{multivariate time series (first row being
@@ -27,8 +24,8 @@
   are to be taken in levels (original series) or in
   difference, or similarly to the univariate ADF case.}
 
-  \item{beta}{for VECM only: cointegrating value. If null,
-  will be estimated}
+  \item{beta}{for VECM only: imposed cointegrating value.
+  If null, will be estimated}
 
   \item{LRinclude}{Possibility to include in the long-run
   relationship and the ECT trend, constant... Can also be a
@@ -42,32 +39,31 @@
   data (then automatically cut) or than end-sample.}
 }
 \value{
-  Fitted model data
+Fitted model data
 }
 \description{
-  Estimate either a VAR or a VECM.
+Estimate either a VAR or a VECM.
 }
 \details{
-  This function provides basic functionalities for VAR and
-  VECM models. More comprehensive functions are in package
-  \pkg{vars}. A few differences appear in the VECM
-  estimation: \describe{ \item{Engle-Granger estimator}{The
-  Engle-Granger estimator is available}
-  \item{Presentation}{Results are printed in a different
-  ways, using a matrix form} \item{lateX export}{The matrix
-  of coefficients can be exported to latex, with or without
-  standard-values and significance stars} }
+This function provides basic functionalities for VAR and
+VECM models. More comprehensive functions are in package
+\pkg{vars}. A few differences appear in the VECM
+estimation: \describe{ \item{Engle-Granger estimator}{The
+Engle-Granger estimator is available}
+\item{Presentation}{Results are printed in a different
+ways, using a matrix form} \item{lateX export}{The matrix
+of coefficients can be exported to latex, with or without
+standard-values and significance stars} }
 
-  Two estimators are available: the Engle-Granger two step
-  approach (\code{2OLS}) or the Johansen (\code{ML}). For
-  the 2OLS, deterministic regressors (or external variables
-  if \code{LRinclude} is of class numeric) can be added for
-  the estimation of the cointegrating value and for the
-  ECT. This is only working when the beta value is not
-  pre-specified.
+Two estimators are available: the Engle-Granger two step
+approach (\code{2OLS}) or the Johansen (\code{ML}). For the
+2OLS, deterministic regressors (or external variables if
+\code{LRinclude} is of class numeric) can be added for the
+estimation of the cointegrating value and for the ECT. This
+is only working when the beta value is not pre-specified.
 
-  The arg beta is the cointegrating value, the
-  cointegrating vector will be taken as: (1, -beta).
+The argument \code{beta} is only for \link{\code{VECM},
+look at the specific help page for more details.
 }
 \examples{
 data(zeroyld)
@@ -113,15 +109,15 @@ toLatex(summary(VECM.EG), parenthese="Pvalue")
 options("show.signif.stars"=TRUE)
 }
 \author{
-  Matthieu Stigler
+Matthieu Stigler
 }
 \seealso{
-  \code{\link{VECM}} which is just a wrapper for
-  \code{lineVar(...,model="VECM")}
+\code{\link{VECM}} which is just a wrapper for
+\code{lineVar(...,model="VECM")}
 
-  \code{\link{TVAR}} and \code{\link{TVECM}} for the
-  corresponding threshold models. \code{\link{linear}} for
-  the univariate AR model.
+\code{\link{TVAR}} and \code{\link{TVECM}} for the
+corresponding threshold models. \code{\link{linear}} for
+the univariate AR model.
 }
 \keyword{ts}
 

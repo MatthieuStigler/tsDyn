@@ -18,8 +18,8 @@ VECM(data, lag, r = 1, include = c("const", "trend", "none", "both"),
   \item{include}{Type of deterministic regressors to
   include}
 
-  \item{beta}{Possibility to impose a cointegrating value.
-  By default is null, so values will be estimated}
+  \item{beta}{for VECM only: imposed cointegrating value.
+  If null, will be estimated so values will be estimated}
 
   \item{LRinclude}{Type of deterministic regressors to
   include in the long-term relationship. Can also be a
@@ -81,6 +81,21 @@ the VECM representation, not in the VAR (as is done in
 package vars or software GRETL). Basically, a VAR with 2
 lags corresponds here to a VECM with 1 lag. Lag 0 in the
 VECM is not allowed.
+
+#'The arg \code{beta} allows to specify constrained
+cointegrating values, leading to \eqn{ECT=
+\beta^{'}X_{t-1}}. It should be specified as a \eqn{K
+\times r} matrix. In case of \eqn{r=1}, can also be
+specified as a vector. Note that the vector should be
+normalised, with the first value to 1, and the next values
+showing the opposite sign in the long-run relationship
+\eqn{- \beta}. In case the vector has \eqn{K-1} values,
+this is what \code{lineVar} is doing, setting \eqn{(1, -
+\beta)}. Note finally one should provide values for all the
+coefficients (eventually except for special case of r=1 and
+k-1), if you want to provide only part of the parameters,
+and let the others be estimated, look at the functions in
+package urca.
 }
 \examples{
 data(zeroyld)
