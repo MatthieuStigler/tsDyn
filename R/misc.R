@@ -42,6 +42,7 @@ extend.MyEnv <- function(this, subclass, ...) {
 #'on a specific model, type: \code{help(modelName)}.
 #'@author Antonio, Fabio Di Narzo
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'availableModels()
@@ -77,8 +78,11 @@ add <- function(...)
 #'@param x numeric vector
 #'@author J. L. Aznarte
 #'@keywords ts
+#'@export
 sigmoid <- function(x) 1/(1 + exp(-x))
 
+#' @export
+#' @rdname sigmoid
 dsigmoid <- function(x) x * (1 - x)
 
 repmat <- function(a, b, c) kronecker(matrix(1,b,c), a)
@@ -136,7 +140,8 @@ else if(length(x) %in% c(2:20))
 else
 	return(max(apply(matrix(sample(x,size=20)),1,internal)))
 }
-###Paramater matrix of tar with 1 threshold,  given the thresh and the delay
+
+### Parameter matrix of tar with 1 threshold,  given the thresh and the delay
 TAR1t_B<-function(thDelay,gamma,yy, xxl,xxh,z,m) {#
         isL <- ifelse(z[, thDelay + 1]<= gamma,1,0)	### isL: dummy 
 	ndown<-mean(isL)
@@ -150,8 +155,9 @@ TAR1t_B<-function(thDelay,gamma,yy, xxl,xxh,z,m) {#
 	nobs <- c(ndown=ndown, nup=1-ndown)
 	
 	list(Bdown=Bdown, Bup=Bup, nobs=nobs)
-        }
-###Paramater matrix of tar with 2 thresholds,  given the 2 thresh and the delay
+}
+
+### Parameter matrix of tar with 2 thresholds,  given the 2 thresh and the delay
 TAR2t_B <- function(gam1,gam2,thDelay, yy, xx,z,m){
 	##Threshold dummies
 	dummydown <- ifelse(z[, thDelay + 1]<=gam1, 1, 0)
@@ -214,32 +220,6 @@ is.InUnitCircle<-function(B,ninc,m, nthresh){
 }
   
 isRoot<-function(coef, regime=c("L", "M", "H", "."), lags){
-
-
-#'Extract variable showing regime
-#'
-#'This function allows to extract the indicator variable specifying the regime
-#'in which the process is at time t.
-#'
-#'
-#'@aliases regime regime.default
-#'@param object object of class \code{setar} or \code{nlVar}
-#'@param initVal Logical. Whether the NA initial values should be returned.
-#'Default to TRUE.
-#'@param timeAttr Logical. Whether the time attributes should be returned.
-#'Default to TRUE.
-#'@param \dots additional arguments to \code{regime}
-#'@return Time series of same attributes as input to setar.
-#'@author Matthieu Stigler
-#'@keywords ts
-#'@examples
-#'
-#'set<-setar(lynx, m=3)
-#'regime(set)
-#'regime(set, time=FALSE, initVal=FALSE)
-#'
-#'plot(regime(set))
-#'
   regime<-match.arg(regime)
   coefName<-paste("phi", regime, sep="")
   phi<-coef[grep(coefName,names(coef))]

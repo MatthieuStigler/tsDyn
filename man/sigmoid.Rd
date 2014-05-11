@@ -5,6 +5,8 @@
 \title{sigmoid functions}
 \usage{
 sigmoid(x)
+
+dsigmoid(x)
 }
 \arguments{
   \item{x}{numeric vector}
