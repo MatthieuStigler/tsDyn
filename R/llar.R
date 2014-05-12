@@ -15,6 +15,7 @@
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
 
+#' @export
 llar <- function(x, m, d=1, steps=d, series, eps.min=sd(x)/2, eps.max=diff(range(x)), neps=30, trace=0) {
 	if(missing(series))
 		series <- deparse(substitute(x))
@@ -44,6 +45,7 @@ llar <- function(x, m, d=1, steps=d, series, eps.min=sd(x)/2, eps.max=diff(range
 	return( res )
 }
 
+#' @S3method print llar
 print.llar <- function(x, ...) {
 	cat("\nCall: ")
 	print(attr(x,"call"))
@@ -53,11 +55,13 @@ print.llar <- function(x, ...) {
 	cat("Relative error ranging from ", reps[1]," to ", reps[2],"\n\n")
 }
 
+#' @S3method plot llar
 plot.llar <- function(x, ...)
 	plot(x$eps, x$RMSE, xlab=expression(epsilon), ylab="relative error", log="x", type="l",
 		ylim=c(0,max(1,max(x$RMSE))),
 		main=paste("local linear fit of",attr(x,"series")))
 
+#' @S3method as.data.frame llar
 as.data.frame.llar <- function(x, row.names, optional, ...)
 	data.frame(unclass(x))
 
@@ -103,6 +107,7 @@ llar.step <- function(x, m, d=1, steps=d, series, eps=stop("you must specify a w
   return(crossprod(c(1,xxFull[nrow(xxFull), seq_len(m)]),lmod$coef))
 }
 
+#' @export
 llar.predict <- function(x, m, d=1, steps=d, series, n.ahead=1,
                          eps=stop("you must specify a window value"),
                          onvoid=c("fail","enlarge"), r = 20, trace=1) {
@@ -119,6 +124,7 @@ llar.predict <- function(x, m, d=1, steps=d, series, n.ahead=1,
   return(x[(n+1):(n+n.ahead)])
 }
 
+#' @export
 llar.fitted <- function(x, m, d=1, steps=d, series, eps, trace=0) {
 	if(missing(series))
 		series <- deparse(substitute(x))

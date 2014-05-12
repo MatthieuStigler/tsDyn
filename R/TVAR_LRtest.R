@@ -74,6 +74,7 @@
 #'Law of One Price," Macroeconomic Dynamics, Cambridge University Press, vol.
 #'5(4), pages 533-76, September.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'

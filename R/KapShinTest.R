@@ -1,4 +1,6 @@
- KapShinTest <- function(x, m=1, series, include = c("none","const", "trend", "both"), c=3, delta=0.5, points=NULL,minObsMid=10, trick=c("for", "apply", "mapply"), trace=FALSE){
+
+#' @export
+KapShinTest <- function(x, m=1, series, include = c("none","const", "trend", "both"), c=3, delta=0.5, points=NULL,minObsMid=10, trick=c("for", "apply", "mapply"), trace=FALSE){
  
  warning("This function should be considered as experimental. No consistency checks with original paper could be made\n")
   include<-match.arg(include)

@@ -244,6 +244,8 @@ predictOld.VECM <- function(object,...){
  predict(vec2var.tsDyn(object), ...)
 }
 
+#' @export irf
+#' @S3method irf nlVar
 irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
   model <- attr(x, "model")
   if(model=="VECM"){
@@ -254,7 +256,8 @@ irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cu
  irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
-
+#' @export fevd
+#' @S3method fevd nlVar
 fevd.nlVar <- function(x, n.ahead=10, ...){
   model <- attr(x, "model")
   if(model=="VECM"){
@@ -268,6 +271,7 @@ fevd.nlVar <- function(x, n.ahead=10, ...){
 
 ####### Predict 
 
+#' @S3method predict VAR
 predict.VAR <- function(object, newdata, n.ahead=5, ...){
   lag <- object$lag
   k <- object$k
@@ -303,7 +307,7 @@ predict.VAR <- function(object, newdata, n.ahead=5, ...){
   return(res)
 }
 
-
+#' @S3method predict VECM
 predict.VECM <- function(object, newdata, n.ahead=5, ...){
   lag <- object$lag
   k <- object$k

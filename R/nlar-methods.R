@@ -130,6 +130,7 @@ getNUsed.nlar <- function(obj, ...)
 #'Non-Linear Time Series: A Dynamical Systems Approach, Tong, H., Oxford:
 #'Oxford University Press (1990).
 #'@keywords ts internal
+#'@export
 nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                  model.specific=NULL, ...) {
   return(extend(list(), "nlar",
@@ -144,16 +145,19 @@ nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                 ))
 }
 
+#' @S3method print nlar
 #Print nlar object
 print.nlar <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   cat("\nNon linear autoregressive model\n")
   invisible(x)
 }
 
+#' @S3method coef nlar
 #Coefficients of a nlar.fit object
 coef.nlar <- function(object, ...)
   object$coefficients
 
+#' @S3method fitted nlar
 #Fitted values for the fitted nlar object
 fitted.nlar <- function(object, ...) {
   ans <- c(rep(NA, object$str$n.used - length(object$fitted.values)), object$fitted.values)
@@ -162,6 +166,7 @@ fitted.nlar <- function(object, ...) {
   ans
 }
 
+#' @S3method residuals nlar
 #Observed residuals for the fitted nlar object
 residuals.nlar <- function(object, ...) {
   str <- object$str
@@ -172,6 +177,33 @@ residuals.nlar <- function(object, ...) {
   ans
 }
 
+#'Extract variable showing regime
+#'
+#'This function allows to extract the indicator variable specifying the regime
+#'in which the process is at time t.
+#'
+#'
+#'@aliases regime regime.default
+#'@param object object of class \code{setar} or \code{nlVar}
+#'@param initVal Logical. Whether the NA initial values should be returned.
+#'Default to TRUE.
+#'@param timeAttr Logical. Whether the time attributes should be returned.
+#'Default to TRUE.
+#'@param \dots additional arguments to \code{regime}
+#'@return Time series of same attributes as input to setar.
+#'@author Matthieu Stigler
+#'@keywords ts
+#'@export
+#'@export
+#'@examples
+#'
+#'set<-setar(lynx, m=3)
+#'regime(set)
+#'regime(set, time=FALSE, initVal=FALSE)
+#'
+#'plot(regime(set))
+#'
+
 #indicator of the regime of the obs
 regime <- function (object, initVal=TRUE,timeAttr=TRUE,...)  
   UseMethod("regime")
@@ -179,7 +211,7 @@ regime <- function (object, initVal=TRUE,timeAttr=TRUE,...)
 regime.default <- function(object, initVal=TRUE,timeAttr=TRUE,...)
   NULL
 
-
+#' @S3method regime setar
 regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
   str <- object$str
@@ -202,7 +234,7 @@ regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   return(ans)
 }
             
-           
+#' @S3method regime nlVar           
 regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
   
@@ -224,7 +256,7 @@ regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   return(ans)
 }
 
-
+#' @S3method regime lstar
 regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...){
 
   thVar <- object$model.specific$thVar
@@ -271,6 +303,7 @@ regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...
 #'@return Threshold value.
 #'@author Matthieu Stigler
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'set<-setar(lynx, m=3)
@@ -297,11 +330,13 @@ getTh.default <- function(object, ...){
   return(allth)
 }
 
+#' @S3method getTh setar
 getTh.setar<-function(object,...){
   object<-object$coefficients
   getTh.default(object)
 }
 
+#' @S3method getTh lstar
 getTh.lstar<-function(object,...){
   object<-object$coefficients
   getTh.default(object)
@@ -312,10 +347,12 @@ getTh.lstar<-function(object,...){
   object["th"]
 }
 
+#' @S3method getTh summary.setar
 getTh.summary.setar<-function(object,...){
   object$th
 }
 
+#' @S3method getTh nlVar
 getTh.nlVar<-function(object,...){
   nth <- object$model.specific$nthresh
 
@@ -334,6 +371,7 @@ getTh.nlVar<-function(object,...){
 }
 
 
+#' @S3method deviance nlar
 #Observed residuals for the fitted nlar object
 deviance.nlar<-function(object,...) crossprod(object$residuals)
 
@@ -351,6 +389,7 @@ deviance.nlar<-function(object,...) crossprod(object$residuals)
 #'@return Computed MSE for the fitted model.
 #'@author Antonio, Fabio Di Narzo
 #'@keywords ts
+#'@export
 mse <- function (object, ...)  
   UseMethod("mse")
 
@@ -361,9 +400,11 @@ mse <- function (object, ...)
 mse.default <- function(object, ...)
   NULL
 
+#' @S3method mse nlar
 mse.nlar <- function(object, ...)
   sum(object$residuals^2)/object$str$n.used
 
+#' @S3method AIC nlar
 #AIC for the fitted nlar model
 AIC.nlar <- function(object,k=2, ...){
   n <- object$str$n.used
@@ -371,7 +412,7 @@ AIC.nlar <- function(object,k=2, ...){
   n * log( mse(object) ) + k * npar
 }
 
-
+#' @S3method BIC nlar
 #BIC for the fitted nlar model
 BIC.nlar <- function(object, ...)
 	AIC.nlar(object, k=log(getNUsed(object)))
@@ -393,7 +434,6 @@ BIC.nlar <- function(object, ...)
 #'@return Computed Mean Absolute Percent Error for the fitted model.
 #'@author Antonio, Fabio Di Narzo
 #'@keywords ts
-
 #' @export
 MAPE <- function(object, ...)
   UseMethod("MAPE")
@@ -404,11 +444,13 @@ MAPE <- function(object, ...)
 MAPE.default <- function(object, ...)
   NULL
 
+#' @S3method MAPE nlar
 MAPE.nlar <- function(object, ...) {
   e <- abs(object$residuals/object$str$yy)
   mean( e[is.finite(e)] )
 }
 
+#' @S3method summary nlar
 #Computes summary infos for the fitted nlar model
 summary.nlar <- function(object, ...) {
   ans <- list()
@@ -421,6 +463,7 @@ summary.nlar <- function(object, ...) {
   return(extend(list(), "summary.nlar", listV=ans))
 }
 
+#' @S3method print summary.nlar
 #Prints summary infos for the fitted nlar model
 print.summary.nlar <- function(x, ...) {
   print(x$object)
@@ -433,6 +476,7 @@ print.summary.nlar <- function(x, ...) {
   invisible(x)
 }
 
+#' @S3method plot nlar
 plot.nlar <- function(x, ask = interactive(), ...) {
   str <- x$str
   op <- par(no.readonly=TRUE)
@@ -482,7 +526,6 @@ plot.nlar <- function(x, ask = interactive(), ...) {
 #'@note This is an internal function, and should not be called by the user
 #'@author Antonio, Fabio Di Narzo
 #'@keywords internal ts
-#'@examples
 #'
 #'tsDyn:::oneStep.linear
 #'

@@ -307,6 +307,7 @@ buildConstants<-function(include=c("const", "trend","none", "both"), n){
 #'(only one of exact/int/around should be given).
 #'@author Matthieu Stigler
 #'@seealso \code{\link{selectSETAR}}
+#'@export
 #'@examples
 #'
 #'sun<-(sqrt(sunspot.year+1)-1)*2		

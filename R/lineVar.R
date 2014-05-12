@@ -43,6 +43,7 @@
 #'\code{\link{TVAR}} and \code{\link{TVECM}} for the corresponding threshold
 #'models. \code{\link{linear}} for the univariate AR model.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'data(zeroyld)
@@ -428,6 +429,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #'the correspoding threshold models. \code{\link{linear}} for the univariate AR
 #'model.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'data(zeroyld)
@@ -494,11 +496,12 @@ toLatex(summary(aVAR))
 
 
 
-
-print.VAR<-function(x,...){
+#' @S3method print VAR
+print.VAR <- function(x,...){
 	print(coef(x))
 }
 
+#' @S3method summary VAR
 summary.VAR<-function(object, digits=4,...){
   x<-object
   r<-4
@@ -539,7 +542,7 @@ summary.VAR<-function(object, digits=4,...){
 }
 
 
-
+#' @S3method print summary.VAR
 print.summary.VAR<-function(x,...){
   cat("#############\n###Model", attr(x,"model"),"\n#############")
   cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
@@ -554,6 +557,7 @@ print.summary.VAR<-function(x,...){
 
 }
 
+#' @S3method vcov VAR
 vcov.VAR<-function(object, ...){
   sum<-summary.VAR(object)
   so<-sum$cov.unscaled%x%sum$sigma
@@ -564,6 +568,7 @@ vcov.VAR<-function(object, ...){
   so
 }
 
+#' @S3method toLatex VAR
 toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue"), label){
   x<-object
   if(attr(x,"model")=="VECM"&&x$model.specific$LRinclude!="none") stop("toLatex not implemented now for models with arg 'LRinclude' different from 'none'") 

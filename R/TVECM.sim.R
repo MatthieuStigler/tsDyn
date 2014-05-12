@@ -1,4 +1,5 @@
 
+#' @export
 #' @rdname TVECM.sim
 VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
   k<- if(!missing(VECMobject)) VECMobject$k else if(!missing(B)) nrow(B) else if(!missing(data)) ncol(data)
@@ -73,6 +74,7 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
 #'@seealso \code{\link{TVECM}} to estimate a TVECM, \code{\link{VAR.sim}} to
 #'simulate/bootstrap a VAR.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'

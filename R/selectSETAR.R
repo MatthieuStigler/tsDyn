@@ -1,3 +1,5 @@
+
+#' @export
 ## Copyright (C) 2005,2006,2009  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -457,6 +459,7 @@ class(ret)<-"selectSETAR"
 return(ret)
 }
 
+#' @S3method print selectSETAR
 print.selectSETAR<-function(x,...){
   cat("Results of the grid search for 1 threshold\n")
   if(x$criterion=="SSR"){
@@ -490,7 +493,7 @@ print.selectSETAR<-function(x,...){
 }
 
 
-
+#' @S3method plot selectSETAR
 plot.selectSETAR<-function(x,...){
   if(x$criterion!="SSR")
     stop("Currently only implemented for criterion SSR")

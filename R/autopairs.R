@@ -24,6 +24,7 @@
 #'\code{\link[sm]{sm.density}} and, especially, \code{\link[sm]{sm.ts.pdf}}
 #'from package \pkg{sm}.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'x <- log10(lynx)

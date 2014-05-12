@@ -1,5 +1,5 @@
 
-
+#' @S3method predict nlar
 #### Predict nlar
 predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"), nboot=100, ci=0.95, block.size=3, boot1Zero=TRUE,...)
 {

@@ -18,6 +18,7 @@
 #'\pkg{scatterplot3d} package and for kernel post-processing of the cloud for
 #'nonparametric autoregression functions estimates.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'if(interactive())

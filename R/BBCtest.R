@@ -19,6 +19,7 @@
 #'-The version of test used (either Wald, LM or LR).
 #'@author Matthieu Stigler
 #'@seealso \code{\link{setarTest}} for a test with stationarity as a null.
+#'@export
 #'@examples
 #'
 #'BBCTest(lynx, m=3, test="Wald", grid="minPerc")

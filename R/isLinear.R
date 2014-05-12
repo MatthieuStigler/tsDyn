@@ -15,12 +15,14 @@
 #'@param ... arguments to and from other methods
 #'@author A. F. Di Narzo
 #'@keywords ts
+#'@export
 isLinear <- function(object, ...)
   UseMethod("isLinear")
 
 isLinear.default <- function(object, ...)
   stop("no linearity tests available for this model")
 
+#' @S3method isLinear lstar
 isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE, ...)
 {
 

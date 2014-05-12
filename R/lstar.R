@@ -1,3 +1,5 @@
+
+#' @export
 ## Copyright (C) 2005, 2006, 2007/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -306,7 +308,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 #############################################
   #Transition function G: moved to star.R
 
-  
+#' @S3method print lstar
 print.lstar <- function(x, ...) {
   NextMethod(...)
   cat("\nLSTAR model\n")
@@ -343,6 +345,7 @@ print.lstar <- function(x, ...) {
   invisible(x)
 }
 
+#' @S3method summary lstar
 summary.lstar <- function(object, ...) {
   ans <- list()  
 
@@ -385,6 +388,7 @@ summary.lstar <- function(object, ...) {
   return(extend(summary.nlar(object), "summary.lstar", listV=ans))
 }
 
+#' @S3method print summary.lstar
 print.summary.lstar <- function(x, digits=max(3, getOption("digits") - 2),
                        signif.stars = getOption("show.signif.stars"), ...)
 {
@@ -409,6 +413,7 @@ print.summary.lstar <- function(x, digits=max(3, getOption("digits") - 2),
   invisible(x)
 }
 
+#' @S3method plot lstar
 plot.lstar <- function(x, ask=interactive(), legend=FALSE,
                        regSwStart, regSwStop, ...) {
   
@@ -471,6 +476,7 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
   invisible(x)
 }
 
+#' @S3method coef lstar
 #Coef() method: hyperCo=FALSE won't show the threshold/slope coef
 coef.lstar <- function(object, hyperCo=TRUE, ...){
   co <- object$coefficients
@@ -478,7 +484,7 @@ coef.lstar <- function(object, hyperCo=TRUE, ...){
   co
 }
 
-
+#' @S3method vcov lstar
 vcov.lstar <- function(object, ...){
   n <- object$str$n.used
   coef<- object$coefficients
@@ -496,6 +502,7 @@ vcov.lstar <- function(object, ...){
 return(vc)
 }
 
+#' @S3method confint lstar
 confint.lstar <- function(object, parm, level = 0.95, ...){
   confint.default(object, parm=parm, level=level, ...)
 }

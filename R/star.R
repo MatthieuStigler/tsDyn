@@ -66,6 +66,7 @@ F <- function(phi1, phi2, x_t, s_t) {
 #'@seealso \code{\link{addRegime}}
 #'@references TODO
 #'@keywords ts internal
+#'@export
 #'@examples
 #'
 #'##TODO
@@ -253,6 +254,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 #'@seealso \code{\link{star}}
 #'@references TODO
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'##TODO
@@ -260,6 +262,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 addRegime <- function(object, ...)
   UseMethod("addRegime")
 
+#' @S3method addRegime star
 addRegime.star <- function(object, ...)
 {
 
@@ -540,6 +543,7 @@ estimateParams.star <- function(object, trace=TRUE, control=list(), ...)
 #   series
 #   rob
 #   sig
+#' @export
 star <- function(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
                  mTh, thDelay, thVar, sig=0.05, trace=TRUE, control=list(), ...)
 {
@@ -999,7 +1003,7 @@ oneStep.star <- function(object, newdata, itime, thVar, ...)
   
 }
 
-
+#' @S3method print star
 print.star <- function(x, ...) {
   NextMethod(...)
   cat("\nMultiple regime STAR model\n\n")

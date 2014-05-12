@@ -39,6 +39,7 @@
 #'@seealso \code{\link{SETAR}} to estimate a SETAR, \code{\link{arima.sim}} to
 #'simulate an ARMA.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'##Simulation of a TAR with 1 threshold

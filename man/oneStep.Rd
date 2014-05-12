@@ -30,12 +30,10 @@ a single vector of length \code{m} or a matrix with
 This is an internal function, and should not be called by
 the user
 }
-\examples{
-tsDyn:::oneStep.linear
-}
 \author{
 Antonio, Fabio Di Narzo
 }
 \keyword{internal}
 \keyword{ts}
+\keyword{tsDyn:::oneStep.linear}
 

@@ -62,6 +62,7 @@
 predict_rolling  <- function (object, ...)  
   UseMethod("predict_rolling")
 
+#' @S3method predict_rolling default
 predict_rolling.default  <- function (object, ...)  NULL
 
 
@@ -176,7 +177,7 @@ predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newda
   return(res)
 }
 
-
+#' @S3method predict_rolling nlar
 predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
 
   if(missing(newdata)) stop("Providing newdata required for objects nlar")
@@ -232,7 +233,6 @@ simplify2df <- function(x) {
   out
 }
 
-
 predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FALSE, ...){
 
   mod_cl <- deparse(substitute(model))
@@ -272,13 +272,14 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
   return(res)
 }
 
-
+#' @S3method predict_rolling Arima
 predict_rolling.Arima <- function(object, n.ahead=1, newdata,  ...){
   res <- predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=Arima,check=TRUE,  ...)
   attr(res, "model") <- "Arima"
   return(res)
 }
 
+#' @S3method predict_rolling ets
 predict_rolling.ets <- function(object,  n.ahead=1, newdata,  ...){
   res <- predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=ets, check=FALSE, ...)
   attr(res, "model") <- "ets"

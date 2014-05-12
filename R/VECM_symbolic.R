@@ -12,6 +12,7 @@
 #'if any.
 #'@return An object of class \sQuote{VECM}, without however any data.
 #'@keywords ts VECM cointegration
+#'@export
 #'@examples
 #'
 #'

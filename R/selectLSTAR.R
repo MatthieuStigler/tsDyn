@@ -1,3 +1,4 @@
+#' @export
 #Exhaustive search over a grid of model parameters
 #x: time series
 #m: maximum autoregressive order

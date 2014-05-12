@@ -61,6 +61,7 @@
 #'differently: \code{K} from \code{ca.jo} corresponds to \code{lag}+1 in
 #'\code{rank.test}.  }
 #'@author Matthieu Stigler
+#'@export
 #'@seealso \code{\link{VECM}} for estimating a VECM. \code{\link{rank.select}}
 #'to estimate the rank based on information criteria.
 #'

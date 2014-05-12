@@ -1,3 +1,5 @@
+#' @export
+
 ## Copyright (C) 2005/2006  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
@@ -32,6 +34,7 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 		model.specific=res), "nnetTs"))
 }
 
+#' @S3method print nnetTs
 print.nnetTs <- function(x, ...) {
 	NextMethod(...)
 	cat("\nNNET time series model\n")
@@ -42,6 +45,7 @@ print.nnetTs <- function(x, ...) {
 oneStep.nnetTs <- function(object, newdata, ...)
 	predict(object$model.specific, newdata)
 
+#' @export
 selectNNET <- function(x, m, d=1, steps=d, size=1:(m+1), maxit=1e3, trace=FALSE) {
 	IDS <- as.matrix( size )
 	colnames(IDS) <- c("size")

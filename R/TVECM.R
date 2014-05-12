@@ -76,6 +76,7 @@
 #'Seo, M. H. (2009) Estimation of non linear error-correction models, Working
 #'paper
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'
@@ -742,6 +743,7 @@ toLatex.TVECM(tvecm)
 #convert warning to cat for There were 2 thresholds values which minimize the SSR in the conditional step
 }
 
+#' @S3method print TVECM
 print.TVECM<-function(x,...){
 # 	NextMethod(...)
   cat("Model TVECM with ", x$model.specific$nthresh, " thresholds\n\n")
@@ -750,6 +752,7 @@ print.TVECM<-function(x,...){
   print(x$model.specific$Thresh)
 }
 
+#' @S3method summary TVECM
 summary.TVECM<-function(object,digits=4,...){
   x<-object
   k<-x$k
@@ -791,7 +794,7 @@ summary.TVECM<-function(object,digits=4,...){
 }
 
 
-
+#' @S3method print summary.TVECM
 print.summary.TVECM<-function(x,...){
   cat("#############\n###Model TVECM\n#############")
   cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
@@ -804,6 +807,7 @@ print.summary.TVECM<-function(x,...){
   cat("\nPercentage of Observations in each regime", percent(x$model.specific$nobs,digits=3,by100=TRUE), "\n")
 }
 
+#' @S3method toLatex TVECM
 toLatex.TVECM<-function(object,digits=4,parenthese=c("StDev","Pvalue"),label, ...){
   x<-object
   Th<-x$model.specific$Thresh

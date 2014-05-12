@@ -58,6 +58,7 @@
 #'Adjustment to the Law of One Price," Macroeconomic Dynamics, Cambridge
 #'University Press, vol. 5(4), pages 533-76, September.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'data(zeroyld)
@@ -482,6 +483,7 @@ return(z)
 }	#end of the whole function
 
 
+#' @S3method print TVAR
 print.TVAR<-function(x,...){
 # 	NextMethod(...)
 	cat("Model TVAR with ", x$model.specific$nthresh, " thresholds\n\n")
@@ -490,6 +492,7 @@ print.TVAR<-function(x,...){
 	print(paste(x$model.specific$Thresh, collapse=" "))
 }
 
+#' @S3method summary TVAR
 summary.TVAR<-function(object,...){
 	x<-object
 	xspe<-x$model.specific
@@ -531,6 +534,7 @@ summary.TVAR<-function(object,...){
 	return(x)
 }
 
+#' @S3method print summary.TVAR
 print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars"),...){
 	coeftoprint<-list()
 	for(i in 1:length(x$bigcoefficients)){
@@ -603,7 +607,7 @@ plot3<-function(th,nthresh, allTh){
     legend("topleft", pch=1, legend=leg, col=c(allDelay+1,c(2:(nthresh+1))), bg="white")
 }
 
-
+#' @S3method plot TVAR
 plot.TVAR<-function(x,ask=interactive(), ...){
   th<-x$model.specific$Thresh
   nthresh<-x$model.specific$nthresh
@@ -618,7 +622,7 @@ plot.TVAR<-function(x,ask=interactive(), ...){
 }
 
 
-
+#' @S3method toLatex TVAR
 toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	x<-object
 	parenthese<-match.arg(parenthese)

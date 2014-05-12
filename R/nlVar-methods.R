@@ -1,3 +1,5 @@
+
+# unused!
 print.nlVar<-function(object,...){
 	if(object$model.specific$nthresh==0) 
 		cat("Linear VAR model\n")
@@ -150,7 +152,7 @@ npar.VECM<-function(object, ..., r) {
   return(nPar)
 }
 
-
+#' @S3method AIC nlVar
 #### AIC criterions
 AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
@@ -159,6 +161,7 @@ AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object)
 }
 
+#' @S3method AIC VECM
 AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	Rank<-if(missing(r)) object$model.specific$r else r
@@ -167,6 +170,7 @@ AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object, r=Rank)
 }
 
+#' @S3method BIC nlVar
 #### BIC criterions
 BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
@@ -175,6 +179,7 @@ BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object)
 }
 
+#' @S3method BIC VECM
 BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	nVar<-object$k
@@ -184,6 +189,7 @@ BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object, r=Rank)
 }
 
+#' @S3method deviance nlVar
 deviance.nlVar<-function(object,...){
 	as.numeric(crossprod(c(object$residuals)))
 }
@@ -240,6 +246,7 @@ residuals.nlVar<-function(object,...){
 #'
 #'
 
+#' @S3method fitted nlVar
 fitted.nlVar <- function(object, level=c("model", "original"),...){
 
   level <- match.arg(level)
@@ -261,6 +268,7 @@ fitted.nlVar <- function(object, level=c("model", "original"),...){
   return(res)
 }
 
+#' @S3method coef nlVar
 coef.nlVar<-function(object,...){
 	return(object$coefficients)
 }

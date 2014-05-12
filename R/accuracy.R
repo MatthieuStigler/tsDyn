@@ -25,6 +25,7 @@
 #'@param \dots Not used currently.
 #'@return A data-frame containing the forecasting accuracy measures.
 #'@author Matthieu Stigler
+#'@export
 #'@keywords ts
 #'@examples
 #'

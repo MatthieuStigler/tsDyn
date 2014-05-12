@@ -37,6 +37,7 @@
 #'Also, be aware of the course of dimensionality: m can't be too high for
 #'relatively small time series. See references for further details.
 #'@author Antonio, Fabio Di Narzo
+#'@export
 #'@seealso BDS marginal independence test: \code{\link[tseries]{bds.test}} in
 #'package \pkg{tseries}
 #'
@@ -95,6 +96,7 @@ delta.test <- function(x, m=2:3, d=1, eps = seq(0.5*sd(x),2*sd(x),length=4), B=4
 #'@references Sebastiano Manzan, Essays in Nonlinear Economic Dynamics, Thela
 #'Thesis (2003)
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'delta.lin(log10(lynx), m=3)

@@ -14,7 +14,7 @@
 ## http://www.gnu.org/copyleft/gpl.html.  You can also obtain it by
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
-
+#' @export
 #AAR fitter
 aar <- function(x, m, d=1, steps=d, series){
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
@@ -35,6 +35,7 @@ aar <- function(x, m, d=1, steps=d, series){
 		), "aar") )
 }
 
+#' @S3method print aar
 print.aar <- function(x, ...) {
 	NextMethod(...)
 	cat("\nAAR model\n")
@@ -42,10 +43,12 @@ print.aar <- function(x, ...) {
   invisible(x)
 }
 
+#' @S3method summary aar
 summary.aar <- function(object, ...) {
 	extend(summary.nlar(object), "summary.aar", internals=summary(object$model.specific, ...))
 }
 
+#' @S3method print summary.aar
 print.summary.aar <- function(x, digits=max(3, getOption("digits") - 2),
 	signif.stars = getOption("show.signif.stars"), ...) {
 	NextMethod(digits=digits, signif.stars=signif.stars, ...)
@@ -53,6 +56,7 @@ print.summary.aar <- function(x, digits=max(3, getOption("digits") - 2),
   invisible(x)
 }
 
+#' @S3method plot aar
 plot.aar <- function(x, ask=interactive(), ...) {
 	op <- par(no.readonly=TRUE)
 	par(ask=ask)

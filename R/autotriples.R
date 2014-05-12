@@ -22,6 +22,7 @@
 #'\code{\link[sm]{sm.regression}} and, especially,
 #'\code{\link[sm]{sm.autoregression}} in package \code{\link[sm]{sm}}.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'autotriples(log(lynx))

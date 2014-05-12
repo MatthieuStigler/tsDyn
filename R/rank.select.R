@@ -26,6 +26,7 @@
 #'\sQuote{summary methods}, containing among other the matrices of AIC/BIC/HQ,
 #'the Likelihood, and best ranks according to each criterion.
 #'@author Matthieu Stigler
+#'@export
 #'@seealso \code{\link{VECM}} for estimating a VECM. \code{\link{rank.test}}
 #'(or \code{\link[urca]{ca.jo}} in package \pkg{urca}) for the classical
 #'Johansen cointegration test.
@@ -154,6 +155,7 @@ rank.select <- function(data, lag.max=10, r.max=ncol(data)-1, include = c( "cons
 #'
 #'\code{\link[vars]{VARselect}} in package \pkg{vars}, does basically the same.
 #'@keywords ts
+#'@export
 #'@examples
 #'
 #'
