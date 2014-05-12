@@ -12,9 +12,9 @@ coefPI(object, ...)
 }
 \arguments{
   \item{object}{An object of class \code{\link{VECM}},
-  \code{\link[vars]{ca.jo}}}
+  \code{\link[urca]{ca.jo}}}
 
-  \item{\ldots}{}
+  \item{\ldots}{Further arguments passed to methods}
 }
 \value{
 A matrix containing the coefficients
@@ -46,7 +46,7 @@ if(require(urca)){
  coefB(vecm_ur)
  coefB(vecm_ur,r=2)
  coefB(cajorls(vecm_ur, r=2))
- all.equal(coefB(vecm), coefB(vecm_ur), check.attributes=FALSE
+ all.equal(coefB(vecm), coefB(vecm_ur), check.attributes=FALSE)
  all.equal(coefB(vecm_r2), coefB(vecm_ur, r=2), check.attributes=FALSE)
 }
 }

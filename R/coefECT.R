@@ -1,6 +1,6 @@
 #' Extract cointegration parameter A, B and PI
-#' @param object An object of class \code{\link{VECM}}, \code{\link[vars]{ca.jo}}
-#' @param \ldots 
+#' @param object An object of class \code{\link{VECM}}, \code{\link[urca]{ca.jo}}
+#' @param \ldots Further arguments passed to methods
 #' @return A matrix containing the coefficients
 #' @export
 #' @examples
@@ -27,7 +27,7 @@
 #'  coefB(vecm_ur)
 #'  coefB(vecm_ur,r=2)
 #'  coefB(cajorls(vecm_ur, r=2))
-#'  all.equal(coefB(vecm), coefB(vecm_ur), check.attributes=FALSE
+#'  all.equal(coefB(vecm), coefB(vecm_ur), check.attributes=FALSE)
 #'  all.equal(coefB(vecm_r2), coefB(vecm_ur, r=2), check.attributes=FALSE)
 #' }
 
@@ -61,7 +61,7 @@ coefB.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   beta
 }
 
-#' @S3method coefB ca.jo.test
+#' @S3method coefB cajo.test
 coefB.cajo.test <- function(object,r=1, normalize=TRUE, ...) 
   coefB.ca.jo(object=object,r=r, normalize=normalize, ...)
 
@@ -100,7 +100,7 @@ coefA.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   alpha
 }
 
-#' @S3method coefA ca.jo.test
+#' @S3method coefA cajo.test
 coefA.cajo.test <- function(object,r=1, normalize=TRUE, ...) 
   coefA.ca.jo(object=object,r=r, normalize=normalize, ...)
 
@@ -120,7 +120,7 @@ coefPI.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   alpha%*%t(beta)
 }    
 
-#' @S3method coefPI ca.jo.test
+#' @S3method coefPI cajo.test
 coefPI.cajo.test <- function(object,r=1, normalize=TRUE, ...) 
   coefPI.ca.jo(object=object,r=r, normalize=normalize, ...)
 
