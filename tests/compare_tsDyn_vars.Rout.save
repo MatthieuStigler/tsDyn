@@ -187,8 +187,12 @@ Loading required package: lmtest
 [1] TRUE
 > all.equal(coefB(vecm_Rrest_tsD),coefB(vecm_Rrest_var), check.attributes=FALSE)
 [1] TRUE
+> all.equal(logLik(vecm_Rrest_tsD, r=1),logLik(vecm_Rrest_var, r=1), check.attributes=FALSE)
+[1] TRUE
 > 
 > all.equal(deviance(vecm_Rrest_tsD),sum(deviance(cajorls(vecm_Rrest_var)[[1]])), check.attributes=FALSE)
+[1] TRUE
+> all.equal(-2*(logLik(vecm_Rrest_tsD)-logLik(vecm_l1_co_tsD)), vecm_Rrest_var@teststat)
 [1] TRUE
 > 
 > #########################

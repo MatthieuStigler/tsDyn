@@ -156,6 +156,8 @@ logLik.ca.jo <- function(object,r,...){
   return(res)
 }
 
+#' @S3method logLik cajo.test
+logLik.cajo.test <- function(object,r,...) logLik.ca.jo(object=object, r=r,...)
 
 #### Small function: get number of estimated parameters
 npar  <- function (object, ...)  

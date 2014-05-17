@@ -99,8 +99,10 @@ vecm_Rrest_var <-blrtest(vecm_l1_co_var, H=R, r=1)
 
 all.equal(coefA(vecm_Rrest_tsD),coefA(vecm_Rrest_var), check.attributes=FALSE)
 all.equal(coefB(vecm_Rrest_tsD),coefB(vecm_Rrest_var), check.attributes=FALSE)
+all.equal(logLik(vecm_Rrest_tsD, r=1),logLik(vecm_Rrest_var, r=1), check.attributes=FALSE)
 
 all.equal(deviance(vecm_Rrest_tsD),sum(deviance(cajorls(vecm_Rrest_var)[[1]])), check.attributes=FALSE)
+all.equal(-2*(logLik(vecm_Rrest_tsD)-logLik(vecm_l1_co_tsD)), vecm_Rrest_var@teststat)
 
 #########################
 ##### VAR #####
