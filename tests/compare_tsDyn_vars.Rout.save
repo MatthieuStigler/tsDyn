@@ -84,6 +84,9 @@ Loading required package: lmtest
 > comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
 > comp_predictOld <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, tsDyn:::predictOld.VECM(x[[2]])$fcst, check.attributes=FALSE)
 > comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
+> comp_VECM_coefA <- function(x) all.equal(coefA(x[[1]]), coefA(x[[2]]), check.attributes=FALSE)
+> comp_VECM_coefB <- function(x) all.equal(coefB(x[[1]]), coefB(x[[2]]), check.attributes=FALSE)
+> comp_VECM_coefPI <- function(x) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE)
 > 
 > ### Small function to print nicely output of all.equal, rounding the number:
 > 
@@ -148,6 +151,36 @@ Loading required package: lmtest
 [1] "Mean relative difference: 5.37e-05"  "Mean relative difference: 0.0002086"
 [3] "Mean relative difference: 0.0016372" "Mean relative difference: 0.0181516"
 
+> sapply(all_models, comp_VECM_coefA)
+[1] "TRUE"                                  
+[2] "TRUE"                                  
+[3] "TRUE"                                  
+[4] "TRUE"                                  
+[5] "TRUE"                                  
+[6] "Mean relative difference: 1.598713e-08"
+> sapply(all_models, comp_VECM_coefB)
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> sapply(all_models, comp_VECM_coefPI)
+[1] TRUE TRUE TRUE TRUE TRUE TRUE
+> 
+> ## restricted betas:
+> all.equal(coefA(vecm_l1_co_tsD),coefA(vecm_l1_co_var), check.attributes=FALSE)
+[1] TRUE
+> all.equal(coefB(vecm_l1_co_tsD),coefB(vecm_l1_co_var), check.attributes=FALSE)
+[1] TRUE
+> 
+> R <- matrix(c(1,0.1, -0.24, 3.6), ncol=1)
+> 
+> vecm_Rrest_tsD <-VECM(Canada, lag=1, include="const", estim="ML", beta=R)
+> vecm_Rrest_var <-blrtest(vecm_l1_co_var, H=R, r=1)
+> 
+> all.equal(coefA(vecm_Rrest_tsD),coefA(vecm_Rrest_var), check.attributes=FALSE)
+[1] TRUE
+> all.equal(coefB(vecm_Rrest_tsD),coefB(vecm_Rrest_var), check.attributes=FALSE)
+[1] TRUE
+> 
+> all.equal(deviance(vecm_Rrest_tsD),sum(deviance(cajorls(vecm_Rrest_var)[[1]])), check.attributes=FALSE)
+[1] TRUE
 > 
 > #########################
 > ##### VAR #####
@@ -235,4 +268,4 @@ Loading required package: lmtest
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      6.300       0.140       6.677 
+      3.876       0.092       3.964 

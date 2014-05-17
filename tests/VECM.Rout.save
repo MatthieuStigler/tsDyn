@@ -2942,6 +2942,505 @@ $vecm_ML_l1_LRbo_exo
 2 1.478564 111.2296 107.9933
 
 > 
+> ### CoefA, coefB, coefPI
+> lapply(vecm_all, coefB)
+$vecm_OLS_l1_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l3_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l3_co_betaGiven
+          r1
+dolcan  1.00
+cpiUSA -0.10
+cpiCAN  0.05
+
+$vecm_OLS_l1_tr
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l1_bo
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l1_no
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l1_coAsExo
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l3_coAsExo
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l1_LRco
+                 r1
+dolcan  1.000000000
+cpiUSA -0.014817492
+cpiCAN  0.009676475
+const  -0.864518262
+
+$vecm_OLS_l1_LRtr
+                 r1
+dolcan  1.000000000
+cpiUSA -0.053879406
+cpiCAN  0.019452076
+trend   0.007610433
+
+$vecm_OLS_l1_LRtr_noCo
+                 r1
+dolcan  1.000000000
+cpiUSA -0.053879406
+cpiCAN  0.019452076
+trend   0.007610433
+
+$vecm_OLS_l1_LRbo
+                 r1
+dolcan  1.000000000
+cpiUSA -0.019039918
+cpiCAN  0.010627527
+const  -0.770704602
+trend   0.000864578
+
+$vecm_ML_l1_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.03933803
+cpiCAN  0.02054510
+
+$vecm_ML_l3_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.03537088
+cpiCAN  0.04022154
+
+$vecm_ML_l1_tr
+                r1
+dolcan  1.00000000
+cpiUSA -0.22538833
+cpiCAN  0.06081836
+
+$vecm_ML_l1_bo
+              r1
+dolcan  1.000000
+cpiUSA  1.650717
+cpiCAN -0.428511
+
+$vecm_ML_l1_no
+                r1
+dolcan  1.00000000
+cpiUSA -0.01751714
+cpiCAN  0.00875961
+
+$vecm_ML_l1_coAsExo
+                r1
+dolcan  1.00000000
+cpiUSA -0.03933803
+cpiCAN  0.02054510
+
+$vecm_ML_l3_coAsExo
+                r1
+dolcan  1.00000000
+cpiUSA -0.03537088
+cpiCAN  0.04022154
+
+$vecm_ML_l1_LRco
+                 r1
+dolcan  1.000000000
+cpiUSA  0.011300229
+cpiCAN  0.008267995
+const  -6.144517684
+
+$vecm_ML_l1_LRc_exo
+                  r1
+dolcan  1.0000000000
+cpiUSA -0.0009857241
+cpiCAN  0.0148118803
+const  -4.8758170001
+
+$vecm_ML_l1_LRtr
+               r1
+dolcan  1.0000000
+cpiUSA  1.0186548
+cpiCAN -0.2419007
+trend  -0.2245410
+
+$vecm_ML_l1_LRtr_exo
+               r1
+dolcan  1.0000000
+cpiUSA  3.0139347
+cpiCAN -0.7507985
+trend  -0.6519786
+
+$vecm_ML_l1_LRtr_noCo
+                r1
+dolcan  1.00000000
+cpiUSA -0.25336947
+cpiCAN  0.06841211
+trend   0.05395278
+
+$vecm_ML_l1_LRbo
+                r1
+dolcan  1.00000000
+cpiUSA -0.19989838
+cpiCAN  0.05533385
+const  -0.41752374
+trend   0.04217450
+
+$vecm_ML_l1_LRbo_exo
+                r1
+dolcan  1.00000000
+cpiUSA -0.16661529
+cpiCAN  0.05084623
+const  -0.59319456
+trend   0.03362924
+
+> lapply(vecm_all, coefA)
+$vecm_OLS_l1_co
+                         ECT
+Equation dolcan -0.002537673
+Equation cpiUSA  0.055320874
+Equation cpiCAN  0.179057392
+
+$vecm_OLS_l3_co
+                         ECT
+Equation dolcan -0.001338343
+Equation cpiUSA  0.029339845
+Equation cpiCAN  0.133099298
+
+$vecm_OLS_l3_co_betaGiven
+                         ECT
+Equation dolcan 0.0002124546
+Equation cpiUSA 0.0094968887
+Equation cpiCAN 0.0341381280
+
+$vecm_OLS_l1_tr
+                          ECT
+Equation dolcan -0.0007661059
+Equation cpiUSA  0.2432039258
+Equation cpiCAN  0.3894987881
+
+$vecm_OLS_l1_bo
+                          ECT
+Equation dolcan -0.0175059946
+Equation cpiUSA -0.0161621128
+Equation cpiCAN  0.0003185219
+
+$vecm_OLS_l1_no
+                         ECT
+Equation dolcan -0.002250595
+Equation cpiUSA  0.072923859
+Equation cpiCAN  0.199609825
+
+$vecm_OLS_l1_coAsExo
+                         ECT
+Equation dolcan -0.002537673
+Equation cpiUSA  0.055320874
+Equation cpiCAN  0.179057392
+
+$vecm_OLS_l3_coAsExo
+                         ECT
+Equation dolcan -0.001338343
+Equation cpiUSA  0.029339845
+Equation cpiCAN  0.133099298
+
+$vecm_OLS_l1_LRco
+                         ECT
+Equation dolcan -0.019977546
+Equation cpiUSA -0.009018453
+Equation cpiCAN  0.214396024
+
+$vecm_OLS_l1_LRtr
+                         ECT
+Equation dolcan -0.018347198
+Equation cpiUSA -0.001166353
+Equation cpiCAN -0.144023002
+
+$vecm_OLS_l1_LRtr_noCo
+                        ECT
+Equation dolcan -0.01523687
+Equation cpiUSA  0.15327753
+Equation cpiCAN  0.04569339
+
+$vecm_OLS_l1_LRbo
+                        ECT
+Equation dolcan -0.02042543
+Equation cpiUSA  0.01429980
+Equation cpiCAN  0.18825465
+
+$vecm_ML_l1_co
+                         ECT
+Equation dolcan -0.001130982
+Equation cpiUSA  0.046105240
+Equation cpiCAN  0.146594632
+
+$vecm_ML_l3_co
+                         ECT
+Equation dolcan -0.003567929
+Equation cpiUSA -0.039517521
+Equation cpiCAN -0.106423797
+
+$vecm_ML_l1_tr
+                          ECT
+Equation dolcan -0.0007704618
+Equation cpiUSA -0.0437029488
+Equation cpiCAN -0.0768177401
+
+$vecm_ML_l1_bo
+                          ECT
+Equation dolcan  0.0002393194
+Equation cpiUSA -0.0015111788
+Equation cpiCAN  0.0177494843
+
+$vecm_ML_l1_no
+                        ECT
+Equation dolcan 0.002204256
+Equation cpiUSA 0.214731716
+Equation cpiCAN 0.288265350
+
+$vecm_ML_l1_coAsExo
+                         ECT
+Equation dolcan -0.001130982
+Equation cpiUSA  0.046105240
+Equation cpiCAN  0.146594632
+
+$vecm_ML_l3_coAsExo
+                         ECT
+Equation dolcan -0.003567929
+Equation cpiUSA -0.039517521
+Equation cpiCAN -0.106423797
+
+$vecm_ML_l1_LRco
+                          ECT
+Equation dolcan -0.0006194775
+Equation cpiUSA -0.0398395940
+Equation cpiCAN -0.0516009162
+
+$vecm_ML_l1_LRc_exo
+                          ECT
+Equation dolcan -0.0008964929
+Equation cpiUSA -0.0533550599
+Equation cpiCAN -0.0682411008
+
+$vecm_ML_l1_LRtr
+                         ECT
+Equation dolcan 0.0001862485
+Equation cpiUSA 0.0040952483
+Equation cpiCAN 0.0292851011
+
+$vecm_ML_l1_LRtr_exo
+                         ECT
+Equation dolcan 8.032743e-05
+Equation cpiUSA 1.526143e-03
+Equation cpiCAN 1.002912e-02
+
+$vecm_ML_l1_LRtr_noCo
+                         ECT
+Equation dolcan -0.000727143
+Equation cpiUSA -0.041425715
+Equation cpiCAN -0.060470225
+
+$vecm_ML_l1_LRbo
+                          ECT
+Equation dolcan -0.0008871317
+Equation cpiUSA -0.0503421884
+Equation cpiCAN -0.0729350525
+
+$vecm_ML_l1_LRbo_exo
+                         ECT
+Equation dolcan -0.001179716
+Equation cpiUSA -0.062648158
+Equation cpiCAN -0.089501483
+
+> lapply(vecm_all, coefPI)
+$vecm_OLS_l1_co
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.002537673  0.0001449059 -0.0001040943
+Equation cpiUSA  0.055320874 -0.0031589262  0.0022692399
+Equation cpiCAN  0.179057392 -0.0102245148  0.0073448620
+
+$vecm_OLS_l3_co
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.001338343  7.642193e-05 -5.489831e-05
+Equation cpiUSA  0.029339845 -1.675360e-03  1.203509e-03
+Equation cpiCAN  0.133099298 -7.600221e-03  5.459680e-03
+
+$vecm_OLS_l3_co_betaGiven
+                      dolcan        cpiUSA       cpiCAN
+Equation dolcan 0.0002124546 -2.124546e-05 1.062273e-05
+Equation cpiUSA 0.0094968887 -9.496889e-04 4.748444e-04
+Equation cpiCAN 0.0341381280 -3.413813e-03 1.706906e-03
+
+$vecm_OLS_l1_tr
+                       dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.0007661059  4.374609e-05 -3.142535e-05
+Equation cpiUSA  0.2432039258 -1.388740e-02  9.976127e-03
+Equation cpiCAN  0.3894987881 -2.224112e-02  1.597708e-02
+
+$vecm_OLS_l1_bo
+                       dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.0175059946  0.0009996253 -7.180888e-04
+Equation cpiUSA -0.0161621128  0.0009228871 -6.629633e-04
+Equation cpiCAN  0.0003185219 -0.0000181882  1.306564e-05
+
+$vecm_OLS_l1_no
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.002250595  0.0001285132 -9.231852e-05
+Equation cpiUSA  0.072923859 -0.0041640899  2.991307e-03
+Equation cpiCAN  0.199609825 -0.0113980975  8.187915e-03
+
+$vecm_OLS_l1_coAsExo
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.002537673  0.0001449059 -0.0001040943
+Equation cpiUSA  0.055320874 -0.0031589262  0.0022692399
+Equation cpiCAN  0.179057392 -0.0102245148  0.0073448620
+
+$vecm_OLS_l3_coAsExo
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.001338343  7.642193e-05 -5.489831e-05
+Equation cpiUSA  0.029339845 -1.675360e-03  1.203509e-03
+Equation cpiCAN  0.133099298 -7.600221e-03  5.459680e-03
+
+$vecm_OLS_l1_LRco
+                      dolcan        cpiUSA        cpiCAN        const
+Equation dolcan -0.019977546  0.0002960171 -1.933122e-04  0.017270953
+Equation cpiUSA -0.009018453  0.0001336309 -8.726684e-05  0.007796617
+Equation cpiCAN  0.214396024 -0.0031768114  2.074598e-03 -0.185349278
+
+$vecm_OLS_l1_LRtr
+                      dolcan       cpiUSA        cpiCAN         trend
+Equation dolcan -0.018347198 9.885361e-04 -3.568911e-04 -1.396301e-04
+Equation cpiUSA -0.001166353 6.284241e-05 -2.268799e-05 -8.876451e-06
+Equation cpiCAN -0.144023002 7.759874e-03 -2.801546e-03 -1.096077e-03
+
+$vecm_OLS_l1_LRtr_noCo
+                     dolcan        cpiUSA        cpiCAN         trend
+Equation dolcan -0.01523687  0.0008209537 -0.0002963888 -0.0001159592
+Equation cpiUSA  0.15327753 -0.0082585025  0.0029815663  0.0011665083
+Equation cpiCAN  0.04569339 -0.0024619329  0.0008888314  0.0003477465
+
+$vecm_OLS_l1_LRbo
+                     dolcan        cpiUSA        cpiCAN       const
+Equation dolcan -0.02042543  0.0003888986 -0.0002170719  0.01574198
+Equation cpiUSA  0.01429980 -0.0002722670  0.0001519715 -0.01102092
+Equation cpiCAN  0.18825465 -0.0035843531  0.0020006814 -0.14508872
+                        trend
+Equation dolcan -1.765938e-05
+Equation cpiUSA  1.236329e-05
+Equation cpiCAN  1.627608e-04
+
+$vecm_ML_l1_co
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.001130982  4.449061e-05 -2.323614e-05
+Equation cpiUSA  0.046105240 -1.813690e-03  9.472370e-04
+Equation cpiCAN  0.146594632 -5.766745e-03  3.011802e-03
+
+$vecm_ML_l3_co
+                      dolcan       cpiUSA        cpiCAN
+Equation dolcan -0.003567929 0.0001262008 -0.0001435076
+Equation cpiUSA -0.039517521 0.0013977696 -0.0015894554
+Equation cpiCAN -0.106423797 0.0037643037 -0.0042805287
+
+$vecm_ML_l1_tr
+                       dolcan       cpiUSA        cpiCAN
+Equation dolcan -0.0007704618 0.0001736531 -4.685822e-05
+Equation cpiUSA -0.0437029488 0.0098501347 -2.657942e-03
+Equation cpiCAN -0.0768177401 0.0173138223 -4.671929e-03
+
+$vecm_ML_l1_bo
+                       dolcan        cpiUSA        cpiCAN
+Equation dolcan  0.0002393194  0.0003950486 -0.0001025510
+Equation cpiUSA -0.0015111788 -0.0024945282  0.0006475567
+Equation cpiCAN  0.0177494843  0.0292993710 -0.0076058485
+
+$vecm_ML_l1_no
+                     dolcan        cpiUSA       cpiCAN
+Equation dolcan 0.002204256 -3.861226e-05 1.930842e-05
+Equation cpiUSA 0.214731716 -3.761486e-03 1.880966e-03
+Equation cpiCAN 0.288265350 -5.049585e-03 2.525092e-03
+
+$vecm_ML_l1_coAsExo
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.001130982  4.449061e-05 -2.323614e-05
+Equation cpiUSA  0.046105240 -1.813690e-03  9.472370e-04
+Equation cpiCAN  0.146594632 -5.766745e-03  3.011802e-03
+
+$vecm_ML_l3_coAsExo
+                      dolcan       cpiUSA        cpiCAN
+Equation dolcan -0.003567929 0.0001262008 -0.0001435076
+Equation cpiUSA -0.039517521 0.0013977696 -0.0015894554
+Equation cpiCAN -0.106423797 0.0037643037 -0.0042805287
+
+$vecm_ML_l1_LRco
+                       dolcan        cpiUSA        cpiCAN       const
+Equation dolcan -0.0006194775 -7.000238e-06 -5.121837e-06 0.003806391
+Equation cpiUSA -0.0398395940 -4.501965e-04 -3.293936e-04 0.244795090
+Equation cpiCAN -0.0516009162 -5.831021e-04 -4.266361e-04 0.317062742
+
+$vecm_ML_l1_LRc_exo
+                       dolcan       cpiUSA        cpiCAN       const
+Equation dolcan -0.0008964929 8.836947e-07 -1.327875e-05 0.004371135
+Equation cpiUSA -0.0533550599 5.259337e-05 -7.902888e-04 0.260149508
+Equation cpiCAN -0.0682411008 6.726690e-05 -1.010779e-03 0.332731120
+
+$vecm_ML_l1_LRtr
+                      dolcan       cpiUSA        cpiCAN         trend
+Equation dolcan 0.0001862485 0.0001897229 -4.505363e-05 -4.182042e-05
+Equation cpiUSA 0.0040952483 0.0041716444 -9.906434e-04 -9.195513e-04
+Equation cpiCAN 0.0292851011 0.0298314097 -7.084086e-03 -6.575707e-03
+
+$vecm_ML_l1_LRtr_exo
+                      dolcan       cpiUSA        cpiCAN         trend
+Equation dolcan 8.032743e-05 0.0002421016 -6.030972e-05 -5.237176e-05
+Equation cpiUSA 1.526143e-03 0.0045996968 -1.145826e-03 -9.950129e-04
+Equation cpiCAN 1.002912e-02 0.0302271225 -7.529851e-03 -6.538773e-03
+
+$vecm_ML_l1_LRtr_noCo
+                      dolcan       cpiUSA        cpiCAN         trend
+Equation dolcan -0.000727143 0.0001842358 -4.974539e-05 -3.923138e-05
+Equation cpiUSA -0.041425715 0.0104960113 -2.834021e-03 -2.235032e-03
+Equation cpiCAN -0.060470225 0.0153213087 -4.136896e-03 -3.262537e-03
+
+$vecm_ML_l1_LRbo
+                       dolcan       cpiUSA        cpiCAN        const
+Equation dolcan -0.0008871317 0.0001773362 -4.908841e-05 0.0003703985
+Equation cpiUSA -0.0503421884 0.0100633219 -2.785627e-03 0.0210190590
+Equation cpiCAN -0.0729350525 0.0145795988 -4.035777e-03 0.0304521161
+                        trend
+Equation dolcan -3.741434e-05
+Equation cpiUSA -2.123157e-03
+Equation cpiCAN -3.076000e-03
+
+$vecm_ML_l1_LRbo_exo
+                      dolcan       cpiUSA        cpiCAN        const
+Equation dolcan -0.001179716 0.0001965588 -5.998414e-05 0.0006998014
+Equation cpiUSA -0.062648158 0.0104381410 -3.185423e-03 0.0371625469
+Equation cpiCAN -0.089501483 0.0149123154 -4.550813e-03 0.0530917929
+                        trend
+Equation dolcan -3.967296e-05
+Equation cpiUSA -2.106810e-03
+Equation cpiCAN -3.009866e-03
+
+> 
 > ### rank test
 > vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
 > 
@@ -3594,4 +4093,4 @@ r=3 -4758.653 -4768.659 -4778.556
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      5.240       0.544       5.780 
+      5.188       0.520       5.709 

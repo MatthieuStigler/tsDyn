@@ -124,6 +124,11 @@ lapply(vecm_all_pred, function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$f
 lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
 lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
+### CoefA, coefB, coefPI
+lapply(vecm_all, coefB)
+lapply(vecm_all, coefA)
+lapply(vecm_all, coefPI)
+
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models
 
