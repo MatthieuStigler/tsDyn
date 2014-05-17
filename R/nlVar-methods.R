@@ -131,6 +131,32 @@ logLik.VECM <- function(object,r,...){
   return(res)
 }
 
+  
+getP <- function(object) UseMethod("getP")
+getP.ca.jo <- function(object) object@P
+getP.cajo.test <- function(object) ncol(object@Z0)
+
+#' @S3method logLik ca.jo
+logLik.ca.jo <- function(object,r,...){
+  t<-nrow(object@Z0)
+  k<-getP(object)
+  lambda<-object@lambda
+  
+  ## compute S00:
+  M00 <- crossprod(object@Z0)/t
+  M11 <- crossprod(object@Z1)/t
+  M01 <- crossprod(object@Z0, object@Z1)/t
+  M10 <- crossprod(object@Z1, object@Z0)/t
+  M11inv <- solve(M11)
+  S00 <- M00 - M01 %*% M11inv %*% M10
+  
+  
+  seq<-if(r==0) 0 else if(r%in%1:k) 1:r else warning("r cann't be greater than k (number of variables)")
+  res <- -(t*k/2)*log(2*pi) - t*k/2 - (t/2)*log(det(S00)) - (t/2)*sum(log(1-lambda[seq]))
+  return(res)
+}
+
+
 #### Small function: get number of estimated parameters
 npar  <- function (object, ...)  
   UseMethod("npar")

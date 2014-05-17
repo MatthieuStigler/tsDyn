@@ -87,6 +87,7 @@ Loading required package: lmtest
 > comp_VECM_coefA <- function(x) all.equal(coefA(x[[1]]), coefA(x[[2]]), check.attributes=FALSE)
 > comp_VECM_coefB <- function(x) all.equal(coefB(x[[1]]), coefB(x[[2]]), check.attributes=FALSE)
 > comp_VECM_coefPI <- function(x) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE)
+> comp_VECM_logLik <- function(x, r=1) all.equal(logLik(x[[1]], r=r), logLik(x[[2]], r=r), check.attributes=FALSE)
 > 
 > ### Small function to print nicely output of all.equal, rounding the number:
 > 
@@ -162,6 +163,14 @@ Loading required package: lmtest
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > sapply(all_models, comp_VECM_coefPI)
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
+> mapply(function(r) sapply(all_models, comp_VECM_logLik, r=r), r=0:4)
+     [,1] [,2] [,3] [,4] [,5]
+[1,] TRUE TRUE TRUE TRUE TRUE
+[2,] TRUE TRUE TRUE TRUE TRUE
+[3,] TRUE TRUE TRUE TRUE TRUE
+[4,] TRUE TRUE TRUE TRUE TRUE
+[5,] TRUE TRUE TRUE TRUE TRUE
+[6,] TRUE TRUE TRUE TRUE TRUE
 > 
 > ## restricted betas:
 > all.equal(coefA(vecm_l1_co_tsD),coefA(vecm_l1_co_var), check.attributes=FALSE)

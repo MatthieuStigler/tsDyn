@@ -55,6 +55,7 @@ comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)
 comp_VECM_coefA <- function(x) all.equal(coefA(x[[1]]), coefA(x[[2]]), check.attributes=FALSE)
 comp_VECM_coefB <- function(x) all.equal(coefB(x[[1]]), coefB(x[[2]]), check.attributes=FALSE)
 comp_VECM_coefPI <- function(x) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE)
+comp_VECM_logLik <- function(x, r=1) all.equal(logLik(x[[1]], r=r), logLik(x[[2]], r=r), check.attributes=FALSE)
 
 ### Small function to print nicely output of all.equal, rounding the number:
 
@@ -85,6 +86,7 @@ lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=7) # 5 and 6
 sapply(all_models, comp_VECM_coefA)
 sapply(all_models, comp_VECM_coefB)
 sapply(all_models, comp_VECM_coefPI)
+mapply(function(r) sapply(all_models, comp_VECM_logLik, r=r), r=0:4)
 
 ## restricted betas:
 all.equal(coefA(vecm_l1_co_tsD),coefA(vecm_l1_co_var), check.attributes=FALSE)
