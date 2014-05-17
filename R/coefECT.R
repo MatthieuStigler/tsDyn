@@ -1,7 +1,34 @@
-#' Extract cointegration parameter A, B and PI
+#' Extract cointegration parameters A, B and PI
+#' 
+#' Extract parameters in VECM: adjustment coefficients \code{A}, 
+#' cointegrating coefficients \code{B} , or the composite matrix \code{PI}
 #' @param object An object of class \code{\link{VECM}}, \code{\link[urca]{ca.jo}}
 #' @param \ldots Further arguments passed to methods
-#' @return A matrix containing the coefficients
+#' @author Matthieu Stigler
+#' @details The functions extract the parameters from a VECM with \deqn{K} variables 
+#' and rank \deqn{r}:
+#'   \describe{
+#'    \item{A}{Adjustment coefficients, of dim \deqn{K \times r}}
+#'    \item{B}{Cointegrating coefficients, of dim \deqn{K \times r}}
+#'    \item{Pi}{Matrix \deqn{\Pi=A\dot B^{'}}, of dim \deqn{K \times K}}
+#'    }
+#'    Coefficients are extracted from a VECM in package \code{tsDyn}, or from a VECM 
+#'    obtained in package \code{urca} from \code{\link[urca]{ca.jo}} or \code{\link[urca]{cajorls}}. 
+#'    
+#'    Note that by default, the A and B coefficients returned are normalized (see below). This is 
+#'    the case for results obtained from \code{\link{VECM}}/\code{\link{lineVar}} and 
+#'    \code{\link[urca]{cajorls}}, while for \code{\link[urca]{ca.jo}}, the user has the choice
+#'    (but normalize=TRUE by default), in which case the rank \code{r} is also to be specified
+#'    The normalization is the standard one followed by Johansen (1995, p. 72), standardising 
+#'    the first \deqn{r\times r} coefficients to \deqn{I_r}:
+#'    \describe{
+#'      \item{B}{\deqn{B_{norm}=B (c^{'}B)^{-1}} with \deqn{c=(I_r,0_{p-r,r})^{'}}}
+#'      \item{A}{\deqn{A_{norm}=B^{'}c}}
+#'    }
+#'    Finally, note that the function also apply to objects obtained from tests of class 
+#'    \code{ca.jo.test} (from \code{\link[urca]{blrtest}} etc...). Care should be taken 
+#'    however, since the normalization might override the restrictions imposed. 
+#' @return A matrix containing the coefficients 
 #' @export
 #' @examples
 #' data(barry)
@@ -34,6 +61,8 @@
 
 coefB <- function(object, ...) UseMethod("coefB")
 
+#' @rdname coefB
+#' @method coefB VECM
 #' @S3method coefB VECM
 coefB.VECM <- function(object,...){
   object$model.specific$beta
@@ -48,8 +77,12 @@ coefB.list <- function(object,...){
   }
 }
 
+#' @rdname coefB
+#' @method coefB ca.jo
 #' @S3method coefB ca.jo
 # Normalize by b (Z')-1, with  (Z')-1 = (C'B)-1, c: (diag|0) 
+#' @param r The cointegrating rank
+#' @param normalize Whether to normalize the A/B coefficients. See details
 coefB.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   beta <- object@V[,1:r,drop=FALSE]
   if(r>1&& normalize){
@@ -69,6 +102,8 @@ coefB.cajo.test <- function(object,r=1, normalize=TRUE, ...)
 #' @export
 coefA <- function(object, ...) UseMethod("coefA")
 
+#' @rdname coefB
+#' @method coefA VECM
 #' @S3method coefA VECM
 coefA.VECM <- function(object,...){
   r <- object$model.specific$r
@@ -85,6 +120,8 @@ coefA.list <- function(object,...){
   }
 }
 
+#' @rdname coefB
+#' @method coefA ca.jo
 #' @S3method coefA ca.jo
 # BETA: Normalize by b (Z')-1, with  (Z')-1 = (C'B)-1, c: (diag|0)
 # ALPHA: Normalize by Z, i.e. B'C, 
