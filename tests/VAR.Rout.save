@@ -1707,8 +1707,8 @@ attr(,"condition")
 
 > 
 > all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
-[1] "Component 2: Mean relative difference: 7.363527e-05"
-[2] "Component 4: Mean relative difference: 0.0001044433"
+[1] "Component “var_l1_tr”: Mean relative difference: 7.363527e-05"
+[2] "Component “var_l3_tr”: Mean relative difference: 0.0001044433"
 > 
 > lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 $var_l1_co
@@ -2006,5 +2006,5 @@ $var_l3_no
 > 
 > 
 > proc.time()
-   user  system elapsed 
-  4.710   0.080   4.829 
+utilisateur     système      écoulé 
+      3.040       0.288       3.321 
