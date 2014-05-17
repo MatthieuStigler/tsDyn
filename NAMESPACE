@@ -30,7 +30,8 @@ export(nlar, mse, MAPE, selectSETAR, selectLSTAR, selectNNET,
 	setar.sim, setarTest,
 	MakeThSpec, BBCTest, KapShinTest, resVar, extendBoot, regime, getTh,
 	fevd, irf, VARrep, VECM_symbolic, rank.select, lags.select, rank.test,
-	predict_rolling, accuracy_stat)
+	predict_rolling, accuracy_stat,
+	coefA, coefB, coefPI)
 S3method(extend, list)
 S3method(isLinear, lstar)
 S3method(toLatex, setar)
@@ -136,5 +137,18 @@ S3method(VARrep, VECM)
 S3method(VARrep, VAR)
 S3method(accuracy_stat, pred_roll)
 S3method(accuracy_stat, default)
+
+S3method(coefA,VECM)
+S3method(coefA,ca.jo)
+S3method(coefA,cajo.test)
+S3method(coefA,list)
+S3method(coefB,VECM)
+S3method(coefB,ca.jo)
+S3method(coefB,cajo.test)
+S3method(coefB,list)
+S3method(coefPI,ca.jo)
+S3method(coefPI,cajo.test)
+S3method(coefPI,default)
+
 
 useDynLib(tsDyn)
