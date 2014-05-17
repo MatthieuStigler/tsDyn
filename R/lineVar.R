@@ -185,7 +185,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 ##VECM: Long-run relationship OLS estimation
   if(model=="VECM"&estim=="2OLS"){
 	  #beta has to be estimated
-    beta.estimated<-if(is.null(beta)) TRUE else FALSE
+    beta.estimated <- is.null(beta)
     if(is.null(beta) ){
 
     ## build LRplus: deterministic/exogeneous regressor in coint
@@ -229,24 +229,24 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
   else if(model=="VECM"&estim=="ML"){
-    beta.estimated<-if(is.null(beta)) TRUE else FALSE
-    if (is.null(beta)){
-      #Auxiliary regression 1
-      reg_res1<-lm.fit(Z,Y)
-      u<-residuals(reg_res1)
-      #Auxiliary regression 2
-      reg_res2<-lm.fit(Z,Xminus1)
-      v<-residuals(reg_res2)
-      #Auxiliary regression 3
-      if(LRinclude!="none"){
-        add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
-        reg_res3<-lm.fit(Z,add)
-        v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
-      }
-      #Moment matrices
-      S00<-crossprod(u)
-      S11<-crossprod(v)
-      S01<-crossprod(u,v)
+    beta.estimated<- is.null(beta)
+    #Auxiliary regression 1
+    reg_res1<-lm.fit(Z,Y)
+    u<-residuals(reg_res1)
+    #Auxiliary regression 2
+    reg_res2<-lm.fit(Z,Xminus1)
+    v<-residuals(reg_res2)
+    #Auxiliary regression 3
+    if(LRinclude!="none"){
+      add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
+      reg_res3<-lm.fit(Z,add)
+      v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
+    }
+    #Moment matrices
+    S00<-crossprod(u)
+    S11<-crossprod(v)
+    S01<-crossprod(u,v)
+    if(beta.estimated){
       SSSS<-solve(S11)%*%t(S01)%*%solve(S00)%*%S01
       eig<-eigen(SSSS)
       ve<-Re(eig$vectors)
@@ -268,18 +268,24 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
       }else{
         ECTminus1<-Xminus1%*%ve_4
       }
-      Z<-cbind(ECTminus1,Z)
       coin_ve_names <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
       dimnames(ve_4)<-list(c(colnames(data), coin_ve_names), paste("r", 1:r, sep=""))
       betaLT<-ve_4
-    }else{  #end beta to be estimated
+#     if beta restricted:
+    } else {
       betaLT <- as.matrix(beta)
       if(ncol(betaLT)!=r) stop("Argument 'beta' should have as many columns as 'r'")
       if(ncol(betaLT)==1&&nrow(betaLT)==k-1) betaLT <- rbind(1,betaLT)
       if(nrow(betaLT)!=k) stop("Argument 'beta' should have as many rows as 'k'")
-      ECTminus1<-Xminus1%*%betaLT 
-      Z<-cbind(ECTminus1,Z)
-    }
+      ECTminus1 <- Xminus1%*%betaLT 
+      ## restricted ML:
+      S11_r <- t(betaLT)%*%S11%*%betaLT ## equa 20.3.11 Hamilton 1994, p. 649
+      S01_r <- S01 %*%betaLT ## equa 20.3.12 Hamilton 1994, p. 649
+      SSSS_r <-solve(S11_r)%*%t(S01_r)%*%solve(S00)%*%S01_r
+      eig_r<-eigen(SSSS_r)
+      va<-Re(eig_r$values)
+     }
+    Z<-cbind(ECTminus1,Z)
   }#end model=="VECM"&estim=="ML"
 
 
@@ -330,7 +336,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     model.specific$beta.estimated<-beta.estimated
     model.specific$estim <- estim
     
-    if(estim=="ML" && beta.estimated){
+    if(estim=="ML"){
       model.specific$S00<-S00
       model.specific$lambda<-va
     } 
