@@ -188,9 +188,8 @@ loop1_onedummy <- function(gam1, thDelay){
 	regimeDown<-dummyDown*Z
 	##SSR
 	if(min(ndown, 1-ndown)>=trim){
-		Z1 <- t(cbind(regimeDown, Z))		# dim k(p+1) x t
-		B1 <- tcrossprod(Y_t,Z1) %*% solve(tcrossprod(Z1))
-		res<-crossprod(c( Y_t - B1 %*% Z1))
+		Z1 <- cbind(regimeDown, Z)		# dim t x k(p+1) 
+		res <- crossprod(c(lm.fit(x=Z1, y=Y)$resid))
 	}	else {
 		res<-NA
 	}
