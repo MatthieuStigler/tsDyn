@@ -55,9 +55,9 @@ VARrep.VECM <- function(object, ...) {
 
   if(lag>0){
     ## A_lag+1 matrix
-    Amat[,(1:k)+k*lag] <- -co[,grep(paste("-", lag, sep=""), colnames(co))]
+    Amat[,(1:k)+k*lag] <- -co[,grep(paste("-", lag, "$", sep=""), colnames(co))]
     ## A_lag+1 matrix
-    if(lag>1) for(i in 1:(lag-1)) Amat[,(1:k)+k*i] <- -(co[,grep(paste("-", i, sep=""), colnames(co))] -co[,grep(paste("-", i+1, sep=""), colnames(co))])
+    if(lag>1) for(i in 1:(lag-1)) Amat[,(1:k)+k*i] <- -(co[,grep(paste("-", i, "$", sep=""), colnames(co))] -co[,grep(paste("-", i+1, "$", sep=""), colnames(co))])
 
     cumulMat <- matrix(0, k,k)
     for(i in 1:lag) cumulMat <- cumulMat + Amat[,(1:k)+k*i]
@@ -124,9 +124,10 @@ VARrep.VAR <- function(object, ...) {
     comat[,(1:k)] <- diag(k)
 
     for(i in 1:lag){
-      comat[,(1:k)+k*(i-1)] <- comat[,(1:k)+k*(i-1)]+co[,grep(paste("-", i, sep=""), colnames(co))] 
+      comat[,(1:k)+k*(i-1)] <- comat[,(1:k)+k*(i-1)]+
+        co[,grep(paste("-", i, "$", sep=""), colnames(co))] 
 #       if(i>1){
-	comat[,(1:k)+k*i] <- -co[,grep(paste("-", i, sep=""), colnames(co))] 
+	comat[,(1:k)+k*i] <- -co[,grep(paste("-", i, "$", sep=""), colnames(co))] 
 #       }
     }
   ## names
