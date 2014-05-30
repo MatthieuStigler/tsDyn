@@ -71,6 +71,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 
 ## Checks
   if(!missing(refit.every)&&refit.every>nroll) stop("arg 'refit.every' should be smaller or equal to arg 'nroll'")
+  if(inherits(ts, c("TVECM", "TVAR"))) stop("predict() not implemented for TVECM/TVAR")
 
 ## infos on model
   model <- attr(object, "model")
