@@ -68,6 +68,13 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
   
 }
 
+
+#### Predict TVECM/TVAR
+#' @S3method predict TVECM
+predict.TVECM <- function(object, ...) stop("predict() not available for TVECM")
+#' @S3method predict TVAR
+predict.TVAR <- function(object, ...) stop("predict() not available for TVAR")
+
 #### Small function to sample in block: sample.block 
 sample.block <- function(x, size=length(x), block.size=2){
   n <- length(x)
