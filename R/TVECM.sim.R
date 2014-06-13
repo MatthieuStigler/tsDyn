@@ -6,8 +6,6 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
   TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat)
 }
 
-
-
 #'Simulation and bootstrap of bivariate VECM/TVECM
 #'
 #'Estimate or bootstraps a multivariate Threshold VAR
@@ -128,6 +126,7 @@ if(!missing(data)&!missing(B))
 p<-lag
 type<-match.arg(type)
 include<-match.arg(include)
+isMissingB <- missing(B)
 
 ###check correct arguments
 if(!nthresh%in%c(0,1,2))
@@ -225,8 +224,9 @@ npar<-k*(p+ninc+1)
   else if(include=="trend")
     for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(2))
     #if (include=="both"): correction useless
-  Bmat<-myInsertCol(Bmat, c=a ,0)
+  Bmat<-myInsertCol(Bmat, c=a, 0)
   nparBmat<-p*k+2+1
+
   
 ##############################
 ###Reconstitution boot/simul
@@ -289,8 +289,12 @@ else if(nthresh==2){
 }
 
 if(show.parMat){
-  colnames_Matrix_system<-as.vector(outer(c("ECT","const", "trend", lags2), pa, paste, sep=""))
-  colnames(Bmat)<- colnames_Matrix_system
+  if(!isMissingB){
+    colnames_Matrix_system<-as.vector(outer(c("ECT","Const", "Trend", lags2), pa, paste, sep=""))
+    colnames(Bmat)<- colnames_Matrix_system
+  } else {
+    colnames(Bmat)[a] <- "Trend"
+  }
   print(Bmat)
 }
 res<-round(Yb, ndig)
