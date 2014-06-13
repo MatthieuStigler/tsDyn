@@ -1,9 +1,9 @@
 
 #' @export
 #' @rdname TVECM.sim
-VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
+VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
   k<- if(!missing(VECMobject)) VECMobject$k else if(!missing(B)) nrow(B) else if(!missing(data)) ncol(data)
-  TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat)
+  TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, seed=seed)
 }
 
 #'Simulation and bootstrap of bivariate VECM/TVECM
@@ -67,6 +67,7 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
 #'multivariate normal is used.
 #'@param show.parMat Logical. Should the parameter matrix be shown? Useful to
 #'understand how to give right input
+#'@param seed Optional. Seed for the random number generation.
 #'@return A matrix with the simulated/bootstraped series.
 #'@author Matthieu Stigler
 #'@seealso \code{\link{TVECM}} to estimate a TVECM, \code{\link{VAR.sim}} to
@@ -118,7 +119,7 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
 #' TVECM.sim.check <- TVECM.sim(TVECMobject=TVECMobject,type="check")
 #' all(TVECM.sim.check==dat)
 #'
-TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE){
+TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
 
 
 if(!missing(data)&!missing(B))
@@ -243,6 +244,7 @@ BETA<-matrix(c(1, -beta), nrow=1)
 #resampling/ simulation of residual/innovations
 if(type=="simul"&&dim(innov)!=c(n,k))
   stop(paste("input innov is not of right dim, should be matrix with", n,"rows and ", k, "cols\n"))
+if(!missing(seed)) set.seed(seed)
 resids<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"= innov, "check"=res)
 resb<-rbind(matrix(0,nrow=p+1, ncol=k),resids)
 

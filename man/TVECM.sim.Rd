@@ -7,12 +7,12 @@
 VECM.sim(data, B, VECMobject, beta, n = 200, lag = 1, type = c("simul",
   "boot", "check"), include = c("const", "trend", "none", "both"),
   starting = NULL, innov = rmnorm(n, mean = 0, varcov = varcov),
-  varcov = diag(1, k), show.parMat = FALSE)
+  varcov = diag(1, k), show.parMat = FALSE, seed)
 
 TVECM.sim(data, B, TVECMobject, nthresh = 1, Thresh, beta, n = 200,
   lag = 1, type = c("simul", "boot", "check"), include = c("const",
   "trend", "none", "both"), starting = NULL, innov = rmnorm(n, mean = 0,
-  varcov = varcov), varcov = diag(1, k), show.parMat = FALSE)
+  varcov = varcov), varcov = diag(1, k), show.parMat = FALSE, seed)
 }
 \arguments{
 \item{data}{matrix of parameter to simulate}
@@ -48,6 +48,8 @@ multivariate normal is used.}
 
 \item{show.parMat}{Logical. Should the parameter matrix be shown? Useful to
 understand how to give right input}
+
+\item{seed}{Optional. Seed for the random number generation.}
 }
 \value{
 A matrix with the simulated/bootstraped series.
