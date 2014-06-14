@@ -121,7 +121,6 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
 #'
 TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
 
-
 if(!missing(data)&!missing(B))
 	stop("You have to provide either B or y, but not both")
 p<-lag
@@ -247,7 +246,6 @@ if(type=="simul"&&dim(innov)!=c(n,k))
 if(!missing(seed)) set.seed(seed)
 resids<-switch(type, "boot"=res[sample(seq_len(t), replace=TRUE),], "simul"= innov, "check"=res)
 resb<-rbind(matrix(0,nrow=p+1, ncol=k),resids)
-
 
 if(nthresh==0){
   for(i in (p+2):T){

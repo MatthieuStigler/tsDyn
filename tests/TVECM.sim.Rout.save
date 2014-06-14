@@ -32,21 +32,40 @@ Type 'q()' to quit R.
 [1,] -0.2  0.2
 [2,]  0.2 -0.2
 > 
+> set.seed(123)
 > innov<-rmnorm(100, varcov=diag(2))
 > vecm1<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1,n=100, lag=1,include="none", innov=innov)
 > ECT<-vecm1[,1]-vecm1[,2]
+> ECT[1:5]
+[1]  0.0000  0.0000  0.1499 -0.3971  1.5671
 > 
 > #add an intercept as in panel B
-> b<-TVECM.sim(B=rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0)), nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov)
+> B2 <- rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0))
+> b<-TVECM.sim(B=B2, nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
+         ECT Const Trend L{x1}{1} L{x2}{1}
+Equ x1: -0.2   0.1     0        0        0
+Equ x2:  0.2   0.4     0        0        0
+> b[1:5,]
+        [,1]    [,2]
+[1,]  0.0000  0.0000
+[2,]  0.0000  0.0000
+[3,] -0.4605 -0.3104
+[4,] -0.5606  0.3165
+[5,]  1.2735  0.2944
 > 
 > 
-> 
-> ##Bootstrap a TVAR with 1 threshold (two regimes)
+> ##Bootstrap a TVECM with 1 threshold (two regimes)
 > data(zeroyld)
 > dat<-zeroyld
 > TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, th1=list(exact=-1.195), plot=FALSE)
-> b<-TVECM.sim(TVECMobject=TVECMobject,type="boot", seed=123)
-> head(b)
+> tv_1_boot <-TVECM.sim(TVECMobject=TVECMobject,type="boot", seed=123, show.parMat=TRUE)
+                         ECT     Const Trend short.run t -1 long.run t -1
+Equation short.run 0.2025264 0.4857667     0      0.2252923   -0.09926611
+Equation long.run  0.9575983 1.5929831     0      0.8703592    0.02252604
+                           ECT        Const Trend short.run t -1 long.run t -1
+Equation short.run 0.001291099  0.004290751     0    -0.02328976    0.06741675
+Equation long.run  0.058816293 -0.007954949     0     0.16032265    0.14668443
+> head(tv_1_boot)
       [,1]   [,2]
 [1,] 2.183  1.575
 [2,] 2.246  1.545
@@ -58,6 +77,43 @@ Type 'q()' to quit R.
 > ##Check the bootstrap
 > all(TVECM.sim(TVECMobject=TVECMobject,type="check")==dat)
 [1] TRUE
+> 
+> ## check correspondance bootstrap/simul:
+> tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", beta=TVECMobject$model.specific$beta,
++                         Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123, innov=matrix(0,200,2))
+          ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
+Equ x1: 0.2025264 0.4857667         0    0.2252923  -0.09926611 0.001291099
+Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
+           Const_upr Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1:  0.004290751         0  -0.02328976   0.06741675
+Equ x2: -0.007954949         0   0.16032265   0.14668443
+> head(tv_1_boot)
+      [,1]   [,2]
+[1,] 2.183  1.575
+[2,] 2.246  1.545
+[3,] 2.237  1.403
+[4,] 1.610  0.940
+[5,] 1.441  0.650
+[6,] 0.697 -0.067
+> 
+> tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", 
++                      beta=TVECMobject$model.specific$beta,
++                      Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
+          ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
+Equ x1: 0.2025264 0.4857667         0    0.2252923  -0.09926611 0.001291099
+Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
+           Const_upr Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1:  0.004290751         0  -0.02328976   0.06741675
+Equ x2: -0.007954949         0   0.16032265   0.14668443
+> head(tv_1_boot)
+      [,1]   [,2]
+[1,] 2.183  1.575
+[2,] 2.246  1.545
+[3,] 2.237  1.403
+[4,] 1.610  0.940
+[5,] 1.441  0.650
+[6,] 0.697 -0.067
+> 
 > 
 > ################################################################
 > ######### Check error message when matrix badly specified:
