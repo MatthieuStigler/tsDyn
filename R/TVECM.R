@@ -691,7 +691,8 @@ specific$oneMatrix<-ifelse(model=="only_ECT",TRUE, FALSE)
 specific$Bnames<-Bcolnames
 specific$regime<-regime
 specific$timeAttributes <- attributes(data[,1])
-
+specific$LRinclude <- "none"
+specific$r <- 1
 # specific$commonInter<-commonInter
 
 z<-list(coefficients=Blist, residuals=resbest, model=YnaX, coeffmat=Bbest,nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
