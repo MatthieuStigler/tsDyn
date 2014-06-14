@@ -17,19 +17,27 @@ ECT[1:5]
 
 #add an intercept as in panel B
 B2 <- rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0))
-b<-TVECM.sim(B=B2, nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
+b<- TVECM.sim(B=B2, nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
+b_2 <- VECM.sim(B=B2,  n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
 b[1:5,]
+all.equal(b, b_2)
 
 ## other ways to input beta:
 b_beta_vec <- TVECM.sim(B=B2, nthresh=0, n=100,beta=c(1,-1), lag=1,include="const", innov=innov, show.parMat=TRUE)
+b_beta_vec_2 <- VECM.sim(B=B2, n=100,beta=c(1,-1), lag=1,include="const", innov=innov, show.parMat=TRUE)
 b_beta_vec[1:5,]
 all.equal(b,b_beta_vec)
+all.equal(b_beta_vec, b_beta_vec_2)
 
 beta_mat <- matrix(c(1,-1), ncol=1)
 b_beta_mat <- TVECM.sim(B=B2, nthresh=0, n=100,beta=beta_mat, lag=1,include="const", innov=innov, show.parMat=TRUE)
 b_beta_mat[1:5,]
 all.equal(b,b_beta_mat)
 
+
+########################
+######## TVECM
+########################
 
 ##Bootstrap a TVECM with 1 threshold (two regimes)
 data(zeroyld)
@@ -50,6 +58,39 @@ tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul",
                      beta=TVECMobject$model.specific$beta,
                      Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
 head(tv_1_boot)
+
+##Bootstrap a TVAR with two threshold (three regimes)
+tv_2_const <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
+                   th2=list(exact=0.774))
+tv_2_none <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
+                th2=list(exact=0.774), include="none")
+tv_2_trend <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
+                   th2=list(exact=0.774), include="trend")
+tv_2_both <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
+                    th2=list(exact=0.774), ngridBeta=5, include="both")
+
+tv_2_const_common <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.451),
+                    th2=list(exact=0.754), include="const", common="only_ECT")
+tv_2_const_l2 <- TVECM(dat, nthresh=2, lag=2, ngridBeta=5,  plot=FALSE, include="none",
+                       th1=list(exact=-1.312),th2=list(exact=0.774), trace=FALSE)
+
+TVECM.sim(TVECMobject=tv_2_const, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+TVECM.sim(TVECMobject=tv_2_none, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+TVECM.sim(TVECMobject=tv_2_trend, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+TVECM.sim(TVECMobject=tv_2_both, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+try(TVECM.sim(TVECMobject=tv_2_const_common, type="boot", show.parMat=TRUE, seed=456)[1:5,], silent=TRUE)
+
+tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const)
+tsDyn:::check.TVECM.boot(TVECMobject=tv_2_none)
+tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const_l2)
+
+
+## does not work:
+tsDyn:::check.TVECM.boot(TVECMobject=tv_2_trend)
+tsDyn:::check.TVECM.boot(TVECMobject=tv_2_both)
+
+
+
 
 ###############
 #### p>2

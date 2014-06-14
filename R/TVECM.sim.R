@@ -20,10 +20,27 @@ VECM.boot <- function(VECMobject, show.parMat=FALSE,  seed, check=TRUE){
   TVECM.sim(TVECMobject=VECMobject,  type="boot", show.parMat=show.parMat, seed=seed)
 }
 
+#' @export
+#' @rdname TVECM.sim
+TVECM.boot <- function(TVECMobject, show.parMat=FALSE,  seed, check=TRUE){
+  if(check){
+    ch <- TVECM.sim(TVECMobject=TVECMobject,  type="check")
+    if(!isTRUE(all.equal(as.matrix(ch), as.matrix(TVECMobject$model[,1:TVECMobject$k]), check.attributes=FALSE)))
+      warning("Pseudo Bootstrap was not able to replicate original data, there might be an issue")
+  }
+  TVECM.sim(TVECMobject=TVECMobject,  type="boot", show.parMat=show.parMat, seed=seed)
+}
+
 check.VECM.boot <- function(VECMobject, show.parMat=FALSE,  seed, check=TRUE){
   if(VECMobject$num_exogen!=0) stop("VECM.boot() does not work for VECM() with exogen variables")
   ch <- TVECM.sim(TVECMobject=VECMobject,  type="check")
   res <- isTRUE(all.equal(as.matrix(ch), as.matrix(VECMobject$model[,1:VECMobject$k]), check.attributes=FALSE))
+  res
+}
+
+check.TVECM.boot <- function(TVECMobject){
+  ch <- TVECM.sim(TVECMobject=TVECMobject,  type="check")
+  res <- isTRUE(all.equal(as.matrix(ch), as.matrix(TVECMobject$model[,1:TVECMobject$k]), check.attributes=FALSE))
   res
 }
 
@@ -33,8 +50,7 @@ as.matrix.ts <-
     # A function implemented by Diethelm Wuertz
     ans = as.matrix.default(unclass(x))
     attr(ans, "tsp")<-NULL
-     rownames(ans)<-NULL
-#     colnames(ans)<-NULL
+     rownames(ans)<-NULL # colnames(ans)<-NULL
     ans
   }
 
@@ -242,6 +258,8 @@ if(!missing(TVECMobject)){
     warning(paste("Accuracy of function (tested with arg type=check) is not good when arg include=",include," is given\n"))
   modSpe<-TVECMobject$model.specific
   LRinclude <- modSpe$LRinclude
+  nthresh <- modSpe$nthresh
+  if(nthresh>0 &&modSpe$model=="only_ECT") stop("TVECM.sim() does not work for 'common=only_ECT'")
   if(LRinclude!="none") stop("TVECM.sim() does not work for 'LRinclude!='none'")
   beta<- -modSpe$coint[2,1]
   tBETA <- t(modSpe$coint)
@@ -324,8 +342,8 @@ if(show.parMat){
     colnames_Matrix_system<-as.vector(outer(c("ECT","Const", "Trend", lags2), pa, paste, sep=""))
     colnames(Bmat)<- colnames_Matrix_system
   } else if(include!="both"){
-    add <- switch(include, "const"="Trend", "trend"="Const", "both"=c("Const", "Trend"))
-    colnames(Bmat)[aa] <- add
+    add <- switch(include, "const"="Trend", "trend"="Const", "none"=c("Const", "Trend"))
+    colnames(Bmat)[aa] <- rep(add, nthresh+1)
   }
   print(Bmat)
 }

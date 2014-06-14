@@ -41,7 +41,11 @@ Type 'q()' to quit R.
 > 
 > #add an intercept as in panel B
 > B2 <- rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0))
-> b<-TVECM.sim(B=B2, nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
+> b<- TVECM.sim(B=B2, nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
+         ECT Const Trend L{x1}{1} L{x2}{1}
+Equ x1: -0.2   0.1     0        0        0
+Equ x2:  0.2   0.4     0        0        0
+> b_2 <- VECM.sim(B=B2,  n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
          ECT Const Trend L{x1}{1} L{x2}{1}
 Equ x1: -0.2   0.1     0        0        0
 Equ x2:  0.2   0.4     0        0        0
@@ -52,9 +56,15 @@ Equ x2:  0.2   0.4     0        0        0
 [3,] -0.4605 -0.3104
 [4,] -0.5606  0.3165
 [5,]  1.2735  0.2944
+> all.equal(b, b_2)
+[1] TRUE
 > 
 > ## other ways to input beta:
 > b_beta_vec <- TVECM.sim(B=B2, nthresh=0, n=100,beta=c(1,-1), lag=1,include="const", innov=innov, show.parMat=TRUE)
+         ECT Const Trend L{x1}{1} L{x2}{1}
+Equ x1: -0.2   0.1     0        0        0
+Equ x2:  0.2   0.4     0        0        0
+> b_beta_vec_2 <- VECM.sim(B=B2, n=100,beta=c(1,-1), lag=1,include="const", innov=innov, show.parMat=TRUE)
          ECT Const Trend L{x1}{1} L{x2}{1}
 Equ x1: -0.2   0.1     0        0        0
 Equ x2:  0.2   0.4     0        0        0
@@ -66,6 +76,8 @@ Equ x2:  0.2   0.4     0        0        0
 [4,] -0.5606  0.3165
 [5,]  1.2735  0.2944
 > all.equal(b,b_beta_vec)
+[1] TRUE
+> all.equal(b_beta_vec, b_beta_vec_2)
 [1] TRUE
 > 
 > beta_mat <- matrix(c(1,-1), ncol=1)
@@ -83,6 +95,10 @@ Equ x2:  0.2   0.4     0        0        0
 > all.equal(b,b_beta_mat)
 [1] TRUE
 > 
+> 
+> ########################
+> ######## TVECM
+> ########################
 > 
 > ##Bootstrap a TVECM with 1 threshold (two regimes)
 > data(zeroyld)
@@ -144,8 +160,128 @@ Equ x2: -0.007954949         0   0.16032265   0.14668443
 [5,] 1.441  0.650
 [6,] 0.697 -0.067
 > 
+> ##Bootstrap a TVAR with two threshold (three regimes)
+> tv_2_const <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
++                    th2=list(exact=0.774))
+> tv_2_none <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
++                 th2=list(exact=0.774), include="none")
+> tv_2_trend <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
++                    th2=list(exact=0.774), include="trend")
+> tv_2_both <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
++                     th2=list(exact=0.774), ngridBeta=5, include="both")
+> 
+> tv_2_const_common <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.451),
++                     th2=list(exact=0.754), include="const", common="only_ECT")
+> tv_2_const_l2 <- TVECM(dat, nthresh=2, lag=2, ngridBeta=5,  plot=FALSE, include="none",
++                        th1=list(exact=-1.312),th2=list(exact=0.774), trace=FALSE)
+> 
+> TVECM.sim(TVECMobject=tv_2_const, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+                         ECT     Const Trend short.run t -1 long.run t -1
+Equation short.run 0.2343191 0.5627267     0      0.2133872   -0.13045497
+Equation long.run  1.1492230 1.9445867     0      0.7652367    0.02490849
+                           ECT        Const Trend short.run t -1 long.run t -1
+Equation short.run -0.01031875  0.007322243     0     0.09944158    0.06907443
+Equation long.run   0.01991474 -0.005735839     0     0.32699066    0.23687489
+                           ECT       Const Trend short.run t -1 long.run t -1
+Equation short.run -0.04920032  0.06691590     0    -0.11216037    0.04637838
+Equation long.run   0.10732160 -0.09079342     0     0.08524092   -0.02873180
+      [,1]  [,2]
+[1,] 2.183 1.575
+[2,] 2.246 1.545
+[3,] 2.256 1.665
+[4,] 2.289 1.701
+[5,] 2.151 1.413
+> TVECM.sim(TVECMobject=tv_2_none, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+                               Const Trend short.run t -1 long.run t -1
+Equation short.run -0.03252245     0     0      0.3508268    -0.2229371
+Equation long.run   0.17029747     0     0      1.2574671    -0.3689984
+                           ECT Const Trend short.run t -1 long.run t -1
+Equation short.run -0.01855284     0     0     0.09248489    0.05361497
+Equation long.run  -0.02128513     0     0     0.25119037    0.19618437
+                           ECT Const Trend short.run t -1 long.run t -1
+Equation short.run 0.008401237     0     0    -0.18027015     0.1024449
+Equation long.run  0.061539636     0     0     0.01649033     0.1198955
+      [,1]  [,2]
+[1,] 2.183 1.575
+[2,] 2.246 1.545
+[3,] 2.229 1.599
+[4,] 2.254 1.610
+[5,] 2.199 1.570
+> TVECM.sim(TVECMobject=tv_2_trend, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+                             Const       Trend short.run t -1 long.run t -1
+Equation short.run 0.3391893     0 0.002350986     0.07245793   -0.05503711
+Equation long.run  1.4764723     0 0.007927246     0.30567992    0.26850260
+                   Const          ECT         Trend short.run t -1 Const
+Equation short.run     0 -0.009627084 -1.272937e-05      0.0967326     0
+Equation long.run      0  0.019137028 -2.862608e-05      0.3246202     0
+                   long.run t -1          ECT         Trend short.run t -1
+Equation short.run    0.07017931 -0.004106742  1.678226e-05    -0.11558062
+Equation long.run     0.23703865  0.080441375 -1.830732e-04     0.08127482
+                   long.run t -1
+Equation short.run    0.04875773
+Equation long.run    -0.02692949
+      [,1]  [,2]
+[1,] 2.183 1.575
+[2,] 2.246 1.545
+[3,] 2.251 1.638
+[4,] 2.273 1.657
+[5,] 2.134 1.377
+Warning message:
+In TVECM.sim(TVECMobject = tv_2_trend, type = "boot", show.parMat = TRUE,  :
+  Accuracy of function (tested with arg type=check) is not good when arg include= trend  is given
+
+> TVECM.sim(TVECMobject=tv_2_both, type="boot", show.parMat=TRUE, seed=456)[1:5,]
+                         ECT      Const       Trend short.run t -1
+Equation short.run 0.3344445 -0.1764324 0.002892201     0.06269098
+Equation long.run  1.4605964 -0.2530547 0.008833043     0.30094440
+                   long.run t -1         ECT        Const         Trend
+Equation short.run   -0.04669461 -0.01913800 0.0329355255 -1.274667e-04
+Equation long.run     0.27609545  0.02432369 0.0003496974 -2.007436e-05
+                   short.run t -1 long.run t -1         ECT       Const
+Equation short.run     0.06886216    0.07908553 -0.05978909  0.09243691
+Equation long.run      0.29465882    0.24365050  0.12349362 -0.06383229
+                           Trend short.run t -1 long.run t -1
+Equation short.run -3.868788e-05    -0.11591998    0.04050465
+Equation long.run  -1.475473e-04     0.07572181   -0.02512837
+      [,1]  [,2]
+[1,] 2.183 1.575
+[2,] 2.246 1.545
+[3,] 2.265 1.629
+[4,] 2.303 1.670
+[5,] 2.167 1.409
+Warning message:
+In TVECM.sim(TVECMobject = tv_2_both, type = "boot", show.parMat = TRUE,  :
+  Accuracy of function (tested with arg type=check) is not good when arg include= both  is given
+
+> try(TVECM.sim(TVECMobject=tv_2_const_common, type="boot", show.parMat=TRUE, seed=456)[1:5,], silent=TRUE)
+> 
+> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const)
+[1] TRUE
+> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_none)
+[1] TRUE
+> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const_l2)
+[1] TRUE
+> 
+> 
+> ## does not work:
+> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_trend)
+[1] FALSE
+Warning message:
+In TVECM.sim(TVECMobject = TVECMobject, type = "check") :
+  Accuracy of function (tested with arg type=check) is not good when arg include= trend  is given
+
+> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_both)
+[1] FALSE
+Warning message:
+In TVECM.sim(TVECMobject = TVECMobject, type = "check") :
+  Accuracy of function (tested with arg type=check) is not good when arg include= both  is given
+
+> 
+> 
+> 
+> 
 > ###############
-> #### p >2
+> #### p>2
 > ###############
 > 
 > data(barry)
@@ -344,4 +480,4 @@ Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  :
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      2.400       0.080       2.478 
+      3.156       0.092       3.244 
