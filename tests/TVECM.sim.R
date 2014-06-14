@@ -20,6 +20,16 @@ B2 <- rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0))
 b<-TVECM.sim(B=B2, nthresh=0, n=100,beta=1, lag=1,include="const", innov=innov, show.parMat=TRUE)
 b[1:5,]
 
+## other ways to input beta:
+b_beta_vec <- TVECM.sim(B=B2, nthresh=0, n=100,beta=c(1,-1), lag=1,include="const", innov=innov, show.parMat=TRUE)
+b_beta_vec[1:5,]
+all.equal(b,b_beta_vec)
+
+beta_mat <- matrix(c(1,-1), ncol=1)
+b_beta_mat <- TVECM.sim(B=B2, nthresh=0, n=100,beta=beta_mat, lag=1,include="const", innov=innov, show.parMat=TRUE)
+b_beta_mat[1:5,]
+all.equal(b,b_beta_mat)
+
 
 ##Bootstrap a TVECM with 1 threshold (two regimes)
 data(zeroyld)
@@ -41,6 +51,23 @@ tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul",
                      Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
 head(tv_1_boot)
 
+###############
+#### p>2
+###############
+
+data(barry)
+
+ve_r1_l1 <- VECM(barry, lag=1)
+tsDyn:::check.VECM.boot(ve_r1_l1)
+VECM.boot(ve_r1_l1, show.parMat=TRUE, seed=234)[1:5,]
+
+ve_r1_l3 <- VECM(barry, lag=3)
+tsDyn:::check.VECM.boot(ve_r1_l3)
+VECM.boot(ve_r1_l3, show.parMat=TRUE, seed=234)[1:5,]
+
+ve_r2_l3 <- VECM(barry, lag=3, estim="ML", r=2)
+tsDyn:::check.VECM.boot(ve_r2_l3)
+VECM.boot(ve_r2_l3, show.parMat=TRUE, seed=234)[1:5,]
 
 ################################################################
 ######### Check error message when matrix badly specified:

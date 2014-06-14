@@ -6,7 +6,37 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
   TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, seed=seed)
 }
 
+#' @export
+#' @rdname TVECM.sim
+#' @param check When performing a bootstrap replication, check if taking original residuals (instead of resampled) 
+#' leads to the original data. 
+VECM.boot <- function(VECMobject, show.parMat=FALSE,  seed, check=TRUE){
+  if(VECMobject$num_exogen!=0) stop("VECM.boot() does not work for VECM() with exogen variables")
+  if(check){
+    ch <- TVECM.sim(TVECMobject=VECMobject,  type="check")
+    if(!isTRUE(all.equal(as.matrix(ch), as.matrix(VECMobject$model[,1:VECMobject$k]), check.attributes=FALSE)))
+      warning("Pseudo Bootstrap was not able to replicate original data, there might be an issue")
+  }
+  TVECM.sim(TVECMobject=VECMobject,  type="boot", show.parMat=show.parMat, seed=seed)
+}
 
+check.VECM.boot <- function(VECMobject, show.parMat=FALSE,  seed, check=TRUE){
+  if(VECMobject$num_exogen!=0) stop("VECM.boot() does not work for VECM() with exogen variables")
+  ch <- TVECM.sim(TVECMobject=VECMobject,  type="check")
+  res <- isTRUE(all.equal(as.matrix(ch), as.matrix(VECMobject$model[,1:VECMobject$k]), check.attributes=FALSE))
+  res
+}
+
+as.matrix.ts <-
+  function(x, ...)
+  {
+    # A function implemented by Diethelm Wuertz
+    ans = as.matrix.default(unclass(x))
+    attr(ans, "tsp")<-NULL
+     rownames(ans)<-NULL
+#     colnames(ans)<-NULL
+    ans
+  }
 
 #'Simulation and bootstrap of bivariate VECM/TVECM
 #'

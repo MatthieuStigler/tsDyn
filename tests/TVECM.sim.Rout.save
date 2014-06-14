@@ -53,6 +53,36 @@ Equ x2:  0.2   0.4     0        0        0
 [4,] -0.5606  0.3165
 [5,]  1.2735  0.2944
 > 
+> ## other ways to input beta:
+> b_beta_vec <- TVECM.sim(B=B2, nthresh=0, n=100,beta=c(1,-1), lag=1,include="const", innov=innov, show.parMat=TRUE)
+         ECT Const Trend L{x1}{1} L{x2}{1}
+Equ x1: -0.2   0.1     0        0        0
+Equ x2:  0.2   0.4     0        0        0
+> b_beta_vec[1:5,]
+        [,1]    [,2]
+[1,]  0.0000  0.0000
+[2,]  0.0000  0.0000
+[3,] -0.4605 -0.3104
+[4,] -0.5606  0.3165
+[5,]  1.2735  0.2944
+> all.equal(b,b_beta_vec)
+[1] TRUE
+> 
+> beta_mat <- matrix(c(1,-1), ncol=1)
+> b_beta_mat <- TVECM.sim(B=B2, nthresh=0, n=100,beta=beta_mat, lag=1,include="const", innov=innov, show.parMat=TRUE)
+         ECT Const Trend L{x1}{1} L{x2}{1}
+Equ x1: -0.2   0.1     0        0        0
+Equ x2:  0.2   0.4     0        0        0
+> b_beta_mat[1:5,]
+        [,1]    [,2]
+[1,]  0.0000  0.0000
+[2,]  0.0000  0.0000
+[3,] -0.4605 -0.3104
+[4,] -0.5606  0.3165
+[5,]  1.2735  0.2944
+> all.equal(b,b_beta_mat)
+[1] TRUE
+> 
 > 
 > ##Bootstrap a TVECM with 1 threshold (two regimes)
 > data(zeroyld)
@@ -114,6 +144,76 @@ Equ x2: -0.007954949         0   0.16032265   0.14668443
 [5,] 1.441  0.650
 [6,] 0.697 -0.067
 > 
+> ###############
+> #### p >2
+> ###############
+> 
+> data(barry)
+> 
+> ve_r1_l1 <- VECM(barry, lag=1)
+> tsDyn:::check.VECM.boot(ve_r1_l1)
+[1] TRUE
+> VECM.boot(ve_r1_l1, show.parMat=TRUE, seed=234)[1:5,]
+                         ECT   Intercept Trend dolcan -1    cpiUSA -1
+Equation dolcan -0.002537673 0.002202355     0 0.1587853 -0.003002494
+Equation cpiUSA  0.055320874 0.135043876     0 0.5426890  0.483673616
+Equation cpiCAN  0.179057392 0.157670998     0 0.2897487  0.327296468
+                    cpiCAN -1
+Equation dolcan  0.0001286435
+Equation cpiUSA -0.0353661496
+Equation cpiCAN -0.0224027426
+       [,1]    [,2]    [,3]
+[1,] 0.9993 27.9800 25.8600
+[2,] 0.9956 28.1700 26.0000
+[3,] 0.9837 28.4766 25.9924
+[4,] 1.0075 28.8608 25.3569
+[5,] 1.0154 28.9239 25.5003
+> 
+> ve_r1_l3 <- VECM(barry, lag=3)
+> tsDyn:::check.VECM.boot(ve_r1_l3)
+[1] TRUE
+> VECM.boot(ve_r1_l3, show.parMat=TRUE, seed=234)[1:5,]
+                         ECT   Intercept Trend dolcan -1    cpiUSA -1
+Equation dolcan -0.001338343 0.003662911     0 0.1611940 -0.002242126
+Equation cpiUSA  0.029339845 0.108353256     0 0.8711430  0.468684873
+Equation cpiCAN  0.133099298 0.100383436     0 0.6925224  0.272239507
+                    cpiCAN -1   dolcan -2    cpiUSA -2    cpiCAN -2  dolcan -3
+Equation dolcan  0.0003953115 -0.04139589  0.002012077 -0.006607018  0.0202477
+Equation cpiUSA -0.0510243367 -0.49404335 -0.023189036  0.071589503 -0.3943149
+Equation cpiCAN -0.0494533196 -0.13395315  0.009117886  0.164960151 -0.6081994
+                   cpiUSA -3     cpiCAN -3
+Equation dolcan -0.002153848 -0.0003941692
+Equation cpiUSA  0.007943649  0.0928680566
+Equation cpiCAN  0.022337674  0.1324489696
+       [,1]    [,2]    [,3]
+[1,] 0.9993 27.9800 25.8600
+[2,] 0.9956 28.1700 26.0000
+[3,] 0.9967 28.4400 26.0700
+[4,] 1.0007 28.6300 26.3600
+[5,] 0.9916 28.9337 26.3204
+> 
+> ve_r2_l3 <- VECM(barry, lag=3, estim="ML", r=2)
+> tsDyn:::check.VECM.boot(ve_r2_l3)
+[1] TRUE
+> VECM.boot(ve_r2_l3, show.parMat=TRUE, seed=234)[1:5,]
+                       ECT1          ECT2  Intercept Trend dolcan -1
+Equation dolcan -0.02128737  0.0005968341 0.02324814     0 0.1622498
+Equation cpiUSA -0.05886126  0.0019115449 0.19169805     0 0.8619558
+Equation cpiCAN  0.13234280 -0.0025774055 0.10561308     0 0.6225139
+                   cpiUSA -1     cpiCAN -1   dolcan -2    cpiUSA -2
+Equation dolcan -0.003419996  0.0006640453 -0.03681695  0.001110734
+Equation cpiUSA  0.462197612 -0.0485913611 -0.48826864 -0.028412522
+Equation cpiCAN  0.266045773 -0.0476408945 -0.19364163  0.004214840
+                   cpiCAN -2   dolcan -3     cpiUSA -3     cpiCAN -3
+Equation dolcan -0.006387489  0.02526483 -0.0036154386 -0.0002821687
+Equation cpiUSA  0.073825879 -0.38942643 -0.0005587153  0.0944265013
+Equation cpiCAN  0.166485918 -0.68004445  0.0141090720  0.1337360507
+       [,1]    [,2]    [,3]
+[1,] 0.9993 27.9800 25.8600
+[2,] 0.9956 28.1700 26.0000
+[3,] 0.9967 28.4400 26.0700
+[4,] 1.0007 28.6300 26.3600
+[5,] 0.9939 28.9469 26.3474
 > 
 > ################################################################
 > ######### Check error message when matrix badly specified:
