@@ -44,7 +44,7 @@ Type 'q()' to quit R.
 > 
 > vecm_ML_l1_co <-VECM(barry, lag=1, estim="ML")
 > vecm_ML_l3_co <-VECM(barry, lag=3, include="const", estim="ML")
-> # vecm_ML_l3_co_betaGiven<-VECM(barry, lag=3, include="const", beta=-1, estim="ML")
+> vecm_ML_l3_co_betaGiven<-VECM(barry, lag=3, include="const", beta=c(-0.035,0.04), estim="ML")
 > vecm_ML_l1_tr <-VECM(barry, lag=1, include="trend", estim="ML")
 > vecm_ML_l1_bo <-VECM(barry, lag=1, include="both", estim="ML")
 > vecm_ML_l1_no <-VECM(barry, lag=1, include="none", estim="ML")
@@ -2942,6 +2942,20 @@ $vecm_ML_l1_LRbo_exo
 2 1.478564 111.2296 107.9933
 
 > 
+> ## VECM boot
+> vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo", names(vecm_all))]
+> options(warn=-1)
+> sapply(vecm_all_noExo_noLRinc, function(x) try(tsDyn:::check.VECM.boot(x), silent=TRUE))
+          vecm_OLS_l1_co           vecm_OLS_l3_co vecm_OLS_l3_co_betaGiven 
+                    TRUE                     TRUE                     TRUE 
+          vecm_OLS_l1_tr           vecm_OLS_l1_bo           vecm_OLS_l1_no 
+                    TRUE                     TRUE                     TRUE 
+           vecm_ML_l1_co            vecm_ML_l3_co            vecm_ML_l1_tr 
+                    TRUE                     TRUE                     TRUE 
+           vecm_ML_l1_bo            vecm_ML_l1_no 
+                    TRUE                     TRUE 
+> options(warn=0)
+> 
 > ### CoefA, coefB, coefPI
 > lapply(vecm_all, coefB)
 $vecm_OLS_l1_co
@@ -4093,4 +4107,4 @@ r=3 -4758.653 -4768.659 -4778.556
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      5.188       0.520       5.709 
+      5.344       0.552       5.891 

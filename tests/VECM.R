@@ -24,7 +24,7 @@ vecm_OLS_l1_LRbo <-VECM(barry, lag=1, LRinclude="both")
 
 vecm_ML_l1_co <-VECM(barry, lag=1, estim="ML")
 vecm_ML_l3_co <-VECM(barry, lag=3, include="const", estim="ML")
-# vecm_ML_l3_co_betaGiven<-VECM(barry, lag=3, include="const", beta=-1, estim="ML")
+vecm_ML_l3_co_betaGiven<-VECM(barry, lag=3, include="const", beta=c(-0.035,0.04), estim="ML")
 vecm_ML_l1_tr <-VECM(barry, lag=1, include="trend", estim="ML")
 vecm_ML_l1_bo <-VECM(barry, lag=1, include="both", estim="ML")
 vecm_ML_l1_no <-VECM(barry, lag=1, include="none", estim="ML")
@@ -123,6 +123,12 @@ lapply(vecm_all_pred, function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$f
 
 lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
 lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
+
+## VECM boot
+vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo", names(vecm_all))]
+options(warn=-1)
+sapply(vecm_all_noExo_noLRinc, function(x) try(tsDyn:::check.VECM.boot(x), silent=TRUE))
+options(warn=0)
 
 ### CoefA, coefB, coefPI
 lapply(vecm_all, coefB)
