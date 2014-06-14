@@ -153,12 +153,12 @@ as.matrix.ts <-
 #'
 TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
 
-if(!missing(data)&!missing(B))
-	stop("You have to provide either B or y, but not both")
-p<-lag
-type<-match.arg(type)
-include<-match.arg(include)
-isMissingB <- missing(B)
+  if(!missing(data)&!missing(B))
+    stop("You have to provide either B or y, but not both")
+  p<-lag
+  type<-match.arg(type)
+  include<-match.arg(include)
+  isMissingB <- missing(B)
 
 ###check correct arguments
 if(!nthresh%in%c(0,1,2))
@@ -179,7 +179,7 @@ if(!missing(B)){
   if(type!="simul"){
     type<-"simul"
     warning("Type check or boot are only avalaible with pre specified data. The type simul was used")
-    }
+  }
   nB<-nrow(B)
   if(nB==1) stop("B matrix should at least have two rows for two variables\n")
   ndig<-4
@@ -220,15 +220,14 @@ if(!missing(B)){
 else if(!missing(data)){
   if(nthresh==0){
     TVECMobject<-lineVar(data, lag=p, include=include, model="VECM")
-  }
-  else{ 
+  } else { 
     if(!missing(Thresh)){
       if(nthresh==1) {
-	TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=list(exact=Thresh))
+        TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=list(exact=Thresh))
       } else if(nthresh==2){
-      TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=list(exact=Thresh[1]),th2=list(exact=Thresh[2]))
+        TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, th1=list(exact=Thresh[1]),th2=list(exact=Thresh[2]))
       }
-    } else{
+    } else {
       TVECMobject<-TVECM(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
     }
   }
@@ -260,15 +259,7 @@ if(!missing(TVECMobject)){
 t <- T-p-1 		#Size of end sample
 npar<-k*(p+ninc+1)
 
-  ##### put coefficients vector in right form according to arg include (arg both need no modif)
-  a<-NULL
-  if(include=="none")
-    for(i in 0:nthresh) a<-c(a, i*(p*k+r+2)+c(r+1,r+2))
-  else if(include=="const")
-    for(i in 0:nthresh) a<-c(a, i*(p*k+r+2)+c(r+2))
-  else if(include=="trend")
-    for(i in 0:nthresh) a<-c(a, i*(p*k+r+1)+c(r+1))
-    #if (include=="both"): correction useless
+##### put coefficients vector in right form according to arg include (arg both need no modif)
   if(include!="both"){
     aa1 <- r+switch(include, "none"=1:2, "const"=2, "trend"=1, "both"=NULL)
     aa <- sort(rep(aa1, each=nthresh+1)+ (0:nthresh)*(p*k+max(aa1)))
@@ -300,39 +291,31 @@ if(nthresh==0){
     ECT<-Bmat[,1:r]%*%tBETA%*%matrix(Yb[i-1,], ncol=1)
     Yb[i,]<-rowSums(cbind(Yb[i-1,],Bmat[,r+1], Bmat[,r+2]*trend[i], ECT,Bmat[,-c(1:(r+2))]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
   }
-}
-
-else if(nthresh==1){
+} else if(nthresh==1){
   BD<-Bmat[,seq_len(nparBmat)]
   BU<-Bmat[,-seq_len(nparBmat)]
   
   for(i in (p+2):(nrow(y))){
-   ECT<-tBETA%*%matrix(Yb[i-1,], ncol=1)
-   if(round(ECT,ndig)<=Thresh){
+    ECT<-tBETA%*%matrix(Yb[i-1,], ncol=1)
+    if(round(ECT,ndig)<=Thresh){
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BD[,1]%*%ECT, BD[,2], BD[,3]*trend[i],BD[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
-      }
-    else{
+    }  else{
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BU[,1]%*%ECT, BU[,2], BU[,3]*trend[i],BU[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
-      }
+    }
   }
-}
-
-
-else if(nthresh==2){
+} else if(nthresh==2){
   BD <- Bmat[,seq_len(nparBmat)]
   BM <- Bmat[,seq_len(nparBmat)+nparBmat]
   BU <- Bmat[,seq_len(nparBmat)+2*nparBmat]
   for(i in (p+2):(nrow(y))){
-  ECT<-tBETA%*%matrix(Yb[i-1,], ncol=1)
+    ECT<-tBETA%*%matrix(Yb[i-1,], ncol=1)
     if(round(ECT,ndig)<=Thresh[1]){ 
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BD[,1]%*%ECT,BD[,2], BD[,3]*trend[i], BD[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
-      }
-    else if(round(ECT,ndig)>Thresh[2]) {
+    } else if(round(ECT,ndig)>Thresh[2]) {
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BU[,1]%*%ECT,BU[,2], BU[,3]*trend[i],BU[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
-      }
-    else{
+    } else{
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BM[,1]%*%ECT,BM[,2], BM[,3]*trend[i],BM[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
-      }
+    }
   }
 }
 
@@ -342,7 +325,7 @@ if(show.parMat){
     colnames(Bmat)<- colnames_Matrix_system
   } else if(include!="both"){
     add <- switch(include, "const"="Trend", "trend"="Const", "both"=c("Const", "Trend"))
-    colnames(Bmat)[a] <- add
+    colnames(Bmat)[aa] <- add
   }
   print(Bmat)
 }
