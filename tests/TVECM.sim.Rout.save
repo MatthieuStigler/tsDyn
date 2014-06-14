@@ -44,13 +44,19 @@ Type 'q()' to quit R.
 > ##Bootstrap a TVAR with 1 threshold (two regimes)
 > data(zeroyld)
 > dat<-zeroyld
-> TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE)
-29 (7.2%) points of the grid lead to regimes with percentage of observations < trim and were not computed
-> b<-TVECM.sim(TVECMobject=TVECMobject,type="boot")
+> TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, th1=list(exact=-1.195), plot=FALSE)
+> b<-TVECM.sim(TVECMobject=TVECMobject,type="boot", seed=123)
+> head(b)
+      [,1]   [,2]
+[1,] 2.183  1.575
+[2,] 2.246  1.545
+[3,] 2.237  1.403
+[4,] 1.610  0.940
+[5,] 1.441  0.650
+[6,] 0.697 -0.067
 > 
 > ##Check the bootstrap
-> all(TVECM.sim(TVECMobject=TVECM(dat, nthresh=1, lag=2, ngridBeta=20, ngridTh=20, plot=FALSE, include="none"),type="check")==dat)
-28 (7%) points of the grid lead to regimes with percentage of observations < trim and were not computed
+> all(TVECM.sim(TVECMobject=TVECMobject,type="check")==dat)
 [1] TRUE
 > 
 > ################################################################
@@ -182,4 +188,4 @@ Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  :
 > 
 > proc.time()
 utilisateur     système      écoulé 
-      3.610       0.060       3.683 
+      2.400       0.080       2.478 
