@@ -6,6 +6,8 @@ VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boo
   TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, seed=seed)
 }
 
+
+
 #'Simulation and bootstrap of bivariate VECM/TVECM
 #'
 #'Estimate or bootstraps a multivariate Threshold VAR
@@ -173,6 +175,15 @@ if(!missing(B)){
     Bmat<-B
     k <- ncol(y) 		#Number of variables
     T <- nrow(y) 		#Size of start sample
+  if(is.vector(beta)){
+    if(length(beta)==k-1) beta <- c(1, -beta)
+    tBETA<-matrix(beta, nrow=1)
+    r <- 1
+  } else {
+    if(nrow(beta)!=k) stop("beta should have k rows and r cols")
+    r <- ncol(beta)
+    tBETA <- t(beta)
+  }
 }
 
 ### possibility 2: only data is given: compute it with linear or selectSETAR
@@ -201,7 +212,11 @@ if(!missing(TVECMobject)){
   if(include %in% c("trend", "both"))
     warning(paste("Accuracy of function (tested with arg type=check) is not good when arg include=",include," is given\n"))
   modSpe<-TVECMobject$model.specific
+  LRinclude <- modSpe$LRinclude
+  if(LRinclude!="none") stop("TVECM.sim() does not work for 'LRinclude!='none'")
   beta<- -modSpe$coint[2,1]
+  tBETA <- t(modSpe$coint)
+  r <- modSpe$r
   res<-residuals(TVECMobject)
   Bmat<-coefMat(TVECMobject)
   y<-as.matrix(TVECMobject$model)[,1:k]
@@ -218,13 +233,17 @@ npar<-k*(p+ninc+1)
   ##### put coefficients vector in right form according to arg include (arg both need no modif)
   a<-NULL
   if(include=="none")
-    for(i in 0:nthresh) a<-c(a, i*(p*k+3)+c(2,3))
+    for(i in 0:nthresh) a<-c(a, i*(p*k+r+2)+c(r+1,r+2))
   else if(include=="const")
-    for(i in 0:nthresh) a<-c(a, i*(p*k+3)+c(3))
+    for(i in 0:nthresh) a<-c(a, i*(p*k+r+2)+c(r+2))
   else if(include=="trend")
-    for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(2))
+    for(i in 0:nthresh) a<-c(a, i*(p*k+r+1)+c(r+1))
     #if (include=="both"): correction useless
-  Bmat<-myInsertCol(Bmat, c=a, 0)
+  if(include!="both"){
+    aa1 <- r+switch(include, "none"=1:2, "const"=2, "trend"=1, "both"=NULL)
+    aa <- sort(rep(aa1, each=nthresh+1)+ (0:nthresh)*(p*k+max(aa1)))
+    Bmat<-myInsertCol(Bmat, c=aa, 0)
+  }
   nparBmat<-p*k+2+1
 
   
@@ -238,7 +257,6 @@ Yb<-matrix(0, nrow=nrow(y), ncol=k)
 Yb[1:(p+1),]<-y[1:(p+1),]		
 
 trend<-c(rep(NA, T-t),1:t)
-BETA<-matrix(c(1, -beta), nrow=1)
 
 #resampling/ simulation of residual/innovations
 if(type=="simul"&&dim(innov)!=c(n,k))
@@ -249,8 +267,8 @@ resb<-rbind(matrix(0,nrow=p+1, ncol=k),resids)
 
 if(nthresh==0){
   for(i in (p+2):T){
-    ECT<-Bmat[,1]%*%BETA%*%matrix(Yb[i-1,], ncol=1)
-    Yb[i,]<-rowSums(cbind(Yb[i-1,],Bmat[,2], Bmat[,3]*trend[i], ECT,Bmat[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
+    ECT<-Bmat[,1:r]%*%tBETA%*%matrix(Yb[i-1,], ncol=1)
+    Yb[i,]<-rowSums(cbind(Yb[i-1,],Bmat[,r+1], Bmat[,r+2]*trend[i], ECT,Bmat[,-c(1:(r+2))]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
   }
 }
 
@@ -259,7 +277,7 @@ else if(nthresh==1){
   BU<-Bmat[,-seq_len(nparBmat)]
   
   for(i in (p+2):(nrow(y))){
-   ECT<-BETA%*%matrix(Yb[i-1,], ncol=1)
+   ECT<-tBETA%*%matrix(Yb[i-1,], ncol=1)
    if(round(ECT,ndig)<=Thresh){
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BD[,1]%*%ECT, BD[,2], BD[,3]*trend[i],BD[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
       }
@@ -275,7 +293,7 @@ else if(nthresh==2){
   BM <- Bmat[,seq_len(nparBmat)+nparBmat]
   BU <- Bmat[,seq_len(nparBmat)+2*nparBmat]
   for(i in (p+2):(nrow(y))){
-  ECT<-BETA%*%matrix(Yb[i-1,], ncol=1)
+  ECT<-tBETA%*%matrix(Yb[i-1,], ncol=1)
     if(round(ECT,ndig)<=Thresh[1]){ 
       Yb[i,]<-rowSums(cbind(Yb[i-1,],BD[,1]%*%ECT,BD[,2], BD[,3]*trend[i], BD[,-c(1,2,3)]%*%matrix(t(Yb[i-c(1:p),]-Yb[i-c(2:(p+1)),]), ncol=1),resb[i,]))
       }
@@ -292,8 +310,9 @@ if(show.parMat){
   if(!isMissingB){
     colnames_Matrix_system<-as.vector(outer(c("ECT","Const", "Trend", lags2), pa, paste, sep=""))
     colnames(Bmat)<- colnames_Matrix_system
-  } else {
-    colnames(Bmat)[a] <- "Trend"
+  } else if(include!="both"){
+    add <- switch(include, "const"="Trend", "trend"="Const", "both"=c("Const", "Trend"))
+    colnames(Bmat)[a] <- add
   }
   print(Bmat)
 }
