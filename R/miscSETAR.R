@@ -138,29 +138,29 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, t
 }
 
 
+
+### Wrapper to just get  the SSR :
+
+getSSR <- function(X,y){
+  base::crossprod(lm.fit(X,y)$residuals) ## specify base if Matrix loaded
+}
+
+### Functions to assemble and return the SSR :
 SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim, fun=buildXth1Common){
 	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH,const, trim)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
-		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
-		#res2<-deviance(lm(yy~XX-1))
-		#check if equal print(c(res,res2))
+		res <- getSSR(XX,yy)
 	}
 	return(res)
 }
 
-SSR<-function(X,y){
-	res<-crossprod(y- X %*%chol2inv(chol(crossprod(X)))%*%crossprod(X,y))
-	#res2<-deviance(lm(y~X-1))
-	return(res)
-	}
-
 AIC.matrices<-function(X,y, T, k=2){
-	SSR<-crossprod(y- X %*%chol2inv(chol(crossprod(X)))%*%crossprod(X,y))
+	SSR <- getSSR(X,y)
 	res<-T*log(SSR/T)+k*(ncol(X)+2)
 	return(res)
-	}
+}
 
 
 
@@ -170,9 +170,7 @@ SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, 
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
-		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
-		#res2<-deviance(lm(yy~XX-1))
-		#print(c(res,res2))
+		res <- getSSR(XX,yy)
 	}
 	return(res)
 }
@@ -186,9 +184,7 @@ SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML
 	if(any(is.na(XX))){
 		res<-NA
 	}	else{
-		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
-		#res2<-deviance(lm(yy~XX-1))
-		#print(c(res,res2))
+		res <- getSSR(XX, yy)
 	}
 	return(res)
 }
@@ -198,9 +194,8 @@ AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=
 	if(any(is.na(XX))){
 		res<-NA
 	}	else{
-		SSR <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		SSR <- getSSR(XX,yy)
 		res<-T*log(SSR/T)+k*(ncol(XX)+1)
-		#res2<-AIC(lm(yy~XX-1))}
 	}
 	return(res)
 }
@@ -210,10 +205,8 @@ AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, 
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
-		SSR <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		SSR <- getSSR(XX,yy)
 		res<-T*log(SSR/T)+k*(ncol(XX)+2)
-		#res2<-AIC(lm(yy~XX-1))
-		#print(c(res,res2))
 	}
 	return(res)
 }
@@ -223,10 +216,8 @@ AIC_2th <-function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
-		SSR <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	
+		SSR <- getSSR(XX,yy)
 		res<-T*log(SSR/T)+k*(ncol(XX)+2)
-		#res2<-AIC(lm(yy~XX-1))
-		#print(c(res,res2))
 	}
 	return(res)
 }
@@ -236,9 +227,7 @@ SSR_2th<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
-		res <- crossprod(yy- XX %*%chol2inv(chol(crossprod(XX)))%*%crossprod(XX,yy))	#SSRres <- NA
-		#res2<-deviance(lm(yy~XX-1))
-		#print(c(res,res2))
+		res <- getSSR(XX,yy)
 	}
 	return(res)
 }
