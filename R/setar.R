@@ -468,7 +468,7 @@ summary.setar <- function(object, ...) {
   ans$externThVar <- mod$externThVar
   ans$lowRegProp <- mod$lowRegProp
   n <- getNUsed(object$str)
-  coef <- coef(object, hyperCo=FALSE) #all coeffients except of the threshold
+  coef <- coef(object, hyperCoef=FALSE) #all coeffients except of the threshold
   p <- length(coef)			#Number of slope coefficients
   resvar <- mse(object) * n / (n-p)
   Qr <- mod$qr
@@ -510,20 +510,20 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 }
 
 #' @S3method coef setar
-#Coef() method: hyperCo=FALSE won't show the threshold coef
-coef.setar <- function(object, hyperCo=TRUE, ...){
+#Coef() method: hyperCoef=FALSE won't show the threshold coef
+coef.setar <- function(object, hyperCoef=TRUE, ...){
   co <- object$coefficients
-  if(!hyperCo) co <- head(co, -length(getTh(object)))
+  if(!hyperCoef) co <- head(co, -length(getTh(object)))
   co
 }
 
 #' @S3method vcov setar
-vcov.setar <- function(object,withTh=TRUE, ...){
+vcov.setar <- function(object,hyperCoef=TRUE, ...){
   mod <- object$model.specific
   
   nthresh<-mod$nthresh
   n <- length(object$str$x)
-  coef <- coef(object$coef, hyperCo=FALSE)#all coeffients except of the threshold
+  coef <- coef(object, hyperCoef=FALSE) #all coeffients except of the threshold
   p <- length(coef)    	#Number of slope coefficients
   
   # residual variance
@@ -538,8 +538,9 @@ vcov.setar <- function(object,withTh=TRUE, ...){
   ## result
   res <- R*resvar
   
-  if(withTh){
+  if(hyperCoef){
     res <- cbind(rbind(res,0),0)
+    if(mod$nthresh==2) res <- cbind(rbind(res,0),0)
   }
   
   return(res)

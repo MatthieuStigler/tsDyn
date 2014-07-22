@@ -477,10 +477,10 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
 }
 
 #' @S3method coef lstar
-#Coef() method: hyperCo=FALSE won't show the threshold/slope coef
-coef.lstar <- function(object, hyperCo=TRUE, ...){
+#Coef() method: hyperCoef=FALSE won't show the threshold/slope coef
+coef.lstar <- function(object, hyperCoef=TRUE, ...){
   co <- object$coefficients
-  if(!hyperCo) co <- head(co, -2)
+  if(!hyperCoef) co <- head(co, -2)
   co
 }
 
