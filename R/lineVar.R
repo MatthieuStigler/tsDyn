@@ -118,7 +118,10 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 ###Check args
   include<-match.arg(include)
   LRinclude<-match.arg(LRinclude)
-  if(lag<1) stop("Lag is minimum 1")
+  if(lag==0) {
+    if(include=="none") stop("Cannot have 'lag=0' and 'include=none'")
+    warning("Lag of 0 not fully implemented, will not work: fevd, predict, irf,...")
+  }
   if(LRinclude%in%c("const", "both"))  include<-"none"
   ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
   model<-match.arg(model)
@@ -165,11 +168,18 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   }
 
 ###Regressors matrix
-  Z <- switch(include,
-	      "none" = Z,  
-	      "const" = cbind(1, Z), 
-	      "trend" = cbind(seq_len(t), Z),
-	      "both"  = cbind(rep(1,t),seq_len(t), Z))
+  if(lag==0){
+    Z <- switch(include,
+                "const" = matrix(1, nrow=t, ncol=1), 
+                "trend" = matrix(seq_len(t), ncol=1),
+                "both"  = cbind(rep(1,t),seq_len(t)))
+  } else {
+    Z <- switch(include,
+                "none" = Z,  
+                "const" = cbind(1, Z), 
+                "trend" = cbind(seq_len(t), Z),
+                "both"  = cbind(rep(1,t),seq_len(t), Z))
+  }
 
   if(!is.null(exogen)){
     if(is.data.frame(exogen)) exogen <- as.matrix(exogen)
@@ -298,8 +308,12 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 ###naming of variables and parameters
   npar<-ncol(B)*nrow(B)
   rownames(B)<-paste("Equation",colnames(data))
-  LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
-  if(I=="ADF") LagNames <- paste("D", LagNames,sep="_")
+  if(p>0){
+    LagNames<-c(paste(rep(colnames(data),length(Lags)), -rep(Lags, each=k)))
+    if(I=="ADF") LagNames <- paste("D", LagNames,sep="_")
+  } else {
+    LagNames <- NULL
+  }
   ECT<- if(model=="VECM") paste("ECT", if(r>1) 1:r else NULL, sep="") else NULL
   Xminus1Names<- if(I=="ADF") paste(colnames(data),"-1",sep="") else NULL
   BnamesInter<-switch(include,"const"="Intercept","none"=NULL,"trend"="Trend","both"=c("Intercept","Trend"))
