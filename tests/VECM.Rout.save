@@ -37,6 +37,39 @@ Type 'q()' to quit R.
 > vecm_OLS_l1_coAsExo <-VECM(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
 > vecm_OLS_l3_coAsExo <-VECM(barry, lag=3, include="none", exogen=rep(1, nrow(barry)))
 > 
+> vecm_OLS_l0_co <-VECM(barry, lag=0)
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_OLS_l0_tr <-VECM(barry, lag=0, include="trend")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_ML_l0_co <-VECM(barry, lag=0, include="const", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_ML_l0_tr <-VECM(barry, lag=0, include="trend", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_ML_l0_bo <-VECM(barry, lag=0, include="both", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_ML_l0_no <-VECM(barry, lag=0, include="none", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_ML_l0_LRco <-VECM(barry, lag=0, LRinclude="const", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> vecm_ML_l0_LRtr <-VECM(barry, lag=0, LRinclude="trend", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+> 
 > vecm_OLS_l1_LRco <-VECM(barry, lag=1, LRinclude="const")
 > vecm_OLS_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend")
 > vecm_OLS_l1_LRtr_noCo <-VECM(barry, lag=1, LRinclude="trend", include="none")
@@ -75,6 +108,16 @@ Type 'q()' to quit R.
 + 		vecm_OLS_l1_LRtr_noCo=vecm_OLS_l1_LRtr_noCo, 
 + 		vecm_OLS_l1_LRbo=vecm_OLS_l1_LRbo, 
 + 
++ 		vecm_OLS_l0_co=vecm_OLS_l0_co,
++ 		vecm_OLS_l0_tr=vecm_OLS_l0_tr,
++ 		vecm_ML_l0_co=vecm_ML_l0_co,
++ 		vecm_ML_l0_tr=vecm_ML_l0_tr,
++ 		vecm_ML_l0_bo=vecm_ML_l0_bo,
++ 		vecm_ML_l0_no=vecm_ML_l0_no,
++ 		vecm_ML_l0_LRco=vecm_ML_l0_LRco,
++ 		vecm_ML_l0_LRtr=vecm_ML_l0_LRtr,
++ 		
++     
 + 		vecm_ML_l1_co=vecm_ML_l1_co,
 + 		vecm_ML_l3_co=vecm_ML_l3_co,
 + 		vecm_ML_l1_tr=vecm_ML_l1_tr, 
@@ -92,6 +135,7 @@ Type 'q()' to quit R.
 > 
 > 
 > vecm_ML <- vecm_all[grep("ML", names(vecm_all))]
+> vecm_no_l0 <- vecm_all[!names(vecm_all)%in%grep("l0", names(vecm_all), value=TRUE)]
 > 
 > lapply(vecm_all, print)
                          ECT   Intercept dolcan -1    cpiUSA -1     cpiCAN -1
@@ -174,6 +218,38 @@ Equation cpiCAN  0.04569339 1.0259115 0.660443050 0.129836506
 Equation dolcan -0.02042543 0.1755439 0.0006424809 0.001532288
 Equation cpiUSA  0.01429980 1.1539268 0.7649198192 0.069831738
 Equation cpiCAN  0.18825465 0.9672391 0.6672418709 0.125157214
+                         ECT   Intercept
+Equation dolcan -0.002780092 0.001704454
+Equation cpiUSA  0.068255265 0.249423711
+Equation cpiCAN  0.186186297 0.235109720
+                          ECT        Trend
+Equation dolcan -0.0001422602 6.872164e-06
+Equation cpiUSA  0.4799565924 1.234973e-03
+Equation cpiCAN  0.5732976471 1.155503e-03
+                          ECT   Intercept
+Equation dolcan -0.0003507433 0.002374059
+Equation cpiUSA -0.0436243553 0.368504529
+Equation cpiCAN -0.0823639695 0.464893314
+                          ECT         Trend
+Equation dolcan -0.0005484774 -2.096466e-05
+Equation cpiUSA -0.0928989256 -3.607422e-03
+Equation cpiCAN -0.1123697005 -4.699981e-03
+                         ECT   Intercept        Trend
+Equation dolcan -0.001999161 -0.01016577 -0.000118541
+Equation cpiUSA -0.019268819  0.18976366 -0.001429789
+Equation cpiCAN -0.100888273 -0.23130939 -0.006626575
+                        ECT
+Equation dolcan 0.001869335
+Equation cpiUSA 0.358828407
+Equation cpiCAN 0.359559513
+                          ECT
+Equation dolcan -0.0008273726
+Equation cpiUSA -0.1396685110
+Equation cpiCAN -0.1389057526
+                          ECT   Intercept
+Equation dolcan -0.0003514011 0.002370631
+Equation cpiUSA -0.0435803377 0.367753637
+Equation cpiCAN -0.0824088721 0.463805846
                          ECT   Intercept dolcan -1    cpiUSA -1     cpiCAN -1
 Equation dolcan -0.001130982 0.001904987 0.1590566 -0.002905063 -0.0001549718
 Equation cpiUSA  0.046105240 0.145721073 0.5267517  0.480576053 -0.0352344706
@@ -361,6 +437,54 @@ $vecm_OLS_l1_LRbo
 Equation dolcan -0.02042543 0.1755439 0.0006424809 0.001532288
 Equation cpiUSA  0.01429980 1.1539268 0.7649198192 0.069831738
 Equation cpiCAN  0.18825465 0.9672391 0.6672418709 0.125157214
+
+$vecm_OLS_l0_co
+                         ECT   Intercept
+Equation dolcan -0.002780092 0.001704454
+Equation cpiUSA  0.068255265 0.249423711
+Equation cpiCAN  0.186186297 0.235109720
+
+$vecm_OLS_l0_tr
+                          ECT        Trend
+Equation dolcan -0.0001422602 6.872164e-06
+Equation cpiUSA  0.4799565924 1.234973e-03
+Equation cpiCAN  0.5732976471 1.155503e-03
+
+$vecm_ML_l0_co
+                          ECT   Intercept
+Equation dolcan -0.0003507433 0.002374059
+Equation cpiUSA -0.0436243553 0.368504529
+Equation cpiCAN -0.0823639695 0.464893314
+
+$vecm_ML_l0_tr
+                          ECT         Trend
+Equation dolcan -0.0005484774 -2.096466e-05
+Equation cpiUSA -0.0928989256 -3.607422e-03
+Equation cpiCAN -0.1123697005 -4.699981e-03
+
+$vecm_ML_l0_bo
+                         ECT   Intercept        Trend
+Equation dolcan -0.001999161 -0.01016577 -0.000118541
+Equation cpiUSA -0.019268819  0.18976366 -0.001429789
+Equation cpiCAN -0.100888273 -0.23130939 -0.006626575
+
+$vecm_ML_l0_no
+                        ECT
+Equation dolcan 0.001869335
+Equation cpiUSA 0.358828407
+Equation cpiCAN 0.359559513
+
+$vecm_ML_l0_LRco
+                          ECT
+Equation dolcan -0.0008273726
+Equation cpiUSA -0.1396685110
+Equation cpiCAN -0.1389057526
+
+$vecm_ML_l0_LRtr
+                          ECT   Intercept
+Equation dolcan -0.0003514011 0.002370631
+Equation cpiUSA -0.0435803377 0.367753637
+Equation cpiCAN -0.0824088721 0.463805846
 
 $vecm_ML_l1_co
                          ECT   Intercept dolcan -1    cpiUSA -1     cpiCAN -1
@@ -751,6 +875,142 @@ Equation dolcan 0.0015(0.0029)
 Equation cpiUSA 0.0698(0.0403).   
 Equation cpiCAN 0.1252(0.0597)*   
 
+$vecm_OLS_l0_co
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -4868.234 	BIC -4845.568 	SSR 29.55513
+Cointegrating vector (estimated by 2OLS):
+   dolcan      cpiUSA    cpiCAN
+r1      1 -0.05710189 0.0410196
+
+
+                ECT                 Intercept        
+Equation dolcan -0.0028(0.0027)     0.0017(0.0008)*  
+Equation cpiUSA 0.0683(0.0370).     0.2494(0.0104)***
+Equation cpiCAN 0.1862(0.0511)***   0.2351(0.0144)***
+
+$vecm_OLS_l0_tr
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -4815.132 	BIC -4792.466 	SSR 32.5443
+Cointegrating vector (estimated by 2OLS):
+   dolcan      cpiUSA    cpiCAN
+r1      1 -0.05710189 0.0410196
+
+
+                ECT                 Trend              
+Equation dolcan -0.0001(0.0026)     6.9e-06(3.9e-06).  
+Equation cpiUSA 0.4800(0.0382)***   0.0012(5.7e-05)*** 
+Equation cpiCAN 0.5733(0.0512)***   0.0012(7.7e-05)*** 
+
+$vecm_ML_l0_co
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -4871.497 	BIC -4848.832 	SSR 29.32748
+Cointegrating vector (estimated by ML):
+   dolcan      cpiUSA     cpiCAN
+r1      1 -0.02123402 0.04020793
+
+
+                ECT                 Intercept         
+Equation dolcan -0.0004(0.0011)     0.0024(0.0030)    
+Equation cpiUSA -0.0436(0.0155)**   0.3685(0.0413)*** 
+Equation cpiCAN -0.0824(0.0214)***  0.4649(0.0572)*** 
+
+$vecm_ML_l0_tr
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -4881.092 	BIC -4858.426 	SSR 28.5781
+Cointegrating vector (estimated by ML):
+   dolcan     cpiUSA     cpiCAN
+r1      1 -0.2189798 0.07550665
+
+
+                ECT                 Trend                
+Equation dolcan -0.0005(0.0004)     -2.1e-05(2.3e-05)    
+Equation cpiUSA -0.0929(0.0061)***  -0.0036(0.0003)***   
+Equation cpiCAN -0.1124(0.0083)***  -0.0047(0.0004)***   
+
+$vecm_ML_l0_bo
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 9
+AIC -4878.988 	BIC -4837.434 	SSR 28.38918
+Cointegrating vector (estimated by ML):
+   dolcan     cpiUSA    cpiCAN
+r1      1 -0.3432729 0.1102598
+
+
+                ECT                 Intercept           Trend               
+Equation dolcan -0.0020(0.0015)     -0.0102(0.0089)     -0.0001(9.1e-05)    
+Equation cpiUSA -0.0193(0.0207)     0.1898(0.1213)      -0.0014(0.0012)     
+Equation cpiCAN -0.1009(0.0280)***  -0.2313(0.1642)     -0.0066(0.0017)***  
+
+$vecm_ML_l0_no
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 3
+AIC -4852.03 	BIC -4833.141 	SSR 30.26036
+Cointegrating vector (estimated by ML):
+   dolcan       cpiUSA       cpiCAN
+r1      1 -0.007705743 0.0002734381
+
+
+                ECT              
+Equation dolcan 0.0019(0.0010).  
+Equation cpiUSA 0.3588(0.0142)***
+Equation cpiCAN 0.3596(0.0195)***
+
+$vecm_ML_l0_LRco
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 3
+AIC -4870.783 	BIC -4851.895 	SSR 29.49155
+Cointegrating vector (estimated by ML):
+   dolcan      cpiUSA     cpiCAN     const
+r1      1 -0.02193294 0.02567844 -3.325051
+
+
+                ECT               
+Equation dolcan -0.0008(0.0004)*  
+Equation cpiUSA -0.1397(0.0053)***
+Equation cpiCAN -0.1389(0.0074)***
+
+$vecm_ML_l0_LRtr
+#############
+###Model VECM 
+#############
+Full sample size: 324 	End sample size: 323
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -4871.557 	BIC -4848.891 	SSR 29.32353
+Cointegrating vector (estimated by ML):
+   dolcan      cpiUSA     cpiCAN        trend
+r1      1 -0.02200917 0.04041511 0.0001604596
+
+
+                ECT                 Intercept         
+Equation dolcan -0.0004(0.0011)     0.0024(0.0030)    
+Equation cpiUSA -0.0436(0.0154)**   0.3678(0.0410)*** 
+Equation cpiCAN -0.0824(0.0214)***  0.4638(0.0569)*** 
+
 $vecm_ML_l1_co
 #############
 ###Model VECM 
@@ -1135,6 +1395,54 @@ $vecm_OLS_l1_LRbo
 [2,]  0.0028116506 -0.02218566  0.10660524
 [3,] -0.0017947104  0.01023665  0.02883006
 
+$vecm_OLS_l0_co
+           dolcan      cpiUSA      cpiCAN
+[1,] -0.004119062 -0.09098194 -0.18119407
+[2,]  0.000656455 -0.01038084 -0.24955440
+[3,]  0.003524634 -0.08959959 -0.02742329
+
+$vecm_OLS_l0_tr
+           dolcan      cpiUSA      cpiCAN
+[1,] -0.003641097 -0.03314578 -0.12622311
+[2,]  0.001150778  0.04984604 -0.19232980
+[3,]  0.004042277 -0.02589529  0.03307674
+
+$vecm_ML_l0_co
+            dolcan     cpiUSA      cpiCAN
+[1,] -0.0055672523 -0.1154696 -0.20588156
+[2,] -0.0007679908 -0.0355614 -0.27605497
+[3,]  0.0021313714 -0.1156407 -0.05620476
+
+$vecm_ML_l0_tr
+            dolcan      cpiUSA      cpiCAN
+[1,] -0.0054205345 -0.10136081 -0.21209092
+[2,] -0.0006186214 -0.02098025 -0.28129413
+[3,]  0.0022734171 -0.10227223 -0.06252042
+
+$vecm_ML_l0_bo
+            dolcan      cpiUSA     cpiCAN
+[1,] -0.0049191795 -0.10920968 -0.2025909
+[2,] -0.0001075646 -0.02881049 -0.2713604
+[3,]  0.0027433158 -0.10899669 -0.0531949
+
+$vecm_ML_l0_no
+            dolcan      cpiUSA       cpiCAN
+[1,] -0.0051782035 -0.09374874 -0.144326869
+[2,] -0.0003686217 -0.01190945 -0.212483835
+[3,]  0.0025331755 -0.09156447  0.007861849
+
+$vecm_ML_l0_LRco
+            dolcan      cpiUSA      cpiCAN
+[1,] -0.0055825954 -0.12780033 -0.17606476
+[2,] -0.0007861302 -0.04839703 -0.24665820
+[3,]  0.0021113675 -0.12881945 -0.02707831
+
+$vecm_ML_l0_LRtr
+            dolcan     cpiUSA      cpiCAN
+[1,] -0.0055685569 -0.1154870 -0.20606183
+[2,] -0.0007692819 -0.0355769 -0.27623185
+[3,]  0.0021300670 -0.1156577 -0.05638455
+
 $vecm_ML_l1_co
             dolcan      cpiUSA      cpiCAN
 [1,]  0.0008340251  0.02041238 -0.23996773
@@ -1292,6 +1600,54 @@ $vecm_OLS_l1_LRbo
 [4,] 0.0011883494 0.2121857 0.1833948
 [5,] 0.0018947104 0.1697633 0.1611699
 
+$vecm_OLS_l0_co
+           dolcan    cpiUSA    cpiCAN
+[1,] 0.0004190618 0.2809819 0.3211941
+[2,] 0.0004435450 0.2803808 0.3195544
+[3,] 0.0004753664 0.2795996 0.3174233
+
+$vecm_OLS_l0_tr
+            dolcan    cpiUSA    cpiCAN
+[1,] -5.890270e-05 0.2231458 0.2662231
+[2,] -5.077771e-05 0.2201540 0.2623298
+[3,] -4.227721e-05 0.2158953 0.2569233
+
+$vecm_ML_l0_co
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.001867252 0.3054696 0.3458816
+[2,] 0.001867991 0.3055614 0.3460550
+[3,] 0.001868629 0.3056407 0.3462048
+
+$vecm_ML_l0_tr
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.001720535 0.2913608 0.3520909
+[2,] 0.001718621 0.2909803 0.3512941
+[3,] 0.001726583 0.2922722 0.3525204
+
+$vecm_ML_l0_bo
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.001219180 0.2992097 0.3425909
+[2,] 0.001207565 0.2988105 0.3413604
+[3,] 0.001256684 0.2989967 0.3431949
+
+$vecm_ML_l0_no
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.001478204 0.2837487 0.2843269
+[2,] 0.001468622 0.2819094 0.2824838
+[3,] 0.001466824 0.2815645 0.2821382
+
+$vecm_ML_l0_LRco
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.001882595 0.3178003 0.3160648
+[2,] 0.001886130 0.3183970 0.3166582
+[3,] 0.001888632 0.3188194 0.3170783
+
+$vecm_ML_l0_LRtr
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.001868557 0.3054870 0.3460618
+[2,] 0.001869282 0.3055769 0.3462318
+[3,] 0.001869933 0.3056577 0.3463845
+
 $vecm_ML_l1_co
            dolcan    cpiUSA    cpiCAN
 [1,] 0.0002659749 0.2495876 0.3099677
@@ -1376,7 +1732,7 @@ $vecm_ML_l1_LRbo_exo
 [2,] 0.0005446609 0.2892518 0.3272675
 [3,] 0.0033308455 0.2679462 0.3018519
 
-> lapply(vecm_all, function(x) head(fitted(x, level="original"), 3))
+> lapply(vecm_no_l0, function(x) head(fitted(x, level="original"), 3))
 $vecm_OLS_l1_co
         dolcan   cpiUSA   cpiCAN
 [1,] 0.9955114 28.41507 26.29686
@@ -1542,16 +1898,22 @@ $vecm_ML_l1_LRbo_exo
                 26.25525                 24.94378                 31.24289 
         vecm_OLS_l1_LRtr    vecm_OLS_l1_LRtr_noCo         vecm_OLS_l1_LRbo 
                 26.96383                 31.25622                 31.26287 
-           vecm_ML_l1_co            vecm_ML_l3_co            vecm_ML_l1_tr 
-                26.19341                 24.99064                 25.73611 
-           vecm_ML_l1_bo            vecm_ML_l1_no       vecm_ML_l1_coAsExo 
-                25.47038                 26.52256                 26.19341 
-      vecm_ML_l3_coAsExo          vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo 
-                24.99064                 26.35791                 26.33632 
-         vecm_ML_l1_LRtr      vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo 
-                25.52893                 25.51699                 25.90410 
-         vecm_ML_l1_LRbo      vecm_ML_l1_LRbo_exo 
-                25.92170                 25.90659 
+          vecm_OLS_l0_co           vecm_OLS_l0_tr            vecm_ML_l0_co 
+                29.55513                 32.54430                 29.32748 
+           vecm_ML_l0_tr            vecm_ML_l0_bo            vecm_ML_l0_no 
+                28.57810                 28.38918                 30.26036 
+         vecm_ML_l0_LRco          vecm_ML_l0_LRtr            vecm_ML_l1_co 
+                29.49155                 29.32353                 26.19341 
+           vecm_ML_l3_co            vecm_ML_l1_tr            vecm_ML_l1_bo 
+                24.99064                 25.73611                 25.47038 
+           vecm_ML_l1_no       vecm_ML_l1_coAsExo       vecm_ML_l3_coAsExo 
+                26.52256                 26.19341                 24.99064 
+         vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo          vecm_ML_l1_LRtr 
+                26.35791                 26.33632                 25.52893 
+     vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo          vecm_ML_l1_LRbo 
+                25.51699                 25.90410                 25.92170 
+     vecm_ML_l1_LRbo_exo 
+                25.90659 
 > 
 > 
 > 
@@ -1565,28 +1927,42 @@ $vecm_ML_l1_LRbo_exo
                -15.38412                -15.46030                -15.10571 
         vecm_OLS_l1_LRtr    vecm_OLS_l1_LRtr_noCo         vecm_OLS_l1_LRbo 
                -15.36557                -15.10725                -15.10473 
-           vecm_ML_l1_co            vecm_ML_l3_co            vecm_ML_l1_tr 
-              1106.44373               1112.10515               1109.79472 
-           vecm_ML_l1_bo            vecm_ML_l1_no       vecm_ML_l1_coAsExo 
-              1114.44940               1101.07482               1106.44373 
-      vecm_ML_l3_coAsExo          vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo 
-              1112.10515               1104.66570               1105.93307 
-         vecm_ML_l1_LRtr      vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo 
-              1113.02033               1113.93740               1106.96679 
-         vecm_ML_l1_LRbo      vecm_ML_l1_LRbo_exo 
-              1106.97988               1108.20375 
+          vecm_OLS_l0_co           vecm_OLS_l0_tr            vecm_ML_l0_co 
+               -15.10908                -14.94468               1066.79728 
+           vecm_ML_l0_tr            vecm_ML_l0_bo            vecm_ML_l0_no 
+              1071.59446               1075.54280               1056.06341 
+         vecm_ML_l0_LRco          vecm_ML_l0_LRtr            vecm_ML_l1_co 
+              1065.44005               1066.81216               1106.44373 
+           vecm_ML_l3_co            vecm_ML_l1_tr            vecm_ML_l1_bo 
+              1112.10515               1109.79472               1114.44940 
+           vecm_ML_l1_no       vecm_ML_l1_coAsExo       vecm_ML_l3_coAsExo 
+              1101.07482               1106.44373               1112.10515 
+         vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo          vecm_ML_l1_LRtr 
+              1104.66570               1105.93307               1113.02033 
+     vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo          vecm_ML_l1_LRbo 
+              1113.93740               1106.96679               1106.97988 
+     vecm_ML_l1_LRbo_exo 
+              1108.20375 
 > sapply(vecm_ML, logLik, r=0)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           1058.1130             960.0029            1067.8467 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+            862.1379             862.1379            1058.1130 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
-            1099.594             1108.108             1070.222 
+           1099.5938            1108.1083            1070.2216 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
-            1107.258             1058.268             1099.594 
+           1107.2577            1058.2684            1099.5938 
   vecm_ML_l3_coAsExo      vecm_ML_l1_LRco   vecm_ML_l1_LRc_exo 
-            1108.108             1058.268             1058.996 
+           1108.1083            1058.2684            1058.9959 
      vecm_ML_l1_LRtr  vecm_ML_l1_LRtr_exo vecm_ML_l1_LRtr_noCo 
-            1099.594             1100.489             1058.268 
+           1099.5938            1100.4894            1058.2684 
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
-            1058.268             1058.996 
+           1058.2684            1058.9959 
 > sapply(vecm_ML, logLik, r=1)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+            1066.797             1071.594             1075.543 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+            1056.063             1065.440             1066.812 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
             1106.444             1112.105             1109.795 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1598,6 +1974,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
             1106.980             1108.204 
 > sapply(vecm_ML, logLik, r=2)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+            1070.887             1074.447             1079.706 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+            1059.259             1069.937             1070.903 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
             1109.997             1115.597             1113.368 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1619,17 +1999,27 @@ $vecm_ML_l1_LRbo_exo
                -4919.687                -4877.297                -4836.039 
         vecm_OLS_l1_LRtr    vecm_OLS_l1_LRtr_noCo         vecm_OLS_l1_LRbo 
                -4913.714                -4836.533                -4835.724 
-           vecm_ML_l1_co            vecm_ML_l3_co            vecm_ML_l1_tr 
-               -4920.277                -4878.572                -4926.979 
-           vecm_ML_l1_bo            vecm_ML_l1_no       vecm_ML_l1_coAsExo 
-               -4930.288                -4915.539                -4920.277 
-      vecm_ML_l3_coAsExo          vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo 
-               -4878.572                -4922.721                -4919.255 
-         vecm_ML_l1_LRtr      vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo 
-               -4933.430                -4929.264                -4927.323 
-         vecm_ML_l1_LRbo      vecm_ML_l1_LRbo_exo 
-               -4927.349                -4923.797 
+          vecm_OLS_l0_co           vecm_OLS_l0_tr            vecm_ML_l0_co 
+               -4868.234                -4815.132                -4871.497 
+           vecm_ML_l0_tr            vecm_ML_l0_bo            vecm_ML_l0_no 
+               -4881.092                -4878.988                -4852.030 
+         vecm_ML_l0_LRco          vecm_ML_l0_LRtr            vecm_ML_l1_co 
+               -4870.783                -4871.557                -4920.277 
+           vecm_ML_l3_co            vecm_ML_l1_tr            vecm_ML_l1_bo 
+               -4878.572                -4926.979                -4930.288 
+           vecm_ML_l1_no       vecm_ML_l1_coAsExo       vecm_ML_l3_coAsExo 
+               -4915.539                -4920.277                -4878.572 
+         vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo          vecm_ML_l1_LRtr 
+               -4922.721                -4919.255                -4933.430 
+     vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo          vecm_ML_l1_LRbo 
+               -4929.264                -4927.323                -4927.349 
+     vecm_ML_l1_LRbo_exo 
+               -4923.797 
 > sapply(vecm_ML, AIC, r=0)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -4881.497            -4891.092            -4888.988 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -4862.030            -4880.783            -4881.557 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -4930.277            -4888.572            -4936.979 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1641,6 +2031,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
            -4937.349            -4933.797 
 > sapply(vecm_ML, AIC, r=1)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -4871.497            -4881.092            -4878.988 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -4852.030            -4870.783            -4871.557 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -4920.277            -4878.572            -4926.979 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1652,6 +2046,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
            -4927.349            -4923.797 
 > sapply(vecm_ML, AIC, r=2)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -4865.497            -4875.092            -4872.988 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -4846.030            -4864.783            -4865.557 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -4914.277            -4872.572            -4920.979 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1663,6 +2061,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
            -4921.349            -4917.797 
 > sapply(vecm_ML, AIC, r=0, fitMeasure="LL")
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -2114.226            -1918.006            -2123.693 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -1724.276            -1724.276            -2114.226 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -2175.188            -2156.217            -2116.443 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1674,6 +2076,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
            -2098.537            -2093.992 
 > sapply(vecm_ML, AIC, r=1, fitMeasure="LL")
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -2121.595            -2131.189            -2129.086 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -2102.127            -2120.880            -2121.624 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -2178.887            -2154.210            -2185.589 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1685,6 +2091,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
            -2185.960            -2182.408 
 > sapply(vecm_ML, AIC, r=2, fitMeasure="LL")
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -2123.775            -2130.894            -2131.411 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -2102.518            -2123.875            -2123.805 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -2179.993            -2155.194            -2186.735 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1705,17 +2115,27 @@ $vecm_ML_l1_LRbo_exo
                -4855.520                -4745.405                -4783.195 
         vecm_OLS_l1_LRtr    vecm_OLS_l1_LRtr_noCo         vecm_OLS_l1_LRbo 
                -4849.547                -4783.690                -4782.880 
-           vecm_ML_l1_co            vecm_ML_l3_co            vecm_ML_l1_tr 
-               -4856.109                -4746.681                -4862.811 
-           vecm_ML_l1_bo            vecm_ML_l1_no       vecm_ML_l1_coAsExo 
-               -4854.797                -4862.695                -4856.109 
-      vecm_ML_l3_coAsExo          vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo 
-               -4746.681                -4869.877                -4855.088 
-         vecm_ML_l1_LRtr      vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo 
-               -4869.263                -4853.773                -4874.479 
-         vecm_ML_l1_LRbo      vecm_ML_l1_LRbo_exo 
-               -4874.505                -4859.629 
+          vecm_OLS_l0_co           vecm_OLS_l0_tr            vecm_ML_l0_co 
+               -4845.568                -4792.466                -4848.832 
+           vecm_ML_l0_tr            vecm_ML_l0_bo            vecm_ML_l0_no 
+               -4858.426                -4837.434                -4833.141 
+         vecm_ML_l0_LRco          vecm_ML_l0_LRtr            vecm_ML_l1_co 
+               -4851.895                -4848.891                -4856.109 
+           vecm_ML_l3_co            vecm_ML_l1_tr            vecm_ML_l1_bo 
+               -4746.681                -4862.811                -4854.797 
+           vecm_ML_l1_no       vecm_ML_l1_coAsExo       vecm_ML_l3_coAsExo 
+               -4862.695                -4856.109                -4746.681 
+         vecm_ML_l1_LRco       vecm_ML_l1_LRc_exo          vecm_ML_l1_LRtr 
+               -4869.877                -4855.088                -4869.263 
+     vecm_ML_l1_LRtr_exo     vecm_ML_l1_LRtr_noCo          vecm_ML_l1_LRbo 
+               -4853.773                -4874.479                -4874.505 
+     vecm_ML_l1_LRbo_exo 
+               -4859.629 
 > sapply(vecm_ML, BIC, r=0)
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -4877.720            -4887.314            -4866.323 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -4862.030            -4880.783            -4877.779 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -4884.982            -4775.523            -4891.684 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1727,6 +2147,10 @@ $vecm_ML_l1_LRbo_exo
      vecm_ML_l1_LRbo  vecm_ML_l1_LRbo_exo 
            -4903.378            -4888.502 
 > sapply(vecm_ML, BIC, r=0, fitMeasure="LL")
+       vecm_ML_l0_co        vecm_ML_l0_tr        vecm_ML_l0_bo 
+           -2110.448            -1914.228            -2101.027 
+       vecm_ML_l0_no      vecm_ML_l0_LRco      vecm_ML_l0_LRtr 
+           -1724.276            -1724.276            -2110.448 
        vecm_ML_l1_co        vecm_ML_l3_co        vecm_ML_l1_tr 
            -2129.893            -2043.167            -2071.149 
        vecm_ML_l1_bo        vecm_ML_l1_no   vecm_ML_l1_coAsExo 
@@ -1817,6 +2241,56 @@ cpiUSA -0.019039918
 cpiCAN  0.010627527
 const  -0.770704602
 trend   0.000864578
+
+$vecm_OLS_l0_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l0_tr
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_ML_l0_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.02123402
+cpiCAN  0.04020793
+
+$vecm_ML_l0_tr
+                r1
+dolcan  1.00000000
+cpiUSA -0.21897978
+cpiCAN  0.07550665
+
+$vecm_ML_l0_bo
+               r1
+dolcan  1.0000000
+cpiUSA -0.3432729
+cpiCAN  0.1102598
+
+$vecm_ML_l0_no
+                  r1
+dolcan  1.0000000000
+cpiUSA -0.0077057431
+cpiCAN  0.0002734381
+
+$vecm_ML_l0_LRco
+                r1
+dolcan  1.00000000
+cpiUSA -0.02193294
+cpiCAN  0.02567844
+const  -3.32505090
+
+$vecm_ML_l0_LRtr
+                  r1
+dolcan  1.0000000000
+cpiUSA -0.0220091730
+cpiCAN  0.0404151067
+trend   0.0001604596
 
 $vecm_ML_l1_co
                 r1
@@ -2041,6 +2515,54 @@ cpiCAN -0.14508872  0.000162761  1.155494 0.66365752 1.127157895 -0.9672391
 dolcan -0.000642481 -0.001532288
 cpiUSA -0.764919819 -0.069831738
 cpiCAN -0.667241871 -0.125157214
+
+$vecm_OLS_l0_co
+          constant  dolcan.l1    cpiUSA.l1    cpiCAN.l1
+dolcan 0.001704454 0.99721991  0.000158749 -0.000114038
+cpiUSA 0.249423711 0.06825526  0.996102496  0.002799803
+cpiCAN 0.235109720 0.18618630 -0.010631589  1.007637287
+
+$vecm_OLS_l0_tr
+             Trend dolcan.l1    cpiUSA.l1    cpiCAN.l1
+dolcan 0.000006872 0.9998577  0.000008123 -0.000005835
+cpiUSA 0.001234973 0.4799566  0.972593573  0.019687626
+cpiCAN 0.001155503 0.5732976 -0.032736377  1.023516438
+
+$vecm_ML_l0_co
+          constant   dolcan.l1   cpiUSA.l1    cpiCAN.l1
+dolcan 0.002374059  0.99964926 0.000007448 -0.000014103
+cpiUSA 0.368504529 -0.04362435 1.000926320 -0.001754045
+cpiCAN 0.464893314 -0.08236397 0.001748918  0.996688316
+
+$vecm_ML_l0_tr
+              Trend   dolcan.l1   cpiUSA.l1    cpiCAN.l1
+dolcan -0.000020965  0.99945152 0.000120105 -0.000041414
+cpiUSA -0.003607422 -0.09289893 1.020342986 -0.007014487
+cpiCAN -0.004699981 -0.11236970 0.024606692  0.991515340
+
+$vecm_ML_l0_bo
+          constant        Trend   dolcan.l1   cpiUSA.l1    cpiCAN.l1
+dolcan -0.01016577 -0.000118541  0.99800084 0.000686258 -0.000220427
+cpiUSA  0.18976366 -0.001429789 -0.01926882 1.006614464 -0.002124577
+cpiCAN -0.23130939 -0.006626575 -0.10088827 0.034632211  0.988876075
+
+$vecm_ML_l0_no
+       dolcan.l1    cpiUSA.l1   cpiCAN.l1
+dolcan 1.0018693 -0.000014405 0.000000511
+cpiUSA 0.3588284  0.997234960 0.000098117
+cpiCAN 0.3595595 -0.002770673 1.000098317
+
+$vecm_ML_l0_LRco
+          constant  dolcan.l1   cpiUSA.l1    cpiCAN.l1
+dolcan 0.002751056  0.9991726 0.000018147 -0.000021246
+cpiUSA 0.464404908 -0.1396685 1.003063341 -0.003586470
+cpiCAN 0.461868698 -0.1389058 0.003046611  0.996433117
+
+$vecm_ML_l0_LRtr
+          constant       Trend   dolcan.l1   cpiUSA.l1    cpiCAN.l1
+dolcan 0.002370631 -5.6000e-08  0.99964860 0.000007734 -0.000014202
+cpiUSA 0.367753637 -6.9930e-06 -0.04358034 1.000959167 -0.001761304
+cpiCAN 0.463805846 -1.3223e-05 -0.08240887 0.001813751  0.996669437
 
 $vecm_ML_l1_co
           constant dolcan.l1    cpiUSA.l1    cpiCAN.l1  dolcan.l2    cpiUSA.l2
@@ -2297,6 +2819,78 @@ $vecm_OLS_l1_LRbo
 [5,] 0.0000000000 0.0000000000 0.8438330929
 [6,] 0.0002577480 0.0021234851 0.6673652077
 
+$vecm_OLS_l0_co
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 1.149285e-03 0.002737697
+[2,] 9.999969e-01 9.979511e-04 0.002267950
+[3,] 0.000000e+00 9.988507e-01 0.121262714
+[4,] 1.020898e-06 9.989955e-01 0.118983841
+[5,] 0.000000e+00 0.000000e+00 0.875999589
+[6,] 2.055104e-06 6.559731e-06 0.878748209
+
+$vecm_OLS_l0_tr
+           dolcan       cpiUSA       cpiCAN
+[1,] 1.000000e+00 6.104311e-05 0.0004794975
+[2,] 1.000000e+00 8.341641e-04 0.0002579400
+[3,] 0.000000e+00 9.999390e-01 0.1691486636
+[4,] 2.586138e-09 9.988723e-01 0.1610025301
+[5,] 0.000000e+00 0.000000e+00 0.8303718390
+[6,] 5.454307e-09 2.935136e-04 0.8387395299
+
+$vecm_ML_l0_co
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 1.828810e-03 0.004594080
+[2,] 1.000000e+00 1.964628e-03 0.004899312
+[3,] 0.000000e+00 9.981712e-01 0.114086603
+[4,] 6.463204e-11 9.980328e-01 0.114428804
+[5,] 0.000000e+00 0.000000e+00 0.881319316
+[6,] 3.130863e-08 2.607333e-06 0.880671883
+
+$vecm_ML_l0_tr
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 2.681424e-03 0.005961305
+[2,] 9.999988e-01 3.020907e-03 0.006484932
+[3,] 0.000000e+00 9.973186e-01 0.105073722
+[4,] 9.719961e-07 9.969399e-01 0.110403844
+[5,] 0.000000e+00 0.000000e+00 0.888964973
+[6,] 2.610384e-07 3.922807e-05 0.883111223
+
+$vecm_ML_l0_bo
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 1.889003e-03 0.006374139
+[2,] 9.999606e-01 1.942788e-03 0.006856100
+[3,] 0.000000e+00 9.981110e-01 0.111349312
+[4,] 3.210605e-05 9.980536e-01 0.119091863
+[5,] 0.000000e+00 0.000000e+00 0.882276550
+[6,] 7.335192e-06 3.624552e-06 0.874052037
+
+$vecm_ML_l0_no
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 5.029336e-04 0.002842137
+[2,] 1.000000e+00 2.577801e-04 0.002016240
+[3,] 0.000000e+00 9.994971e-01 0.124319502
+[4,] 1.948785e-08 9.997422e-01 0.123797468
+[5,] 0.000000e+00 0.000000e+00 0.872838361
+[6,] 4.138960e-11 7.863053e-09 0.874186291
+
+$vecm_ML_l0_LRco
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 2.272162e-03 0.004965122
+[2,] 9.999999e-01 2.796258e-03 0.005508342
+[3,] 0.000000e+00 9.977278e-01 0.112057281
+[4,] 6.253713e-09 9.971927e-01 0.112645614
+[5,] 0.000000e+00 0.000000e+00 0.882977597
+[6,] 7.194280e-08 1.102239e-05 0.881846044
+
+$vecm_ML_l0_LRtr
+           dolcan       cpiUSA      cpiCAN
+[1,] 1.000000e+00 1.829777e-03 0.004597732
+[2,] 1.000000e+00 1.965457e-03 0.004903348
+[3,] 0.000000e+00 9.981702e-01 0.114050922
+[4,] 1.074005e-10 9.980319e-01 0.114407080
+[5,] 0.000000e+00 0.000000e+00 0.881351346
+[6,] 3.174601e-08 2.628541e-06 0.880689573
+
 $vecm_ML_l1_co
            dolcan       cpiUSA      cpiCAN
 [1,] 1.000000e+00 0.0005840363 0.002617406
@@ -2442,9 +3036,11 @@ Warning messages:
   Not guaranted to work with this specification of deterministic terms.
 9: In fevd.nlVar(x, n.ahead = 2) :
   Not guaranted to work with this specification of deterministic terms.
+10: In fevd.nlVar(x, n.ahead = 2) :
+  Not guaranted to work with this specification of deterministic terms.
 > 
 > ### irf
-> vecm_irf <- vecm_all[-grep("l1_no|bo|exo|Exo", names(vecm_all))] ## does not work for these models
+> vecm_irf <- vecm_all[-grep("l1_no|bo|exo|Exo|l0", names(vecm_all))] ## does not work for these models
 > lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 $vecm_OLS_l1_co
            dolcan        cpiUSA        cpiCAN
@@ -2597,6 +3193,36 @@ $vecm_OLS_l1_LRtr
 325 1.519221 110.5899 107.5134
 326 1.571053 110.8113 108.0834
 
+$vecm_OLS_l0_co
+      dolcan   cpiUSA   cpiCAN
+325 1.475143 110.6690 107.1521
+326 1.478096 110.8878 107.3037
+
+$vecm_OLS_l0_tr
+      dolcan   cpiUSA   cpiCAN
+325 1.472277 110.2386 106.7468
+326 1.472361 110.0293 106.4959
+
+$vecm_ML_l0_co
+      dolcan   cpiUSA   cpiCAN
+325 1.473371 110.6689 107.1825
+326 1.474541 110.8877 107.3646
+
+$vecm_ML_l0_tr
+      dolcan   cpiUSA   cpiCAN
+325 1.480185 111.8024 108.6351
+326 1.488239 113.1664 110.2840
+
+$vecm_ML_l0_LRco
+      dolcan   cpiUSA   cpiCAN
+325 1.473464 110.6634 107.2122
+326 1.474726 110.8765 107.4241
+
+$vecm_ML_l0_LRtr
+      dolcan   cpiUSA   cpiCAN
+325 1.473388 110.6711 107.1864
+326 1.474574 110.8919 107.3725
+
 $vecm_ML_l1_co
       dolcan   cpiUSA   cpiCAN
 325 1.475616 110.5636 107.0919
@@ -2652,6 +3278,36 @@ $vecm_OLS_l1_LRtr
        dolcan   cpiUSA   cpiCAN
 [1,] 1.474400 110.5871 107.1615
 [2,] 1.475435 110.7875 107.3654
+
+$vecm_OLS_l0_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.475143 110.6690 107.1521
+[2,] 1.478096 110.8878 107.3037
+
+$vecm_OLS_l0_tr
+      dolcan   cpiUSA   cpiCAN
+[1,] 1.47227 110.2374 106.7457
+[2,] 1.47234 110.0256 106.4924
+
+$vecm_ML_l0_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.473371 110.6689 107.1825
+[2,] 1.474541 110.8877 107.3646
+
+$vecm_ML_l0_tr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.480206 111.8060 108.6398
+[2,] 1.488302 113.1773 110.2982
+
+$vecm_ML_l0_LRco
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.473464 110.6634 107.2122
+[2,] 1.474726 110.8765 107.4241
+
+$vecm_ML_l0_LRtr
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.473370 110.6688 107.1822
+[2,] 1.474538 110.8874 107.3640
 
 $vecm_ML_l1_co
        dolcan   cpiUSA   cpiCAN
@@ -2740,6 +3396,46 @@ $vecm_OLS_l1_LRbo
 1 1.483236 110.5364 107.0975
 2 1.471002 110.4805 106.8727
 
+$vecm_OLS_l0_co
+    dolcan   cpiUSA   cpiCAN
+1 1.480731 110.6054 107.1582
+2 1.470589 110.6744 107.0549
+
+$vecm_OLS_l0_tr
+    dolcan   cpiUSA   cpiCAN
+1 1.477776 110.1700 106.7475
+2 1.467583 110.2312 106.6369
+
+$vecm_ML_l0_co
+    dolcan   cpiUSA   cpiCAN
+1 1.478756 110.6057 107.1940
+2 1.468565 110.6765 107.0956
+
+$vecm_ML_l0_tr
+    dolcan   cpiUSA   cpiCAN
+1 1.485305 111.7059 108.6062
+2 1.475122 111.7789 108.5099
+
+$vecm_ML_l0_bo
+    dolcan   cpiUSA   cpiCAN
+1 1.516465 111.0134 109.2008
+2 1.506357 111.0842 109.1054
+
+$vecm_ML_l0_no
+   dolcan   cpiUSA   cpiCAN
+1 1.47891 110.6253 107.2457
+2 1.46869 110.6917 107.1421
+
+$vecm_ML_l0_LRco
+    dolcan   cpiUSA   cpiCAN
+1 1.478935 110.6016 107.2204
+2 1.468748 110.6738 107.1225
+
+$vecm_ML_l0_LRtr
+    dolcan   cpiUSA   cpiCAN
+1 1.478778 110.6077 107.1979
+2 1.468587 110.6786 107.0995
+
 $vecm_ML_l1_co
     dolcan   cpiUSA   cpiCAN
 1 1.479862 110.5931 107.1624
@@ -2810,6 +3506,23 @@ $vecm_ML_l1_LRbo_exo
 1 1.489512 111.1946 108.079
 2 1.478307 111.2070 107.953
 
+Warning messages:
+1: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+2: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+3: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+4: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+5: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+6: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+7: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+8: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
 > lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 $vecm_OLS_l1_co
     dolcan   cpiUSA   cpiCAN
@@ -2870,6 +3583,46 @@ $vecm_OLS_l1_LRbo
     dolcan   cpiUSA   cpiCAN
 1 1.483236 110.5364 107.0975
 2 1.471005 110.4808 106.8735
+
+$vecm_OLS_l0_co
+    dolcan   cpiUSA   cpiCAN
+1 1.480731 110.6054 107.1582
+2 1.470357 110.6719 107.0510
+
+$vecm_OLS_l0_tr
+    dolcan  cpiUSA   cpiCAN
+1 1.477776 110.170 106.7475
+2 1.467477 110.233 106.6387
+
+$vecm_ML_l0_co
+    dolcan   cpiUSA   cpiCAN
+1 1.478756 110.6057 107.1940
+2 1.468520 110.6725 107.0871
+
+$vecm_ML_l0_tr
+    dolcan   cpiUSA   cpiCAN
+1 1.485305 111.7059 108.6062
+2 1.475494 111.7924 108.5291
+
+$vecm_ML_l0_bo
+    dolcan   cpiUSA   cpiCAN
+1 1.516465 111.0134 109.2008
+2 1.505883 111.0853 109.1520
+
+$vecm_ML_l0_no
+    dolcan   cpiUSA   cpiCAN
+1 1.478910 110.6253 107.2457
+2 1.468625 110.6864 107.1365
+
+$vecm_ML_l0_LRco
+    dolcan   cpiUSA   cpiCAN
+1 1.478935 110.6016 107.2204
+2 1.468690 110.6689 107.1173
+
+$vecm_ML_l0_LRtr
+    dolcan   cpiUSA   cpiCAN
+1 1.478778 110.6077 107.1979
+2 1.468540 110.6747 107.0911
 
 $vecm_ML_l1_co
     dolcan   cpiUSA   cpiCAN
@@ -2941,9 +3694,10 @@ $vecm_ML_l1_LRbo_exo
 1 1.489512 111.1946 108.0790
 2 1.478564 111.2296 107.9933
 
+There were 24 warnings (use warnings() to see them)
 > 
 > ## VECM boot
-> vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo", names(vecm_all))]
+> vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo|l0", names(vecm_all))]
 > options(warn=-1)
 > sapply(vecm_all_noExo_noLRinc, function(x) try(tsDyn:::check.VECM.boot(x), silent=TRUE))
           vecm_OLS_l1_co           vecm_OLS_l3_co vecm_OLS_l3_co_betaGiven 
@@ -3034,6 +3788,56 @@ cpiUSA -0.019039918
 cpiCAN  0.010627527
 const  -0.770704602
 trend   0.000864578
+
+$vecm_OLS_l0_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_OLS_l0_tr
+                r1
+dolcan  1.00000000
+cpiUSA -0.05710189
+cpiCAN  0.04101960
+
+$vecm_ML_l0_co
+                r1
+dolcan  1.00000000
+cpiUSA -0.02123402
+cpiCAN  0.04020793
+
+$vecm_ML_l0_tr
+                r1
+dolcan  1.00000000
+cpiUSA -0.21897978
+cpiCAN  0.07550665
+
+$vecm_ML_l0_bo
+               r1
+dolcan  1.0000000
+cpiUSA -0.3432729
+cpiCAN  0.1102598
+
+$vecm_ML_l0_no
+                  r1
+dolcan  1.0000000000
+cpiUSA -0.0077057431
+cpiCAN  0.0002734381
+
+$vecm_ML_l0_LRco
+                r1
+dolcan  1.00000000
+cpiUSA -0.02193294
+cpiCAN  0.02567844
+const  -3.32505090
+
+$vecm_ML_l0_LRtr
+                  r1
+dolcan  1.0000000000
+cpiUSA -0.0220091730
+cpiCAN  0.0404151067
+trend   0.0001604596
 
 $vecm_ML_l1_co
                 r1
@@ -3201,6 +4005,54 @@ Equation dolcan -0.02042543
 Equation cpiUSA  0.01429980
 Equation cpiCAN  0.18825465
 
+$vecm_OLS_l0_co
+                         ECT
+Equation dolcan -0.002780092
+Equation cpiUSA  0.068255265
+Equation cpiCAN  0.186186297
+
+$vecm_OLS_l0_tr
+                          ECT
+Equation dolcan -0.0001422602
+Equation cpiUSA  0.4799565924
+Equation cpiCAN  0.5732976471
+
+$vecm_ML_l0_co
+                          ECT
+Equation dolcan -0.0003507433
+Equation cpiUSA -0.0436243553
+Equation cpiCAN -0.0823639695
+
+$vecm_ML_l0_tr
+                          ECT
+Equation dolcan -0.0005484774
+Equation cpiUSA -0.0928989256
+Equation cpiCAN -0.1123697005
+
+$vecm_ML_l0_bo
+                         ECT
+Equation dolcan -0.001999161
+Equation cpiUSA -0.019268819
+Equation cpiCAN -0.100888273
+
+$vecm_ML_l0_no
+                        ECT
+Equation dolcan 0.001869335
+Equation cpiUSA 0.358828407
+Equation cpiCAN 0.359559513
+
+$vecm_ML_l0_LRco
+                          ECT
+Equation dolcan -0.0008273726
+Equation cpiUSA -0.1396685110
+Equation cpiCAN -0.1389057526
+
+$vecm_ML_l0_LRtr
+                          ECT
+Equation dolcan -0.0003514011
+Equation cpiUSA -0.0435803377
+Equation cpiCAN -0.0824088721
+
 $vecm_ML_l1_co
                          ECT
 Equation dolcan -0.001130982
@@ -3362,6 +4214,54 @@ Equation dolcan -1.765938e-05
 Equation cpiUSA  1.236329e-05
 Equation cpiCAN  1.627608e-04
 
+$vecm_OLS_l0_co
+                      dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.002780092  0.0001587485 -0.0001140383
+Equation cpiUSA  0.068255265 -0.0038975044  0.0027998034
+Equation cpiCAN  0.186186297 -0.0106315887  0.0076372868
+
+$vecm_OLS_l0_tr
+                       dolcan        cpiUSA        cpiCAN
+Equation dolcan -0.0001422602  8.123327e-06 -5.835457e-06
+Equation cpiUSA  0.4799565924 -2.740643e-02  1.968763e-02
+Equation cpiCAN  0.5732976471 -3.273638e-02  2.351644e-02
+
+$vecm_ML_l0_co
+                       dolcan       cpiUSA        cpiCAN
+Equation dolcan -0.0003507433 7.447690e-06 -1.410266e-05
+Equation cpiUSA -0.0436243553 9.263203e-04 -1.754045e-03
+Equation cpiCAN -0.0823639695 1.748918e-03 -3.311684e-03
+
+$vecm_ML_l0_tr
+                       dolcan       cpiUSA        cpiCAN
+Equation dolcan -0.0005484774 0.0001201055 -4.141369e-05
+Equation cpiUSA -0.0928989256 0.0203429860 -7.014487e-03
+Equation cpiCAN -0.1123697005 0.0246066919 -8.484660e-03
+
+$vecm_ML_l0_bo
+                      dolcan       cpiUSA        cpiCAN
+Equation dolcan -0.001999161 0.0006862579 -0.0002204272
+Equation cpiUSA -0.019268819 0.0066144637 -0.0021245770
+Equation cpiCAN -0.100888273 0.0346322109 -0.0111239250
+
+$vecm_ML_l0_no
+                     dolcan        cpiUSA       cpiCAN
+Equation dolcan 0.001869335 -1.440461e-05 5.111474e-07
+Equation cpiUSA 0.358828407 -2.765040e-03 9.811735e-05
+Equation cpiCAN 0.359559513 -2.770673e-03 9.831726e-05
+
+$vecm_ML_l0_LRco
+                       dolcan       cpiUSA        cpiCAN       const
+Equation dolcan -0.0008273726 1.814671e-05 -2.124564e-05 0.002751056
+Equation cpiUSA -0.1396685110 3.063341e-03 -3.586470e-03 0.464404908
+Equation cpiCAN -0.1389057526 3.046611e-03 -3.566883e-03 0.461868698
+
+$vecm_ML_l0_LRtr
+                       dolcan       cpiUSA        cpiCAN         trend
+Equation dolcan -0.0003514011 7.734047e-06 -1.420191e-05 -5.638569e-08
+Equation cpiUSA -0.0435803377 9.591672e-04 -1.761304e-03 -6.992885e-06
+Equation cpiCAN -0.0824088721 1.813751e-03 -3.330563e-03 -1.322330e-05
+
 $vecm_ML_l1_co
                       dolcan        cpiUSA        cpiCAN
 Equation dolcan -0.001130982  4.449061e-05 -2.323614e-05
@@ -3466,6 +4366,12 @@ Equation cpiCAN -3.009866e-03
 > rank.tests.all <- c(rank.tests , rank.tests_rnull1, rank.tests_tr,rank.tests_tr_rnull1 )
 > 
 > lapply(rank.tests.all, print)
+Rank selected: 0 (first eigen test with pval above 5 %: 16.1 %)
+Rank selected: 1 (first eigen test with pval above 5 %: 39.2 %)
+Rank selected: 0 (first eigen test with pval above 5 %: 48 %)
+Rank selected: 1 (first eigen test with pval above 5 %: 31.5 %)
+Rank selected: 1 (first eigen test with pval above 5 %: 44.7 %)
+Rank selected: 0 (first eigen test with pval above 5 %: 44 %)
 Rank selected: 0 (first eigen test with pval above 5 %: 40.4 %)
 Rank selected: 0 (first eigen test with pval above 5 %: 89.6 %)
 Rank selected: 1 (first eigen test with pval above 5 %: 24.3 %)
@@ -3477,6 +4383,12 @@ Rank selected: 1 (first eigen test with pval above 5 %: 46.3 %)
 Rank selected: 1 (first eigen test with pval above 5 %: 41.9 %)
 Rank selected: 1 (first eigen test with pval above 5 %: 86 %)
 Rank selected: 1 (first eigen test with pval above 5 %: 78.8 %)
+Test of rank 1 versus 2  (eigen test), p-value: 0.368863.
+Test of rank 1 versus 2  (eigen test), p-value: 0.3923516.
+Test of rank 1 versus 2  (eigen test), p-value: 0.574022.
+Test of rank 1 versus 2  (eigen test), p-value: 0.3145692.
+Test of rank 1 versus 2  (eigen test), p-value: 0.4466289.
+Test of rank 1 versus 2  (eigen test), p-value: 0.8011453.
 Test of rank 1 versus 2  (eigen test), p-value: 0.4853022.
 Test of rank 1 versus 2  (eigen test), p-value: 0.4995697.
 Test of rank 1 versus 2  (eigen test), p-value: 0.242794.
@@ -3488,6 +4400,12 @@ Test of rank 1 versus 2  (eigen test), p-value: 0.4625218.
 Test of rank 1 versus 2  (eigen test), p-value: 0.4189499.
 Test of rank 1 versus 2  (eigen test), p-value: 0.8601055.
 Test of rank 1 versus 2  (eigen test), p-value: 0.7875418.
+Rank selected: 0 (first trace test with pval above 5 %: 13.8 %)
+Rank selected: 1 (first trace test with pval above 5 %: 42.4 %)
+Rank selected: 0 (first trace test with pval above 5 %: 46.5 %)
+Rank selected: 1 (first trace test with pval above 5 %: 25 %)
+Rank selected: 1 (first trace test with pval above 5 %: 53.5 %)
+Rank selected: 0 (first trace test with pval above 5 %: 74.6 %)
 Rank selected: 0 (first trace test with pval above 5 %: 35.7 %)
 Rank selected: 0 (first trace test with pval above 5 %: 77.6 %)
 Rank selected: 1 (first trace test with pval above 5 %: 29.4 %)
@@ -3499,6 +4417,12 @@ Rank selected: 1 (first trace test with pval above 5 %: 54.7 %)
 Rank selected: 1 (first trace test with pval above 5 %: 50.7 %)
 Rank selected: 0 (first trace test with pval above 5 %: 16.5 %)
 Rank selected: 0 (first trace test with pval above 5 %: 13.1 %)
+Test of rank 1 versus 3  (trace test), p-value: 0.4266331.
+Test of rank 1 versus 3  (trace test), p-value: 0.4237623.
+Test of rank 1 versus 3  (trace test), p-value: 0.6474022.
+Test of rank 1 versus 3  (trace test), p-value: 0.2495298.
+Test of rank 1 versus 3  (trace test), p-value: 0.5350455.
+Test of rank 1 versus 3  (trace test), p-value: 0.9674519.
 Test of rank 1 versus 3  (trace test), p-value: 0.5299647.
 Test of rank 1 versus 3  (trace test), p-value: 0.5699397.
 Test of rank 1 versus 3  (trace test), p-value: 0.2942669.
@@ -3510,6 +4434,24 @@ Test of rank 1 versus 3  (trace test), p-value: 0.5468212.
 Test of rank 1 versus 3  (trace test), p-value: 0.5074649.
 Test of rank 1 versus 3  (trace test), p-value: 0.8999922.
 Test of rank 1 versus 3  (trace test), p-value: 0.8394808.
+$vecm_ML_l0_co
+Rank selected: 0 (first eigen test with pval above 5 %: 16.1 %)
+
+$vecm_ML_l0_tr
+Rank selected: 1 (first eigen test with pval above 5 %: 39.2 %)
+
+$vecm_ML_l0_bo
+Rank selected: 0 (first eigen test with pval above 5 %: 48 %)
+
+$vecm_ML_l0_no
+Rank selected: 1 (first eigen test with pval above 5 %: 31.5 %)
+
+$vecm_ML_l0_LRco
+Rank selected: 1 (first eigen test with pval above 5 %: 44.7 %)
+
+$vecm_ML_l0_LRtr
+Rank selected: 0 (first eigen test with pval above 5 %: 44 %)
+
 $vecm_ML_l1_co
 Rank selected: 0 (first eigen test with pval above 5 %: 40.4 %)
 
@@ -3542,6 +4484,24 @@ Rank selected: 1 (first eigen test with pval above 5 %: 86 %)
 
 $vecm_ML_l1_LRtr_exo
 Rank selected: 1 (first eigen test with pval above 5 %: 78.8 %)
+
+$vecm_ML_l0_co
+Test of rank 1 versus 2  (eigen test), p-value: 0.368863.
+
+$vecm_ML_l0_tr
+Test of rank 1 versus 2  (eigen test), p-value: 0.3923516.
+
+$vecm_ML_l0_bo
+Test of rank 1 versus 2  (eigen test), p-value: 0.574022.
+
+$vecm_ML_l0_no
+Test of rank 1 versus 2  (eigen test), p-value: 0.3145692.
+
+$vecm_ML_l0_LRco
+Test of rank 1 versus 2  (eigen test), p-value: 0.4466289.
+
+$vecm_ML_l0_LRtr
+Test of rank 1 versus 2  (eigen test), p-value: 0.8011453.
 
 $vecm_ML_l1_co
 Test of rank 1 versus 2  (eigen test), p-value: 0.4853022.
@@ -3576,6 +4536,24 @@ Test of rank 1 versus 2  (eigen test), p-value: 0.8601055.
 $vecm_ML_l1_LRtr_exo
 Test of rank 1 versus 2  (eigen test), p-value: 0.7875418.
 
+$vecm_ML_l0_co
+Rank selected: 0 (first trace test with pval above 5 %: 13.8 %)
+
+$vecm_ML_l0_tr
+Rank selected: 1 (first trace test with pval above 5 %: 42.4 %)
+
+$vecm_ML_l0_bo
+Rank selected: 0 (first trace test with pval above 5 %: 46.5 %)
+
+$vecm_ML_l0_no
+Rank selected: 1 (first trace test with pval above 5 %: 25 %)
+
+$vecm_ML_l0_LRco
+Rank selected: 1 (first trace test with pval above 5 %: 53.5 %)
+
+$vecm_ML_l0_LRtr
+Rank selected: 0 (first trace test with pval above 5 %: 74.6 %)
+
 $vecm_ML_l1_co
 Rank selected: 0 (first trace test with pval above 5 %: 35.7 %)
 
@@ -3608,6 +4586,24 @@ Rank selected: 0 (first trace test with pval above 5 %: 16.5 %)
 
 $vecm_ML_l1_LRtr_exo
 Rank selected: 0 (first trace test with pval above 5 %: 13.1 %)
+
+$vecm_ML_l0_co
+Test of rank 1 versus 3  (trace test), p-value: 0.4266331.
+
+$vecm_ML_l0_tr
+Test of rank 1 versus 3  (trace test), p-value: 0.4237623.
+
+$vecm_ML_l0_bo
+Test of rank 1 versus 3  (trace test), p-value: 0.6474022.
+
+$vecm_ML_l0_no
+Test of rank 1 versus 3  (trace test), p-value: 0.2495298.
+
+$vecm_ML_l0_LRco
+Test of rank 1 versus 3  (trace test), p-value: 0.5350455.
+
+$vecm_ML_l0_LRtr
+Test of rank 1 versus 3  (trace test), p-value: 0.9674519.
 
 $vecm_ML_l1_co
 Test of rank 1 versus 3  (trace test), p-value: 0.5299647.
@@ -3643,6 +4639,42 @@ $vecm_ML_l1_LRtr_exo
 Test of rank 1 versus 3  (trace test), p-value: 0.8394808.
 
 > lapply(rank.tests.all, summary)
+$vecm_ML_l0_co
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 25.8105875     0.1383       0.1395 17.3685873     0.1605
+2 1  8.4420003     0.4266       0.4294  8.1804329     0.3689
+3 2  0.2615674     0.6090       0.6108  0.2615674     0.6091
+
+$vecm_ML_l0_tr
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 229.2889876     <0.001       <0.001 223.1831443     <0.001
+2 1   6.1058432     0.4238       0.4313   5.7049245     0.3924
+3 2   0.4009187     0.5973       0.5885   0.4009187     0.5892
+
+$vecm_ML_l0_bo
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 23.79134923     0.4645       0.4670 15.39224665     0.4800
+2 1  8.39910259     0.6474       0.6477  8.32575125     0.5740
+3 2  0.07335134     0.7865       0.7870  0.07335134     0.7865
+
+$vecm_ML_l0_no
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 395.708595     <0.001       <0.001 387.850932     <0.001
+2 1   7.857663     0.2495       0.2543   6.390852     0.3146
+3 2   1.466811     0.2646       0.2636   1.466811     0.2636
+
+$vecm_ML_l0_LRco
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 417.76067     <0.001       <0.001 406.60422     <0.001
+2 1  11.15645     0.5350       0.5381   8.99480     0.4466
+3 2   2.16165     0.7444       <0.001   2.16165     0.7432
+
+$vecm_ML_l0_LRtr
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 25.849628     0.7461       0.7525 17.398358     0.4398
+2 1  8.451270     0.9675       0.9681  8.181151     0.8011
+3 2  0.270119     0.9999       0.9999  0.270119     1.0000
+
 $vecm_ML_l1_co
   r      trace trace_pval trace_pval_T      eigen eigen_pval
 1 0 21.1755537     0.3572       0.3592 13.6999485     0.4044
@@ -3709,6 +4741,42 @@ $vecm_ML_l1_LRtr_exo
 2 1 11.534618     0.8395       0.8418  8.337220    0.78754
 3 2  3.197398     0.8431       0.8441  3.197398    0.84472
 
+$vecm_ML_l0_co
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 25.8105875     0.1383       0.1395 17.3685873     0.1605
+2 1  8.4420003     0.4266       0.4294  8.1804329     0.3689
+3 2  0.2615674     0.6090       0.6108  0.2615674     0.6091
+
+$vecm_ML_l0_tr
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 229.2889876     <0.001       <0.001 223.1831443     <0.001
+2 1   6.1058432     0.4238       0.4313   5.7049245     0.3924
+3 2   0.4009187     0.5973       0.5885   0.4009187     0.5892
+
+$vecm_ML_l0_bo
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 23.79134923     0.4645       0.4670 15.39224665     0.4800
+2 1  8.39910259     0.6474       0.6477  8.32575125     0.5740
+3 2  0.07335134     0.7865       0.7870  0.07335134     0.7865
+
+$vecm_ML_l0_no
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 395.708595     <0.001       <0.001 387.850932     <0.001
+2 1   7.857663     0.2495       0.2543   6.390852     0.3146
+3 2   1.466811     0.2646       0.2636   1.466811     0.2636
+
+$vecm_ML_l0_LRco
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 417.76067     <0.001       <0.001 406.60422     <0.001
+2 1  11.15645     0.5350       0.5381   8.99480     0.4466
+3 2   2.16165     0.7444       <0.001   2.16165     0.7432
+
+$vecm_ML_l0_LRtr
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 25.849628     0.7461       0.7525 17.398358     0.4398
+2 1  8.451270     0.9675       0.9681  8.181151     0.8011
+3 2  0.270119     0.9999       0.9999  0.270119     1.0000
+
 $vecm_ML_l1_co
   r      trace trace_pval trace_pval_T      eigen eigen_pval
 1 0 21.1755537     0.3572       0.3592 13.6999485     0.4044
@@ -3775,6 +4843,42 @@ $vecm_ML_l1_LRtr_exo
 2 1 11.534618     0.8395       0.8418  8.337220    0.78754
 3 2  3.197398     0.8431       0.8441  3.197398    0.84472
 
+$vecm_ML_l0_co
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 25.8105875     0.1383       0.1395 17.3685873     0.1605
+2 1  8.4420003     0.4266       0.4294  8.1804329     0.3689
+3 2  0.2615674     0.6090       0.6108  0.2615674     0.6091
+
+$vecm_ML_l0_tr
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 229.2889876     <0.001       <0.001 223.1831443     <0.001
+2 1   6.1058432     0.4238       0.4313   5.7049245     0.3924
+3 2   0.4009187     0.5973       0.5885   0.4009187     0.5892
+
+$vecm_ML_l0_bo
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 23.79134923     0.4645       0.4670 15.39224665     0.4800
+2 1  8.39910259     0.6474       0.6477  8.32575125     0.5740
+3 2  0.07335134     0.7865       0.7870  0.07335134     0.7865
+
+$vecm_ML_l0_no
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 395.708595     <0.001       <0.001 387.850932     <0.001
+2 1   7.857663     0.2495       0.2543   6.390852     0.3146
+3 2   1.466811     0.2646       0.2636   1.466811     0.2636
+
+$vecm_ML_l0_LRco
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 417.76067     <0.001       <0.001 406.60422     <0.001
+2 1  11.15645     0.5350       0.5381   8.99480     0.4466
+3 2   2.16165     0.7444       <0.001   2.16165     0.7432
+
+$vecm_ML_l0_LRtr
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 25.849628     0.7461       0.7525 17.398358     0.4398
+2 1  8.451270     0.9675       0.9681  8.181151     0.8011
+3 2  0.270119     0.9999       0.9999  0.270119     1.0000
+
 $vecm_ML_l1_co
   r      trace trace_pval trace_pval_T      eigen eigen_pval
 1 0 21.1755537     0.3572       0.3592 13.6999485     0.4044
@@ -3840,6 +4944,42 @@ $vecm_ML_l1_LRtr_exo
 1 0 38.430526     0.1311       0.1354 26.895908    0.03249
 2 1 11.534618     0.8395       0.8418  8.337220    0.78754
 3 2  3.197398     0.8431       0.8441  3.197398    0.84472
+
+$vecm_ML_l0_co
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 25.8105875     0.1383       0.1395 17.3685873     0.1605
+2 1  8.4420003     0.4266       0.4294  8.1804329     0.3689
+3 2  0.2615674     0.6090       0.6108  0.2615674     0.6091
+
+$vecm_ML_l0_tr
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 229.2889876     <0.001       <0.001 223.1831443     <0.001
+2 1   6.1058432     0.4238       0.4313   5.7049245     0.3924
+3 2   0.4009187     0.5973       0.5885   0.4009187     0.5892
+
+$vecm_ML_l0_bo
+  r       trace trace_pval trace_pval_T       eigen eigen_pval
+1 0 23.79134923     0.4645       0.4670 15.39224665     0.4800
+2 1  8.39910259     0.6474       0.6477  8.32575125     0.5740
+3 2  0.07335134     0.7865       0.7870  0.07335134     0.7865
+
+$vecm_ML_l0_no
+  r      trace trace_pval trace_pval_T      eigen eigen_pval
+1 0 395.708595     <0.001       <0.001 387.850932     <0.001
+2 1   7.857663     0.2495       0.2543   6.390852     0.3146
+3 2   1.466811     0.2646       0.2636   1.466811     0.2636
+
+$vecm_ML_l0_LRco
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 417.76067     <0.001       <0.001 406.60422     <0.001
+2 1  11.15645     0.5350       0.5381   8.99480     0.4466
+3 2   2.16165     0.7444       <0.001   2.16165     0.7432
+
+$vecm_ML_l0_LRtr
+  r     trace trace_pval trace_pval_T     eigen eigen_pval
+1 0 25.849628     0.7461       0.7525 17.398358     0.4398
+2 1  8.451270     0.9675       0.9681  8.181151     0.8011
+3 2  0.270119     0.9999       0.9999  0.270119     1.0000
 
 $vecm_ML_l1_co
   r      trace trace_pval trace_pval_T      eigen eigen_pval

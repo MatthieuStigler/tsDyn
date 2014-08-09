@@ -17,6 +17,15 @@ vecm_OLS_l1_no <-VECM(barry, lag=1, include="none")
 vecm_OLS_l1_coAsExo <-VECM(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
 vecm_OLS_l3_coAsExo <-VECM(barry, lag=3, include="none", exogen=rep(1, nrow(barry)))
 
+vecm_OLS_l0_co <-VECM(barry, lag=0)
+vecm_OLS_l0_tr <-VECM(barry, lag=0, include="trend")
+vecm_ML_l0_co <-VECM(barry, lag=0, include="const", estim="ML")
+vecm_ML_l0_tr <-VECM(barry, lag=0, include="trend", estim="ML")
+vecm_ML_l0_bo <-VECM(barry, lag=0, include="both", estim="ML")
+vecm_ML_l0_no <-VECM(barry, lag=0, include="none", estim="ML")
+vecm_ML_l0_LRco <-VECM(barry, lag=0, LRinclude="const", estim="ML")
+vecm_ML_l0_LRtr <-VECM(barry, lag=0, LRinclude="trend", estim="ML")
+
 vecm_OLS_l1_LRco <-VECM(barry, lag=1, LRinclude="const")
 vecm_OLS_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend")
 vecm_OLS_l1_LRtr_noCo <-VECM(barry, lag=1, LRinclude="trend", include="none")
@@ -55,6 +64,16 @@ vecm_all <- list(
 		vecm_OLS_l1_LRtr_noCo=vecm_OLS_l1_LRtr_noCo, 
 		vecm_OLS_l1_LRbo=vecm_OLS_l1_LRbo, 
 
+		vecm_OLS_l0_co=vecm_OLS_l0_co,
+		vecm_OLS_l0_tr=vecm_OLS_l0_tr,
+		vecm_ML_l0_co=vecm_ML_l0_co,
+		vecm_ML_l0_tr=vecm_ML_l0_tr,
+		vecm_ML_l0_bo=vecm_ML_l0_bo,
+		vecm_ML_l0_no=vecm_ML_l0_no,
+		vecm_ML_l0_LRco=vecm_ML_l0_LRco,
+		vecm_ML_l0_LRtr=vecm_ML_l0_LRtr,
+		
+    
 		vecm_ML_l1_co=vecm_ML_l1_co,
 		vecm_ML_l3_co=vecm_ML_l3_co,
 		vecm_ML_l1_tr=vecm_ML_l1_tr, 
@@ -72,13 +91,14 @@ vecm_all <- list(
 
 
 vecm_ML <- vecm_all[grep("ML", names(vecm_all))]
+vecm_no_l0 <- vecm_all[!names(vecm_all)%in%grep("l0", names(vecm_all), value=TRUE)]
 
 lapply(vecm_all, print)
 lapply(vecm_all, summary)
 
 lapply(vecm_all, function(x) head(residuals(x), 3))
 lapply(vecm_all, function(x) head(fitted(x), 3))
-lapply(vecm_all, function(x) head(fitted(x, level="original"), 3))
+lapply(vecm_no_l0, function(x) head(fitted(x, level="original"), 3))
 sapply(vecm_all, deviance)
 
 
@@ -113,7 +133,7 @@ lapply(vecm_all, function(x) round(VARrep(x),9))
 lapply(vecm_all, function(x) sapply(fevd(x, n.ahead=2), head))
 
 ### irf
-vecm_irf <- vecm_all[-grep("l1_no|bo|exo|Exo", names(vecm_all))] ## does not work for these models
+vecm_irf <- vecm_all[-grep("l1_no|bo|exo|Exo|l0", names(vecm_all))] ## does not work for these models
 lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
 ## predict
@@ -125,7 +145,7 @@ lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
 lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ## VECM boot
-vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo", names(vecm_all))]
+vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo|l0", names(vecm_all))]
 options(warn=-1)
 sapply(vecm_all_noExo_noLRinc, function(x) try(tsDyn:::check.VECM.boot(x), silent=TRUE))
 options(warn=0)
