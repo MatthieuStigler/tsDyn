@@ -14,6 +14,11 @@ var_l1_bo <-lineVar(barry, lag=1, include="both")
 var_l1_no <-lineVar(barry, lag=1, include="none")
 var_l1_coAsExo <-lineVar(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
 
+var_l0_co <-lineVar(barry, lag=0, include="const")
+var_l0_tr <-lineVar(barry, lag=0, include="trend")
+var_l0_bo <-lineVar(barry, lag=0, include="both")
+var_l0_coAsExo <-lineVar(barry, lag=0, include="trend", exogen=rep(1, nrow(barry)))
+
 var_l3_co <-lineVar(barry, lag=3, include="const")
 var_l3_tr <-lineVar(barry, lag=3, include="trend")
 var_l3_bo <-lineVar(barry, lag=3, include="both")
@@ -35,6 +40,7 @@ var_l2_adf_coAsExo <-lineVar(barry, lag=2, include="none", I="ADF", exogen=rep(1
 
 var_all <- list(
 		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, var_l1_coAsExo,
+		var_l0_co, var_l0_tr, var_l0_bo, var_l0_coAsExo,
 		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no, var_l3_coAsExo,
 		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no, var_l2_diff_coAsExo,
 		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no, var_l2_adf_coAsExo)
@@ -42,6 +48,7 @@ var_all <- list(
 
 names(var_all) <-c(
 		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", "var_l1_coAsExo",
+		"var_l0_co", "var_l0_tr", "var_l0_bo",  "var_l0_coAsExo",
 		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no", "var_l3_coAsExo",
 		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no", "var_l2_diff_coAsExo",
 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no","var_l2_adf_coAsExo")
@@ -69,13 +76,12 @@ lapply(var_all_noADF, VARrep)
 
 
 ### fevd
-var_all_level <- var_all[-grep("diff|adf|Exo", names(var_all))]
+var_all_level <- var_all[-grep("diff|adf|Exo|l0", names(var_all))]
 lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 
 
-
 ## predict
-var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo", names(var_all))]
+var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo|l0", names(var_all))]
 lapply(var_all_pred, predict, n.ahead=2)
 lapply(var_all, function(x) try(predict(x, n.ahead=2), silent=TRUE))
 lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
@@ -87,7 +93,7 @@ lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 lapply(var_all_level , function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ## boot
-var_all_boot <- var_all[-grep("adf|diff|Exo", names(var_all))]
+var_all_boot <- var_all[-grep("adf|diff|Exo|l0", names(var_all))]
 lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 
 ## sim 

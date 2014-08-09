@@ -34,6 +34,23 @@ Type 'q()' to quit R.
 > var_l1_no <-lineVar(barry, lag=1, include="none")
 > var_l1_coAsExo <-lineVar(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
 > 
+> var_l0_co <-lineVar(barry, lag=0, include="const")
+Warning message:
+In lineVar(barry, lag = 0, include = "const") :
+  Lag of 0 not fully implemented, will not work: fevd, predict, irf,...
+> var_l0_tr <-lineVar(barry, lag=0, include="trend")
+Warning message:
+In lineVar(barry, lag = 0, include = "trend") :
+  Lag of 0 not fully implemented, will not work: fevd, predict, irf,...
+> var_l0_bo <-lineVar(barry, lag=0, include="both")
+Warning message:
+In lineVar(barry, lag = 0, include = "both") :
+  Lag of 0 not fully implemented, will not work: fevd, predict, irf,...
+> var_l0_coAsExo <-lineVar(barry, lag=0, include="trend", exogen=rep(1, nrow(barry)))
+Warning message:
+In lineVar(barry, lag = 0, include = "trend", exogen = rep(1, nrow(barry))) :
+  Lag of 0 not fully implemented, will not work: fevd, predict, irf,...
+> 
 > var_l3_co <-lineVar(barry, lag=3, include="const")
 > var_l3_tr <-lineVar(barry, lag=3, include="trend")
 > var_l3_bo <-lineVar(barry, lag=3, include="both")
@@ -55,6 +72,7 @@ Type 'q()' to quit R.
 > 
 > var_all <- list(
 + 		var_l1_co, var_l1_tr, var_l1_bo, var_l1_no, var_l1_coAsExo,
++ 		var_l0_co, var_l0_tr, var_l0_bo, var_l0_coAsExo,
 + 		var_l3_co, var_l3_tr, var_l3_bo, var_l3_no, var_l3_coAsExo,
 + 		var_l2_diff_co, var_l2_diff_tr, var_l2_diff_bo, var_l2_diff_no, var_l2_diff_coAsExo,
 + 		var_l2_adf_co, var_l2_adf_tr, var_l2_adf_bo, var_l2_adf_no, var_l2_adf_coAsExo)
@@ -62,6 +80,7 @@ Type 'q()' to quit R.
 > 
 > names(var_all) <-c(
 + 		"var_l1_co", "var_l1_tr", "var_l1_bo", "var_l1_no", "var_l1_coAsExo",
++ 		"var_l0_co", "var_l0_tr", "var_l0_bo",  "var_l0_coAsExo",
 + 		"var_l3_co", "var_l3_tr", "var_l3_bo", "var_l3_no", "var_l3_coAsExo",
 + 		"var_l2_diff_co", "var_l2_diff_tr", "var_l2_diff_bo", "var_l2_diff_no", "var_l2_diff_coAsExo",
 + 		"var_l2_adf_co", "var_l2_adf_tr", "var_l2_adf_bo", "var_l2_adf_no","var_l2_adf_coAsExo")
@@ -93,6 +112,22 @@ Equation cpiCAN 0.4371558 -0.0064386166  1.002389e+00
 Equation dolcan  0.98184934  0.0006535181 -0.0005441472 0.01606226
 Equation cpiUSA -0.17515457  1.0034816358 -0.0035567095 0.47682275
 Equation cpiCAN  0.07511337 -0.0023545869  0.9998414195 0.33858157
+                Intercept
+Equation dolcan  1.231588
+Equation cpiUSA 71.664414
+Equation cpiCAN 71.804784
+                      Trend
+Equation dolcan 0.006009626
+Equation cpiUSA 0.397201333
+Equation cpiCAN 0.400004285
+                Intercept       Trend
+Equation dolcan  1.024833 0.001272341
+Equation cpiUSA 28.609033 0.264956187
+Equation cpiCAN 27.342742 0.273612566
+                      Trend     exo_1
+Equation dolcan 0.001272341  1.024833
+Equation cpiUSA 0.264956187 28.609033
+Equation cpiCAN 0.273612566 27.342742
                 Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
 Equation dolcan 0.0213132 1.1426667 -0.002923395 -5.319548e-05 -0.1947679
 Equation cpiUSA 0.2297914 0.6115380  1.473715592 -3.413037e-02 -1.2214788
@@ -270,6 +305,30 @@ $var_l1_coAsExo
 Equation dolcan  0.98184934  0.0006535181 -0.0005441472 0.01606226
 Equation cpiUSA -0.17515457  1.0034816358 -0.0035567095 0.47682275
 Equation cpiCAN  0.07511337 -0.0023545869  0.9998414195 0.33858157
+
+$var_l0_co
+                Intercept
+Equation dolcan  1.231588
+Equation cpiUSA 71.664414
+Equation cpiCAN 71.804784
+
+$var_l0_tr
+                      Trend
+Equation dolcan 0.006009626
+Equation cpiUSA 0.397201333
+Equation cpiCAN 0.400004285
+
+$var_l0_bo
+                Intercept       Trend
+Equation dolcan  1.024833 0.001272341
+Equation cpiUSA 28.609033 0.264956187
+Equation cpiCAN 27.342742 0.273612566
+
+$var_l0_coAsExo
+                      Trend     exo_1
+Equation dolcan 0.001272341  1.024833
+Equation cpiUSA 0.264956187 28.609033
+Equation cpiCAN 0.273612566 27.342742
 
 $var_l3_co
                 Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
@@ -526,6 +585,58 @@ Equation cpiCAN 0.0751(0.1770)      -0.0024(0.0062)     0.9998(0.0056)***
 Equation dolcan 0.0161(0.0084).  
 Equation cpiUSA 0.4768(0.1147)***
 Equation cpiCAN 0.3386(0.1591)*  
+
+$var_l0_co
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 324
+Number of variables: 3 	Number of estimated slope parameters 3
+AIC 1036.999 	BIC 1048.341 	SSR 417858
+
+                Intercept         
+Equation dolcan 1.2316(0.0080)*** 
+Equation cpiUSA 71.6644(1.3844)***
+Equation cpiCAN 71.8048(1.4410)***
+
+$var_l0_tr
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 324
+Number of variables: 3 	Number of estimated slope parameters 3
+AIC 827.5667 	BIC 838.9089 	SSR 133042.9
+
+                Trend            
+Equation dolcan 0.0060(0.0002)***
+Equation cpiUSA 0.3972(0.0043)***
+Equation cpiCAN 0.4000(0.0042)***
+
+$var_l0_bo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 324
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -567.7922 	BIC -545.1077 	SSR 6690.337
+
+                Intercept          Trend             
+Equation dolcan 1.0248(0.0091)***  0.0013(4.8e-05)***
+Equation cpiUSA 28.6090(0.2469)*** 0.2650(0.0013)*** 
+Equation cpiCAN 27.3427(0.4434)*** 0.2736(0.0024)*** 
+
+$var_l0_coAsExo
+#############
+###Model VAR 
+#############
+Full sample size: 324 	End sample size: 324
+Number of variables: 3 	Number of estimated slope parameters 6
+AIC -567.7922 	BIC -545.1077 	SSR 6690.337
+
+                Trend              exo_1             
+Equation dolcan 0.0013(4.8e-05)*** 1.0248(0.0091)*** 
+Equation cpiUSA 0.2650(0.0013)***  28.6090(0.2469)***
+Equation cpiCAN 0.2736(0.0024)***  27.3427(0.4434)***
 
 $var_l3_co
 #############
@@ -902,6 +1013,30 @@ $var_l1_coAsExo
 [2,] -0.001153241 -0.03804209 -0.27291264
 [3,]  0.001628365 -0.11854049 -0.05234842
 
+$var_l0_co
+        dolcan    cpiUSA    cpiCAN
+[1,] -0.232288 -43.68441 -45.94478
+[2,] -0.235988 -43.49441 -45.80478
+[3,] -0.234888 -43.22441 -45.73478
+
+$var_l0_tr
+        dolcan  cpiUSA   cpiCAN
+[1,] 0.9932904 27.5828 25.46000
+[2,] 0.9835807 27.3756 25.19999
+[3,] 0.9786711 27.2484 24.86999
+
+$var_l0_bo
+          dolcan     cpiUSA    cpiCAN
+[1,] -0.02680486 -0.8939894 -1.756355
+[2,] -0.03177720 -0.9689456 -1.889967
+[3,] -0.03194954 -0.9639017 -2.093580
+
+$var_l0_coAsExo
+          dolcan     cpiUSA    cpiCAN
+[1,] -0.02680486 -0.8939894 -1.756355
+[2,] -0.03177720 -0.9689456 -1.889967
+[3,] -0.03194954 -0.9639017 -2.093580
+
 $var_l3_co
             dolcan      cpiUSA      cpiCAN
 [1,]  8.589731e-05 -0.09997020 -0.02038427
@@ -1023,6 +1158,30 @@ $var_l1_coAsExo
 [2,] 0.9978532 28.47804 26.34291
 [3,] 0.9990716 28.74854 26.41235
 
+$var_l0_co
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.231588 71.66441 71.80478
+[2,] 1.231588 71.66441 71.80478
+[3,] 1.231588 71.66441 71.80478
+
+$var_l0_tr
+          dolcan    cpiUSA    cpiCAN
+[1,] 0.006009626 0.3972013 0.4000043
+[2,] 0.012019251 0.7944027 0.8000086
+[3,] 0.018028877 1.1916040 1.2000129
+
+$var_l0_bo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.026105 28.87399 27.61635
+[2,] 1.027377 29.13895 27.88997
+[3,] 1.028650 29.40390 28.16358
+
+$var_l0_coAsExo
+       dolcan   cpiUSA   cpiCAN
+[1,] 1.026105 28.87399 27.61635
+[2,] 1.027377 29.13895 27.88997
+[3,] 1.028650 29.40390 28.16358
+
 $var_l3_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.000614 28.72997 26.38038
@@ -1116,8 +1275,10 @@ $var_l2_adf_coAsExo
 > sapply(var_all, deviance)
           var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
            29.23749            28.55718            28.29124            30.05131 
-     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
-           29.23749            25.40966            25.12657            24.90230 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+           29.23749        417858.03039        133042.92090          6690.33674 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+         6690.33674            25.40966            25.12657            24.90230 
           var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
            25.56968            25.40966            26.01173            27.74863 
      var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
@@ -1130,8 +1291,10 @@ $var_l2_adf_coAsExo
 > sapply(var_all, logLik)
           var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
            1071.018            1074.647            1079.742            1059.992 
-     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
-           1071.018            1114.481            1117.300            1121.617 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+           1071.018           -1894.708           -1789.992           -1089.312 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -1089.312            1114.481            1117.300            1121.617 
           var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
            1108.957            1114.481            1106.000            1087.205 
      var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
@@ -1140,20 +1303,24 @@ $var_l2_adf_coAsExo
            1117.300            1121.617            1108.957            1114.481 
 > sapply(var_all, AIC)
           var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
-          -4867.939           -4875.198           -4879.388           -4851.887 
-     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
-          -4867.939           -4901.837           -4907.476           -4910.109 
+         -4867.9394          -4875.1976          -4879.3876          -4851.8874 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+         -4867.9394           1036.9990            827.5667           -567.7922 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -567.7922          -4901.8367          -4907.4762          -4910.1087 
           var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
-          -4896.790           -4901.837           -4902.876           -4865.286 
+         -4896.7900          -4901.8367          -4902.8757          -4865.2865 
      var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
-          -4908.370           -4855.443           -4902.876           -4901.837 
+         -4908.3702          -4855.4433          -4902.8757          -4901.8367 
       var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
-          -4907.476           -4910.109           -4896.790           -4901.837 
+         -4907.4762          -4910.1087          -4896.7900          -4901.8367 
 > sapply(var_all, AIC, fitMeasure="LL")
           var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
           -2118.037           -2125.295           -2129.485           -2101.984 
-     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
-          -2118.037           -2168.961           -2174.601           -2177.233 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+          -2118.037            3795.416            3585.983            2190.624 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+           2190.624           -2168.961           -2174.601           -2177.233 
           var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
           -2163.914           -2168.961           -2170.000           -2132.411 
      var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
@@ -1162,20 +1329,24 @@ $var_l2_adf_coAsExo
           -2174.601           -2177.233           -2163.914           -2168.961 
 > sapply(var_all, BIC)
           var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
-          -4822.608           -4829.866           -4822.723           -4817.888 
-     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
-          -4822.608           -4788.693           -4794.333           -4785.651 
+         -4822.6076          -4829.8658          -4822.7228          -4817.8885 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+         -4822.6076           1048.3412            838.9089           -545.1077 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+          -545.1077          -4788.6934          -4794.3330          -4785.6511 
           var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
-          -4794.961           -4788.693           -4823.675           -4786.086 
+         -4794.9611          -4788.6934          -4823.6754          -4786.0862 
      var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
-          -4817.856           -4787.557           -4823.675           -4788.693 
+         -4817.8556          -4787.5574          -4823.6754          -4788.6934 
       var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
-          -4794.333           -4785.651           -4794.961           -4788.693 
+         -4794.3330          -4785.6511          -4794.9611          -4788.6934 
 > sapply(var_all, BIC, fitMeasure="LL")
           var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
           -2072.705           -2079.963           -2072.820           -2067.986 
-     var_l1_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
-          -2072.705           -2055.818           -2061.457           -2052.775 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+          -2072.705            3806.758            3597.325            2213.309 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+           2213.309           -2055.818           -2061.457           -2052.775 
           var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
           -2062.085           -2055.818           -2090.800           -2053.211 
      var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
@@ -1219,6 +1390,30 @@ $var_l1_coAsExo
 Equation dolcan  0.98184934  0.0006535181 -0.0005441472 0.01606226
 Equation cpiUSA -0.17515457  1.0034816358 -0.0035567095 0.47682275
 Equation cpiCAN  0.07511337 -0.0023545869  0.9998414195 0.33858157
+
+$var_l0_co
+                Intercept
+Equation dolcan  1.231588
+Equation cpiUSA 71.664414
+Equation cpiCAN 71.804784
+
+$var_l0_tr
+                      Trend
+Equation dolcan 0.006009626
+Equation cpiUSA 0.397201333
+Equation cpiCAN 0.400004285
+
+$var_l0_bo
+                Intercept       Trend
+Equation dolcan  1.024833 0.001272341
+Equation cpiUSA 28.609033 0.264956187
+Equation cpiCAN 27.342742 0.273612566
+
+$var_l0_coAsExo
+                      Trend     exo_1
+Equation dolcan 0.001272341  1.024833
+Equation cpiUSA 0.264956187 28.609033
+Equation cpiCAN 0.273612566 27.342742
 
 $var_l3_co
                 Intercept dolcan -1    cpiUSA -1     cpiCAN -1  dolcan -2
@@ -1331,7 +1526,7 @@ Equation cpiCAN  0.196169888 0.27376324 -0.005901144 -0.203559141 0.122931337
 > 
 > 
 > ### fevd
-> var_all_level <- var_all[-grep("diff|adf|Exo", names(var_all))]
+> var_all_level <- var_all[-grep("diff|adf|Exo|l0", names(var_all))]
 > lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 $var_l1_co
            dolcan       cpiUSA      cpiCAN
@@ -1407,9 +1602,8 @@ $var_l3_no
 
 > 
 > 
-> 
 > ## predict
-> var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo", names(var_all))]
+> var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo|l0", names(var_all))]
 > lapply(var_all_pred, predict, n.ahead=2)
 $var_l1_co
       dolcan   cpiUSA   cpiCAN
@@ -1459,6 +1653,34 @@ attr(,"class")
 attr(,"condition")
 <simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Matrix B badly specified: expected 3 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 4
 >
+
+$var_l0_co
+[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+
+$var_l0_tr
+[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+
+$var_l0_bo
+[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+
+$var_l0_coAsExo
+[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
 
 $var_l3_co
       dolcan   cpiUSA   cpiCAN
@@ -1603,6 +1825,34 @@ attr(,"class")
 [1] "try-error"
 attr(,"condition")
 <simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l0_co
+[1] "Error in A[[i]] <- co[, grep(paste(\"\\\\.l\", i, sep = \"\"), colnames(co)),  : \n  attempt to select less than one element\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in A[[i]] <- co[, grep(paste("\\.l", i, sep = ""), colnames(co)),     drop = FALSE]: attempt to select less than one element>
+
+$var_l0_tr
+[1] "Error in A[[i]] <- co[, grep(paste(\"\\\\.l\", i, sep = \"\"), colnames(co)),  : \n  attempt to select less than one element\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in A[[i]] <- co[, grep(paste("\\.l", i, sep = ""), colnames(co)),     drop = FALSE]: attempt to select less than one element>
+
+$var_l0_bo
+[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
+
+$var_l0_coAsExo
+[1] "Error in A[[i]] <- co[, grep(paste(\"\\\\.l\", i, sep = \"\"), colnames(co)),  : \n  attempt to select less than one element\n"
+attr(,"class")
+[1] "try-error"
+attr(,"condition")
+<simpleError in A[[i]] <- co[, grep(paste("\\.l", i, sep = ""), colnames(co)),     drop = FALSE]: attempt to select less than one element>
 
 $var_l3_co
        dolcan   cpiUSA   cpiCAN
@@ -1794,7 +2044,7 @@ $var_l3_no
 
 > 
 > ## boot
-> var_all_boot <- var_all[-grep("adf|diff|Exo", names(var_all))]
+> var_all_boot <- var_all[-grep("adf|diff|Exo|l0", names(var_all))]
 > lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 $var_l1_co
            [,1]     [,2]     [,3]
