@@ -119,8 +119,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   include<-match.arg(include)
   LRinclude<-match.arg(LRinclude)
   if(lag==0) {
-    if(include=="none") stop("Cannot have 'lag=0' and 'include=none'")
-    warning("Lag of 0 not fully implemented, will not work: fevd, predict, irf,...")
+    warning("Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...")
   }
   if(LRinclude%in%c("const", "both"))  include<-"none"
   ninclude<-switch(include, "const"=1, "trend"=1,"none"=0, "both"=2)
@@ -240,17 +239,24 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
   else if(model=="VECM"&estim=="ML"){
     beta.estimated<- is.null(beta)
-    #Auxiliary regression 1
-    reg_res1<-lm.fit(Z,Y)
-    u<-residuals(reg_res1)
-    #Auxiliary regression 2
-    reg_res2<-lm.fit(Z,Xminus1)
-    v<-residuals(reg_res2)
+    if(lag==0 & include=="none"){
+     u <- Y
+     v <- Xminus1
+    } else {
+      #Auxiliary regression 1
+      reg_res1<-lm.fit(Z,Y)
+      u<-residuals(reg_res1)
+      #Auxiliary regression 2
+      reg_res2<-lm.fit(Z,Xminus1)
+      v<-residuals(reg_res2)
+    }
     #Auxiliary regression 3
     if(LRinclude!="none"){
-      add <- switch(LRinclude, "const"=matrix(1, nrow=nrow(Z)), "trend"=matrix(1:nrow(Z), nrow=nrow(Z)), "both"=cbind(1,1:nrow(Z)))
-      reg_res3<-lm.fit(Z,add)
-      v<-cbind(v,residuals(reg_res3)) # equ 20.2.46 in Hamilton 
+      add <- switch(LRinclude, "const"=matrix(1, nrow=t), 
+                    "trend"=matrix(1:t, nrow=t), 
+                    "both"=cbind(1,1:t))
+      reg_res3 <- if(lag==0) add else residuals(lm.fit(Z,add))
+      v<-cbind(v,reg_res3) # equ 20.2.46 in Hamilton 
     }
     #Moment matrices
     S00<-crossprod(u)
