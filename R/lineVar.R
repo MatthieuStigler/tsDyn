@@ -167,18 +167,12 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   }
 
 ###Regressors matrix
-  if(lag==0){
-    Z <- switch(include,
-                "const" = matrix(1, nrow=t, ncol=1), 
-                "trend" = matrix(seq_len(t), ncol=1),
-                "both"  = cbind(rep(1,t),seq_len(t)))
-  } else {
-    Z <- switch(include,
-                "none" = Z,  
-                "const" = cbind(1, Z), 
-                "trend" = cbind(seq_len(t), Z),
-                "both"  = cbind(rep(1,t),seq_len(t), Z))
-  }
+  incReg <- switch(include,
+                   "const" = matrix(1, nrow=t, ncol=1), 
+                   "trend" = matrix(seq_len(t), ncol=1),
+                   "both"  = cbind(rep(1,t),seq_len(t)),
+                   "none"=NULL)
+  Z <-if(lag==0) incReg else cbind(incReg, Z)
 
   if(!is.null(exogen)){
     if(is.data.frame(exogen)) exogen <- as.matrix(exogen)
