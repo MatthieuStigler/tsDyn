@@ -363,13 +363,13 @@ myHead <- function(x, n=6){
   res
 }
 
-myTail <- function(x, n=6){
+myTail <- function(x, n=6,...){
 
   if(inherits(x, "ts")){
-    res <-  apply(x,2,tail,n)
+    res <-  apply(x,2,tail,n,...)
     if(n==1) res <- matrix(res, nrow=1)
   } else {
-    res <-  tail(x,n) 
+    res <-  tail(x,n,...) 
   }
 
   res
