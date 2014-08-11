@@ -270,7 +270,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
       ve_4 <- ve_3 %*% solve(t(C) %*% ve_3)
 
       #compute A (speed adjustment)
-      z0<-t(u)%*%v%*%ve_no[,1:r]%*%t(ve_no[,1:r])
+      z0<-t(u)%*%v%*%tcrossprod(ve_no[,1:r])
 
 	###Slope parameters
       if(LRinclude!="none"){
