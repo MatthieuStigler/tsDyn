@@ -175,13 +175,13 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   Z <-if(lag==0) incReg else cbind(incReg, Z)
 
   if(!is.null(exogen)){
-    if(is.data.frame(exogen)) exogen <- as.matrix(exogen)
+    if(is.data.frame(exogen)|is.vector(exogen)) exogen <- as.matrix(exogen)
     n_exo <- NROW(exogen)
-    if(n_exo!=nrow(Z)){
+    if(n_exo!=t){
       if(n_exo!=T)  warning("exogen is of size ", n_exo, "while full/end-sample size is of size", T,"/", nrow(Z), "series shortened")
-      exogen <- myTail(exogen, nrow(Z))
+      exogen <- myTail(exogen, t, addrownums=FALSE)
     }
-    Z <- cbind(Z, exogen)
+    Z <- if(lag==0 & include=="none") exogen else cbind(Z, exogen)
   }
 
 
@@ -233,7 +233,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 ##VECM: ML (Johansen ) estimation of cointegrating vector
   else if(model=="VECM"&estim=="ML"){
     beta.estimated<- is.null(beta)
-    if(lag==0 & include=="none"){
+    if(lag==0 & include=="none" & is.null(exogen)){
      u <- Y
      v <- Xminus1
     } else {
