@@ -1,8 +1,8 @@
 Package: tsDyn
 Type: Package
 Title: Nonlinear time series models with regime switching
-Version: 0.9-33
-Date: 28/3/2014
+Version: 0.9-40
+Date: 12/8/2014
 Authors@R: c(person("Antonio Fabio", "Di Narzo",role = c("aut", "cre")),
              person("Jose Luis", "Aznarte",role = "ctb"),
              person("Matthieu", "Stigler", role = c("aut","cre"), email="Matthieu.Stigler@gmail.com"))

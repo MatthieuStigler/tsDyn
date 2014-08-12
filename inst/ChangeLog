@@ -1,3 +1,18 @@
+Version 0.9-40: Matthieu Stigler (12/8/2014)
+- new functions coefB(), coefA(), coefPI() returning the A, B and PI coefs for VECMs
+ -new function VECM.sim()
+- new function TVECM.boot()
+- new method getTh.lstar(), getTh.default()
+- new method vcov.setar()
+- new method coef.setar(), coef.lstar()
+- new method logLik.cajo.test()
+- extend argument in lineVar/VECM: allow lag=0 
+- TVECM.sim() extend for r>1, new argument seed
+- VECM(): extend ML estimation of restricted model
+- lstar(): change coefficient naming, consistency with setar()
+- minor: robustify OLS computations using lm.fit() in SETAR(), in TVAR()
+
+
 Version 0.9-33: Matthieu Stigler (28/3/2014)
 -minor: correct use of partial naming in all.equal(), which resulted in package being taken out of CRAN
 -bug correction: correct VARrep in presence of external regressors. Reported by Paul Schreck
