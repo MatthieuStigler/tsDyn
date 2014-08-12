@@ -153,7 +153,9 @@ options(warn=0)
 ### CoefA, coefB, coefPI
 lapply(vecm_all, coefB)
 lapply(vecm_all, coefA)
+options(digits=6)
 lapply(vecm_all, coefPI)
+options(digits=7)
 
 ### rank test
 vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models

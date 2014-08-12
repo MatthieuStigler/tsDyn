@@ -4137,223 +4137,213 @@ Equation dolcan -0.001179716
 Equation cpiUSA -0.062648158
 Equation cpiCAN -0.089501483
 
+> options(digits=6)
 > lapply(vecm_all, coefPI)
 $vecm_OLS_l1_co
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.002537673  0.0001449059 -0.0001040943
-Equation cpiUSA  0.055320874 -0.0031589262  0.0022692399
-Equation cpiCAN  0.179057392 -0.0102245148  0.0073448620
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00253767  0.000144906 -0.000104094
+Equation cpiUSA  0.05532087 -0.003158926  0.002269240
+Equation cpiCAN  0.17905739 -0.010224515  0.007344862
 
 $vecm_OLS_l3_co
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.001338343  7.642193e-05 -5.489831e-05
-Equation cpiUSA  0.029339845 -1.675360e-03  1.203509e-03
-Equation cpiCAN  0.133099298 -7.600221e-03  5.459680e-03
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00133834  7.64219e-05 -5.48983e-05
+Equation cpiUSA  0.02933984 -1.67536e-03  1.20351e-03
+Equation cpiCAN  0.13309930 -7.60022e-03  5.45968e-03
 
 $vecm_OLS_l3_co_betaGiven
-                      dolcan        cpiUSA       cpiCAN
-Equation dolcan 0.0002124546 -2.124546e-05 1.062273e-05
-Equation cpiUSA 0.0094968887 -9.496889e-04 4.748444e-04
-Equation cpiCAN 0.0341381280 -3.413813e-03 1.706906e-03
+                     dolcan       cpiUSA      cpiCAN
+Equation dolcan 0.000212455 -2.12455e-05 1.06227e-05
+Equation cpiUSA 0.009496889 -9.49689e-04 4.74844e-04
+Equation cpiCAN 0.034138128 -3.41381e-03 1.70691e-03
 
 $vecm_OLS_l1_tr
-                       dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.0007661059  4.374609e-05 -3.142535e-05
-Equation cpiUSA  0.2432039258 -1.388740e-02  9.976127e-03
-Equation cpiCAN  0.3894987881 -2.224112e-02  1.597708e-02
+                      dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.000766106  4.37461e-05 -3.14254e-05
+Equation cpiUSA  0.243203926 -1.38874e-02  9.97613e-03
+Equation cpiCAN  0.389498788 -2.22411e-02  1.59771e-02
 
 $vecm_OLS_l1_bo
-                       dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.0175059946  0.0009996253 -7.180888e-04
-Equation cpiUSA -0.0161621128  0.0009228871 -6.629633e-04
-Equation cpiCAN  0.0003185219 -0.0000181882  1.306564e-05
+                      dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.017505995  9.99625e-04 -7.18089e-04
+Equation cpiUSA -0.016162113  9.22887e-04 -6.62963e-04
+Equation cpiCAN  0.000318522 -1.81882e-05  1.30656e-05
 
 $vecm_OLS_l1_no
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.002250595  0.0001285132 -9.231852e-05
-Equation cpiUSA  0.072923859 -0.0041640899  2.991307e-03
-Equation cpiCAN  0.199609825 -0.0113980975  8.187915e-03
+                    dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.0022506  0.000128513 -9.23185e-05
+Equation cpiUSA  0.0729239 -0.004164090  2.99131e-03
+Equation cpiCAN  0.1996098 -0.011398098  8.18791e-03
 
 $vecm_OLS_l1_coAsExo
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.002537673  0.0001449059 -0.0001040943
-Equation cpiUSA  0.055320874 -0.0031589262  0.0022692399
-Equation cpiCAN  0.179057392 -0.0102245148  0.0073448620
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00253767  0.000144906 -0.000104094
+Equation cpiUSA  0.05532087 -0.003158926  0.002269240
+Equation cpiCAN  0.17905739 -0.010224515  0.007344862
 
 $vecm_OLS_l3_coAsExo
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.001338343  7.642193e-05 -5.489831e-05
-Equation cpiUSA  0.029339845 -1.675360e-03  1.203509e-03
-Equation cpiCAN  0.133099298 -7.600221e-03  5.459680e-03
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00133834  7.64219e-05 -5.48983e-05
+Equation cpiUSA  0.02933984 -1.67536e-03  1.20351e-03
+Equation cpiCAN  0.13309930 -7.60022e-03  5.45968e-03
 
 $vecm_OLS_l1_LRco
-                      dolcan        cpiUSA        cpiCAN        const
-Equation dolcan -0.019977546  0.0002960171 -1.933122e-04  0.017270953
-Equation cpiUSA -0.009018453  0.0001336309 -8.726684e-05  0.007796617
-Equation cpiCAN  0.214396024 -0.0031768114  2.074598e-03 -0.185349278
+                     dolcan       cpiUSA       cpiCAN       const
+Equation dolcan -0.01997755  0.000296017 -1.93312e-04  0.01727095
+Equation cpiUSA -0.00901845  0.000133631 -8.72668e-05  0.00779662
+Equation cpiCAN  0.21439602 -0.003176811  2.07460e-03 -0.18534928
 
 $vecm_OLS_l1_LRtr
-                      dolcan       cpiUSA        cpiCAN         trend
-Equation dolcan -0.018347198 9.885361e-04 -3.568911e-04 -1.396301e-04
-Equation cpiUSA -0.001166353 6.284241e-05 -2.268799e-05 -8.876451e-06
-Equation cpiCAN -0.144023002 7.759874e-03 -2.801546e-03 -1.096077e-03
+                     dolcan      cpiUSA       cpiCAN        trend
+Equation dolcan -0.01834720 9.88536e-04 -0.000356891 -1.39630e-04
+Equation cpiUSA -0.00116635 6.28424e-05 -0.000022688 -8.87645e-06
+Equation cpiCAN -0.14402300 7.75987e-03 -0.002801546 -1.09608e-03
 
 $vecm_OLS_l1_LRtr_noCo
-                     dolcan        cpiUSA        cpiCAN         trend
-Equation dolcan -0.01523687  0.0008209537 -0.0002963888 -0.0001159592
-Equation cpiUSA  0.15327753 -0.0082585025  0.0029815663  0.0011665083
-Equation cpiCAN  0.04569339 -0.0024619329  0.0008888314  0.0003477465
+                    dolcan       cpiUSA       cpiCAN        trend
+Equation dolcan -0.0152369  0.000820954 -0.000296389 -0.000115959
+Equation cpiUSA  0.1532775 -0.008258503  0.002981566  0.001166508
+Equation cpiCAN  0.0456934 -0.002461933  0.000888831  0.000347746
 
 $vecm_OLS_l1_LRbo
-                     dolcan        cpiUSA        cpiCAN       const
-Equation dolcan -0.02042543  0.0003888986 -0.0002170719  0.01574198
-Equation cpiUSA  0.01429980 -0.0002722670  0.0001519715 -0.01102092
-Equation cpiCAN  0.18825465 -0.0035843531  0.0020006814 -0.14508872
-                        trend
-Equation dolcan -1.765938e-05
-Equation cpiUSA  1.236329e-05
-Equation cpiCAN  1.627608e-04
+                    dolcan       cpiUSA       cpiCAN      const        trend
+Equation dolcan -0.0204254  0.000388899 -0.000217072  0.0157420 -1.76594e-05
+Equation cpiUSA  0.0142998 -0.000272267  0.000151971 -0.0110209  1.23633e-05
+Equation cpiCAN  0.1882546 -0.003584353  0.002000681 -0.1450887  1.62761e-04
 
 $vecm_OLS_l0_co
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.002780092  0.0001587485 -0.0001140383
-Equation cpiUSA  0.068255265 -0.0038975044  0.0027998034
-Equation cpiCAN  0.186186297 -0.0106315887  0.0076372868
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00278009  0.000158749 -0.000114038
+Equation cpiUSA  0.06825526 -0.003897504  0.002799803
+Equation cpiCAN  0.18618630 -0.010631589  0.007637287
 
 $vecm_OLS_l0_tr
-                       dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.0001422602  8.123327e-06 -5.835457e-06
-Equation cpiUSA  0.4799565924 -2.740643e-02  1.968763e-02
-Equation cpiCAN  0.5732976471 -3.273638e-02  2.351644e-02
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00014226  8.12333e-06 -5.83546e-06
+Equation cpiUSA  0.47995659 -2.74064e-02  1.96876e-02
+Equation cpiCAN  0.57329765 -3.27364e-02  2.35164e-02
 
 $vecm_ML_l0_co
-                       dolcan       cpiUSA        cpiCAN
-Equation dolcan -0.0003507433 7.447690e-06 -1.410266e-05
-Equation cpiUSA -0.0436243553 9.263203e-04 -1.754045e-03
-Equation cpiCAN -0.0823639695 1.748918e-03 -3.311684e-03
+                      dolcan      cpiUSA       cpiCAN
+Equation dolcan -0.000350743 7.44769e-06 -1.41027e-05
+Equation cpiUSA -0.043624355 9.26320e-04 -1.75404e-03
+Equation cpiCAN -0.082363969 1.74892e-03 -3.31168e-03
 
 $vecm_ML_l0_tr
-                       dolcan       cpiUSA        cpiCAN
-Equation dolcan -0.0005484774 0.0001201055 -4.141369e-05
-Equation cpiUSA -0.0928989256 0.0203429860 -7.014487e-03
-Equation cpiCAN -0.1123697005 0.0246066919 -8.484660e-03
+                      dolcan      cpiUSA       cpiCAN
+Equation dolcan -0.000548477 0.000120105 -4.14137e-05
+Equation cpiUSA -0.092898926 0.020342986 -7.01449e-03
+Equation cpiCAN -0.112369700 0.024606692 -8.48466e-03
 
 $vecm_ML_l0_bo
-                      dolcan       cpiUSA        cpiCAN
-Equation dolcan -0.001999161 0.0006862579 -0.0002204272
-Equation cpiUSA -0.019268819 0.0066144637 -0.0021245770
-Equation cpiCAN -0.100888273 0.0346322109 -0.0111239250
+                     dolcan      cpiUSA       cpiCAN
+Equation dolcan -0.00199916 0.000686258 -0.000220427
+Equation cpiUSA -0.01926882 0.006614464 -0.002124577
+Equation cpiCAN -0.10088827 0.034632211 -0.011123925
 
 $vecm_ML_l0_no
-                     dolcan        cpiUSA       cpiCAN
-Equation dolcan 0.001869335 -1.440461e-05 5.111474e-07
-Equation cpiUSA 0.358828407 -2.765040e-03 9.811735e-05
-Equation cpiCAN 0.359559513 -2.770673e-03 9.831726e-05
+                    dolcan       cpiUSA      cpiCAN
+Equation dolcan 0.00186933 -1.44046e-05 5.11147e-07
+Equation cpiUSA 0.35882841 -2.76504e-03 9.81174e-05
+Equation cpiCAN 0.35955951 -2.77067e-03 9.83173e-05
 
 $vecm_ML_l0_LRco
-                       dolcan       cpiUSA        cpiCAN       const
-Equation dolcan -0.0008273726 1.814671e-05 -2.124564e-05 0.002751056
-Equation cpiUSA -0.1396685110 3.063341e-03 -3.586470e-03 0.464404908
-Equation cpiCAN -0.1389057526 3.046611e-03 -3.566883e-03 0.461868698
+                      dolcan      cpiUSA       cpiCAN      const
+Equation dolcan -0.000827373 1.81467e-05 -2.12456e-05 0.00275106
+Equation cpiUSA -0.139668511 3.06334e-03 -3.58647e-03 0.46440491
+Equation cpiCAN -0.138905753 3.04661e-03 -3.56688e-03 0.46186870
 
 $vecm_ML_l0_LRtr
-                       dolcan       cpiUSA        cpiCAN         trend
-Equation dolcan -0.0003514011 7.734047e-06 -1.420191e-05 -5.638569e-08
-Equation cpiUSA -0.0435803377 9.591672e-04 -1.761304e-03 -6.992885e-06
-Equation cpiCAN -0.0824088721 1.813751e-03 -3.330563e-03 -1.322330e-05
+                      dolcan      cpiUSA       cpiCAN        trend
+Equation dolcan -0.000351401 7.73405e-06 -1.42019e-05 -5.63857e-08
+Equation cpiUSA -0.043580338 9.59167e-04 -1.76130e-03 -6.99289e-06
+Equation cpiCAN -0.082408872 1.81375e-03 -3.33056e-03 -1.32233e-05
 
 $vecm_ML_l1_co
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.001130982  4.449061e-05 -2.323614e-05
-Equation cpiUSA  0.046105240 -1.813690e-03  9.472370e-04
-Equation cpiCAN  0.146594632 -5.766745e-03  3.011802e-03
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00113098  4.44906e-05 -2.32361e-05
+Equation cpiUSA  0.04610524 -1.81369e-03  9.47237e-04
+Equation cpiCAN  0.14659463 -5.76674e-03  3.01180e-03
 
 $vecm_ML_l3_co
-                      dolcan       cpiUSA        cpiCAN
-Equation dolcan -0.003567929 0.0001262008 -0.0001435076
-Equation cpiUSA -0.039517521 0.0013977696 -0.0015894554
-Equation cpiCAN -0.106423797 0.0037643037 -0.0042805287
+                     dolcan      cpiUSA       cpiCAN
+Equation dolcan -0.00356793 0.000126201 -0.000143508
+Equation cpiUSA -0.03951752 0.001397770 -0.001589455
+Equation cpiCAN -0.10642380 0.003764304 -0.004280529
 
 $vecm_ML_l1_tr
-                       dolcan       cpiUSA        cpiCAN
-Equation dolcan -0.0007704618 0.0001736531 -4.685822e-05
-Equation cpiUSA -0.0437029488 0.0098501347 -2.657942e-03
-Equation cpiCAN -0.0768177401 0.0173138223 -4.671929e-03
+                      dolcan      cpiUSA       cpiCAN
+Equation dolcan -0.000770462 0.000173653 -4.68582e-05
+Equation cpiUSA -0.043702949 0.009850135 -2.65794e-03
+Equation cpiCAN -0.076817740 0.017313822 -4.67193e-03
 
 $vecm_ML_l1_bo
-                       dolcan        cpiUSA        cpiCAN
-Equation dolcan  0.0002393194  0.0003950486 -0.0001025510
-Equation cpiUSA -0.0015111788 -0.0024945282  0.0006475567
-Equation cpiCAN  0.0177494843  0.0292993710 -0.0076058485
+                      dolcan       cpiUSA       cpiCAN
+Equation dolcan  0.000239319  0.000395049 -0.000102551
+Equation cpiUSA -0.001511179 -0.002494528  0.000647557
+Equation cpiCAN  0.017749484  0.029299371 -0.007605848
 
 $vecm_ML_l1_no
-                     dolcan        cpiUSA       cpiCAN
-Equation dolcan 0.002204256 -3.861226e-05 1.930842e-05
-Equation cpiUSA 0.214731716 -3.761486e-03 1.880966e-03
-Equation cpiCAN 0.288265350 -5.049585e-03 2.525092e-03
+                    dolcan       cpiUSA      cpiCAN
+Equation dolcan 0.00220426 -3.86123e-05 1.93084e-05
+Equation cpiUSA 0.21473172 -3.76149e-03 1.88097e-03
+Equation cpiCAN 0.28826535 -5.04959e-03 2.52509e-03
 
 $vecm_ML_l1_coAsExo
-                      dolcan        cpiUSA        cpiCAN
-Equation dolcan -0.001130982  4.449061e-05 -2.323614e-05
-Equation cpiUSA  0.046105240 -1.813690e-03  9.472370e-04
-Equation cpiCAN  0.146594632 -5.766745e-03  3.011802e-03
+                     dolcan       cpiUSA       cpiCAN
+Equation dolcan -0.00113098  4.44906e-05 -2.32361e-05
+Equation cpiUSA  0.04610524 -1.81369e-03  9.47237e-04
+Equation cpiCAN  0.14659463 -5.76674e-03  3.01180e-03
 
 $vecm_ML_l3_coAsExo
-                      dolcan       cpiUSA        cpiCAN
-Equation dolcan -0.003567929 0.0001262008 -0.0001435076
-Equation cpiUSA -0.039517521 0.0013977696 -0.0015894554
-Equation cpiCAN -0.106423797 0.0037643037 -0.0042805287
+                     dolcan      cpiUSA       cpiCAN
+Equation dolcan -0.00356793 0.000126201 -0.000143508
+Equation cpiUSA -0.03951752 0.001397770 -0.001589455
+Equation cpiCAN -0.10642380 0.003764304 -0.004280529
 
 $vecm_ML_l1_LRco
-                       dolcan        cpiUSA        cpiCAN       const
-Equation dolcan -0.0006194775 -7.000238e-06 -5.121837e-06 0.003806391
-Equation cpiUSA -0.0398395940 -4.501965e-04 -3.293936e-04 0.244795090
-Equation cpiCAN -0.0516009162 -5.831021e-04 -4.266361e-04 0.317062742
+                      dolcan       cpiUSA       cpiCAN      const
+Equation dolcan -0.000619478 -7.00024e-06 -5.12184e-06 0.00380639
+Equation cpiUSA -0.039839594 -4.50197e-04 -3.29394e-04 0.24479509
+Equation cpiCAN -0.051600916 -5.83102e-04 -4.26636e-04 0.31706274
 
 $vecm_ML_l1_LRc_exo
-                       dolcan       cpiUSA        cpiCAN       const
-Equation dolcan -0.0008964929 8.836947e-07 -1.327875e-05 0.004371135
-Equation cpiUSA -0.0533550599 5.259337e-05 -7.902888e-04 0.260149508
-Equation cpiCAN -0.0682411008 6.726690e-05 -1.010779e-03 0.332731120
+                      dolcan      cpiUSA       cpiCAN      const
+Equation dolcan -0.000896493 8.83695e-07 -1.32787e-05 0.00437114
+Equation cpiUSA -0.053355060 5.25934e-05 -7.90289e-04 0.26014951
+Equation cpiCAN -0.068241101 6.72669e-05 -1.01078e-03 0.33273112
 
 $vecm_ML_l1_LRtr
-                      dolcan       cpiUSA        cpiCAN         trend
-Equation dolcan 0.0001862485 0.0001897229 -4.505363e-05 -4.182042e-05
-Equation cpiUSA 0.0040952483 0.0041716444 -9.906434e-04 -9.195513e-04
-Equation cpiCAN 0.0292851011 0.0298314097 -7.084086e-03 -6.575707e-03
+                     dolcan      cpiUSA       cpiCAN        trend
+Equation dolcan 0.000186248 0.000189723 -4.50536e-05 -4.18204e-05
+Equation cpiUSA 0.004095248 0.004171644 -9.90643e-04 -9.19551e-04
+Equation cpiCAN 0.029285101 0.029831410 -7.08409e-03 -6.57571e-03
 
 $vecm_ML_l1_LRtr_exo
-                      dolcan       cpiUSA        cpiCAN         trend
-Equation dolcan 8.032743e-05 0.0002421016 -6.030972e-05 -5.237176e-05
-Equation cpiUSA 1.526143e-03 0.0045996968 -1.145826e-03 -9.950129e-04
-Equation cpiCAN 1.002912e-02 0.0302271225 -7.529851e-03 -6.538773e-03
+                     dolcan      cpiUSA       cpiCAN        trend
+Equation dolcan 8.03274e-05 0.000242102 -6.03097e-05 -5.23718e-05
+Equation cpiUSA 1.52614e-03 0.004599697 -1.14583e-03 -9.95013e-04
+Equation cpiCAN 1.00291e-02 0.030227122 -7.52985e-03 -6.53877e-03
 
 $vecm_ML_l1_LRtr_noCo
-                      dolcan       cpiUSA        cpiCAN         trend
-Equation dolcan -0.000727143 0.0001842358 -4.974539e-05 -3.923138e-05
-Equation cpiUSA -0.041425715 0.0104960113 -2.834021e-03 -2.235032e-03
-Equation cpiCAN -0.060470225 0.0153213087 -4.136896e-03 -3.262537e-03
+                      dolcan      cpiUSA       cpiCAN        trend
+Equation dolcan -0.000727143 0.000184236 -4.97454e-05 -3.92314e-05
+Equation cpiUSA -0.041425715 0.010496011 -2.83402e-03 -2.23503e-03
+Equation cpiCAN -0.060470225 0.015321309 -4.13690e-03 -3.26254e-03
 
 $vecm_ML_l1_LRbo
-                       dolcan       cpiUSA        cpiCAN        const
-Equation dolcan -0.0008871317 0.0001773362 -4.908841e-05 0.0003703985
-Equation cpiUSA -0.0503421884 0.0100633219 -2.785627e-03 0.0210190590
-Equation cpiCAN -0.0729350525 0.0145795988 -4.035777e-03 0.0304521161
-                        trend
-Equation dolcan -3.741434e-05
-Equation cpiUSA -2.123157e-03
-Equation cpiCAN -3.076000e-03
+                      dolcan      cpiUSA       cpiCAN       const        trend
+Equation dolcan -0.000887132 0.000177336 -4.90884e-05 0.000370399 -3.74143e-05
+Equation cpiUSA -0.050342188 0.010063322 -2.78563e-03 0.021019059 -2.12316e-03
+Equation cpiCAN -0.072935053 0.014579599 -4.03578e-03 0.030452116 -3.07600e-03
 
 $vecm_ML_l1_LRbo_exo
-                      dolcan       cpiUSA        cpiCAN        const
-Equation dolcan -0.001179716 0.0001965588 -5.998414e-05 0.0006998014
-Equation cpiUSA -0.062648158 0.0104381410 -3.185423e-03 0.0371625469
-Equation cpiCAN -0.089501483 0.0149123154 -4.550813e-03 0.0530917929
-                        trend
-Equation dolcan -3.967296e-05
-Equation cpiUSA -2.106810e-03
-Equation cpiCAN -3.009866e-03
+                     dolcan      cpiUSA       cpiCAN       const        trend
+Equation dolcan -0.00117972 0.000196559 -5.99841e-05 0.000699801 -0.000039673
+Equation cpiUSA -0.06264816 0.010438141 -3.18542e-03 0.037162547 -0.002106810
+Equation cpiCAN -0.08950148 0.014912315 -4.55081e-03 0.053091793 -0.003009866
 
+> options(digits=7)
 > 
 > ### rank test
 > vecm_ML_rtest <- vecm_ML[-grep("vecm_ML_l1_LRtr_noCo|vecm_ML_l1_LRbo", names(vecm_ML))] ## does not work for these models

@@ -26,7 +26,7 @@ sapply(set_all, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
 lapply(set_all, summary)
 sapply(set_all, function(x) tail(coef(x),4))
 sapply(set_all, function(x) tail(coef(x, hyperCo=FALSE),4))
-lapply(set_all, vcov)
+lapply(set_all, function(x) round(vcov(x),9))
 
 lapply(set_all, function(x) window(residuals(x), end=c(1830)))
 lapply(set_all, function(x) window(fitted(x), end=c(1830)))
