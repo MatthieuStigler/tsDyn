@@ -25,13 +25,12 @@
 #' autotriples.rgl(log(lynx))
 #'
 autotriples.rgl <- function(x, lags=1:2, type=c("lines","points")) {
-	require(rgl) || stop("rgl package is required for interactive 3d visualization")
 	type <- match.arg(type)
 	X <- embedd(x, lags=c(-lags,0))
-	rgl.clear()
+	rgl::rgl.clear()
 	if(type=="lines")
-		rgl.linestrips(X[,1],X[,2],X[,3])
+	  rgl::rgl.linestrips(X[,1],X[,2],X[,3])
 	else if (type=="points")
-		rgl.points(X[,1],X[,2],X[,3])
+	  rgl::rgl.points(X[,1],X[,2],X[,3])
         invisible(NULL)
 }
