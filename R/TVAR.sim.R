@@ -1,6 +1,9 @@
-TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), n=200, lag=1, include = c("const", "trend","none", "both"),  
-thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, round=FALSE, seed){
-
+TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), 
+                     n=200, lag=1, include = c("const", "trend","none", "both"),  
+                     thDelay=1,  thVar=NULL, mTh=1, starting=NULL, 
+                     innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), 
+                     show.parMat=FALSE, round=FALSE, seed){
+  
   ###check correct arguments
   if(!nthresh%in%c(0,1,2))
     stop("Arg nthresh should  be either 0, 1 or 2")
@@ -9,19 +12,19 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
   if(!missing(TVARobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag), !missing(thDelay), !missing(mTh)))
     warning("When object TVARobject is given, only args 'type' and 'round' are relevant, others are not considered")
   if(!missing(data)&!missing(B))
-	  stop("You have to provide either B or y, but not both")
-
+    stop("You have to provide either B or y, but not both")
+  
   type<-match.arg(type)
   include<-match.arg(include)
-
+  
   ## Create some variables/parameters
   p <- switch(type, "boot"=if(!missing(TVARobject)) TVARobject$lag else lag, lag)
   ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
   add <- switch(type, "simul"=p, 0)
   if(max(thDelay)>p)
-	  stop("Max of thDelay should be smaller or equal to the number of lags")
-
-
+    stop("Max of thDelay should be smaller or equal to the number of lags")
+  
+  
   ### possibility 1: only parameters matrix is given
   if(!missing(B)){
     if(type!="simul"){
@@ -37,9 +40,9 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
     y<-matrix(0,ncol=nB, nrow=n+add)
     if(!is.null(starting)){
       if(all(dim(as.matrix(starting))==c(p,nB)))
-	y[seq_len(p),]<- as.matrix(starting)
+        y[seq_len(p),]<- as.matrix(starting)
       else
-	stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables. But is: ", dim(as.matrix(starting)), sep="")
+        stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables. But is: ", dim(as.matrix(starting)), sep="")
     }
     Bmat<-B
     temp<-TVAR_thresh(mTh=mTh,thDelay=thDelay,thVar=thVar,y=y, p=p) #Stored in misc.R
@@ -48,15 +51,15 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
     
     if(nthresh==1){
       if(missing(Thresh))
-	Thresh<-mean(trans)
+        Thresh<-mean(trans)
       if(length(Thresh)!=1){
-	warning("Please only one Thresh value if you choose nthresh=1. First one was chosen")
-	Thresh<-Thresh[1]}
+        warning("Please only one Thresh value if you choose nthresh=1. First one was chosen")
+        Thresh<-Thresh[1]}
     } else  if(nthresh==2){
       if(missing(Thresh))
-	Thresh<-quantile(trans, probs=c(0.25, 0.75))
+        Thresh<-quantile(trans, probs=c(0.25, 0.75))
       if(length(Thresh)!=2)
-	stop("please give two Thresh values if you choose nthresh=2")
+        stop("please give two Thresh values if you choose nthresh=2")
     }
     if(nthresh%in%c(1,2))
       Thresh<-round(Thresh,ndig)
@@ -71,9 +74,9 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
       TVARobject<-lineVar(data, lag=p, include=include, model="VAR")
     } else{ 
       if(!missing(Thresh)){
-	TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, gamma=Thresh)
+        TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, gamma=Thresh)
       } else{
-	TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
+        TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
       }
     }
   }
@@ -91,11 +94,11 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
     include <- TVARobject$include
     if(nthresh>0){
       if(modSpe$oneMatrix)
-	stop("arg commoninter in TVAR currently not implemented in TVAR.sim")
+        stop("arg commoninter in TVAR currently not implemented in TVAR.sim")
       if(attr(TVARobject, "levelTransVar")=="MTAR")
-	stop("arg model=MTAR in TVAR currently not implemented in TVAR.sim")
+        stop("arg model=MTAR in TVAR currently not implemented in TVAR.sim")
       if(attr(TVARobject, "transVar")=="external")
-	stop("arg thVaR in TVAR currently not implemented in TVAR.sim")
+        stop("arg thVaR in TVAR currently not implemented in TVAR.sim")
       Thresh<-modSpe$Thresh
       thDelay<-modSpe$thDelay
       combin<-modSpe$transCombin
@@ -105,17 +108,17 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
   t <- T-p+add 		#Size of end sample
   npar<-k*(p+ninc)
 
-    ##### put coefficients vector in right form according to arg include (arg both need no modif)
-    a<-NULL
-    if(include=="none")
-      for(i in 0:nthresh) a<-c(a, i*(p*k)+c(1,2))
-    else if(include=="const")
-      for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(2))
-    else if(include=="trend")
-      for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(1))
-      #if (include=="both"): correction useless
-    Bmat<-myInsertCol(Bmat, c=a ,0)
-    nparBmat<-p*k+2
+  ##### put coefficients vector in right form according to arg include (arg both need no modif)
+  a<-NULL
+  if(include=="none")
+    for(i in 0:nthresh) a<-c(a, i*(p*k)+c(1,2))
+  else if(include=="const")
+    for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(2))
+  else if(include=="trend")
+    for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(1))
+  #if (include=="both"): correction useless
+  Bmat<-myInsertCol(Bmat, c=a ,0)
+  nparBmat<-p*k+2
     
     
   ##############################
@@ -151,34 +154,34 @@ thDelay=1,  thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=var
 	  BUp<-Bmat[,-seq_len(nparBmat)]
 
 	  for(i in (p+1):(T+add)){
-		  if(round(z2[i-thDelay],ndig)<=Thresh) {
-			  Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-			  if(round)
-			    Yb[i,]<-round(Yb[i,], ndig)
-		  }
-		  else{
-			  Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-			  if(round)
-			    Yb[i,]<-round(Yb[i,], ndig)
-		  }
-		  z2[i]<-Yb[i,]%*%combin
+	    if(round(z2[i-thDelay],ndig)<=Thresh) {
+	      Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+	      if(round)
+	        Yb[i,]<-round(Yb[i,], ndig)
+	    }
+	    else{
+	      Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+	      if(round)
+	        Yb[i,]<-round(Yb[i,], ndig)
+	    }
+	    z2[i]<-Yb[i,]%*%combin
 	  }
   }  else if(nthresh==2){
-	  BDown <- Bmat[,seq_len(nparBmat)]
-	  BMiddle <- Bmat[,seq_len(nparBmat)+nparBmat]
-	  BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
-	  for(i in (p+1):(T+add)){
-		  if(round(z2[i-thDelay],ndig)<=Thresh[1]) 
-			  Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-		  else if(round(z2[i-thDelay],ndig)>Thresh[2]) 
-			  Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-		  else
-			  Yb[i,]<-rowSums(cbind(BMiddle[,1],BMiddle[,2]*trend[i], BMiddle[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-		  z2[i]<-Yb[i,]%*%combin
-	  }
+    BDown <- Bmat[,seq_len(nparBmat)]
+    BMiddle <- Bmat[,seq_len(nparBmat)+nparBmat]
+    BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
+    for(i in (p+1):(T+add)){
+      if(round(z2[i-thDelay],ndig)<=Thresh[1]) 
+        Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+      else if(round(z2[i-thDelay],ndig)>Thresh[2]) 
+        Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+      else
+        Yb[i,]<-rowSums(cbind(BMiddle[,1],BMiddle[,2]*trend[i], BMiddle[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+      z2[i]<-Yb[i,]%*%combin
+    }
   }
-
-
+  
+  
   if(FALSE){
 	  new<-TVAR_thresh(y=Yb,mTh=mTh,thDelay=thDelay,thVar=thVar, p=p)$trans
 	  if(mean(ifelse(new[,thDelay]<Thresh, 1,0))>0.05)
