@@ -1,6 +1,10 @@
-Version 0.9-40: Matthieu Stigler (12/8/2014)
+Version 0.9-41: Matthieu Stigler (26/8/2014)
+ -change description for new url to github wiki, as well as new field mailinglist
+ -fix suggests issues (sm::foo()) newly detected by R CMD check devel
+
+Version 0.9-40: Matthieu Stigler (12/8/2014), never published on cran
 - new functions coefB(), coefA(), coefPI() returning the A, B and PI coefs for VECMs
- -new function VECM.sim()
+- new function VECM.sim()
 - new function TVECM.boot()
 - new method getTh.lstar(), getTh.default()
 - new method vcov.setar()
