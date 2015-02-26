@@ -107,8 +107,10 @@ VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "che
   k <- VARobject$k
   lags <- VARobject$lag
   include <- VARobject$include
+  num_exogen <- VARobject$num_exogen 
   
-  yorig <- VARobject$model[,1:k]
+  YX <- VARobject$model
+  yorig <- YX[,1:k]
   starts <- yorig[1:lags,, drop=FALSE]
   resids <- residuals(VARobject)
 
@@ -119,8 +121,17 @@ VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "che
                   "wild2"=resids+sample(c(-1,1), size = t, replace=TRUE),
                   "check"=  resids)
   
+  ## Exogen
+  if(num_exogen>0){
+    nYX <- ncol(YX)
+    exogen <- YX[, -(num_exogen-1):0+nYX]
+#     starts <- cbind(starts, matrix(0, nrow=nrow(starts), ncol=num_exogen))
+  } else {
+    exogen <- NULL
+  }
+  
   res <- VAR.gen(B=B, n=t, lag=lags, include = include,  
-                 starting=starts, innov=innov, 
+                 starting=starts, innov=innov, exogen=exogen, 
                  show.parMat=FALSE, returnStarting=TRUE)
   colnames(res) <- colnames(yorig)
   res
@@ -145,5 +156,14 @@ if(FALSE){
 
   var_l2_trend <-VAR.boot(lineVar(barry, lag=2, include="trend"), boot.scheme="check")
   all.equal(var_l2_trend, barry_mat)
+  
+  var_l2_exo <-VAR.boot(lineVar(barry[,1:2], lag=2, exogen=barry[-c(1,2),3]), boot.scheme="check")
+  all.equal(var_l2_exo, barry_mat[,1:2])
+
+  var_l2_exo2 <-VAR.boot(lineVar(barry[,2:3], lag=1, exogen=barry[-c(1),1]), boot.scheme="check")
+  all.equal(var_l2_exo2, barry_mat[,2:3])
+  
+  var_l2_exo_both <-VAR.boot(lineVar(barry[,1:2], lag=2, exogen=barry[-c(1,2),3], include="both"), boot.scheme="check")
+  all.equal(var_l2_exo_both, barry_mat[,1:2])
   
 }
