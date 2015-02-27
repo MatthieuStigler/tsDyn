@@ -1,7 +1,6 @@
 VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
                     starting=NULL, innov, exogen=NULL,
-                    show.parMat=FALSE, returnStarting=FALSE,
-                    seed){
+                    show.parMat=FALSE, returnStarting=FALSE){
   
   include<-match.arg(include)
   
@@ -72,7 +71,7 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
 
   
   if(show.parMat) print(Bmat)
-  if(!returnStarting) y <- y[-c(1:p),] 
+  if(!returnStarting) y <- y[-c(1:p),, drop=FALSE] 
   return(y)
 }
 
@@ -89,12 +88,11 @@ if(FALSE){
 VAR.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
                     starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), 
                     varcov=diag(1,k), 
-                    show.parMat=FALSE, returnInitial=FALSE, seed){
+                    show.parMat=FALSE, returnInitial=FALSE){
   
   VAR.gen(B=B, n=n, lag=lag, include = include,  
           starting=NULL, innov=innov, 
-          show.parMat=FALSE, returnInitial=returnInitial, 
-          seed)
+          show.parMat=FALSE, returnInitial=returnInitial)
 }
     
 VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "check"),
@@ -115,6 +113,7 @@ VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "che
   resids <- residuals(VARobject)
 
   ## boot it
+  if(!missing(seed)) set.seed(seed) 
   innov <- switch(boot.scheme, 
                   "resample"=  resids[sample(seq_len(t), replace=TRUE),], 
                   "wild1"=resids+rnorm(t), 
@@ -136,6 +135,8 @@ VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "che
   colnames(res) <- colnames(yorig)
   res
 }
+
+
 
 
 if(FALSE){
@@ -166,4 +167,5 @@ if(FALSE){
   var_l2_exo_both <-VAR.boot(lineVar(barry[,1:2], lag=2, exogen=barry[-c(1,2),3], include="both"), boot.scheme="check")
   all.equal(var_l2_exo_both, barry_mat[,1:2])
   
+ 
 }
