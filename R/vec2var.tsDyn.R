@@ -272,6 +272,7 @@ fevd.nlVar <- function(x, n.ahead=10, ...){
 
 ####### Predict 
 
+#' @rdname predict.VAR
 #' @S3method predict VECM
 predict.VECM <- function(object, newdata, n.ahead=5, ...){
   lag <- object$lag

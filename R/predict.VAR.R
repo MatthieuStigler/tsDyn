@@ -1,7 +1,36 @@
-
-#' @S3method predict VAR
-#' @rdname predict.nlar
+#' Predict method for objects of class \sQuote{\code{VAR}} or \sQuote{\code{VECM}}
+#' 
+#' Forecating a  \sQuote{\code{VAR}} / \sQuote{\code{VECM}}
+#' 
+#' @aliases  predict.VAR predict.VECM
+#' @param object An object of class  \sQuote{\code{VAR}} or \sQuote{\code{VECM}}
+#' @param newdata Optional. A new data frame to predict from.
+#' @param n.ahead An integer specifying the number of forecast steps.
 #' @param exoPred vector/matrix of predictions for the exogeneous variable(s)
+#' @param \dots Arguments passed to the unexported \sQuote{\code{VAR.gen}} function
+#' 
+#' @details
+#' The forecasts are obtained recursively from the estimated model.  
+#' 
+#' @return A matrix of predicted values.
+#' @author Matthieu Stigler
+#' @seealso  \code{\link{lineVar}} and \code{\link{VECM}}.
+#' 
+#' A more sophisticated predict function, allowing to do sub-sample rolling
+#' predictions: \code{\link{predict_rolling}}.
+#' @keywords regression
+#' @examples
+#' 
+#' data(barry)
+#' mod_vecm <- VECM(barry, lag=2)
+#' predict(mod_vecm)
+#' 
+#' # note that when providing newdata, newdata has to be ordered chronologically, 
+#' # so that the first row/element is the earliest value:
+#' all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(322, 323, 324),]))
+
+
+# unused so far, make sure;#' @S3method predict VAR
 predict.VAR <- function(object, newdata, n.ahead=5, exoPred=NULL, ...){
   lag <- object$lag
   k <- object$k
