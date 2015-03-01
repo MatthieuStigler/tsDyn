@@ -272,42 +272,6 @@ fevd.nlVar <- function(x, n.ahead=10, ...){
 
 ####### Predict 
 
-#' @S3method predict VAR
-predict.VAR <- function(object, newdata, n.ahead=5, ...){
-  lag <- object$lag
-  k <- object$k
-  include <- object$include
-  if(attr(object, "varsLevel")=="ADF") stop("Does not work with VAR in diff specification")
-
-## get coefs
-  B <- coef(object)
-  if(attr(object, "varsLevel")=="diff") {
-    B <- VARrep.VAR(object)
-    lag <- lag+1
-  }
-
-## setup starting values (data in y), innovations (0)
-  original.data <- object$model[,1:k, drop=FALSE]
-  starting <-   myTail(original.data,lag)
-  innov <- matrix(0, nrow=n.ahead, ncol=k)
-  if(!missing(newdata)) {
-    if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
-    if(nrow(newdata)!=lag) stop("Please provide newdata with nrow=lag")
-    starting <-  newdata 
-  }
-
-## use VAR sim
-  res <- VAR.sim(B=B, lag=lag, n=n.ahead, starting=starting, innov=innov,include=include)
-
-## results
-  colnames(res) <- colnames(original.data )
-  res <- tail(res, n.ahead)
-
-  rownames(res) <- (nrow(original.data)+1):(nrow(original.data)+n.ahead)
-
-  return(res)
-}
-
 #' @S3method predict VECM
 predict.VECM <- function(object, newdata, n.ahead=5, ...){
   lag <- object$lag
@@ -340,7 +304,7 @@ predict.VECM <- function(object, newdata, n.ahead=5, ...){
   }
 
 ## use VAR sim
-  res <- VAR.sim(B=B, lag=lag+1, n=n.ahead, starting=starting, innov=innov, include=include)
+  res <- VAR.sim2(B=B, lag=lag+1, n=n.ahead, starting=starting, innov=innov, include=include)
 
 ## results
   colnames(res) <- colnames(original.data )
