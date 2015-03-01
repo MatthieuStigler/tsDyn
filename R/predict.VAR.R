@@ -1,5 +1,7 @@
 
 #' @S3method predict VAR
+#' @rdname predict.nlar
+#' @param exoPred vector/matrix of predictions for the exogeneous variable(s)
 predict.VAR <- function(object, newdata, n.ahead=5, exoPred=NULL, ...){
   lag <- object$lag
   k <- object$k

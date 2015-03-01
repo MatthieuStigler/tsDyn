@@ -20,6 +20,7 @@
 #' to zero.
 #' @param \dots Currently not used.
 #' 
+#' @details
 #' The forecasts are obtained recursively from the estimated model.  Given that
 #' the models are non-linear, ignoring the residuals in the 2- and more steps
 #' ahead forecasts leads to biased forecasts (so-called naive).  Different
