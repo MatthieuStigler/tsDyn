@@ -3,9 +3,10 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
                     show.parMat=FALSE, returnStarting=FALSE){
   
   include<-match.arg(include)
-  
+  if(!is.matrix(B)) stop("B should be a matrix")
   ## Create some variables/parameters
   p <- lag
+  plast <- if(lag==0) 1 else p
   ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
   k <- nrow(B)
   T <- n   	#Size of start sample
@@ -45,9 +46,10 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
   }
   
   
-  ## Augment B to include always constant/trend (eventually 0)
+  ## Augment B to include always constant/trend (eventually 0), exogen, lags
   addInc <- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
   Bfull <- myInsertCol(B, c=addInc ,0)
+  if(lag==0) Bfull <- cbind(Bfull, matrix(0, ncol=k, nrow=k))
   if(nExogen==0) Bfull <- cbind(Bfull, 0)
   
   
@@ -61,10 +63,12 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
 
   ## innovations
   resb <- rbind(matrix(0,nrow=p, ncol=k),innov)	
-  
+
   ## MAIN loop:  
+  pstart <- if(lag==0) 0 else 1
+
   for(i in (p+1):(n+p)){
-    Y <- matrix(t(y[i-c(1:p),, drop=FALSE]), ncol=1)
+    Y <- matrix(t(y[i-c(pstart:p),, drop=FALSE]), ncol=1)
     Yexo <-  rbind(Y, t(exogen[i,]))
     y[i,]<-rowSums(cbind(Bfull[,1],  # intercept
                          Bfull[,2]*trend[i], #trend
@@ -76,7 +80,7 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
 
   
   if(show.parMat) print(Bfull)
-  if(!returnStarting) y <- y[-c(1:p),, drop=FALSE] 
+  if(!returnStarting && lag!=0) y <- y[-c(1:p),, drop=FALSE] 
   return(y)
 }
 
@@ -87,6 +91,7 @@ if(FALSE){
   inno <- matrix(rnorm(200*2), ncol=2)
   environment(VAR.gen) <- environment(TVECM)
   VAR.gen(B=B, include="const", lag=1, innov=inno)
+  VAR.gen(B=B[,1,drop=FALSE], include="const", lag=0, innov=matrix(0, ncol=2, nrow=200))
   
 }
 
