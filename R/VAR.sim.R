@@ -1,4 +1,4 @@
-VAR.gen2 <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
+VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
                     starting=NULL, innov, exogen=NULL, trendStart=1,
                     show.parMat=FALSE, returnStarting=FALSE){
   

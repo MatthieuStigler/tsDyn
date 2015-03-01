@@ -29,7 +29,7 @@ predict.VAR <- function(object, newdata, n.ahead=5, exoPred=NULL, ...){
   }
   
   ## use VAR sim
-  res <- VAR.gen2(B=B, lag=lag, n=n.ahead, 
+  res <- VAR.gen(B=B, lag=lag, n=n.ahead, 
                  starting=starting, innov=innov,include=include,
                  exogen=exoPred, ...)
   
@@ -100,7 +100,7 @@ if(FALSE){
   var_l1_coAsExo <-lineVar(barry, lag=1, include="none", exogen=rep(1, nrow(barry)))
   var_l1 <-lineVar(barry, lag=1, include="const")
   environment(predict.VAR) <- environment(VECM)
-  environment(VAR.gen2) <- environment(TVECM)
+  environment(VAR.gen) <- environment(TVECM)
   all.equal(coef(var_l1_coAsExo), coef(var_l1)[, c(2:4,1)], check.attributes=FALSE)
   all.equal(predict.VAR(var_l1_coAsExo, exoPred=rep(1,5), n.ahead=5),   predict.VAR(var_l1))
 }

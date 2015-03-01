@@ -1647,12 +1647,11 @@ $var_l1_no
 326 1.480338 110.9416 107.3768
 
 $var_l1_coAsExo
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Matrix B badly specified: expected 3 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 4\n\n"
+[1] "Error in predict.VAR(x, n.ahead = 2) : Please provide exogeneous values. \n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Matrix B badly specified: expected 3 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 4
->
+<simpleError in predict.VAR(x, n.ahead = 2): Please provide exogeneous values. >
 
 $var_l0_co
 [1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
@@ -1676,11 +1675,11 @@ attr(,"condition")
 <simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
 
 $var_l0_coAsExo
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
+[1] "Error in predict.VAR(x, n.ahead = 2) : Please provide exogeneous values. \n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+<simpleError in predict.VAR(x, n.ahead = 2): Please provide exogeneous values. >
 
 $var_l3_co
       dolcan   cpiUSA   cpiCAN
@@ -1703,12 +1702,11 @@ $var_l3_no
 326 1.483828 110.7233 107.1905
 
 $var_l3_coAsExo
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Matrix B badly specified: expected 9 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 10\n\n"
+[1] "Error in predict.VAR(x, n.ahead = 2) : Please provide exogeneous values. \n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Matrix B badly specified: expected 9 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 10
->
+<simpleError in predict.VAR(x, n.ahead = 2): Please provide exogeneous values. >
 
 $var_l2_diff_co
       dolcan   cpiUSA   cpiCAN
@@ -1731,12 +1729,11 @@ $var_l2_diff_no
 326 1.474002 110.4702 107.0212
 
 $var_l2_diff_coAsExo
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Matrix B badly specified: expected 9 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 10\n\n"
+[1] "Error in predict.VAR(x, n.ahead = 2) : Please provide exogeneous values. \n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Matrix B badly specified: expected 9 elements ( (lag*K+ n inc)* (nthresh+1) ) but has 10
->
+<simpleError in predict.VAR(x, n.ahead = 2): Please provide exogeneous values. >
 
 $var_l2_adf_co
 [1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
@@ -1767,11 +1764,11 @@ attr(,"condition")
 <simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
 
 $var_l2_adf_coAsExo
-[1] "Error in predict.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff specification\n"
+[1] "Error in predict.VAR(x, n.ahead = 2) : Please provide exogeneous values. \n"
 attr(,"class")
 [1] "try-error"
 attr(,"condition")
-<simpleError in predict.VAR(x, n.ahead = 2): Does not work with VAR in diff specification>
+<simpleError in predict.VAR(x, n.ahead = 2): Please provide exogeneous values. >
 
 > lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 $var_l1_co
@@ -1957,8 +1954,8 @@ attr(,"condition")
 
 > 
 > all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
-[1] "Component \"var_l1_tr\": Mean relative difference: 7.363527e-05"
-[2] "Component \"var_l3_tr\": Mean relative difference: 0.0001044433"
+[1] "Component “var_l1_tr”: Mean relative difference: 7.363527e-05"
+[2] "Component “var_l3_tr”: Mean relative difference: 0.0001044433"
 > 
 > lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 $var_l1_co
@@ -2047,42 +2044,42 @@ $var_l3_no
 > var_all_boot <- var_all[-grep("adf|diff|Exo|l0", names(var_all))]
 > lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
 $var_l1_co
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.442404 113.8773 110.2911
 [324,] 1.445671 114.0330 110.5575
 
 $var_l1_tr
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.137617 102.2290 99.10353
 [324,] 1.137412 102.2283 99.17006
 
 $var_l1_bo
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.503339 114.4799 108.1857
 [324,] 1.506696 114.6297 108.4283
 
 $var_l1_no
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.238563 104.0766 101.5310
 [324,] 1.240809 104.1735 101.7416
 
 $var_l3_co
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.598671 113.2035 108.8799
 [324,] 1.602465 113.1174 109.1044
 
 $var_l3_tr
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.626017 116.6467 114.0517
 [324,] 1.633879 116.6164 114.3531
 
 $var_l3_bo
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.473404 113.6039 113.9904
 [324,] 1.479700 113.5191 114.2641
 
 $var_l3_no
-           [,1]     [,2]     [,3]
+         dolcan   cpiUSA   cpiCAN
 [323,] 1.675683 110.2168 105.3033
 [324,] 1.681117 110.2065 105.6054
 
