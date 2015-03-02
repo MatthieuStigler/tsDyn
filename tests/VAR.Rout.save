@@ -1654,25 +1654,19 @@ attr(,"condition")
 <simpleError in predict.VAR(x, n.ahead = 2): Please provide exogeneous values. >
 
 $var_l0_co
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+      dolcan   cpiUSA   cpiCAN
+325 1.231588 71.66441 71.80478
+326 1.231588 71.66441 71.80478
 
 $var_l0_tr
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+         dolcan    cpiUSA    cpiCAN
+325 0.006009626 0.3972013 0.4000043
+326 0.012019251 0.7944027 0.8000086
 
 $var_l0_bo
-[1] "Error in TVAR.gen(B = B, nthresh = 0, type = \"simul\", n = n, lag = lag,  : \n  Max of thDelay should be smaller or equal to the number of lags\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in TVAR.gen(B = B, nthresh = 0, type = "simul", n = n, lag = lag,     include = include, starting = starting, innov = innov, varcov = varcov,     show.parMat = show.parMat, round = round, seed = seed, ...): Max of thDelay should be smaller or equal to the number of lags>
+      dolcan   cpiUSA   cpiCAN
+325 1.026105 28.87399 27.61635
+326 1.027377 29.13895 27.88997
 
 $var_l0_coAsExo
 [1] "Error in predict.VAR(x, n.ahead = 2) : Please provide exogeneous values. \n"

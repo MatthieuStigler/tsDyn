@@ -49,7 +49,7 @@ predict.VAR <- function(object, newdata, n.ahead=5, exoPred=NULL, ...){
   
   ## setup starting values (data in y), innovations (0)
   original.data <- object$model[,1:k, drop=FALSE]
-  starting <-   myTail(original.data,lag)
+  starting <-   if(lag>0) myTail(original.data,lag) else NULL
   innov <- matrix(0, nrow=n.ahead, ncol=k)  
   
   
