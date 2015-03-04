@@ -2070,6 +2070,25 @@ $var_l3_no
 2 1.469934 110.5988 107.0181
 
 > 
+> ## check "retro" predictions against fitted
+> check.pred <- function(x,...){
++   true <- tail(fitted(x),1)
++   if(x$lag>0){
++     newD <- barry[nrow(barry)-(x$lag:1),,drop=FALSE] 
++     check <- predict(x, newdata=newD, n.ahead=1, ...)
++   } else {
++     check <- predict(x, n.ahead=1, ...)
++   }
++   
++   isTRUE(all.equal(true, check, check.attributes=FALSE))
++ }
+> sapply(var_all_pred2, check.pred)
+var_l1_co var_l1_tr var_l1_bo var_l1_no var_l0_co var_l0_tr var_l0_bo var_l3_co 
+     TRUE     FALSE     FALSE      TRUE      TRUE     FALSE     FALSE      TRUE 
+var_l3_tr var_l3_bo var_l3_no 
+    FALSE     FALSE      TRUE 
+> 
+> 
 > ## boot
 > var_all_boot <- var_all[-grep("adf|diff|Exo|l0", names(var_all))]
 > lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))

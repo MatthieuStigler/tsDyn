@@ -93,6 +93,21 @@ all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, functio
 lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 lapply(var_all_level , function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
+## check "retro" predictions against fitted
+check.pred <- function(x,...){
+  true <- tail(fitted(x),1)
+  if(x$lag>0){
+    newD <- barry[nrow(barry)-(x$lag:1),,drop=FALSE] 
+    check <- predict(x, newdata=newD, n.ahead=1, ...)
+  } else {
+    check <- predict(x, n.ahead=1, ...)
+  }
+  
+  isTRUE(all.equal(true, check, check.attributes=FALSE))
+}
+sapply(var_all_pred2, check.pred)
+
+
 ## boot
 var_all_boot <- var_all[-grep("adf|diff|Exo|l0", names(var_all))]
 lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
