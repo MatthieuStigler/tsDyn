@@ -264,9 +264,9 @@ Loading required package: lmtest
 [4] "Mean relative difference: 0.0001395315"
 > sapply(all_var_models, comp_var_logLik, tol=lowlowtol)
 [1] TRUE TRUE TRUE TRUE
-> roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),4)
-[1] "TRUE"                             "Mean relative difference: 0.0115"
-[3] "TRUE"                             "Mean relative difference: 0.0164"
+> roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),7)
+[1] "TRUE"                              "Mean relative difference: 4e-07"  
+[3] "TRUE"                              "Mean relative difference: 1.5e-06"
 > roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_predOld),7)
 [1] "TRUE"                                "Mean relative difference: 0.0118874"
 [3] "TRUE"                                "Mean relative difference: 0.0173923"

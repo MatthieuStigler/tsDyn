@@ -173,7 +173,7 @@ comp_var_IRF <- function(x) isTRUE(all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[
 ### Compare VECM methods:
 sapply(all_var_models, comp_var_coefs)
 sapply(all_var_models, comp_var_logLik, tol=lowlowtol)
-roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),4)
+roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),7)
 roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_predOld),7)
 sapply(all_var_models_noNoBo, comp_var_IRF)
 
