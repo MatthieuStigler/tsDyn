@@ -111,6 +111,11 @@ sapply(var_all_pred2, check.pred)
 ## boot
 var_all_boot <- var_all[-grep("adf|diff|Exo|l0", names(var_all))]
 lapply(var_all_boot, function(x) tail(VAR.boot(x, seed=1234),2))
+checkBoot <- function(x){
+  check <- VAR.boot(x, boot.scheme="check")
+  all.equal(check, as.matrix(as.data.frame(barry)), check.attributes = FALSE)
+}
+sapply(var_all_boot, checkBoot)
 
 ## sim 
 comp_tvar_sim <- function(mod, serie){

@@ -125,7 +125,7 @@ VAR.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
 #'
 #'
 #'
-#'##Bootstrap a TVAR with two threshold (three regimes)
+#'##Bootstrap a VAR 
 #'data(zeroyld)
 #'mod <- lineVar(data=zeroyld,lag=1)
 #'VAR.boot(mod)
@@ -141,6 +141,7 @@ VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "che
   t <- VARobject$t
   k <- VARobject$k
   lags <- VARobject$lag
+  startLag <- if(lags==0) 0 else 1
   include <- VARobject$include
   num_exogen <- VARobject$num_exogen 
   
@@ -160,7 +161,7 @@ VAR.boot <- function(VARobject, boot.scheme=c("resample", "wild1", "wild2", "che
   ## Exogen
   if(num_exogen>0){
     nYX <- ncol(YX)
-    exogen <- YX[, -(num_exogen-1):0+nYX]
+    exogen <- YX[-c(startLag:lags), -(num_exogen-1):0+nYX]
 #     starts <- cbind(starts, matrix(0, nrow=nrow(starts), ncol=num_exogen))
   } else {
     exogen <- NULL
@@ -180,12 +181,14 @@ if(FALSE){
   barry_mat <- as.matrix(as.data.frame(barry))
   
   va <- lineVar(barry, lag=1)
-  a<-VAR.boot(va, boot.scheme="check")
-  all.equal(a, as.matrix(as.data.frame(barry)), check.attributes = FALSE)
+  checkBoot <- function(x){
+    check <- VAR.boot(x, boot.scheme="check")
+    all.equal(check, as.matrix(as.data.frame(barry)), check.attributes = FALSE)
+  }
+  checkBoot(va)
+  checkBoot(lineVar(barry, lag=2))
   
-  var_l2_const <-VAR.boot(lineVar(barry, lag=2), boot.scheme="check")
-  all.equal(var_l2_const, barry_mat)
-  
+  sapply(var_all_boot, checkBoot)
   var_l3_const <-VAR.boot(lineVar(barry, lag=3), boot.scheme="check")
   all.equal(var_l3_const, barry_mat)
   

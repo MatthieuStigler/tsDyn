@@ -1984,8 +1984,8 @@ attr(,"condition")
 
 > 
 > all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
-[1] "Component “var_l1_tr”: Mean relative difference: 0.01818794"
-[2] "Component “var_l3_tr”: Mean relative difference: 0.01021486"
+[1] "Component \"var_l1_tr\": Mean relative difference: 0.01818794"
+[2] "Component \"var_l3_tr\": Mean relative difference: 0.01021486"
 > 
 > lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 $var_l1_co
@@ -2132,6 +2132,13 @@ $var_l3_no
 [323,] 1.675683 110.2168 105.3033
 [324,] 1.681117 110.2065 105.6054
 
+> checkBoot <- function(x){
++   check <- VAR.boot(x, boot.scheme="check")
++   all.equal(check, as.matrix(as.data.frame(barry)), check.attributes = FALSE)
++ }
+> sapply(var_all_boot, checkBoot)
+var_l1_co var_l1_tr var_l1_bo var_l1_no var_l3_co var_l3_tr var_l3_bo var_l3_no 
+     TRUE      TRUE      TRUE      TRUE      TRUE      TRUE      TRUE      TRUE 
 > 
 > ## sim 
 > comp_tvar_sim <- function(mod, serie){
