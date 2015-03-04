@@ -5,7 +5,8 @@
 \alias{predict.VECM}
 \title{Predict method for objects of class \sQuote{\code{VAR}} or \sQuote{\code{VECM}}}
 \usage{
-\method{predict}{VAR}(object, newdata, n.ahead = 5, exoPred = NULL, ...)
+\method{predict}{VAR}(object, newdata, n.ahead = 5, newdataTrendStart,
+  exoPred = NULL, ...)
 
 \method{predict}{VECM}(object, newdata, n.ahead = 5, ...)
 }
@@ -15,6 +16,10 @@
 \item{newdata}{Optional. A new data frame to predict from.}
 
 \item{n.ahead}{An integer specifying the number of forecast steps.}
+
+\item{newdataTrendStart}{If \sQuote{\code{newdata}} is provided by the user,
+and the estimated model includes a trend,
+this argument specifies where the trend should start}
 
 \item{exoPred}{vector/matrix of predictions for the exogeneous variable(s)}
 

@@ -7,6 +7,9 @@
 #' @param newdata Optional. A new data frame to predict from.
 #' @param n.ahead An integer specifying the number of forecast steps.
 #' @param exoPred vector/matrix of predictions for the exogeneous variable(s)
+#' @param newdataTrendStart If \sQuote{\code{newdata}} is provided by the user, 
+#' and the estimated model includes a trend, 
+#' this argument specifies where the trend should start
 #' @param \dots Arguments passed to the unexported \sQuote{\code{VAR.gen}} function
 #' 
 #' @details
