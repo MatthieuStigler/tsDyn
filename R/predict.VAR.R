@@ -150,3 +150,81 @@ if(FALSE){
   all.equal(coef(var_l1_coAsExo), coef(var_l1)[, c(2:4,1)], check.attributes=FALSE)
   all.equal(predict.VAR(var_l1_coAsExo, exoPred=rep(1,5), n.ahead=5),   predict.VAR(var_l1))
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#' @rdname predict.VAR
+#' @S3method predict VECM
+predict.VECM <- function(object, newdata, n.ahead=5, newdataTrendStart, exoPred=NULL, ...){
+  
+  lag <- object$lag
+  k <- object$k
+  include <- object$include
+  LRinclude <- object$model.specific$LRinclude
+  hasExo <- object$exogen
+  if(hasExo&&is.null(exoPred)) stop("Please provide exogeneous values. ")
+  
+  if(attr(object, "varsLevel")=="ADF") stop("Does not work with VAR in diff specification")
+  
+  ## get VAR representation
+  B <- VARrep(object)
+  lag <- lag+1
+  
+  ## check deterministc specification
+  if(LRinclude!="none"){
+    if(LRinclude=="const"){
+      include <- "const"
+    } else if(LRinclude=="trend"){
+      include <- if(include=="const") "both" else "trend"
+    } else if(LRinclude=="both"){
+      include <- "both"
+    }
+  }
+  
+  ## setup starting values (data in y), innovations (0)
+  original.data <- object$model[,1:k, drop=FALSE]
+  starting <-   if(lag>0) myTail(original.data,lag) else NULL 
+  innov <- matrix(0, nrow=n.ahead, ncol=k)  
+  
+  
+  if(!missing(newdata)) {
+    if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
+    if(nrow(newdata)!=lag) stop("Please provide newdata with nrow=lag") 
+    starting <-  newdata 
+  }
+  
+  ## trend
+  if(missing(newdataTrendStart)){
+    if(include%in%c("trend", "both")){
+      trendStart <- object$t+1
+    }  else {
+      trendStart <- 0
+    }
+  } else {
+    trendStart <- newdataTrendStart
+  }
+  trendStart <- lag+1 # temporary!!
+  
+  ## use VAR sim
+  res <- VAR.gen(B=B, lag=lag, n=n.ahead, trendStart=trendStart,
+                 starting=starting, innov=innov,include=include,
+                 exogen=exoPred,...)
+  
+  ## results
+  colnames(res) <- colnames(original.data )
+  
+  rownames(res) <- (nrow(original.data)+1):(nrow(original.data)+n.ahead)
+  return(res)
+  
+}
