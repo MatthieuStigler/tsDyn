@@ -94,13 +94,13 @@ lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 lapply(var_all_level , function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ## check "retro" predictions against fitted
-check.pred <- function(x,...){
+check.pred <- function(x){
   true <- tail(fitted(x),1)
   if(x$lag>0){
     newD <- barry[nrow(barry)-(x$lag:1),,drop=FALSE] 
-    check <- predict(x, newdata=newD, n.ahead=1, ...)
+    check <- predict(x, newdata=newD, newdataTrendStart=x$t, n.ahead=1)
   } else {
-    check <- predict(x, n.ahead=1, ...)
+    check <- predict(x, n.ahead=1, newdataTrendStart=x$t)
   }
   
   isTRUE(all.equal(true, check, check.attributes=FALSE))

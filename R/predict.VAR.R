@@ -31,7 +31,7 @@
 
 
 # unused so far, make sure;#' @S3method predict VAR
-predict.VAR <- function(object, newdata, n.ahead=5, exoPred=NULL, ...){
+predict.VAR <- function(object, newdata, n.ahead=5, newdataTrendStart, exoPred=NULL, ...){
   lag <- object$lag
   k <- object$k
   include <- object$include
@@ -59,8 +59,20 @@ predict.VAR <- function(object, newdata, n.ahead=5, exoPred=NULL, ...){
     starting <-  newdata 
   }
   
+  ## trend
+  if(missing(newdataTrendStart)){
+     if(include%in%c("trend", "both")){
+       trendStart <- tail(object$model[,"Trend"],1)+1
+     }  else {
+       trendStart <- 0
+     }
+  } else {
+    trendStart <- newdataTrendStart
+  }
+  
+  
   ## use VAR sim
-  res <- VAR.gen(B=B, lag=lag, n=n.ahead, 
+  res <- VAR.gen(B=B, lag=lag, n=n.ahead, trendStart=trendStart,
                  starting=starting, innov=innov,include=include,
                  exogen=exoPred, ...)
   
