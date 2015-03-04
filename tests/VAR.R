@@ -82,7 +82,8 @@ lapply(var_all_level , function(x) sapply(fevd(x, n.ahead=2), head))
 
 ## predict
 var_all_pred <- var_all[-grep("bo|no|adf|diff|Exo|l0", names(var_all))]
-lapply(var_all_pred, predict, n.ahead=2)
+var_all_pred2 <- var_all[-grep("adf|diff|Exo", names(var_all))]
+lapply(var_all_pred2, predict, n.ahead=2)
 lapply(var_all, function(x) try(predict(x, n.ahead=2), silent=TRUE))
 lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 lapply(var_all, function(x) try(sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
