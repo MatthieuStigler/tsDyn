@@ -214,7 +214,6 @@ predict.VECM <- function(object, newdata, n.ahead=5, newdataTrendStart, exoPred=
   } else {
     trendStart <- newdataTrendStart
   }
-  trendStart <- lag+1 # temporary!!
   
   ## use VAR sim
   res <- VAR.gen(B=B, lag=lag, n=n.ahead, trendStart=trendStart,
