@@ -3,7 +3,7 @@ Type: Package
 Title: Nonlinear time series models with regime switching
 Version: 0.9-41
 Date: 26/8/2014
-Authors@R: c(person("Antonio Fabio", "Di Narzo",role = c("aut", "cre")),
+Authors@R: c(person("Antonio Fabio", "Di Narzo",role = "aut"),
              person("Jose Luis", "Aznarte",role = "ctb"),
              person("Matthieu", "Stigler", role = c("aut","cre"), email="Matthieu.Stigler@gmail.com"))
 Imports: mnormt, mgcv, nnet, tseriesChaos, tseries, utils, vars, urca, forecast, MASS, Matrix, foreach
