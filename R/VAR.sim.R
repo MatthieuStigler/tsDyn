@@ -68,7 +68,7 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
 
   for(i in (p+1):(n+p)){
     Y <- matrix(t(y[i-c(pstart:p),, drop=FALSE]), ncol=1)
-    Yexo <-  rbind(Y, t(exogen[i,]))
+    Yexo <-  rbind(Y, t(exogen[i, , drop=FALSE]))
     y[i,]<-rowSums(cbind(Bfull[,1],  # intercept
                          Bfull[,2]*trend[i], #trend
                          Bfull[,-c(1,2)]%*%Yexo, #lags
@@ -95,7 +95,7 @@ if(FALSE){
 }
 
 VAR.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
-                    starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), 
+                    starting=NULL, innov=rmnorm(n, varcov=varcov), 
                     varcov=diag(1,nrow(B)), 
                     show.parMat=FALSE, returnStarting=FALSE){
   

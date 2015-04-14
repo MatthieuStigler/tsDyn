@@ -43,10 +43,16 @@ predict.VAR <- function(object, newdata, n.ahead=5,
   lag <- object$lag
   k <- object$k
   include <- object$include
+  
+  ## Check exogen
   hasExo <- object$exogen
-  if(hasExo&&is.null(exoPred)) stop("Please provide exogeneous values. ")
-  
-  
+  if(hasExo){
+    if(is.null(exoPred)) stop("Please provide exogeneous values. ")
+    if(!is.matrix(exoPred)) exoPred <- as.matrix(exoPred)
+    dim_exo <- c(n.ahead, object$num_exogen)
+    if(!all(dim(exoPred)==dim_exo)) 
+      stop("exoPred should be a matrix with ", n.ahead, " rows and ", object$num_exogen, " columns")
+  }
   
   
   ## get coefs
