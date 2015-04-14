@@ -1,7 +1,7 @@
 TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), 
                      n=200, lag=1, include = c("const", "trend","none", "both"),  
                      thDelay=1,  thVar=NULL, mTh=1, starting=NULL, 
-                     innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), 
+                     innov=rmnorm(n, varcov=varcov), varcov=diag(1,k), 
                      show.parMat=FALSE, round=FALSE, seed){
   
   ###check correct arguments
@@ -291,7 +291,7 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
 #'
 #'
 TVAR.sim <- function(B, Thresh, nthresh=1, n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  
-thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...){
+thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...){
 
 	    TVAR.gen(B=B, Thresh=Thresh, nthresh=nthresh, type="simul", n=n, lag=lag, include = include,  thDelay=thDelay,
 		    thVar=thVar, mTh=mTh, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, round=round, seed=seed, ...)
@@ -338,7 +338,7 @@ TVAR.boot <- function(TVARobject, innov, seed, ...){
 }
 
 VAR.sim2 <- function(B,  n=200, lag=1, include = c("const", "trend","none", "both"),  starting=NULL, 
-innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...){
+innov=rmnorm(n,  varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...){
   TVAR.gen(B=B, nthresh=0, type="simul", n=n, lag=lag, include = include,   starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, round=round, seed=seed, ...)
 }
 

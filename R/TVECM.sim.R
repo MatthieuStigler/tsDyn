@@ -1,7 +1,7 @@
 
 #' @export
 #' @rdname TVECM.sim
-VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
+VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n,  varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
   k<- if(!missing(VECMobject)) VECMobject$k else if(!missing(B)) nrow(B) else if(!missing(data)) ncol(data)
   TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, lag=lag, type=type,  include = include, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, seed=seed)
 }
@@ -167,7 +167,7 @@ as.matrix.ts <-
 #' TVECM.sim.check <- TVECM.sim(TVECMobject=TVECMobject,type="check")
 #' all(TVECM.sim.check==dat)
 #'
-TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, mean=0, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
+TVECM.sim<-function(data,B,TVECMobject, nthresh=1, Thresh, beta, n=200, lag=1, type=c("simul","boot", "check"),  include = c("const", "trend","none", "both"), starting=NULL, innov=rmnorm(n, varcov=varcov), varcov=diag(1,k), show.parMat=FALSE, seed){
 
   if(!missing(data)&!missing(B))
     stop("You have to provide either B or y, but not both")
