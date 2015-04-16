@@ -11,7 +11,8 @@
 \arguments{
 \item{object}{An object of class  \sQuote{\code{VAR}} or \sQuote{\code{VECM}}}
 
-\item{newdata}{Optional. A new data frame to predict from.}
+\item{newdata}{Optional. A new data frame to predict from.
+This should contain lags of the level of the original series. See Details.}
 
 \item{n.ahead}{An integer specifying the number of forecast steps.}
 
@@ -19,7 +20,7 @@
 and the estimated model includes a trend,
 this argument specifies where the trend should start}
 
-\item{exoPred}{vector/matrix of predictions for the exogeneous variable(s)}
+\item{exoPred}{vector/matrix of predictions for the exogeneous variable(s) (with \sQuote{\code{n.ahead}} rows)}
 
 \item{\dots}{Arguments passed to the unexported \sQuote{\code{VAR.gen}} function}
 }
@@ -27,15 +28,29 @@ this argument specifies where the trend should start}
 A matrix of predicted values.
 }
 \description{
-Forecating a  \sQuote{\code{VAR}} / \sQuote{\code{VECM}}
+Forecating the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}}
 }
 \details{
-The forecasts are obtained recursively from the estimated model.
+The forecasts are obtained recursively, and are for the levels of the series.  For VECM, the forecasts are
+obtained by transforming the VECM to a VAR (using function \code{\link{VARrep}}).
+Note that a VECM(lag=p) corresponds to a VAR(lag=p+1), so that if the user provides newdata
+for a VECM(lag=p), newdata should actually contain p+1 rows.
 }
 \examples{
 data(barry)
 mod_vecm <- VECM(barry, lag=2)
-predict(mod_vecm)
+pred_VECM <- predict(mod_vecm)
+
+
+mod_var <- lineVar(barry, lag=3)
+pred_VAR <- predict(mod_var)
+
+## compare
+
+plot(tail(barry[,1],50), type="l", xlim=c(0,60))
+lines(51:55,pred_VAR[,1], lty=2, col=2)
+lines(51:55,pred_VECM[,1], lty=2, col=3)
+
 
 # note that when providing newdata, newdata has to be ordered chronologically,
 # so that the first row/element is the earliest value:
@@ -45,7 +60,7 @@ all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(322, 323, 324),])
 Matthieu Stigler
 }
 \seealso{
-\code{\link{lineVar}} and \code{\link{VECM}}.
+\code{\link{lineVar}} and \code{\link{VECM}}. \code{\link{VARrep}}
 
 A more sophisticated predict function, allowing to do sub-sample rolling
 predictions: \code{\link{predict_rolling}}.
