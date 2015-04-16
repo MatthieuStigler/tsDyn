@@ -534,7 +534,7 @@ estimateParams.star <- function(object, trace=TRUE, control=list(), ...)
 # Incremental STAR fitter
 #
 #   Builds a STAR model with as many regimes as needed, using the
-#     bottom-up strategy proposed by Ter�svirta et al.
+#     bottom-up strategy proposed by Terasvirta et al.
 #
 #   x: the time series 
 #   m: the order of the autoregressive terms
