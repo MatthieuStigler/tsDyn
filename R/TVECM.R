@@ -245,7 +245,7 @@ gammas<-round(gammas, ndig)
 
 ###Grid for beta
 #beta pre-specified
-if(is.null(beta$exact)==FALSE) {
+if(!is.null(beta$exact)) {
   betas<-matrix(beta$exact, nrow=1)
   bn<-1
 } else if(is.numeric(beta$int)) {
