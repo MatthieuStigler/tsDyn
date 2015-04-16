@@ -1,4 +1,9 @@
 Version 0.9-41: Matthieu Stigler (26/8/2014)
+ -full rewrite of VAR.sim, VAR.gen, now cleaner, allows for exogeneous predictions, etc.
+ -remove predict.VECM
+ -fix small issue in DESC file (pkg description in title case, only one maintainer).
+
+Version 0.9-41: Matthieu Stigler (26/8/2014)
  -change description for new url to github wiki, as well as new field mailinglist
  -fix suggests issues (sm::foo()) newly detected by R CMD check devel
 
