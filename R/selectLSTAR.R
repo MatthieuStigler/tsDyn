@@ -35,7 +35,7 @@ selectLSTAR <- function(x, m, d=1, steps=d, mL = 1:m, mH = 1:m, thDelay=0:(m-1),
 
     ## base values on previous CI
       cf <- confint(lst, parm=c("gamma", "th"), level=0.99) #use previous CI
-      if(cf["gamma",1]<0) cf["gamma",1] <-  0.1
+      if(is.na(cf["gamma",1]) || cf["gamma",1]<0) cf["gamma",1] <-  0.1
 
     ## base values on previous estimates
       can_th <- sapply(computedMod, getTh) 
