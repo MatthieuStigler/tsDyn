@@ -1,4 +1,7 @@
-Version 0.9-41: Matthieu Stigler (26/8/2014)
+Version 0.9-43: Matthieu Stigler (23/4/2015)
+ -minor fixes: add checking in selectLSTAR in case of convergence issue, rename lstar.Rout.save as created issues on other platforms
+
+Version 0.9-42: Matthieu Stigler (15/4/2015) never published on CRAN
  -full rewrite of VAR.sim, VAR.gen, now cleaner, allows for exogeneous predictions, etc.
  -remove predict.VECM
  -fix small issue in DESC file (pkg description in title case, only one maintainer).
