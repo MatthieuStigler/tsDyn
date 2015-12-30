@@ -1,3 +1,11 @@
+##3 TODO
+# 1 insert col
+## rowsums
+## finir tvar.gen, initial values, etc
+## tvar.sim
+## tvar.boot
+
+
 #'Simulation and bootstrap of Threshold Autoregressive model
 #'
 #'Simulate or bootstrap a Threshold VAR
@@ -57,180 +65,122 @@
 #'##Check the bootstrap
 #'cbind(setar.sim(data=sun,nthresh=2,n=500, type="check", Thresh=c(6,9))$serie,sun)
 #'
-setar.sim<-function(data,B, setarObject, n=200, lag=1, trend=TRUE, nthresh=0, thDelay=0, Thresh, type=c("boot", "simul", "check"), starting=NULL,  rand.gen = rnorm, innov = rand.gen(n, ...),...){
-###1: 3 possibilities: 
-#either simulation with given th and coefMat B
-# or bootstrap of linear/setar object or raw data converted into it
-###2:simulations loops
+setar.gen <- function(B, n=200, lag=1, include=c("const", "none"), 
+                      nthresh=0, thDelay=0, Thresh, 
+                      starting=NULL,  innov, ...){
 
-
-if(!missing(data)&!missing(B))
-	stop("You have to provide either B or data, but not both")
-if(!nthresh%in%c(0,1,2))
+## Check arguments
+  if(!nthresh%in%c(0,1,2))
   stop("arg nthresh should be either 0,1 or 2")
-# p<-lag
-# m<-lag
-type<-match.arg(type)
+  type <- match.arg(type)
+  include <- match.arg(include)
+  esp<-switch(include, const=lag+1, none=lag)
 
-if(!missing(B)){
-  if(type!="simul"){
-    type<-"simul"
-    warning("Type check or boot are only avalaible with pre-specified data. The type simul was used")}
-    esp<-lag
-  if(trend)
-    esp<-lag+1
+## check specification of B
   if(esp*(nthresh+1)!=length(B))
-    stop("Matrix B bad specified")
-  y<-vector("numeric", length=n)
-  if(!is.null(starting)){
-    if(length(starting)==lag)
-    y[seq_len(lag)]<-starting
-    else
-    stop("Bad specification of starting values. Should have so many values as the number of lags")
-  }
+    stop("Matrix B badly specified")
+  if(!is.null(starting) && length(starting)!=lag)
+      stop("Bad specification of starting values. Should have so many values as the number of lags")
+  
+## Extend B
+  addInc <- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
+  
+  Bfull <- myInsertCol(B, c=addInc, 0)
   npar<-esp
+  
   if(nthresh==1){
-    BDown<-B[seq_len(npar)]
-    BUp<-B[-seq_len(npar)]
-  }
-  if(nthresh==2){
+    addInc <- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
+    BDown <- myInsertCol(B[seq_len(npar)], c=addInc, 0)
+    BUp   <- myInsertCol(B[-seq_len(npar)], c=addInc, 0)
+  } else if(nthresh==2){
     BDown <- B[seq_len(npar)]
     BMiddle <- B[seq_len(npar)+npar]
     BUp <- B[seq_len(npar)+2*npar]
   }
-}
 
+##
+  y<-vector("numeric", length=n)
+  if(!is.null(starting)) y[seq_len(lag)]<-starting
 
-if(!missing(data)){
-  if(nthresh==0){
-    setarObject<-linear(data, m=lag, include="const")
-  }
-  else if (nthresh %in% c(1,2)){
-    if(missing(Thresh)){
-      selSet<-selectSETAR(data, nthresh=nthresh, m=lag, criterion="SSR", trace=FALSE, plot=FALSE)
-      th<-selSet$bests[seq_len(nthresh)+1]
-    }
-    else
-      th<-Thresh
-    setarObject<-setar(data, nthresh=nthresh, m=lag, th=th, trace=FALSE)
-   }
-} 
+### MAIN loop
+  
+  thDelay<-thDelay+1
 
-
-if(!missing(setarObject)){
-mod<-setarObject$model.specific
-  if(inherits(setarObject,"linear")){
-    B<-coef(setarObject)
-    nthresh<-0
-  }
-  if(inherits(setarObject,"setar")){
-    Thresh<-getTh(coef(setarObject))
-    nthresh<-mod$nthresh
-    incNames<-mod$incNames
-    thDelay<-mod$thDelay
-    if(incNames%in%c("none", "trend"))
-      stop("Arg include = none or trend currently not implemented")
-    if(incNames=="trend")
-      trend<-TRUE
-    TotNpar<-length(coef(setarObject))-nthresh
-    B<-coef(setarObject)[seq_len(TotNpar)]
-    BUp<-B[grep("H", names(B))]
-    BDown<-B[grep("L", names(B))]
-    if(mod$nthresh==2)
-      BMiddle<-B[grep("M", names(B))]
-    if(mod$restriction=="OuterSymAll"){
-    BUp<-B[grep("H", names(B))]
-    BMiddle<-B[grep("L", names(B))]
-    BDown<-BUp
-    nthresh<-2
-    Thresh<-c(-Thresh, Thresh)
-    }
-  }
-  y<-setarObject$str$x
-#   m<-setarObject$str$m
-#   p<-m
-  lag<-setarObject$str$m
-  res<-na.omit(residuals(setarObject))
-  sigma<-sum(res)/length(res)
-}
-
-
-### Try to compute number of digits of the input series and round output correspondly
-#bootstraped series should not have more digits than input: this allows
-if(FALSE){
-if(type=="simul")
-	ndig<-4
-else
-	ndig<-getndp(y)
-	
-if(ndig>.Options$digits){
-	ndig<-.Options$digits
-	y<-round(y,ndig)
-}
-
-if(nthresh!=0)
-	Thresh<-round(Thresh, ndig)
- }
- else
-  ndig<-10
-
-##############################
-###Bootstrap
-##############################
-thDelay<-thDelay+1
 #initial values
-Yb<-vector("numeric", length=length(y))		#Delta Y term
-Yb[1:lag]<-y[1:lag]
+  Yb<-vector("numeric", length=length(y))		#Delta Y term
+  Yb[1:lag]<-y[1:lag]
 
-z2<-vector("numeric", length=length(y))
-z2[1:lag]<-y[1:lag]
-#rnorm(length(y)-lag,sd=sigma)
-innova<-switch(type, "boot"=sample(res, replace=TRUE), "simul"=innov, "check"=res)
-resb<-c(rep(0,lag),innova)	
+  z2<-vector("numeric", length=length(y))
+  z2[1:lag]<-y[1:lag]
+  resb<-c(rep(0,lag),innov)	
 
-if(nthresh==0){
-for(i in (lag+1):length(y)){
-	Yb[i]<-sum(B[1],B[-1]*Yb[i-c(1:lag)],resb[i])
-	}
+  if(nthresh==0){
+    for(i in (lag+1):length(y)){
+      Yb[i]<-sum(B[1],B[-1]*Yb[i-c(1:lag)],resb[i])
+    }
+  } else if(nthresh==1){
+    for(i in (lag+1):length(y)){
+      if(round(z2[i-thDelay],ndig)<=Thresh) 
+        Yb[i]<-sum(BDown[1],BDown[-1]*Yb[i-c(1:lag)],resb[i])
+      else 
+        Yb[i]<-sum(BUp[1],BUp[-1]*Yb[i-c(1:lag)],resb[i])
+      z2[i]<-Yb[i]
+    }
+  } else if(nthresh==2){
+    for(i in (lag+1):length(y)){
+      if(round(z2[i-thDelay],ndig)<=Thresh[1]) {
+        Yb[i]<-sum(BDown[1],BDown[-1]*Yb[i-c(1:lag)],resb[i])
+      } else if(round(z2[i-thDelay],ndig)>Thresh[2]) {
+        Yb[i]<-sum(BUp[1],BUp[-1]*Yb[i-c(1:lag)],resb[i])
+      } else{ 
+        Yb[i]<-sum(BMiddle[1],BMiddle[-1]*Yb[i-c(1:lag)],resb[i])
+      z2[i]<-Yb[i]
+      }
+    }
+  }
+
+
+  list(B=B, serie=round(Yb,ndig))
 }
 
-
-else if(nthresh==1){
-	for(i in (lag+1):length(y)){
-		if(round(z2[i-thDelay],ndig)<=Thresh) 
-			Yb[i]<-sum(BDown[1],BDown[-1]*Yb[i-c(1:lag)],resb[i])
-		else 
-			Yb[i]<-sum(BUp[1],BUp[-1]*Yb[i-c(1:lag)],resb[i])
-		z2[i]<-Yb[i]
-		}
-}
-
-else if(nthresh==2){
-	for(i in (lag+1):length(y)){
-		if(round(z2[i-thDelay],ndig)<=Thresh[1]) 
-			Yb[i]<-sum(BDown[1],BDown[-1]*Yb[i-c(1:lag)],resb[i])
-		else if(round(z2[i-thDelay],ndig)>Thresh[2]) 
-			Yb[i]<-sum(BUp[1],BUp[-1]*Yb[i-c(1:lag)],resb[i])
-		else
-			Yb[i]<-sum(BMiddle[1],BMiddle[-1]*Yb[i-c(1:lag)],resb[i])
-		z2[i]<-Yb[i]
-		}
-}
-
-if(FALSE){
-	while(mean(ifelse(Yb<Thresh, 1,0))>0.05){
-		cat("not enough")
-		if(!missing(thVar)) 
-			Recall(B=B,n=n, lag=lag, trend=trend, nthresh=nthresh, thDelay=thDelay,thVar=thVar, type="simul", starting=starting)
-		else
-			Recall(B=B, n=n, lag=lag, trend=trend, nthresh=nthresh, thDelay=thDelay,mTh=mTh, type="simul", starting=starting)
-		y<-NULL
-		
-		}
-}
-
-
-list(B=B, serie=round(Yb,ndig))
+### 
+setar.boot <- function(setarObject){
+  if(!missing(setarObject)){
+    mod<-setarObject$model.specific
+    if(inherits(setarObject,"linear")){
+      B<-coef(setarObject)
+      nthresh<-0
+    }
+    if(inherits(setarObject,"setar")){
+      Thresh<-getTh(coef(setarObject))
+      nthresh<-mod$nthresh
+      incNames<-mod$incNames
+      thDelay<-mod$thDelay
+      if(incNames%in%c("none", "trend"))
+        stop("Arg include = none or trend currently not implemented")
+      if(incNames=="trend")
+        trend<-TRUE
+      TotNpar<-length(coef(setarObject))-nthresh
+      B<-coef(setarObject)[seq_len(TotNpar)]
+      BUp<-B[grep("H", names(B))]
+      BDown<-B[grep("L", names(B))]
+      if(mod$nthresh==2)
+        BMiddle<-B[grep("M", names(B))]
+      if(mod$restriction=="OuterSymAll"){
+        BUp<-B[grep("H", names(B))]
+        BMiddle<-B[grep("L", names(B))]
+        BDown<-BUp
+        nthresh<-2
+        Thresh<-c(-Thresh, Thresh)
+      }
+    }
+    y<-setarObject$str$x
+    #   m<-setarObject$str$m
+    #   p<-m
+    lag<-setarObject$str$m
+    res<-na.omit(residuals(setarObject))
+    sigma<-sum(res)/length(res)
+  }
 }
 
 if(FALSE){
