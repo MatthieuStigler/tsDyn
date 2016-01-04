@@ -67,14 +67,15 @@
 #'
 setar.gen <- function(B, n=200, lag=1, include=c("const", "none"), 
                       nthresh=0, thDelay=0, Thresh, 
+                      trendStart=1, 
                       starting=NULL,  innov, ...){
 
 ## Check arguments
   if(!nthresh%in%c(0,1,2))
   stop("arg nthresh should be either 0,1 or 2")
-  type <- match.arg(type)
   include <- match.arg(include)
   esp<-switch(include, const=lag+1, none=lag)
+  ndig <- 10
 
 ## check specification of B
   if(esp*(nthresh+1)!=length(B))
@@ -82,25 +83,27 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
   if(!is.null(starting) && length(starting)!=lag)
       stop("Bad specification of starting values. Should have so many values as the number of lags")
   
-## Extend B
-  addInc <- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
+## y vec, trend vec
+  y<-vector("numeric", length=n+lag)
+  if(!is.null(starting)) y[seq_len(lag)]<-starting  
+  trend<-c(rep(0, lag), trendStart+(0:(n-1)))  ### n-1 a sstarts from zero
   
-  Bfull <- myInsertCol(B, c=addInc, 0)
+## Extend B
+  addInc <<- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
+  B <<- B
+  Bfull <- as.vector(tsDyn:::myInsertCol(matrix(B,nrow=1), c=addInc, 0))
   npar<-esp
   
   if(nthresh==1){
-    addInc <- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
-    BDown <- myInsertCol(B[seq_len(npar)], c=addInc, 0)
-    BUp   <- myInsertCol(B[-seq_len(npar)], c=addInc, 0)
+    BDown <- Bfull[seq_len(npar)]
+    BUp   <- Bfull[-seq_len(npar)]
   } else if(nthresh==2){
-    BDown <- B[seq_len(npar)]
-    BMiddle <- B[seq_len(npar)+npar]
-    BUp <- B[seq_len(npar)+2*npar]
+    BDown <- Bfull[seq_len(npar)]
+    BMiddle <- Bfull[seq_len(npar)+npar]
+    BUp <- Bfull[seq_len(npar)+2*npar]
   }
 
-##
-  y<-vector("numeric", length=n)
-  if(!is.null(starting)) y[seq_len(lag)]<-starting
+
 
 ### MAIN loop
   
@@ -116,15 +119,18 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
 
   if(nthresh==0){
     for(i in (lag+1):length(y)){
-      Yb[i]<-sum(B[1],B[-1]*Yb[i-c(1:lag)],resb[i])
+      y[i] <- sum(Bfull[1], # intercept
+                  Bfull[2]*trend[i], #trend
+                  Bfull[-c(1,2)]*y[i-c(1:lag)], # lags
+                  resb[i]) #residuals
     }
   } else if(nthresh==1){
     for(i in (lag+1):length(y)){
       if(round(z2[i-thDelay],ndig)<=Thresh) 
-        Yb[i]<-sum(BDown[1],BDown[-1]*Yb[i-c(1:lag)],resb[i])
+        y[i]<-sum(BDown[1],BDown[2]*trend[i], BDown[-c(1,2)]*y[i-c(1:lag)],resb[i])
       else 
-        Yb[i]<-sum(BUp[1],BUp[-1]*Yb[i-c(1:lag)],resb[i])
-      z2[i]<-Yb[i]
+        yb[i]<-sum(BUp[1],BUp[2]*trend[i], BUp[-c(1,2)]*y[i-c(1:lag)],resb[i])
+      z2[i]<-y[i]
     }
   } else if(nthresh==2){
     for(i in (lag+1):length(y)){
@@ -181,6 +187,15 @@ setar.boot <- function(setarObject){
     res<-na.omit(residuals(setarObject))
     sigma<-sum(res)/length(res)
   }
+}
+
+if(FALSE){
+  Bvals <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
+  library(tsDyn)
+  environment(setar.gen) <- environment(star)
+  sim_new <- setar.gen(B=Bvals,lag=2, nthresh=1, Thresh=2, starting=c(2.8,2.2),
+                       innov=rnorm(200))$serie
+  
 }
 
 if(FALSE){
