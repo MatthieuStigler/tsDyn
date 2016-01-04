@@ -279,7 +279,7 @@ myInsertCol<-function (m, c, v = NA) {
     m2 <- if (1 %in% c) cbind(matrix(v, nrow = nr), m) else m
     #inter
     for(i in c[!c%in%c(1, length(c)+nc)])
-        m2 <- cbind(m2[, 1:(i - 1)], matrix(v, nrow = nr), m2[,i:ncol(m2)])
+        m2 <- cbind(m2[, 1:(i - 1), drop=FALSE], matrix(v, nrow = nr), m2[,i:ncol(m2), drop=FALSE])
     #last
     if (eval(ncol(m2) + 1) %in% c) 
       m2 <- cbind(m2, matrix(v, nrow = nr))
