@@ -5,12 +5,12 @@
 #' @param object An object of class \code{\link{VECM}}, \code{\link[urca]{ca.jo}}
 #' @param \ldots Further arguments passed to methods
 #' @author Matthieu Stigler
-#' @details The functions extract the parameters from a VECM with \deqn{K} variables 
-#' and rank \deqn{r}:
+#' @details The functions extract the parameters from a VECM with \eqn{K} variables 
+#' and rank \eqn{r}:
 #'   \describe{
-#'    \item{A}{Adjustment coefficients, of dim \deqn{K \times r}}
-#'    \item{B}{Cointegrating coefficients, of dim \deqn{K \times r}}
-#'    \item{Pi}{Matrix \deqn{\Pi=A\dot B^{'}}, of dim \deqn{K \times K}}
+#'    \item{A}{Adjustment coefficients, of dim \eqn{K \times r}}
+#'    \item{B}{Cointegrating coefficients, of dim \eqn{K \times r}}
+#'    \item{Pi}{Matrix \eqn{\Pi=A\dot B^{'}}, of dim \eqn{K \times K}}
 #'    }
 #'    Coefficients are extracted from a VECM in package \code{tsDyn}, or from a VECM 
 #'    obtained in package \code{urca} from \code{\link[urca]{ca.jo}} or \code{\link[urca]{cajorls}}. 
@@ -18,12 +18,12 @@
 #'    Note that by default, the A and B coefficients returned are normalized (see below). This is 
 #'    the case for results obtained from \code{\link{VECM}}/\code{\link{lineVar}} and 
 #'    \code{\link[urca]{cajorls}}, while for \code{\link[urca]{ca.jo}}, the user has the choice
-#'    (but normalize=TRUE by default), in which case the rank \code{r} is also to be specified
-#'    The normalization is the standard one followed by Johansen (1995, p. 72), standardising 
-#'    the first \deqn{r\times r} coefficients to \deqn{I_r}:
+#'    (but normalize=TRUE by default), in which case the rank \code{r} is also to be specified.
+#'    The normalization is the Phillips triangular representation,  as suggested by Johansen (1995, p. 72), 
+#'    standardising  the first \eqn{r\times r} coefficients to \eqn{I_r}:
 #'    \describe{
-#'      \item{B}{\deqn{B_{norm}=B (c^{'}B)^{-1}} with \deqn{c=(I_r,0_{p-r,r})^{'}}}
-#'      \item{A}{\deqn{A_{norm}=B^{'}c}}
+#'      \item{B}{\eqn{B_{norm}=B (c^{'}B)^{-1}} with \eqn{c=(I_r,0_{p-r,r})^{'}}}
+#'      \item{A}{\eqn{A_{norm}=B^{'}c}}
 #'    }
 #'    Finally, note that the function also apply to objects obtained from tests of class 
 #'    \code{ca.jo.test} (from \code{\link[urca]{blrtest}} etc...). Care should be taken 

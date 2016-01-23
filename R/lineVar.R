@@ -11,7 +11,7 @@
 #'        with or without standard-values and significance stars}
 #' } 
 #'
-#'Two estimators are available: the Engle-Granger two step
+#'Two estimators are available: the Engle-Granger two-steps
 #'approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS,
 #'deterministic regressors (or external variables if \code{LRinclude} is of
 #'class numeric) can be added for the estimation of the cointegrating value and
@@ -265,6 +265,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
       ve_no<-apply(ve,2, function(x) x/sqrt(t(x)%*%S11%*%x))
       ve_2<-t(t(ve_no)/diag(ve_no)) 
       ve_3<-ve_2[,1:r, drop=FALSE]
+      ## Phillips triangular normalisation (Juselius (2006, p. 216))
       C2 <- matrix(0, nrow = nrow(ve_2) - r, ncol = r)
       C <- rbind(diag(r), C2)
       ve_4 <- ve_3 %*% solve(t(C) %*% ve_3)
@@ -386,13 +387,13 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 #' Estimation of Vector error correction model (VECM)
 #'
-#' Estimate either a VECM by Engle-Granger or Johansen (MLE) method.
+#' Estimate a VECM by either Engle-Granger (2OLS) or Johansen (MLE) method.
 #'
 #' This function is just a wrapper for the \code{\link{lineVar}}, with
 #' model="VECM".
 #'
-#' More comprehensive functions for VECM are in package \pkg{vars}. A few
-#' differences appear in the VECM estimation: \describe{ \item{Engle-Granger
+#' More comprehensive functions for VECM are in package \pkg{vars}. 
+#' Differences with that package are: \describe{ \item{Engle-Granger
 #' estimator}{The Engle-Granger estimator is available}
 #' \item{Presentation}{Results are printed in a different ways, using a matrix
 #' form} \item{lateX export}{The matrix of coefficients can be exported to
@@ -412,7 +413,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #' Note that the lag specification corresponds to the lags in the VECM
 #' representation, not in the VAR (as is done in package vars or software
 #' GRETL). Basically, a VAR with 2 lags corresponds here to a VECM with 1 lag.
-#' Lag 0 in the VECM is not allowed.
+#' The lag can be set to 0, although some methods (irf, fevd) won't work for this case.
 #' 
 #' #'The arg \code{beta} allows to specify constrained cointegrating values, leading to
 #' \eqn{ECT= \beta^{'}X_{t-1}}. It should be specified as a \eqn{K \times r} matrix. In case of
@@ -422,6 +423,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #' Note finally one should provide values for all
 #' the coefficients (eventually except for special case of r=1 and k-1), if you want to provide only part of the 
 #' parameters, and let the others be estimated, look at the functions in package urca. 
+#'
+#'The eigenvector matrix \eqn{\beta} is normalised using the Phillips triangular representation, 
+#'see Hamilton (1994, p. 576) and Juselius (2006, p. 216), see \code{\link{coefA}} for more details. 
 #'
 #' @param data multivariate time series (first row being first=oldest value)
 #' @param lag Number of lags (in the VECM representation, see Details)
@@ -436,6 +440,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #'@param exogen Inclusion of exogenous variables (first row being first=oldest
 #'value). Is either of same size than data (then automatically cut) or than
 #'end-sample.
+#'
 #'@return An object of class \code{VECM} (and higher classes \code{VAR} and
 #'\code{nlVar}) with methods: \describe{ \item{Usual methods}{Print, summary,
 #'plot, residuals, fitted, vcov} \item{Fit criteria}{AIC, BIC,
@@ -444,8 +449,17 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #'\code{\link{predict_rolling}}} \item{VAR/VECM methods}{Impulse response
 #'function (\code{\link[=irf.nlVar]{irf}}) and forecast error variance
 #'decomposition (\code{\link[=fevd.nlVar]{fevd}})} \item{LaTeX}{toLatex} }
+#'
 #'@author Matthieu Stigler
-#'@seealso \code{\link{lineVar}} \code{\link{TVAR}} and \code{\link{TVECM}} for
+#'
+#'@references
+#' Hamilton (1994) Time Series Analysis, Princeton University Press
+#' 
+#' Juselius (2006) The Cointegrated VAR model, Oxford University Press
+#'@seealso \code{\link{coefA}}, \code{\link{coefB}} and \code{\link{coefPi}} 
+#'to extract the relevant parameter matrices. 
+#'
+#'\code{\link{lineVar}} \code{\link{TVAR}} and \code{\link{TVECM}} for
 #'the correspoding threshold models. \code{\link{linear}} for the univariate AR
 #'model.
 #'@keywords ts
