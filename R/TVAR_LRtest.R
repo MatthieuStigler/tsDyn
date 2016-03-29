@@ -130,10 +130,14 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 ##################
 ###Linear model
 #################
-  B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
-  res<-Y-Z%*%t(B)
+  linMod <- lm.fit(x=Z, y=Y)
+  B <- t(linMod$coef)
+  res <- linMod$residuals
+  
+#   B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
+#   res<-Y-Z%*%t(B)
   Sigma<- matrix(1/T*crossprod(res),ncol=k)
-
+  Y_long <- Y
   Y<-t(Y)
 
 ########################
@@ -204,10 +208,12 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 	  d1<-ifelse(trans[,d]<gam1, 1,0)
 	  ndown<-mean(d1)
 	  if(min(ndown, 1-ndown)>=trim){
-		  Z1 <- t(cbind(d1 * Z, (1-d1)*Z))		# dim k(p+1) x t
-		  res<-crossprod(c(Y - tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))%*% Z1))}
-	  else
+		  Z1 <- cbind(d1 * Z, (1-d1)*Z)		# dim k(p+1) x t
+		  res <- crossprod(c(qr.resid(qr(Z1),Y)))
+		  # res<-crossprod(c(Y - tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))%*% Z1))}
+	  } else {
 		  res<-NA
+	  }
 	  return(res)
   } #end of the function
 
@@ -217,9 +223,10 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 	  regimeDown <- d1 * Z
 	  regimeUp<-(1-d1)*Z
 	  ##SSR
-	  Z1 <- t(cbind(regimeDown, regimeUp))		# dim k(p+1) x t
-	  B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
-	  matrix(1/T*tcrossprod(Y - B1 %*% Z1),ncol=k)
+	  Z1 <- cbind(regimeDown, regimeUp)		# dim k(p+1) x t
+	  res <- qr.resid(qr(Z1),Y)
+	  # B1 <- tcrossprod(Y,Z1) %*% solve(tcrossprod(Z1))
+	  matrix(1/T*crossprod(res),ncol=k)
   } #end of the function
 
   SSR_2thresh <- function(gam1,gam2,d,Z,Y,trans){
@@ -233,8 +240,8 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 	  ##SSR from TVAR(3)
   #  	print(c(ndown,1-nup-ndown,nup))
 	  if(min(nup, ndown, 1-nup-ndown)>=trim){
-		  Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
-		  resid <- crossprod(c( Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2))	#SSR
+		  Z2 <- cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup)		# dim k(p+1) x t	
+		  resid <- crossprod(c(qr.resid(qr(Z2),Y)))	#SSR
 	  }
 	  else
 		  resid <- NA
@@ -248,8 +255,8 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 	  dummyup <- ifelse(trans[,d]>=gam2, 1, 0)
 	  regimeup <- dummyup*Z
 	  ##SSR from TVAR(3)
-	  Z2 <- t(cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup))		# dim k(p+1) x t	
-	  matrix(1/T*tcrossprod(Y - tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))%*%Z2),ncol=k)
+	  Z2 <- cbind(regimedown, (1-dummydown-dummyup)*Z, regimeup)		# dim k(p+1) x t	
+	  matrix(1/T*crossprod(qr.resid(qr(Z2),Y)),ncol=k)
   }
 
 ##################
@@ -257,14 +264,14 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 ##################
 
   IDS<-as.matrix(expand.grid(thDelay, gammas)) 
-  result <- apply(IDS, 1, SSR_1thresh,Z=Z, Y=Y,trans=z)
+  result <- apply(IDS, 1, SSR_1thresh,Z=Z, Y=Y_long,trans=z)
   posBest<-which(result==min(result, na.rm=TRUE))
   bestDelay<-IDS[posBest,1]
   bestThresh<-IDS[posBest,2]
 
   if(trace) cat("Best unique threshold", bestThresh, "\t\t\t\t SSR", min(result, na.rm=TRUE), "\n")
 
-  Sigma_mod1thresh<-Sigma_1thresh(gam1=bestThresh, d=bestDelay,Z=Z,Y=Y, trans=z)
+  Sigma_mod1thresh<-Sigma_1thresh(gam1=bestThresh, d=bestDelay,Z=Z,Y=Y_long, trans=z)
 
 ##################
 ###Two thresholds
@@ -309,7 +316,7 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 
 
 ###Applying the function for conditional search to original data
-  More<-list(d=bestDelay, Z=Z, Y=Y,trans=z)
+  More<-list(d=bestDelay, Z=Z, Y=Y_long,trans=z)
   Thresh2<-condiStep(allgammas, bestThresh, fun=SSR_2thresh, MoreArgs=More)$newThresh
   Thresh3<-condiStep(allgammas, Thresh2, fun=SSR_2thresh, MoreArgs=More)
   smallThresh<-min(Thresh2, Thresh3$newThresh)
@@ -320,7 +327,7 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
     cat("Iterative best: ",Thresh3$newThresh, " (conditionnal on ",Thresh2, ")\n")
   }
 
-  Sigma_mod2thresh<-Sigma_2thresh(gam1=smallThresh,gam2=bigThresh,d=bestDelay, Z=Z, Y=Y,trans=z)
+  Sigma_mod2thresh<-Sigma_2thresh(gam1=smallThresh,gam2=bigThresh,d=bestDelay, Z=Z, Y=Y_long,trans=z)
 
 ###F test for original data
   LRtest12<-as.numeric(t*(log(det(Sigma))-log(det(Sigma_mod1thresh))))
@@ -454,22 +461,22 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 ###One threshold Search on bootstrap data
 
   IDSb<-as.matrix(expand.grid(thDelay, gammasb))
-  resultb <- apply(IDSb, 1, SSR_1thresh,Z=Zb, Y=t(Yboot),trans=zb)
+  resultb <- apply(IDSb, 1, SSR_1thresh,Z=Zb, Y=Yboot,trans=zb)
   postBestb<-which(resultb==min(resultb, na.rm=TRUE))[1]
   bestDelayb<-IDSb[postBestb,1]
   bestThreshb<-IDSb[postBestb,2]
   
-  Sigma_mod1threshb<-Sigma_1thresh(gam1=bestThreshb, d=bestDelayb,Z=Zb,Y=t(Yboot), trans=zb)
+  Sigma_mod1threshb<-Sigma_1thresh(gam1=bestThreshb, d=bestDelayb,Z=Zb,Y=Yboot, trans=zb)
 # print(bestThreshb)
 ###Two threshold Search (conditional and 1 iteration) on bootstrap data
-  Moreb<-list(d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
+  Moreb<-list(d=bestDelayb, Z=Zb, Y=Yboot,trans=zb)
   Thresh2b<-condiStep(allgammasb, bestThreshb, fun=SSR_2thresh, MoreArgs=Moreb)$newThresh
   Thresh3b<-condiStep(allgammasb, Thresh2b, fun=SSR_2thresh, MoreArgs=Moreb)
   smallThreshb<-min(Thresh2b, Thresh3b$newThresh)
   bigThreshb<-max(Thresh2b, Thresh3b$newThresh)
 
 
-  Sigma_mod2threshb<-Sigma_2thresh(gam1=smallThreshb,gam2=bigThreshb,d=bestDelayb, Z=Zb, Y=t(Yboot),trans=zb)
+  Sigma_mod2threshb<-Sigma_2thresh(gam1=smallThreshb,gam2=bigThreshb,d=bestDelayb, Z=Zb, Y=Yboot,trans=zb)
   
 ###Test statistic on bootstrap data
   LRtest12b<-as.numeric(t*(log(det(Sigmab))-log(det(Sigma_mod1threshb))))
