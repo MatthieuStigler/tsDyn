@@ -70,6 +70,9 @@ sapply(var_all, AIC, fitMeasure="LL")
 sapply(var_all, BIC)
 sapply(var_all, BIC, fitMeasure="LL")
 
+## Misc
+sapply(var_all, df.residual)
+
 ### VARrep
 var_all_noADF <- var_all[-grep("adf", names(var_all))]
 lapply(var_all_noADF, VARrep)

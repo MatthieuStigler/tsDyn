@@ -1354,6 +1354,21 @@ $var_l2_adf_coAsExo
       var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
           -2061.457           -2052.775           -2062.085           -2055.818 
 > 
+> ## Misc
+> sapply(var_all, df.residual)
+          var_l1_co           var_l1_tr           var_l1_bo           var_l1_no 
+                319                 319                 318                 320 
+     var_l1_coAsExo           var_l0_co           var_l0_tr           var_l0_bo 
+                319                 323                 323                 322 
+     var_l0_coAsExo           var_l3_co           var_l3_tr           var_l3_bo 
+                322                 311                 311                 310 
+          var_l3_no      var_l3_coAsExo      var_l2_diff_co      var_l2_diff_tr 
+                312                 311                 314                 314 
+     var_l2_diff_bo      var_l2_diff_no var_l2_diff_coAsExo       var_l2_adf_co 
+                313                 315                 314                 311 
+      var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
+                311                 310                 312                 311 
+> 
 > ### VARrep
 > var_all_noADF <- var_all[-grep("adf", names(var_all))]
 > lapply(var_all_noADF, VARrep)
