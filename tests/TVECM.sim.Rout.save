@@ -192,7 +192,7 @@ Equation long.run   0.10732160 -0.09079342     0     0.08524092   -0.02873180
 [4,] 2.289 1.701
 [5,] 2.151 1.413
 > TVECM.sim(TVECMobject=tv_2_none, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-                               Const Trend short.run t -1 long.run t -1
+                           ECT Const Trend short.run t -1 long.run t -1
 Equation short.run -0.03252245     0     0      0.3508268    -0.2229371
 Equation long.run   0.17029747     0     0      1.2574671    -0.3689984
                            ECT Const Trend short.run t -1 long.run t -1
@@ -208,7 +208,7 @@ Equation long.run  0.061539636     0     0     0.01649033     0.1198955
 [4,] 2.254 1.610
 [5,] 2.199 1.570
 > TVECM.sim(TVECMobject=tv_2_trend, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-                             Const       Trend short.run t -1 long.run t -1
+                         ECT Const       Trend short.run t -1 long.run t -1
 Equation short.run 0.3391893     0 0.002350986     0.07245793   -0.05503711
 Equation long.run  1.4764723     0 0.007927246     0.30567992    0.26850260
                    Const          ECT         Trend short.run t -1 Const
