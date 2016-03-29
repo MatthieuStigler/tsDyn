@@ -133,9 +133,6 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
   linMod <- lm.fit(x=Z, y=Y)
   B <- t(linMod$coef)
   res <- linMod$residuals
-  
-#   B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
-#   res<-Y-Z%*%t(B)
   Sigma<- matrix(1/T*crossprod(res),ncol=k)
   Y_long <- Y
   Y<-t(Y)
@@ -360,9 +357,14 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 
   dummydown <- ifelse(z[,bestDelay]<=bestThresh, 1, 0)
   regimedown <- dummydown*Z
-  Z2 <- t(cbind(regimedown, (1-dummydown)*Z))		# dim k(p+1) x t	
-  B1thresh<-tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))
-  res_thresh <- t(Y - B1thresh%*%Z2)	#SSR
+  Z2 <- cbind(regimedown, (1-dummydown)*Z)		# dim k(p+1) x t	
+  
+  thresh_Mod <- lm.fit(x=Z2, y=Y_long)
+  B1thresh <- t(thresh_Mod$coef)
+  res_thresh <- thresh_Mod$residuals
+  
+#   B1thresh<-tcrossprod(Y,Z2) %*% solve(tcrossprod(Z2))
+#   res_thresh <- t(Y - B1thresh%*%Z2)	#SSR
 
   B1tDown<-B1thresh[,seq_len(k*m+1)]
   B1tUp<-B1thresh[,-seq_len(k*m+1)]
@@ -429,8 +431,9 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
     Zb <- string[, -seq_len(k)]	#Lags matrix
     if(trend==TRUE)
       Zb <- cbind(1,Zb)
-    Bboot<-t(Yboot)%*%Zb%*%solve(t(Zb)%*%Zb)		#B: OLS parameters, dim 2 x npar
-    resboot<-Yboot-Zb%*%t(Bboot)
+    resboot <- qr.resid(qr(Zb),Yboot)
+#     Bboot<-t(Yboot)%*%Zb%*%solve(t(Zb)%*%Zb)		#B: OLS parameters, dim 2 x npar
+#     resboot<-Yboot-Zb%*%t(Bboot)
     Sigmab<- matrix(1/T*crossprod(resboot),ncol=k)
     
   #grid for threshold boot model
