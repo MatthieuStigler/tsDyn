@@ -287,6 +287,8 @@ myInsertCol<-function (m, c, v = NA) {
     return(m2)
 }
 
+ct <- function(x) c(t(x))
+
 if(FALSE){
 X<-freeny.x
 myInsertCol(X, 1, 2)
