@@ -564,7 +564,8 @@ summary.VAR<-function(object, digits=4,...){
   ## assemble
   coMat <- cbind(ct(betas), ct(StDevB), ct(Tvalue), ct(Pval))
   colnames(coMat) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
-  rownames(coMat) <- paste(rep(eqNames(x), each=ncol(betas)), colnames(betas), sep=":")
+  rownames(coMat) <- paste(rep(eqNames(x), each=ncol(betas)), 
+                           gsub(" ", "", colnames(betas)), sep=":")
   
   x$bigcoefficients<-ab
   x$cov.unscaled<-cov.unscaled
@@ -600,9 +601,9 @@ print.summary.VAR<-function(x,...){
 #' @S3method vcov VAR
 vcov.VAR<-function(object, ...){
   sum<-summary.VAR(object)
-  so<-sum$cov.unscaled%x%sum$sigma
+  so<-sum$sigma %x% sum$cov.unscaled
   co.names<-gsub(" ", "", colnames(coef(object)))
-  eq.names<-gsub("Equation ", "",rownames(coef(object)))
+  eq.names <- eqNames(object)
   together.names<-paste(rep(eq.names,each= length(co.names)), co.names, sep=":")
   dimnames(so)<-list(together.names, together.names)
   so

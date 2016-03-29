@@ -58,6 +58,7 @@ names(var_all) <-c(
 lapply(var_all, print)
 lapply(var_all, summary)
 lapply(var_all, function(x) summary(x)$coefMat)
+all(sapply(var_all, function(x) all.equal(summary(x)$coefMat[,2], sqrt(diag(vcov(x))))))
 
 lapply(var_all, function(x) head(residuals(x), 3))
 lapply(var_all, function(x) head(fitted(x), 3))
@@ -73,6 +74,7 @@ sapply(var_all, BIC, fitMeasure="LL")
 
 ## Misc
 sapply(var_all, df.residual)
+sapply(var_all, vcov)
 
 ### VARrep
 var_all_noADF <- var_all[-grep("adf", names(var_all))]
