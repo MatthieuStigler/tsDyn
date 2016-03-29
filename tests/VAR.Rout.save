@@ -1537,8 +1537,6 @@ cpiCAN:D_cpiUSA-2  0.0136459464 0.0907917689  0.15029938 8.806259e-01
 cpiCAN:D_cpiCAN-2  0.1703618200 0.0583407818  2.92011548 3.754716e-03
 cpiCAN:exo_1       0.1465490545 0.1625480236  0.90157389 3.679809e-01
 
-> all(sapply(var_all, function(x) all.equal(summary(x)$coefMat[,2], sqrt(diag(vcov(x))))))
-[1] TRUE
 > 
 > lapply(var_all, function(x) head(residuals(x), 3))
 $var_l1_co
@@ -1926,6 +1924,8 @@ $var_l2_adf_coAsExo
                 313                 315                 314                 311 
       var_l2_adf_tr       var_l2_adf_bo       var_l2_adf_no  var_l2_adf_coAsExo 
                 311                 310                 312                 311 
+> 
+> ## vcov
 > sapply(var_all, vcov)
 $var_l1_co
                  dolcan:Intercept dolcan:dolcan-1 dolcan:cpiUSA-1
@@ -5790,6 +5790,11 @@ cpiCAN:D_cpiUSA-2 -2.063770e-03
 cpiCAN:D_cpiCAN-2 -2.782477e-04
 cpiCAN:exo_1       2.642186e-02
 
+> all(sapply(var_all, function(x) all.equal(summary(x)$coefMat[,2], sqrt(diag(vcov(x))))))
+[1] TRUE
+> var_all_withInt <- var_all[-grep("no|l0|diff", names(var_all))]
+> all(sapply(var_all_withInt, function(x) all.equal(vcov(tsDyn:::toMlm.nlVar(summary(x))), vcov(x), check.attributes=FALSE)))
+[1] TRUE
 > 
 > ### VARrep
 > var_all_noADF <- var_all[-grep("adf", names(var_all))]
