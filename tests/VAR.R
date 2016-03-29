@@ -57,6 +57,7 @@ names(var_all) <-c(
 ## Check methods:
 lapply(var_all, print)
 lapply(var_all, summary)
+lapply(var_all, function(x) summary(x)$coefMat)
 
 lapply(var_all, function(x) head(residuals(x), 3))
 lapply(var_all, function(x) head(fitted(x), 3))

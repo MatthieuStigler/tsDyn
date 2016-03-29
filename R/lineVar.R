@@ -542,6 +542,7 @@ summary.VAR<-function(object, digits=4,...){
   t<-x$t
   k<-x$k
   Sigma<-matrix(1/(object$df.residual)*crossprod(x$residuals),ncol=k)
+  betas <- x$coefficients 
   XX <- crossprod(x$model.x)
   cov.unscaled <- try(solve(XX), silent=TRUE)
   if(inherits(cov.unscaled, "try-error")) {
@@ -552,19 +553,25 @@ summary.VAR<-function(object, digits=4,...){
   }
   VarCovB<-cov.unscaled%x%Sigma
   StDevB<-matrix(sqrt(diag(VarCovB)), nrow=k)
-  Tvalue<-x$coefficients/StDevB
+  Tvalue<-betas/StDevB
   
   Pval <- 2* pt(abs(Tvalue), df=x$df.residual, lower.tail=FALSE)
   symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","** ","*  ",".  ","    "))
   stars<-matrix(symp, nrow=nrow(Pval))
-  ab<-matrix(paste(myformat(x$coefficients,digits),"(", myformat(StDevB,digits),")",stars,sep=""), nrow=nrow(Pval))
-  dimnames(ab)<-dimnames(x$coefficients)		
+  ab<-matrix(paste(myformat(betas,digits),"(", myformat(StDevB,digits),")",stars,sep=""), nrow=nrow(Pval))
+  dimnames(ab)<-dimnames(betas)		
 
+  ## assemble
+  coMat <- cbind(ct(betas), ct(StDevB), ct(Tvalue), ct(Pval))
+  colnames(coMat) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
+  rownames(coMat) <- paste(rep(eqNames(x), each=ncol(betas)), colnames(betas), sep=":")
+  
   x$bigcoefficients<-ab
   x$cov.unscaled<-cov.unscaled
   x$sigma<-Sigma
   x$StDev<-StDevB
   x$Pvalues<-Pval
+  x$coefMat <- coMat
   x$stars<-stars
   x$starslegend<-symp
   x$aic<-AIC.nlVar(x)
