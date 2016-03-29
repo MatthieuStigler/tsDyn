@@ -554,8 +554,7 @@ summary.VAR<-function(object, digits=4,...){
   StDevB<-matrix(sqrt(diag(VarCovB)), nrow=k)
   Tvalue<-x$coefficients/StDevB
   
-  Pval<-pt(abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(nrow(x$model.x)-ncol(x$model.x)), lower.tail=TRUE)
-	#Pval<-round(Pval,4)
+  Pval <- 2* pt(abs(Tvalue), df=x$df.residual, lower.tail=FALSE)
   symp <- symnum(Pval, corr=FALSE,cutpoints = c(0,  .001,.01,.05, .1, 1), symbols = c("***","** ","*  ",".  ","    "))
   stars<-matrix(symp, nrow=nrow(Pval))
   ab<-matrix(paste(myformat(x$coefficients,digits),"(", myformat(StDevB,digits),")",stars,sep=""), nrow=nrow(Pval))

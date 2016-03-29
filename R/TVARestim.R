@@ -508,8 +508,10 @@ summary.TVAR<-function(object,...){
 	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
 	Tvalue<-x$coeffmat/StDevB
 	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
-	Pval<-pt(abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=FALSE)+pt(-abs(Tvalue), df=(ncol(Z)-nrow(Z)), lower.tail=TRUE)
+	Pval <- 2* pt(abs(Tvalue), df=x$df.residual, lower.tail=FALSE)
 	Pval<-nameB(Pval,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
+
+	## export results
 	x$coefficients<-asListIfMat(x$coefficients)
 	x$StDev<-asListIfMat(StDevB)
 	x$Pvalues<-asListIfMat(Pval)
