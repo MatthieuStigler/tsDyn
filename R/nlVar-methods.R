@@ -333,6 +333,15 @@ toMlm.nlVar<-function(x){
   return(mlm)
   }
 
+
+### Method eqNames
+eqNames <- function (object, ...)  
+  UseMethod("eqNames")
+
+eqNames.nlVar <- function(object)
+  gsub("Equation ", "", rownames(coef(object)))
+
+
 ###Tolatex preliminary###
 #########################
 ###Latex vector
