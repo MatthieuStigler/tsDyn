@@ -504,8 +504,8 @@ summary.TVAR<-function(object,...){
 	Z<-t(as.matrix(tail.matrix(x$model[,-c(1:k)],t)))
 	###Stdev, VarCov
 	SigmabestOls <- matrix(1/x$df.residual*crossprod(x$residuals),ncol=k)
-	VarCovB<-solve(tcrossprod(Z))%x%SigmabestOls
-	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k)
+	VarCovB <- SigmabestOls %x% solve(tcrossprod(Z))
+	StDevB<-matrix(diag(VarCovB)^0.5, nrow=k, byrow=TRUE)
 	Tvalue<-x$coeffmat/StDevB
 	StDevB<-nameB(StDevB,commonInter=xspe$oneMatrix, Bnames=xspe$Bnames, nthresh=xspe$nthresh, npar=xspe$nrowB)
 	Pval <- 2* pt(abs(Tvalue), df=x$df.residual, lower.tail=FALSE)

@@ -7,7 +7,7 @@ vcov.TVAR <- function (object, ...) {
   
   ## 
   Sigma <- matrix((1/x$df.residual) * crossprod(x$residuals),ncol=x$k)
-  VarCovB <- R%x% Sigma
+  VarCovB <- Sigma %x% R
   
   VarCovB
 }
