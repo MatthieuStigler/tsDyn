@@ -551,8 +551,8 @@ summary.VAR<-function(object, digits=4,...){
     cov.unscaled <- chol2inv(Qr$qr[p1, p1, drop = FALSE])
     warning("Potential numerical unstability, beware of standard errors\n")
   }
-  VarCovB<-cov.unscaled%x%Sigma
-  StDevB<-matrix(sqrt(diag(VarCovB)), nrow=k)
+  VarCovB <- Sigma %x% cov.unscaled
+  StDevB<-matrix(sqrt(diag(VarCovB)), nrow=k, byrow = TRUE)
   Tvalue<-betas/StDevB
   
   Pval <- 2* pt(abs(Tvalue), df=x$df.residual, lower.tail=FALSE)
