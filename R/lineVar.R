@@ -301,10 +301,10 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 
 ###Slope parameters, residuals and fitted
-#   B<-t(Y)%*%Z%*%solve(t(Z)%*%Z)		#B: OLS parameters, dim 2 x npar
-  B<- t(qr.coef(qr(Z),Y))
-  fitted<-Z%*%t(B)
-  res<-Y-fitted
+  lmReg <- lm.fit(Z,Y) 
+  B <- lmReg$coefficients 
+  fitted <- lmReg$fitted.values 
+  res <- lmReg$residuals
 
 ###naming of variables and parameters
   npar<-ncol(B)*nrow(B)
