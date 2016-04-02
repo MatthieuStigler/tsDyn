@@ -299,10 +299,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     Z<-cbind(ECTminus1,Z)
   }#end model=="VECM"&estim=="ML"
 
-
 ###Slope parameters, residuals and fitted
   lmReg <- lm.fit(Z,Y) 
-  B <- lmReg$coefficients 
+  B <- t(lmReg$coefficients )
   fitted <- lmReg$fitted.values 
   res <- lmReg$residuals
 
@@ -368,7 +367,8 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
           df.residual=t-npar/k, 
           exogen = !is.null(exogen),
           num_exogen = if(!is.null(exogen)) NCOL(exogen) else 0,
-          model.specific=model.specific)
+          model.specific=model.specific,
+          qr=lmReg$qr)
   if(model=="VAR"){
     class(z)<-c("VAR","nlVar")
   } else {
@@ -544,7 +544,8 @@ summary.VAR<-function(object, digits=4,...){
   Sigma<-matrix(1/(object$df.residual)*crossprod(x$residuals),ncol=k)
   betas <- x$coefficients 
   XX <- crossprod(x$model.x)
-  cov.unscaled <- try(solve(XX), silent=TRUE)
+  # cov.unscaled <- try(solve(XX), silent=TRUE)
+  cov.unscaled <- chol2inv(object$qr$qr)
   if(inherits(cov.unscaled, "try-error")) {
     Qr <- qr(x$model.x)
     p1 <- 1:Qr$rank
