@@ -1,4 +1,3 @@
-importFrom(utils, toLatex)
 importFrom(tseriesChaos, embedd, mutual, d2)
 importFrom(nnet, nnet)
 importFrom(tseries, na.remove)
@@ -9,6 +8,23 @@ importFrom(mgcv, gam , s, predict.gam, print.gam, print.summary.gam, plot.gam, P
 importFrom(MASS, ginv)
 importFrom(foreach, foreach, "%dopar%", "%:%")
 importFrom(mnormt, rmnorm)
+importFrom("grDevices", "rgb")
+importFrom("graphics", "abline", "axis", "contour", "curve", "image",
+             "layout", "legend", "lines", "lines.default", "par",
+             "persp", "plot", "points", "segments", "title")
+importFrom("methods", "new")
+importFrom("stats", "AIC", "acf", "aggregate", "anova", "ar",
+             "arima.sim", "as.formula", "as.ts", "coef", "coefficients",
+             "confint", "confint.default", "dchisq", "deltat", "density",
+             "deviance", "embed", "frequency", "is.ts", "lm", "lm.fit",
+             "logLik", "na.omit", "optim", "optimHess", "pacf", "pf",
+             "pgamma", "plogis", "plot.ts", "pnorm", "predict",
+             "princomp", "printCoefmat", "pt", "qgamma", "quantile",
+             "residuals", "rnorm", "sd", "symnum", "time", "ts",
+             "ts.plot", "tsp", "tsp<-", "update", "var", "vcov",
+             "weighted.mean", "window")
+importFrom("utils", "head", "tail", "tail.matrix", "toLatex")
+
 
 importClassesFrom(urca, ca.jo)
 
