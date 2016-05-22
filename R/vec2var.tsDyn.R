@@ -235,6 +235,7 @@ vec2var.tsDyn <- function(x){
 
 predictOld.VAR <- function(object,...){
   if(object$include%in%c("both","none")) stop("Does not work with include='none' or 'both'")
+  if(object$lag==0) stop("Does not work with lag=0")
   if(attr(object, "varsLevel")!="level") stop("Does not work with VAR in diff or ADf specification")
 
   predict(vec2var.tsDyn(object), ...)
