@@ -1,3 +1,13 @@
+Version 0.9-44: Matthieu Stigler (22/5/2016)
+ -new: vcov.TVAR
+ -minor fix: TVAR_LRtest now uses robust QR instead of manual solve()...
+ -fix bug: vcov.VAR corrected, was wrong
+ -minor fixes:  VAR.sim did not return all args, internal insertCol did not handle well just one row, typos in man file VECM
+ -minor new: summary.VAR now outputs component coefMat, more consistent output
+ -minor new: TVAR outputs df.residual
+ -vcov: improve vcov for VAR/VECM, using faster chol2inv saving previous qr
+ -minor fixes in NAMESPACE, urls citations, etc 
+
 Version 0.9-43: Matthieu Stigler (23/4/2015)
  -minor fixes: add checking in selectLSTAR in case of convergence issue, rename lstar.Rout.save as created issues on other platforms
 
