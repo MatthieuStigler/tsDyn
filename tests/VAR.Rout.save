@@ -6263,7 +6263,8 @@ $var_l3_tr
 [1,] 1.537566 110.8513 108.0941
 [2,] 1.606902 111.4570 109.2867
 
-> lapply(var_all, function(x) try(sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
+> prOld <- lapply(var_all, function(x) try(sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"]), silent=TRUE))
+> prOld[sapply(prOld, function(x) !inherits(x, "try-error"))]
 $var_l1_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.475498 110.6729 107.1721
@@ -6274,55 +6275,6 @@ $var_l1_tr
 [1,] 1.515193 111.6651 108.7021
 [2,] 1.557888 112.8895 110.4156
 
-$var_l1_bo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l1_no
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l1_coAsExo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l0_co
-[1] "Error in A[[i]] <- co[, grep(paste(\"\\\\.l\", i, sep = \"\"), colnames(co)),  : \n  attempt to select less than one element\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in A[[i]] <- co[, grep(paste("\\.l", i, sep = ""), colnames(co)),     drop = FALSE]: attempt to select less than one element>
-
-$var_l0_tr
-[1] "Error in A[[i]] <- co[, grep(paste(\"\\\\.l\", i, sep = \"\"), colnames(co)),  : \n  attempt to select less than one element\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in A[[i]] <- co[, grep(paste("\\.l", i, sep = ""), colnames(co)),     drop = FALSE]: attempt to select less than one element>
-
-$var_l0_bo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l0_coAsExo
-[1] "Error in A[[i]] <- co[, grep(paste(\"\\\\.l\", i, sep = \"\"), colnames(co)),  : \n  attempt to select less than one element\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in A[[i]] <- co[, grep(paste("\\.l", i, sep = ""), colnames(co)),     drop = FALSE]: attempt to select less than one element>
-
 $var_l3_co
        dolcan   cpiUSA   cpiCAN
 [1,] 1.478664 110.5527 107.0629
@@ -6332,97 +6284,6 @@ $var_l3_tr
        dolcan   cpiUSA   cpiCAN
 [1,] 1.537566 110.8513 108.0941
 [2,] 1.606902 111.4570 109.2867
-
-$var_l3_bo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l3_no
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l3_coAsExo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l2_diff_co
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
-
-$var_l2_diff_tr
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
-
-$var_l2_diff_bo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l2_diff_no
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l2_diff_coAsExo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l2_adf_co
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
-
-$var_l2_adf_tr
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with VAR in diff or ADf specification\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with VAR in diff or ADf specification>
-
-$var_l2_adf_bo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l2_adf_no
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
-
-$var_l2_adf_coAsExo
-[1] "Error in tsDyn:::predictOld.VAR(x, n.ahead = 2) : \n  Does not work with include='none' or 'both'\n"
-attr(,"class")
-[1] "try-error"
-attr(,"condition")
-<simpleError in tsDyn:::predictOld.VAR(x, n.ahead = 2): Does not work with include='none' or 'both'>
 
 > 
 > all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
