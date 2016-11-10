@@ -12,7 +12,7 @@ TVECM.SeoTest(data, lag, beta, trim = 0.1, nboot, plot = FALSE,
 
 \item{lag}{Number of lags to include in each regime}
 
-\item{beta}{Pre-specified cointegarting value}
+\item{beta}{Pre-specified cointegrating value}
 
 \item{trim}{trimming parameter indicating the minimal percentage of
 observations in each regime}

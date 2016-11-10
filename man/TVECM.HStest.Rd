@@ -2,7 +2,7 @@
 \alias{TVECM.HStest }
 \title{Test of linear cointegration vs threshold cointegration}
 \description{
-Tests the null of linear cointegration against threshold cointegration following Hansen and Seo (2002). Fixed regressor anfd residual bootstrap are available. 
+Tests the null of linear cointegration against threshold cointegration following Hansen and Seo (2002). Fixed regressor and residual bootstrap are available. 
 }
 \usage{
 TVECM.HStest(data, lag=1, ngridTh=300, trim=0.05, 
@@ -14,12 +14,13 @@ TVECM.HStest(data, lag=1, ngridTh=300, trim=0.05,
 \arguments{
 \item{data}{Time series }
 \item{lag}{Number of lags to include in each regime}
-\item{ngridTh}{Number of threshold points to estimate}
+\item{ngridTh}{Number of threshold grid points to evaluate the optimal threshold.}
 \item{trim}{Trimming parameter indicating the minimal percentage of observations in each regime}
 \item{nboot}{Number of bootstrap replications}
-\item{fixed.beta}{Numeric. User pre-specified cointegrating value. When NULL (default), the value is estimated from the linear VECM.}
+\item{fixed.beta}{Numeric. User pre-specified cointegrating value, as in \code{\link{VECM}} 
+(i.e. cointegrating  vector will be c(1, \code{-beta.fixed})). When NULL (default), the value is estimated from the linear VECM.}
 \item{intercept}{Logical. Whether an intercept has to be included in the VECM}
-\item{boot.type}{Character. Type of bootstrap simulation (only if nboot>0)}
+\item{boot.type}{Character. Type of bootstrap simulation (only if \code{nboot}>0)}
 \item{hpc}{Possibility to run the bootstrap on parallel core. See details}
 }
 

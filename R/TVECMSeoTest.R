@@ -16,7 +16,7 @@
 #'
 #'@param data time series
 #'@param lag Number of lags to include in each regime
-#'@param beta Pre-specified cointegarting value
+#'@param beta Pre-specified cointegrating value (i.e. cointegrating  vector will be c(1, \code{-beta}))
 #'@param trim trimming parameter indicating the minimal percentage of
 #'observations in each regime
 #'@param nboot Number of bootstrap replications

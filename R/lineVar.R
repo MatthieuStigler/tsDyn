@@ -27,9 +27,10 @@
 #'@param I For VAR only: whether in the VAR the variables are to be taken in
 #'levels (original series) or in difference, or similarly to the univariate ADF
 #'case.
-#'@param beta for VECM only: imposed cointegrating value. If null, will be estimated
+#'@param beta for VECM only: user-specified cointegrating value. 
+#'If NULL, will be estimated using the estimator specified in \code{estim}
 #'@param LRinclude Possibility to include in the long-run relationship and the
-#'ECT trend, constant... Can also be a matrix with exogeneous regressors
+#'ECT a trend, a, constant, etc. Can also be a matrix with exogeneous regressors
 #'@param estim Type of estimator for the VECM: '2OLS' for the two-step approach
 #'or 'ML' for Johansen MLE
 #'@param exogen Inclusion of exogenous variables (first row being first=oldest
@@ -431,8 +432,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #' @param lag Number of lags (in the VECM representation, see Details)
 #' @param r Number of cointegrating relationships
 #' @param include Type of deterministic regressors to include
-#' @param beta for VECM only: imposed cointegrating value. If null, will be estimated
-#'so values will be estimated
+#'@param beta for VECM only: user-specified cointegrating values, the cointegrating vector will be
+#' taken as: (1, -\code{beta})
+#'If NULL, will be estimated using the estimator specified in \code{estim}
 #'@param LRinclude Type of deterministic regressors to include in the long-term
 #'relationship. Can also be a matrix with exogeneous regressors (2OLS only).
 #'@param estim Type of estimator: \code{2OLS} for the two-step approach or

@@ -27,8 +27,9 @@
 #'The grid for the threshold parameters can be set in different ways, through
 #'the argument \var{th1}, \var{th2} and \var{beta}:
 #'
-#'\describe{ \item{exact:}{Pre-specified value. } \item{int:}{Specify an
-#'interval (of length \var{ngridTh}) in which to search.}
+#'\describe{ 
+#'\item{exact:}{Pre-specified value (for beta: cointegrating vector will be c(1,\code{-beta}))} 
+#'\item{int:}{Specify an interval (of length \var{ngridTh}) in which to search.}
 #'\item{around:}{Specify to take \var{ngridTh} points around the value given. }
 #'}
 #'
@@ -161,7 +162,7 @@ if(is.null(beta$exact)){
 } else {
   betaLT<-beta$exact
   if(length(betaLT)!=k-1)
-    warning("beta$exact should be of same size as cols of y -1\n")
+    warning("beta$exact should be of length ncol(data) -1, cointegrating vector will be c(1,-beta) \n")
   if(beta0[1]!=0){
     stop("Sorry, use of beta0 and beta$exact currently not supported simultaneously\n")
   } else{
