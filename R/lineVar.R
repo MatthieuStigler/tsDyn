@@ -458,7 +458,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #' Hamilton (1994) Time Series Analysis, Princeton University Press
 #' 
 #' Juselius (2006) The Cointegrated VAR model, Oxford University Press
-#'@seealso \code{\link{coefA}}, \code{\link{coefB}} and \code{\link{coefPi}} 
+#'@seealso \code{\link{coefA}}, \code{\link{coefB}} and \code{\link{coefPI}} 
 #'to extract the relevant parameter matrices. 
 #'
 #'\code{\link{lineVar}} \code{\link{TVAR}} and \code{\link{TVECM}} for
