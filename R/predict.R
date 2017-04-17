@@ -15,7 +15,8 @@
 #' @param block.size The block size when the block-bootstrap is used.
 #' @param boot1Zero Whether the first innovation for MC/bootstrap should be set
 #' to zero.
-#' @param \dots Currently not used.
+#' @param \dots Further arguments passed to the internal \sQuote{\code{oneStep}} function. 
+#' Mainly argument \sQuote{\code{thVar}} if an external threshold variable was provided
 #' 
 #' @details
 #' The forecasts are obtained recursively from the estimated model.  Given that
