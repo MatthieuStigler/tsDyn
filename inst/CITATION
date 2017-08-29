@@ -2,10 +2,12 @@
 
 citEntry(entry="Manual",
 	title = "tsDyn: Time series analysis based on dynamical systems theory",
-	author = "Antonio, Fabio Di Narzo, Jose Luis Aznarte, Matthieu Stigler",
-	year = 2009,
+	author = c(person("Antonio", "Fabio Di Narzo", role=c("aut", "ctb")),
+             person("Jose Luis", "Aznarte", role=c("aut", "ctb")),
+             person("Matthieu", "Stigler", role=c("aut", "ctb", "cre"))),
+             	year = 2009,
 	note = "R package version 0.7",
-        url  = "https://cran.r-project.org/web/packages/tsDyn/vignettes/tsDyn.pdf",
+        url  = "https://cran.r-project.org/package=tsDyn/vignettes/tsDyn.pdf",
 	textVersion = "Antonio, Fabio Di Narzo, Jose Luis Aznarte and Matthieu Stigler (2009). tsDyn: Time series analysis based on dynamical systems theory")
 
 citEntry(entry="Manual",
@@ -13,5 +15,5 @@ citEntry(entry="Manual",
 	author = "Matthieu Stigler",
 	year = 2010,
 	note = "R package version 0.7-2",
-        url  = "https://cran.r-project.org/web/packages/tsDyn/vignettes/ThCointOverview.pdf",
+        url  = "https://cran.r-project.org/package=tsDyn/vignettes/ThCointOverview.pdf",
 	textVersion = "Matthieu Stigler (2010). tsDyn: Threshold cointegration: overview and implementation in R")
