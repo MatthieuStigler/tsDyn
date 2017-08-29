@@ -263,7 +263,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
       ve<-Re(eig$vectors)
       va<-Re(eig$values)
       #normalize eigenvectors
-      ve_no<-apply(ve,2, function(x) x/sqrt(t(x)%*%S11%*%x))
+      ve_no<-apply(ve,2, function(x) x/c(sqrt(t(x)%*%S11%*%x)))
       ve_2<-t(t(ve_no)/diag(ve_no)) 
       ve_3<-ve_2[,1:r, drop=FALSE]
       ## Phillips triangular normalisation (Juselius (2006, p. 216))
