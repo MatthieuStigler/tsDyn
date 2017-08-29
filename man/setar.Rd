@@ -87,10 +87,9 @@ mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
 mod.setar
 summary(mod.setar)
 
-if(require(FinTS)) {
-	data(m.unrate)
-	setar(diff(m.unrate), ML=c(2,3,4,12), MH=c(2,4,12), th=0.1, include="none")
-}
+## example in Tsay (2005)
+data(m.unrate)
+setar(diff(m.unrate), ML=c(2,3,4,12), MH=c(2,4,12), th=0.1, include="none")
 }
 \keyword{ ts }
 \references{
