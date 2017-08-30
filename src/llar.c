@@ -37,7 +37,7 @@ out_res: local linear fit error as function of neighbourhood size
 out_nok: number of 'good' points as function of neighborhood size
 out_avfound: average number of neighbours for each 'good' point
 */
-void llar(double *in_series, int *in_length, int *in_m, int *in_d, int *in_steps, double *in_tol, 
+void llarinc(double *in_series, int *in_length, int *in_m, int *in_d, int *in_steps, double *in_tol, 
 	  double *epsSeq, int *NEPS, int *trace, double *out_res, int *out_nok, double *out_avfound) {
 	int i,j;
 	double eps, *dists;

@@ -29,7 +29,7 @@ llar <- function(x, m, d=1, steps=d, series, eps.min=sd(x)/2, eps.max=diff(range
 	err <- rep(-1, length(epsSeq))
         nok <- rep(0, length(epsSeq))
         avfound <- rep(-1, length(epsSeq))
-	res <- .C("llar", series=as.double(x1), length=as.integer(length(x1)),
+	res <- .C("llarinc", series=as.double(x1), length=as.integer(length(x1)),
                   m=as.integer(m), d=as.integer(d), steps=as.integer(steps), tol=as.double(1e-7),
                   epsSeq = as.double(epsSeq), NEPS=length(epsSeq),
                   trace=as.integer(trace), err=as.double(err), nok=as.integer(nok),
