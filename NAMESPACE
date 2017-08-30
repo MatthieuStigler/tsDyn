@@ -173,4 +173,4 @@ S3method(coefPI,cajo.test)
 S3method(coefPI,default)
 
 
-useDynLib(tsDyn)
+useDynLib(tsDyn, .registration = TRUE)
