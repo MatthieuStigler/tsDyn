@@ -1,3 +1,8 @@
+Version 0.9-45: Matthieu Stigler (29/8/2017)
+ -minor: change registration of c code
+ -minor: add dataset m.unrate, previously in (now archived) FinTs
+ -minor: small documentation updates, use canonical urls, etc
+
 Version 0.9-44: Matthieu Stigler (22/5/2016)
  -new: vcov.TVAR
  -minor fix: TVAR_LRtest now uses robust QR instead of manual solve()...
