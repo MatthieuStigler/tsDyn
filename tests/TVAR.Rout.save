@@ -684,6 +684,1871 @@ Second best: 3.003 (conditionnal on th= 3.195 and Delay= 2 ) 	 SSR/AIC: 5.092174
 
 Second step best thresholds 3.003 3.195 		 SSR: 5.092174 
 > 
-> names(TVAR_outs) <- paste("mod", 1:length(a), sep="_")
-Error in paste("mod", 1:length(a), sep = "_") : object 'a' not found
-Execution halted
+> names(TVAR_outs) <- paste("mod", 1:length(TVAR_outs), sep="_")
+> 
+> ## check outputs
+> lapply(TVAR_outs, print)
+Model TVAR with  1  thresholds
+
+$Bdown
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.2832007    0.9396643  0.01650815  -0.06915515   0.0270369
+Equation long.run  0.3018691    0.3586970  1.19854272  -0.45756604  -0.2142721
+
+$Bup
+                   Intercept short.run -1  long.run -1 short.run -2 long.run -2
+Equation short.run 0.8744681    0.7032444 -0.007655547   0.23058624 -0.17635745
+Equation long.run  1.0445491    0.3368997  0.486616097  -0.06591612 -0.07190994
+
+
+Threshold value[1] "3.173"
+Model TVAR with  1  thresholds
+
+$Bdown
+                           Trend short.run -1 long.run -1 short.run -2
+Equation short.run  0.0004599199    1.0286865  0.06283835  -0.04883251
+Equation long.run  -0.0003674653    0.4708071  1.21964197  -0.43624235
+                   long.run -2
+Equation short.run -0.03294379
+Equation long.run  -0.25602317
+
+$Bup
+                         Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.006927979    0.8781817 -0.02132602   0.07952605
+Equation long.run  0.005741491    0.5515048  0.46122895  -0.16091952
+                    long.run -2
+Equation short.run -0.095053066
+Equation long.run  -0.002868694
+
+
+Threshold value[1] "3.189"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    1.0391823  0.04821119   -0.0505209 -0.02118022
+Equation long.run     0.4624212  1.23132873   -0.4348934 -0.26542199
+
+$Bup
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.8754612  -0.0449194   0.33243671 -0.17515454
+Equation long.run     0.5492502   0.4416762   0.04867759 -0.06925197
+
+
+Threshold value[1] "3.189"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   Intercept        Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.7945870 0.0025557204    0.7645884  0.06746809   -0.1685681
+Equation long.run  0.4463826 0.0007222254    0.3092220  1.21294357   -0.4856593
+                   long.run -2
+Equation short.run  0.04216543
+Equation long.run  -0.20999691
+
+$Bup
+                   Intercept      Trend short.run -1 long.run -1 short.run -2
+Equation short.run  1.481438 0.01103125    0.5637752  0.05734241   -0.2169814
+Equation long.run   1.605047 0.01018666    0.2081087  0.54663758   -0.4792164
+                   long.run -2
+Equation short.run -0.05411242
+Equation long.run   0.04097558
+
+
+Threshold value[1] "3.173"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.2588048    1.0010115 -0.03033653   -0.1216495  0.07488954
+Equation long.run  0.2537710    0.4796473  1.10618520   -0.5610622 -0.11992734
+
+$Bmiddle
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run  5.184416    -1.034966   0.5343629    0.6156229  -0.6789873
+Equation long.run   7.327257    -3.071481   1.9817578    1.4851627  -1.6385701
+
+$Bup
+                   Intercept short.run -1  long.run -1 short.run -2 long.run -2
+Equation short.run  1.705713  0.379160720 -0.008943793    0.3090020 -0.13887286
+Equation long.run   1.890135 -0.008113763  0.633504924   -0.1262766 -0.01764579
+
+
+Threshold value[1] "3.091 3.405"
+Model TVAR with  2  thresholds
+
+$Bdown
+                           Trend short.run -1 long.run -1 short.run -2
+Equation short.run  0.0002518295    1.2028864 -0.05253768   -0.2183941
+Equation long.run  -0.0001415314    0.5615302  0.94158698   -0.5488400
+                   long.run -2
+Equation short.run  0.08426555
+Equation long.run   0.05329404
+
+$Bmiddle
+                        Trend short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.01222293    0.6065981   0.5100604    0.2347623  -0.5902899
+Equation long.run  0.01368128   -0.7883235   2.0719420    1.1463882  -1.7387759
+
+$Bup
+                         Trend short.run -1 long.run -1 short.run -2
+Equation short.run  0.01814691    0.4395244   0.3992507   -0.1732682
+Equation long.run  -0.01805456    0.7108550   0.3766512    0.4305294
+                   long.run -2
+Equation short.run -0.05599304
+Equation long.run  -0.14626126
+
+
+Threshold value[1] "3.058 3.344"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    1.2037536 -0.05669087   -0.2134358  0.08522469
+Equation long.run     0.5610428  0.94392112   -0.5516266  0.05275499
+
+$Bmiddle
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run     0.556324   0.2158971    0.6881505  -0.4836541
+Equation long.run     -0.844596   1.7426811    1.6538714  -1.6194170
+
+$Bup
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.7387331  0.06776343   0.34768353 -0.15643931
+Equation long.run     0.4131690  0.70645158  -0.08777122 -0.04632617
+
+
+Threshold value[1] "3.058 3.344"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   Intercept        Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.3907058 0.0013961534    1.0662633 -0.03698259   -0.2756177
+Equation long.run  0.2841099 0.0006905876    0.4621819  0.95289819   -0.5904513
+                   long.run -2
+Equation short.run   0.1129476
+Equation long.run    0.0741508
+
+$Bmiddle
+                   Intercept      Trend short.run -1 long.run -1 short.run -2
+Equation short.run  1.367155 0.01151720   0.06198597   0.5435843    0.3929145
+Equation long.run   3.204385 0.01285288  -2.03015761   2.2203610    1.4225466
+                   long.run -2
+Equation short.run  -0.6545286
+Equation long.run   -1.9026935
+
+$Bup
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run  1.624979  0.02312486  -0.02362167   0.4373554   -0.3343761
+Equation long.run   1.341350 -0.01758756   0.38297432   0.3073416    0.4387147
+                   long.run -2
+Equation short.run -0.01071633
+Equation long.run  -0.12874511
+
+
+Threshold value[1] "3.058 3.357"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.1967369    0.9024595  0.08054676   -0.2601721  0.02659415
+Equation long.run  0.2070307    0.4332564  1.11765254   -0.3853018 -0.06301269
+                   short.run -3 long.run -3
+Equation short.run    0.2764994 -0.08552854
+Equation long.run    -0.1028154 -0.08282521
+
+$Bup
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.8205095    0.6507265  0.01949351   0.03649528  -0.2650380
+Equation long.run  0.8843399    0.3792890  0.47929084  -0.02745512  -0.2487799
+                   short.run -3 long.run -3
+Equation short.run   0.30258873  0.02533358
+Equation long.run   -0.01400777  0.16624249
+
+
+Threshold value[1] "3.173"
+Model TVAR with  1  thresholds
+
+$Bdown
+                           Trend short.run -1 long.run -1 short.run -2
+Equation short.run  0.0003032222     0.948069  0.09417286   -0.2490979
+Equation long.run  -0.0001032298     0.485098  1.12431295   -0.3752695
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  0.02985988   0.30221017  -0.1213044
+Equation long.run  -0.06249592  -0.06999189  -0.1126849
+
+$Bup
+                         Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.005795312    0.9012984 -0.02070981   0.05503851
+Equation long.run  0.006558431    0.6517655  0.43603933  -0.01187527
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.2422282   0.06256554   0.1172989
+Equation long.run   -0.2208972  -0.28286362   0.2675476
+
+
+Threshold value[1] "3.173"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.9508302  0.08865962   -0.2502621  0.02776345
+Equation long.run     0.4841579  1.12618989   -0.3748732 -0.06178220
+                   short.run -3 long.run -3
+Equation short.run   0.30635123  -0.1157126
+Equation long.run   -0.07140168  -0.1145886
+
+$Bup
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.8565424 -0.02218284   0.13680369  -0.3034419
+Equation long.run     0.6011161  0.43437234   0.08065663  -0.2901714
+                   short.run -3 long.run -3
+Equation short.run   0.25112221   0.0767413
+Equation long.run   -0.06947806   0.2216494
+
+
+Threshold value[1] "3.173"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.6448545 0.002062598    0.7735010  0.09957019   -0.2748258
+Equation long.run  0.4532960 0.001133511    0.3623866  1.12810696   -0.3933548
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  0.03819123    0.1803358 -0.05481368
+Equation long.run  -0.05663946   -0.1556626 -0.06594571
+
+$Bup
+                   Intercept      Trend short.run -1 long.run -1 short.run -2
+Equation short.run  1.401932 0.01049255    0.5859147  0.05169282   -0.1826222
+Equation long.run   1.532243 0.01169228    0.3070666  0.51517185   -0.2716268
+                   long.run -2 short.run -3 long.run -3
+Equation short.run -0.12699561 -0.002327788  0.06233603
+Equation long.run  -0.09495357 -0.353788841  0.20747585
+
+
+Threshold value[1] "3.173"
+Model TVAR with  2  thresholds
+
+$Bdown
+                     Intercept short.run -1 long.run -1 short.run -2
+Equation short.run 0.009343302    1.1263399 -0.01194672   -0.3871924
+Equation long.run  0.133039994    0.5738207  1.00350757   -0.4591184
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  0.12301909    0.2557926 -0.09316183
+Equation long.run   0.01143377   -0.1392814 -0.04505061
+
+$Bmiddle
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run -0.2316633    0.1400663    1.054398     2.827951   -2.840360
+Equation long.run   4.2645638   -2.9068152    2.710032     4.121924   -4.216496
+                   short.run -3 long.run -3
+Equation short.run    -1.722817    1.577701
+Equation long.run     -1.875388    1.786239
+
+$Bup
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run  1.632393   0.10928587   0.0962093  -0.04965012  -0.2829809
+Equation long.run   1.662304  -0.09749277   0.6803840  -0.24565263  -0.2078715
+                   short.run -3 long.run -3
+Equation short.run    0.7136689 -0.01268697
+Equation long.run     0.3213474  0.10090816
+
+
+Threshold value[1] "3.062 3.357"
+Model TVAR with  2  thresholds
+
+$Bdown
+                          Trend short.run -1 long.run -1 short.run -2
+Equation short.run 2.559560e-04    1.1262105 -0.01046192   -0.3938025
+Equation long.run  4.297801e-05    0.5300969  0.95918867   -0.5597820
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  0.12758689   0.26033787 -0.09608653
+Equation long.run   0.05347769   0.03951455 -0.01836994
+
+$Bmiddle
+                        Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.01452177    0.8513576   0.2446008  -0.04814896
+Equation long.run  0.01786668   -0.3563039   1.7015592   1.23383105
+                    long.run -2 short.run -3  long.run -3
+Equation short.run -0.005328368  -0.04025565 -0.283383135
+Equation long.run  -1.207883788  -0.74330328 -0.006737565
+
+$Bup
+                          Trend short.run -1 long.run -1 short.run -2
+Equation short.run  0.002718693     0.481491   0.2197999   -0.0861726
+Equation long.run  -0.058538768     0.850046  -0.1706988    0.7562607
+                   long.run -2 short.run -3  long.run -3
+Equation short.run  -0.3115054    0.6437456  0.001548061
+Equation long.run   -0.6242640    1.5483833 -0.124306339
+
+
+Threshold value[1] "3.058 3.369"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.9508302  0.08865962   -0.2502621  0.02776345
+Equation long.run     0.4841579  1.12618989   -0.3748732 -0.06178220
+                   short.run -3 long.run -3
+Equation short.run   0.30635123  -0.1157126
+Equation long.run   -0.07140168  -0.1145886
+
+$Bmiddle
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.7881264   0.1988264    1.0604765  -0.9340827
+Equation long.run     0.9379745   0.1672334    0.3802467  -0.3867938
+                   short.run -3 long.run -3
+Equation short.run   -0.5962418   0.4814874
+Equation long.run    -0.6339278   0.5112913
+
+$Bup
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.5128610  0.05840548   -0.5504474  -0.1726551
+Equation long.run    -0.1648127  0.92902591    0.3205289   0.3175651
+                   short.run -3 long.run -3
+Equation short.run    1.3091527  -0.1590313
+Equation long.run     0.2424556  -0.6801342
+
+
+Threshold value[1] "3.173 3.748"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.6448545 0.002062598    0.7735010  0.09957019   -0.2748258
+Equation long.run  0.4532960 0.001133511    0.3623866  1.12810696   -0.3933548
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  0.03819123    0.1803358 -0.05481368
+Equation long.run  -0.05663946   -0.1556626 -0.06594571
+
+$Bmiddle
+                   Intercept      Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.6306102 0.01309287    0.9921338  0.08134731    0.3623070
+Equation long.run  2.9390101 0.02388531    0.2648202  0.44795034   -0.8290849
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.4512674   -0.8220583   0.3922994
+Equation long.run    0.5272884   -0.5680193  -0.2022906
+
+$Bup
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run -6.001019 -0.04674042     2.204824  -0.6762527    0.4699711
+Equation long.run  -7.035577 -0.09827466     2.604056  -0.7569670    1.3348474
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.2795461     2.520628  -0.7255222
+Equation long.run   -0.7050719     3.127489  -0.7335721
+
+
+Threshold value[1] "3.173 3.712"
+Model TVAR with  1  thresholds
+
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.4221312    0.9044330 0.006768059  -0.09451865  0.04927258
+Equation long.run  0.4763771    0.3144436 1.186308374  -0.48942467 -0.18634229
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.8103215 -0.02809227   0.26411544  -0.1724251
+Equation long.run     0.4713973  0.46094591  -0.02380072  -0.0669706
+
+Threshold value[1] "3.173"
+Model TVAR with  2  thresholds
+
+                     Intercept short.run -1 long.run -1 short.run -2
+Equation short.run  0.04773692    1.1215448 -0.02085254   -0.1664741
+Equation long.run  -0.13545476    0.5585268  0.97423201   -0.5001925
+                   long.run -2 short.run -1 long.run -1 short.run -2
+Equation short.run  0.07600803    0.6689391   0.1414144    0.4611938
+Equation long.run   0.02777120   -0.3657792   1.7163124    0.8159160
+                   long.run -2 short.run -1 long.run -1 short.run -2
+Equation short.run  -0.2990783    0.8040020   0.1810796    0.1880898
+Equation long.run   -1.1410112    0.5065698   0.9014364   -0.2846535
+                   long.run -2
+Equation short.run  -0.1947605
+Equation long.run   -0.1107118
+
+Threshold value[1] "3.008 3.214"
+Model TVAR with  1  thresholds
+
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.3589170    0.8625851  0.07385892   -0.2683415  0.02563024
+Equation long.run  0.3831302    0.3899597  1.11039071   -0.3941723 -0.06405933
+                   short.run -3 long.run -3 short.run -1  long.run -1
+Equation short.run    0.2518911 -0.06064631    0.7665120 -0.003952275
+Equation long.run    -0.1295358 -0.05580741    0.5050121  0.453832763
+                   short.run -2 long.run -2 short.run -3 long.run -3
+Equation short.run   0.09292560  -0.2866428   0.27363530  0.05425393
+Equation long.run    0.03381845  -0.2722390  -0.04544619  0.19764499
+
+Threshold value[1] "3.173"
+Model TVAR with  2  thresholds
+
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.2165169    1.0625479 -0.01558042   -0.3869353 0.116082744
+Equation long.run  0.3973527    0.4924346  0.99887169   -0.4587905 0.002584361
+                   short.run -3 long.run -3 short.run -1 long.run -1
+Equation short.run    0.2273664 -0.06218120  -0.02960929    1.077715
+Equation long.run    -0.1755476 -0.00552544  -1.44273562    2.508836
+                   short.run -2 long.run -2 short.run -3 long.run -3
+Equation short.run     2.836257   -2.854727    -1.703682    1.573557
+Equation long.run      4.050256   -4.092528    -2.040493    1.822000
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.4694056   0.1488920 -0.007144646  -0.2957049
+Equation long.run     0.2242402   0.7274511 -0.207678008  -0.2192393
+                   short.run -3  long.run -3
+Equation short.run    0.6370600 0.0004194623
+Equation long.run     0.2529045 0.1126175191
+
+Threshold value[1] "3.062 3.357"
+Model TVAR with  1  thresholds
+
+$Bdown
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.22146604    0.9061864   0.1299808   -0.2575857  -0.1493407
+Equation long.run  0.05963299    0.1808340   1.1265635   -0.3318690  -0.2735769
+                   short.run -3 long.run -3
+Equation short.run    0.2465101   0.0618477
+Equation long.run     0.1115348   0.1864413
+
+$Bup
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run  0.1864381    0.8570790   0.1005647  -0.11097729  -0.1243534
+Equation long.run  -0.2436023    0.7044036   0.8242433  -0.09176081  -0.0936612
+                   short.run -3 long.run -3
+Equation short.run    0.3117425 -0.09444285
+Equation long.run    -0.2509585 -0.06081042
+
+
+Threshold value[1] "3.003"
+Model TVAR with  1  thresholds
+
+$Bdown
+                         Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.001274795    0.8092677  0.09994505   0.07922671
+Equation long.run  0.001771201    0.3928897  1.02718592  -0.07643419
+                   long.run -2 short.run -3  long.run -3
+Equation short.run -0.10847363    0.1062534  0.003837981
+Equation long.run  -0.06680867   -0.2640662 -0.059028482
+
+$Bup
+                         Trend short.run -1 long.run -1 short.run -2
+Equation short.run -0.02468274    0.9459944   0.3982769   -0.2030473
+Equation long.run  -0.09624328    2.1786419  -0.2785201    0.3457862
+                   long.run -2 short.run -3 long.run -3
+Equation short.run   -1.053879     1.691706  -0.2881678
+Equation long.run    -1.308131     2.436449  -0.3616428
+
+
+Threshold value[1] "3.713"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.9072240   0.1378856   -0.1940247  -0.1621514
+Equation long.run     0.1811134   1.1286920   -0.3147542  -0.2770264
+                   short.run -3 long.run -3
+Equation short.run    0.2786112  0.04845998
+Equation long.run     0.1201785  0.18283646
+
+$Bup
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.8729578  0.09040618  -0.07035599 -0.13701804
+Equation long.run     0.6836562  0.83751653  -0.14483710 -0.07711344
+                   short.run -3 long.run -3
+Equation short.run    0.3236704 -0.08815567
+Equation long.run    -0.2665436 -0.06902533
+
+
+Threshold value[1] "3.003"
+Model TVAR with  1  thresholds
+
+$Bdown
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.3980118 0.002727102    0.7461738   0.1264134   0.01891301
+Equation long.run  0.2397976 0.002646200    0.3548763   1.0431328  -0.11277250
+                   long.run -2 short.run -3 long.run -3
+Equation short.run -0.10050873   0.01819531  0.03236628
+Equation long.run  -0.06200991  -0.31712020 -0.04184051
+
+$Bup
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run -3.323697 -0.02798803     1.155992   0.2973742    0.3327893
+Equation long.run  -6.706506 -0.10291266     2.602373  -0.4821201    1.4269890
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.9347861     2.010805  -0.4463617
+Equation long.run   -1.0678266     3.080322  -0.6808441
+
+
+Threshold value[1] "3.713"
+Model TVAR with  2  thresholds
+
+$Bdown
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.22146604    0.9061864   0.1299808   -0.2575857  -0.1493407
+Equation long.run  0.05963299    0.1808340   1.1265635   -0.3318690  -0.2735769
+                   short.run -3 long.run -3
+Equation short.run    0.2465101   0.0618477
+Equation long.run     0.1115348   0.1864413
+
+$Bmiddle
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run  2.407979     1.504859  -0.5229292    -1.103426   0.8352313
+Equation long.run   7.686311     1.987991  -0.1930573    -2.795720   1.4929248
+                   short.run -3 long.run -3
+Equation short.run    0.1433666  -0.6939182
+Equation long.run    -0.9794814  -1.1526078
+
+$Bup
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 1.1324017    0.7042974   0.2812027  -0.04223056  -0.5346012
+Equation long.run  0.3851522    0.5800297   0.8540580  -0.01484510  -0.2391981
+                   short.run -3 long.run -3
+Equation short.run    0.2561823  0.01823231
+Equation long.run    -0.4554243  0.14855034
+
+
+Threshold value[1] "3.003 3.195"
+Model TVAR with  2  thresholds
+
+$Bdown
+                         Trend short.run -1 long.run -1 short.run -2
+Equation short.run 0.001306317    0.8773844   0.1428851   -0.1591998
+Equation long.run  0.001586234    0.1448799   1.1347629   -0.2724671
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.1473274   0.24507914  0.04435461
+Equation long.run   -0.2590259   0.07946123  0.17785140
+
+$Bmiddle
+                          Trend short.run -1 long.run -1 short.run -2
+Equation short.run -0.005234523     1.974641  -0.8190096   -0.5515159
+Equation long.run  -0.008737675     2.772282  -0.8079007   -0.9693829
+                   long.run -2 short.run -3 long.run -3
+Equation short.run    1.143090    0.1311334   -0.849384
+Equation long.run     2.264799   -0.6495879   -1.626268
+
+$Bup
+                          Trend short.run -1 long.run -1 short.run -2
+Equation short.run  0.001125747    0.8016596   0.2273959    0.1229852
+Equation long.run  -0.001321745    0.6331955   0.8384990    0.0210960
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.4882614    0.2598129  0.04788446
+Equation long.run   -0.2317716   -0.3960630  0.14241687
+
+
+Threshold value[1] "3.003 3.195"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.9072240   0.1378856   -0.1940247  -0.1621514
+Equation long.run     0.1811134   1.1286920   -0.3147542  -0.2770264
+                   short.run -3 long.run -3
+Equation short.run    0.2786112  0.04845998
+Equation long.run     0.1201785  0.18283646
+
+$Bmiddle
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run     1.504931  -0.6021359   -0.5090729    1.004649
+Equation long.run      1.988223  -0.4458866   -0.8985354    2.033708
+                   short.run -3 long.run -3
+Equation short.run    0.3734158  -0.8345501
+Equation long.run    -0.2451603  -1.6015072
+
+$Bup
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.8149014   0.2292066   0.10961069  -0.4937655
+Equation long.run     0.6176483   0.8363730   0.03679912  -0.2253091
+                   short.run -3 long.run -3
+Equation short.run    0.2981999  0.03717353
+Equation long.run    -0.4411333  0.15499263
+
+
+Threshold value[1] "3.003 3.195"
+Model TVAR with  2  thresholds
+
+$Bdown
+                   Intercept       Trend short.run -1 long.run -1 short.run -2
+Equation short.run  1.414766 0.005366773   0.77800562   0.1079283   -0.4569925
+Equation long.run   1.139527 0.004856739   0.06483493   1.1066067   -0.5123250
+                   long.run -2 short.run -3 long.run -3
+Equation short.run -0.01941213   -0.0642165   0.1171171
+Equation long.run  -0.15599619   -0.1696618   0.2364581
+
+$Bmiddle
+                   Intercept        Trend short.run -1 long.run -1 short.run -2
+Equation short.run  1.790746 -0.005071305     1.959941  -0.7533434   -0.9921959
+Equation long.run   6.697135 -0.008127264     2.717306  -0.5623187   -2.6174630
+                   long.run -2 short.run -3 long.run -3
+Equation short.run    1.012782  -0.03239308  -0.7443375
+Equation long.run     1.777467  -1.26115354  -1.2334096
+
+$Bup
+                   Intercept        Trend short.run -1 long.run -1 short.run -2
+Equation short.run 1.6566657  0.006425835    0.5775066   0.2949397  -0.03618523
+Equation long.run  0.3752658 -0.000121176    0.5824206   0.8537989  -0.01495910
+                   long.run -2 short.run -3 long.run -3
+Equation short.run  -0.5220886   0.01761445  0.07060183
+Equation long.run   -0.2394341  -0.45092549  0.14756278
+
+
+Threshold value[1] "3.003 3.195"
+Model TVAR with  1  thresholds
+
+                     Intercept short.run -1 long.run -1 short.run -2
+Equation short.run  0.20757089    0.9062515   0.1304768   -0.2535978
+Equation long.run  -0.06065663    0.1813975   1.1308570   -0.2973457
+                   long.run -2 short.run -3 long.run -3 short.run -1
+Equation short.run  -0.1501445    0.2485242  0.06100773    0.8552791
+Equation long.run   -0.2805351    0.1289705  0.17916974    0.6888223
+                   long.run -1 short.run -2 long.run -2 short.run -3
+Equation short.run   0.1017161   -0.1155817 -0.12291786    0.3103905
+Equation long.run    0.8342115   -0.1316212 -0.08123381   -0.2626629
+                   long.run -3
+Equation short.run -0.09515550
+Equation long.run  -0.06697983
+
+Threshold value[1] "3.003"
+Model TVAR with  2  thresholds
+
+                   Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.4357598    0.9051825   0.1223321   -0.3190883  -0.1369448
+Equation long.run  0.1582672    0.1803719   1.1230430   -0.3601771  -0.2678714
+                   short.run -3 long.run -3 short.run -1 long.run -1
+Equation short.run   0.21544873  0.07480186     1.504918  -0.5878023
+Equation long.run    0.09723797  0.19240379     1.988218  -0.4406806
+                   short.run -2 long.run -2 short.run -3 long.run -3
+Equation short.run   -0.6166299   0.9739901    0.3317850  -0.8091007
+Equation long.run    -0.9375999   2.0225728   -0.2602806  -1.5922640
+                   short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run    0.7723398   0.2492152   0.05118062  -0.5094795
+Equation long.run     0.6021900   0.8436402   0.01557742  -0.2310164
+                   short.run -3 long.run -3
+Equation short.run    0.2820311  0.02988475
+Equation long.run    -0.4470058  0.15234536
+
+Threshold value[1] "3.003 3.195"
+$mod_1
+[1] "3.173"
+
+$mod_2
+[1] "3.189"
+
+$mod_3
+[1] "3.189"
+
+$mod_4
+[1] "3.173"
+
+$mod_5
+[1] "3.091 3.405"
+
+$mod_6
+[1] "3.058 3.344"
+
+$mod_7
+[1] "3.058 3.344"
+
+$mod_8
+[1] "3.058 3.357"
+
+$mod_9
+[1] "3.173"
+
+$mod_10
+[1] "3.173"
+
+$mod_11
+[1] "3.173"
+
+$mod_12
+[1] "3.173"
+
+$mod_13
+[1] "3.062 3.357"
+
+$mod_14
+[1] "3.058 3.369"
+
+$mod_15
+[1] "3.173 3.748"
+
+$mod_16
+[1] "3.173 3.712"
+
+$mod_17
+[1] "3.173"
+
+$mod_18
+[1] "3.008 3.214"
+
+$mod_19
+[1] "3.173"
+
+$mod_20
+[1] "3.062 3.357"
+
+$mod_21
+[1] "3.003"
+
+$mod_22
+[1] "3.713"
+
+$mod_23
+[1] "3.003"
+
+$mod_24
+[1] "3.713"
+
+$mod_25
+[1] "3.003 3.195"
+
+$mod_26
+[1] "3.003 3.195"
+
+$mod_27
+[1] "3.003 3.195"
+
+$mod_28
+[1] "3.003 3.195"
+
+$mod_29
+[1] "3.003"
+
+$mod_30
+[1] "3.003 3.195"
+
+> lapply(TVAR_outs, getTh)
+$mod_1
+   th 
+3.173 
+
+$mod_2
+   th 
+3.189 
+
+$mod_3
+   th 
+3.189 
+
+$mod_4
+   th 
+3.173 
+
+$mod_5
+  th1   th2 
+3.091 3.405 
+
+$mod_6
+  th1   th2 
+3.058 3.344 
+
+$mod_7
+  th1   th2 
+3.058 3.344 
+
+$mod_8
+  th1   th2 
+3.058 3.357 
+
+$mod_9
+   th 
+3.173 
+
+$mod_10
+   th 
+3.173 
+
+$mod_11
+   th 
+3.173 
+
+$mod_12
+   th 
+3.173 
+
+$mod_13
+  th1   th2 
+3.062 3.357 
+
+$mod_14
+  th1   th2 
+3.058 3.369 
+
+$mod_15
+  th1   th2 
+3.173 3.748 
+
+$mod_16
+  th1   th2 
+3.173 3.712 
+
+$mod_17
+   th 
+3.173 
+
+$mod_18
+  th1   th2 
+3.008 3.214 
+
+$mod_19
+   th 
+3.173 
+
+$mod_20
+  th1   th2 
+3.062 3.357 
+
+$mod_21
+   th 
+3.003 
+
+$mod_22
+   th 
+3.713 
+
+$mod_23
+   th 
+3.003 
+
+$mod_24
+   th 
+3.713 
+
+$mod_25
+  th1   th2 
+3.003 3.195 
+
+$mod_26
+  th1   th2 
+3.003 3.195 
+
+$mod_27
+  th1   th2 
+3.003 3.195 
+
+$mod_28
+  th1   th2 
+3.003 3.195 
+
+$mod_29
+   th 
+3.003 
+
+$mod_30
+  th1   th2 
+3.003 3.195 
+
+> lapply(TVAR_outs, summary)
+$mod_1
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 20 + 1
+AIC -693.4198 	BIC -639.1355 	 SSR 6.033018 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.2832(0.2404) 0.9397(0.1883) 0.0165(0.1139) -0.0692(0.1855)
+Equation long.run  0.3019(0.3207) 0.3587(0.2512) 1.1985(0.1520) -0.4576(0.2475)
+                   long.run -2    
+Equation short.run 0.0270(0.1188) 
+Equation long.run  -0.2143(0.1585)
+
+[[2]]
+                   Intercept      short.run -1   long.run -1    
+Equation short.run 0.8745(0.4339) 0.7032(0.2116) -0.0077(0.1407)
+Equation long.run  1.0445(0.5787) 0.3369(0.2822) 0.4866(0.1877) 
+                   short.run -2    long.run -2    
+Equation short.run 0.2306(0.1960)  -0.1764(0.1177)
+Equation long.run  -0.0659(0.2615) -0.0719(0.1570)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.4% 27.6% 
+
+$mod_2
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 20 + 1
+AIC -694.4421 	BIC -640.1577 	 SSR 6.079709 
+
+[[1]]
+                   Trend           short.run -1   long.run -1   
+Equation short.run 0.0005(0.0009)  1.0287(0.1766) 0.0628(0.1151)
+Equation long.run  -0.0004(0.0012) 0.4708(0.2387) 1.2196(0.1556)
+                   short.run -2    long.run -2    
+Equation short.run -0.0488(0.1767) -0.0329(0.1141)
+Equation long.run  -0.4362(0.2388) -0.2560(0.1542)
+
+[[2]]
+                   Trend          short.run -1   long.run -1    
+Equation short.run 0.0069(0.0031) 0.8782(0.1857) -0.0213(0.1391)
+Equation long.run  0.0057(0.0041) 0.5515(0.2511) 0.4612(0.1880) 
+                   short.run -2    long.run -2    
+Equation short.run 0.0795(0.2240)  -0.0951(0.1224)
+Equation long.run  -0.1609(0.3029) -0.0029(0.1655)
+
+
+Threshold value: 3.189
+Percentage of Observations in each regime: 73.5% 26.5% 
+
+$mod_3
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 16 + 1
+AIC -695.914 	BIC -651.9696 	 SSR 6.301583 
+
+[[1]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 1.0392(0.1787) 0.0482(0.1137) -0.0505(0.1799)
+Equation long.run  0.4624(0.2371) 1.2313(0.1508) -0.4349(0.2388)
+                   long.run -2    
+Equation short.run -0.0212(0.1139)
+Equation long.run  -0.2654(0.1512)
+
+[[2]]
+                   short.run -1   long.run -1     short.run -2  
+Equation short.run 0.8755(0.1892) -0.0449(0.1413) 0.3324(0.1978)
+Equation long.run  0.5493(0.2511) 0.4417(0.1875)  0.0487(0.2625)
+                   long.run -2    
+Equation short.run -0.1752(0.1194)
+Equation long.run  -0.0693(0.1584)
+
+
+Threshold value: 3.189
+Percentage of Observations in each regime: 73.5% 26.5% 
+
+$mod_4
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 24 + 1
+AIC -704.0109 	BIC -639.3867 	 SSR 5.442117 
+
+[[1]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 0.7946(0.3376) 0.0026(0.0013) 0.7646(0.1947) 0.0675(0.1084)
+Equation long.run  0.4464(0.4770) 0.0007(0.0018) 0.3092(0.2752) 1.2129(0.1532)
+                   short.run -2    long.run -2    
+Equation short.run -0.1686(0.1786) 0.0422(0.1102) 
+Equation long.run  -0.4857(0.2524) -0.2100(0.1557)
+
+[[2]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 1.4814(0.4360) 0.0110(0.0031) 0.5638(0.1996) 0.0573(0.1315)
+Equation long.run  1.6050(0.6160) 0.0102(0.0044) 0.2081(0.2821) 0.5466(0.1858)
+                   short.run -2    long.run -2    
+Equation short.run -0.2170(0.2205) -0.0541(0.1142)
+Equation long.run  -0.4792(0.3116) 0.0410(0.1613) 
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.4% 27.6% 
+
+$mod_5
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 30 + 2
+AIC -686.9451 	BIC -604.2262 	 SSR 5.359576 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    
+Equation short.run 0.2588(0.2400) 1.0010(0.2014) -0.0303(0.1269)
+Equation long.run  0.2538(0.3101) 0.4796(0.2602) 1.1062(0.1639) 
+                   short.run -2    long.run -2    
+Equation short.run -0.1216(0.1949) 0.0749(0.1318) 
+Equation long.run  -0.5611(0.2518) -0.1199(0.1702)
+
+[[2]]
+                   Intercept      short.run -1    long.run -1    short.run -2  
+Equation short.run 5.1844(2.7743) -1.0350(0.9501) 0.5344(0.2556) 0.6156(0.3134)
+Equation long.run  7.3273(3.5840) -3.0715(1.2273) 1.9818(0.3301) 1.4852(0.4049)
+                   long.run -2    
+Equation short.run -0.6790(0.2424)
+Equation long.run  -1.6386(0.3132)
+
+[[3]]
+                   Intercept      short.run -1    long.run -1    
+Equation short.run 1.7057(0.8701) 0.3792(0.3217)  -0.0089(0.1811)
+Equation long.run  1.8901(1.1240) -0.0081(0.4156) 0.6335(0.2339) 
+                   short.run -2    long.run -2    
+Equation short.run 0.3090(0.2665)  -0.1389(0.1220)
+Equation long.run  -0.1263(0.3443) -0.0176(0.1576)
+
+
+Threshold value: 3.091 3.405
+Percentage of Observations in each regime: 71.4% 10.2% 18.4% 
+
+$mod_6
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 30 + 2
+AIC -729.4219 	BIC -646.703 	 SSR 4.589685 
+
+[[1]]
+                   Trend           short.run -1   long.run -1    
+Equation short.run 0.0003(0.0009)  1.2029(0.1809) -0.0525(0.1262)
+Equation long.run  -0.0001(0.0011) 0.5615(0.2352) 0.9416(0.1641) 
+                   short.run -2    long.run -2   
+Equation short.run -0.2184(0.1851) 0.0843(0.1317)
+Equation long.run  -0.5488(0.2407) 0.0533(0.1713)
+
+[[2]]
+                   Trend          short.run -1    long.run -1    short.run -2  
+Equation short.run 0.0122(0.0027) 0.6066(0.2417)  0.5101(0.1969) 0.2348(0.3135)
+Equation long.run  0.0137(0.0035) -0.7883(0.3143) 2.0719(0.2560) 1.1464(0.4076)
+                   long.run -2    
+Equation short.run -0.5903(0.1999)
+Equation long.run  -1.7388(0.2600)
+
+[[3]]
+                   Trend           short.run -1   long.run -1   
+Equation short.run 0.0181(0.0077)  0.4395(0.2687) 0.3993(0.2131)
+Equation long.run  -0.0181(0.0100) 0.7109(0.3494) 0.3767(0.2770)
+                   short.run -2    long.run -2    
+Equation short.run -0.1733(0.3253) -0.0560(0.1180)
+Equation long.run  0.4305(0.4230)  -0.1463(0.1535)
+
+
+Threshold value: 3.058 3.344
+Percentage of Observations in each regime: 68.4% 10.2% 21.4% 
+
+$mod_7
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 24 + 2
+AIC -692.6493 	BIC -625.4402 	 SSR 5.794965 
+
+[[1]]
+                   short.run -1   long.run -1     short.run -2   
+Equation short.run 1.2038(0.2043) -0.0567(0.1416) -0.2134(0.2082)
+Equation long.run  0.5610(0.2560) 0.9439(0.1774)  -0.5516(0.2608)
+                   long.run -2   
+Equation short.run 0.0852(0.1488)
+Equation long.run  0.0528(0.1864)
+
+[[2]]
+                   short.run -1    long.run -1    short.run -2  
+Equation short.run 0.5563(0.2728)  0.2159(0.2103) 0.6882(0.3360)
+Equation long.run  -0.8446(0.3417) 1.7427(0.2635) 1.6539(0.4210)
+                   long.run -2    
+Equation short.run -0.4837(0.2243)
+Equation long.run  -1.6194(0.2810)
+
+[[3]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 0.7387(0.2678) 0.0678(0.1813) 0.3477(0.2706) 
+Equation long.run  0.4132(0.3355) 0.7065(0.2272) -0.0878(0.3390)
+                   long.run -2    
+Equation short.run -0.1564(0.1244)
+Equation long.run  -0.0463(0.1559)
+
+
+Threshold value: 3.058 3.344
+Percentage of Observations in each regime: 68.4% 10.2% 21.4% 
+
+$mod_8
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 36 + 2
+AIC -730.8556 	BIC -632.6269 	 SSR 4.250102 
+
+[[1]]
+                   Intercept      Trend          short.run -1   long.run -1    
+Equation short.run 0.3907(0.3519) 0.0014(0.0013) 1.0663(0.2140) -0.0370(0.1230)
+Equation long.run  0.2841(0.4666) 0.0007(0.0018) 0.4622(0.2838) 0.9529(0.1630) 
+                   short.run -2    long.run -2   
+Equation short.run -0.2756(0.1865) 0.1129(0.1301)
+Equation long.run  -0.5905(0.2472) 0.0742(0.1725)
+
+[[2]]
+                   Intercept      Trend          short.run -1    long.run -1   
+Equation short.run 1.3672(1.5340) 0.0115(0.0024) 0.0620(0.6220)  0.5436(0.2061)
+Equation long.run  3.2044(2.0340) 0.0129(0.0032) -2.0302(0.8247) 2.2204(0.2733)
+                   short.run -2   long.run -2    
+Equation short.run 0.3929(0.3004) -0.6545(0.2110)
+Equation long.run  1.4225(0.3983) -1.9027(0.2798)
+
+[[3]]
+                   Intercept      Trend           short.run -1   
+Equation short.run 1.6250(0.6201) 0.0231(0.0081)  -0.0236(0.3118)
+Equation long.run  1.3413(0.8221) -0.0176(0.0108) 0.3830(0.4134) 
+                   long.run -1    short.run -2    long.run -2    
+Equation short.run 0.4374(0.2239) -0.3344(0.3391) -0.0107(0.1163)
+Equation long.run  0.3073(0.2968) 0.4387(0.4497)  -0.1287(0.1542)
+
+
+Threshold value: 3.058 3.357
+Percentage of Observations in each regime: 68.4% 11.2% 20.4% 
+
+$mod_9
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 28 + 1
+AIC -682.5048 	BIC -607.8381 	 SSR 5.744725 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.1967(0.2625) 0.9025(0.1965) 0.0805(0.1361) -0.2602(0.2241)
+Equation long.run  0.2070(0.3570) 0.4333(0.2673) 1.1177(0.1851) -0.3853(0.3048)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run 0.0266(0.2008)  0.2765(0.1775)  -0.0855(0.1267)
+Equation long.run  -0.0630(0.2731) -0.1028(0.2414) -0.0828(0.1723)
+
+[[2]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.8205(0.4428) 0.6507(0.2200) 0.0195(0.1417) 0.0365(0.2529) 
+Equation long.run  0.8843(0.6022) 0.3793(0.2993) 0.4793(0.1927) -0.0275(0.3440)
+                   long.run -2     short.run -3    long.run -3   
+Equation short.run -0.2650(0.1575) 0.3026(0.2240)  0.0253(0.1200)
+Equation long.run  -0.2488(0.2142) -0.0140(0.3046) 0.1662(0.1632)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.2% 27.8% 
+
+$mod_10
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 28 + 1
+AIC -681.4627 	BIC -606.7961 	 SSR 5.79395 
+
+[[1]]
+                   Trend           short.run -1   long.run -1   
+Equation short.run 0.0003(0.0009)  0.9481(0.1870) 0.0942(0.1375)
+Equation long.run  -0.0001(0.0013) 0.4851(0.2535) 1.1243(0.1865)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.2491(0.2252) 0.0299(0.2021)  0.3022(0.1745) 
+Equation long.run  -0.3753(0.3053) -0.0625(0.2740) -0.0700(0.2366)
+                   long.run -3    
+Equation short.run -0.1213(0.1221)
+Equation long.run  -0.1127(0.1656)
+
+[[2]]
+                   Trend          short.run -1   long.run -1    
+Equation short.run 0.0058(0.0035) 0.9013(0.1930) -0.0207(0.1408)
+Equation long.run  0.0066(0.0047) 0.6518(0.2617) 0.4360(0.1908) 
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run 0.0550(0.2534)  -0.2422(0.1613) 0.0626(0.2505) 
+Equation long.run  -0.0119(0.3435) -0.2209(0.2187) -0.2829(0.3396)
+                   long.run -3   
+Equation short.run 0.1173(0.1200)
+Equation long.run  0.2675(0.1626)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.2% 27.8% 
+
+$mod_11
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 24 + 1
+AIC -685.7517 	BIC -621.3839 	 SSR 5.953759 
+
+[[1]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 0.9508(0.1878) 0.0887(0.1372) -0.2503(0.2263)
+Equation long.run  0.4842(0.2532) 1.1262(0.1850) -0.3749(0.3052)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run 0.0278(0.2031)  0.3064(0.1750)  -0.1157(0.1216)
+Equation long.run  -0.0618(0.2738) -0.0714(0.2359) -0.1146(0.1639)
+
+[[2]]
+                   short.run -1   long.run -1     short.run -2  
+Equation short.run 0.8565(0.1922) -0.0222(0.1415) 0.1368(0.2499)
+Equation long.run  0.6011(0.2591) 0.4344(0.1908)  0.0807(0.3370)
+                   long.run -2     short.run -3    long.run -3   
+Equation short.run -0.3034(0.1579) 0.2511(0.2248)  0.0767(0.1181)
+Equation long.run  -0.2902(0.2129) -0.0695(0.3031) 0.2216(0.1593)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.2% 27.8% 
+
+$mod_12
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 32 + 1
+AIC -687.1383 	BIC -602.1729 	 SSR 5.269641 
+
+[[1]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 0.6449(0.3916) 0.0021(0.0014) 0.7735(0.2063) 0.0996(0.1302)
+Equation long.run  0.4533(0.5475) 0.0011(0.0019) 0.3624(0.2884) 1.1281(0.1820)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.2748(0.2136) 0.0382(0.1913)  0.1803(0.1810) 
+Equation long.run  -0.3934(0.2987) -0.0566(0.2675) -0.1557(0.2530)
+                   long.run -3    
+Equation short.run -0.0548(0.1224)
+Equation long.run  -0.0659(0.1711)
+
+[[2]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 1.4019(0.4672) 0.0105(0.0036) 0.5859(0.2107) 0.0517(0.1353)
+Equation long.run  1.5322(0.6532) 0.0117(0.0051) 0.3071(0.2946) 0.5152(0.1892)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.1826(0.2525) -0.1270(0.1574) -0.0023(0.2380)
+Equation long.run  -0.2716(0.3530) -0.0950(0.2200) -0.3538(0.3327)
+                   long.run -3   
+Equation short.run 0.0623(0.1150)
+Equation long.run  0.2075(0.1607)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.2% 27.8% 
+
+$mod_13
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 42 + 2
+AIC -690.9993 	BIC -577.712 	 SSR 4.537429 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    
+Equation short.run 0.0093(0.2488) 1.1263(0.2034) -0.0119(0.1346)
+Equation long.run  0.1330(0.3451) 0.5738(0.2821) 1.0035(0.1866) 
+                   short.run -2    long.run -2    short.run -3   
+Equation short.run -0.3872(0.2147) 0.1230(0.1873) 0.2558(0.1642) 
+Equation long.run  -0.4591(0.2978) 0.0114(0.2598) -0.1393(0.2277)
+                   long.run -3    
+Equation short.run -0.0932(0.1202)
+Equation long.run  -0.0451(0.1668)
+
+[[2]]
+                   Intercept       short.run -1    long.run -1   
+Equation short.run -0.2317(1.8263) 0.1401(0.7492)  1.0544(0.2852)
+Equation long.run  4.2646(2.5331)  -2.9068(1.0392) 2.7100(0.3956)
+                   short.run -2   long.run -2     short.run -3   
+Equation short.run 2.8280(0.6635) -2.8404(0.6417) -1.7228(0.5534)
+Equation long.run  4.1219(0.9202) -4.2165(0.8901) -1.8754(0.7676)
+                   long.run -3   
+Equation short.run 1.5777(0.4372)
+Equation long.run  1.7862(0.6065)
+
+[[3]]
+                   Intercept      short.run -1    long.run -1   
+Equation short.run 1.6324(0.6378) 0.1093(0.2986)  0.0962(0.1711)
+Equation long.run  1.6623(0.8847) -0.0975(0.4142) 0.6804(0.2374)
+                   short.run -2    long.run -2     short.run -3  
+Equation short.run -0.0497(0.2969) -0.2830(0.1495) 0.7137(0.2645)
+Equation long.run  -0.2457(0.4118) -0.2079(0.2073) 0.3213(0.3669)
+                   long.run -3    
+Equation short.run -0.0127(0.1136)
+Equation long.run  0.1009(0.1576) 
+
+
+Threshold value: 3.062 3.357
+Percentage of Observations in each regime: 69.1% 10.3% 20.6% 
+
+$mod_14
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 42 + 2
+AIC -729.6564 	BIC -616.3691 	 SSR 3.701224 
+
+[[1]]
+                   Trend           short.run -1   long.run -1    
+Equation short.run 0.0003(0.0009)  1.1262(0.1880) -0.0105(0.1339)
+Equation long.run  4.3e-05(0.0010) 0.5301(0.2267) 0.9592(0.1615) 
+                   short.run -2    long.run -2    short.run -3  
+Equation short.run -0.3938(0.2147) 0.1276(0.1852) 0.2603(0.1679)
+Equation long.run  -0.5598(0.2590) 0.0535(0.2233) 0.0395(0.2025)
+                   long.run -3    
+Equation short.run -0.0961(0.1144)
+Equation long.run  -0.0184(0.1379)
+
+[[2]]
+                   Trend          short.run -1    long.run -1   
+Equation short.run 0.0145(0.0030) 0.8514(0.2762)  0.2446(0.2313)
+Equation long.run  0.0179(0.0036) -0.3563(0.3331) 1.7016(0.2789)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.0481(0.5509) -0.0053(0.5432) -0.0403(0.3970)
+Equation long.run  1.2338(0.6644)  -1.2079(0.6551) -0.7433(0.4787)
+                   long.run -3    
+Equation short.run -0.2834(0.3798)
+Equation long.run  -0.0067(0.4580)
+
+[[3]]
+                   Trend           short.run -1   long.run -1    
+Equation short.run 0.0027(0.0116)  0.4815(0.2691) 0.2198(0.2480) 
+Equation long.run  -0.0585(0.0140) 0.8500(0.3245) -0.1707(0.2991)
+                   short.run -2    long.run -2     short.run -3  
+Equation short.run -0.0862(0.3508) -0.3115(0.1665) 0.6437(0.3633)
+Equation long.run  0.7563(0.4230)  -0.6243(0.2008) 1.5484(0.4381)
+                   long.run -3    
+Equation short.run 0.0015(0.1212) 
+Equation long.run  -0.1243(0.1462)
+
+
+Threshold value: 3.058 3.369
+Percentage of Observations in each regime: 68% 12.4% 19.6% 
+
+$mod_15
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 36 + 2
+AIC -709.0451 	BIC -611.206 	 SSR 4.907752 
+
+[[1]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 0.9508(0.1670) 0.0887(0.1220) -0.2503(0.2013)
+Equation long.run  0.4842(0.2454) 1.1262(0.1793) -0.3749(0.2958)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run 0.0278(0.1806)  0.3064(0.1556)  -0.1157(0.1081)
+Equation long.run  -0.0618(0.2654) -0.0714(0.2287) -0.1146(0.1589)
+
+[[2]]
+                   short.run -1   long.run -1    short.run -2   long.run -2    
+Equation short.run 0.7881(0.2246) 0.1988(0.2009) 1.0605(0.3174) -0.9341(0.2360)
+Equation long.run  0.9380(0.3301) 0.1672(0.2951) 0.3802(0.4663) -0.3868(0.3467)
+                   short.run -3    long.run -3   
+Equation short.run -0.5962(0.2772) 0.4815(0.1354)
+Equation long.run  -0.6339(0.4073) 0.5113(0.1990)
+
+[[3]]
+                   short.run -1    long.run -1    short.run -2   
+Equation short.run 0.5129(0.3133)  0.0584(0.2021) -0.5504(0.3938)
+Equation long.run  -0.1648(0.4604) 0.9290(0.2969) 0.3205(0.5787) 
+                   long.run -2     short.run -3   long.run -3    
+Equation short.run -0.1727(0.3378) 1.3092(0.3424) -0.1590(0.3241)
+Equation long.run  0.3176(0.4964)  0.2425(0.5031) -0.6801(0.4763)
+
+
+Threshold value: 3.173 3.748
+Percentage of Observations in each regime: 72.2% 17.5% 10.3% 
+
+$mod_16
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 48 + 2
+AIC -730.2492 	BIC -601.5137 	 SSR 3.405836 
+
+[[1]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 0.6449(0.3288) 0.0021(0.0012) 0.7735(0.1732) 0.0996(0.1093)
+Equation long.run  0.4533(0.4656) 0.0011(0.0017) 0.3624(0.2453) 1.1281(0.1548)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.2748(0.1794) 0.0382(0.1606)  0.1803(0.1519) 
+Equation long.run  -0.3934(0.2540) -0.0566(0.2275) -0.1557(0.2152)
+                   long.run -3    
+Equation short.run -0.0548(0.1028)
+Equation long.run  -0.0659(0.1456)
+
+[[2]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 0.6306(0.8305) 0.0131(0.0035) 0.9921(0.3780) 0.0813(0.2507)
+Equation long.run  2.9390(1.1761) 0.0239(0.0050) 0.2648(0.5353) 0.4480(0.3550)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run 0.3623(0.3472)  -0.4513(0.2512) -0.8221(0.3226)
+Equation long.run  -0.8291(0.4917) 0.5273(0.3557)  -0.5680(0.4568)
+                   long.run -3    
+Equation short.run 0.3923(0.2664) 
+Equation long.run  -0.2023(0.3773)
+
+[[3]]
+                   Intercept       Trend           short.run -1  
+Equation short.run -6.0010(2.2402) -0.0467(0.0184) 2.2048(0.6916)
+Equation long.run  -7.0356(3.1724) -0.0983(0.0261) 2.6041(0.9793)
+                   long.run -1     short.run -2   long.run -2    
+Equation short.run -0.6763(0.3727) 0.4700(0.3631) -0.2795(0.1633)
+Equation long.run  -0.7570(0.5278) 1.3348(0.5142) -0.7051(0.2313)
+                   short.run -3   long.run -3    
+Equation short.run 2.5206(0.5472) -0.7255(0.1988)
+Equation long.run  3.1275(0.7750) -0.7336(0.2815)
+
+
+Threshold value: 3.173 3.712
+Percentage of Observations in each regime: 72.2% 15.5% 12.4% 
+
+$mod_17
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 18 + 1
+AIC -695.5749 	BIC -646.4605 	 SSR 6.123373 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.4221(0.2108) 0.9044(0.1864) 0.0068(0.1139) -0.0945(0.1847)
+Equation long.run  0.4764(0.2809) 0.3144(0.2485) 1.1863(0.1518) -0.4894(0.2462)
+                   long.run -2     short.run -1   long.run -1    
+Equation short.run 0.0493(0.1176)  0.8103(0.1920) -0.0281(0.1400)
+Equation long.run  -0.1863(0.1567) 0.4714(0.2559) 0.4609(0.1866) 
+                   short.run -2    long.run -2    
+Equation short.run 0.2641(0.1945)  -0.1724(0.1179)
+Equation long.run  -0.0238(0.2591) -0.0670(0.1572)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.4% 27.6% 
+
+$mod_18
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 98
+Number of variables: 2 	Number of estimated parameters: 26 + 2
+AIC -667.9351 	BIC -595.556 	 SSR 6.67732 
+
+[[1]]
+                   Intercept       short.run -1   long.run -1    
+Equation short.run 0.0477(0.2557)  1.1215(0.2303) -0.0209(0.1552)
+Equation long.run  -0.1355(0.3537) 0.5585(0.3186) 0.9742(0.2147) 
+                   short.run -2    long.run -2    short.run -1   
+Equation short.run -0.1665(0.2147) 0.0760(0.1592) 0.6689(0.3324) 
+Equation long.run  -0.5002(0.2970) 0.0278(0.2202) -0.3658(0.4598)
+                   long.run -1    short.run -2   long.run -2     short.run -1  
+Equation short.run 0.1414(0.1964) 0.4612(0.3601) -0.2991(0.2071) 0.8040(0.2198)
+Equation long.run  1.7163(0.2717) 0.8159(0.4981) -1.1410(0.2864) 0.5066(0.3040)
+                   long.run -1    short.run -2    long.run -2    
+Equation short.run 0.1811(0.1736) 0.1881(0.2205)  -0.1948(0.1233)
+Equation long.run  0.9014(0.2402) -0.2847(0.3050) -0.1107(0.1706)
+
+
+Threshold value: 3.008 3.214
+Percentage of Observations in each regime: 65.3% 10.2% 24.5% 
+
+$mod_19
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 26 + 1
+AIC -684.7229 	BIC -615.2057 	 SSR 5.822445 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.3589(0.2264) 0.8626(0.1943) 0.0739(0.1363) -0.2683(0.2247)
+Equation long.run  0.3831(0.3070) 0.3900(0.2634) 1.1104(0.1848) -0.3942(0.3046)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run 0.0256(0.2013)  0.2519(0.1768)  -0.0606(0.1254)
+Equation long.run  -0.0641(0.2729) -0.1295(0.2397) -0.0558(0.1700)
+                   short.run -1   long.run -1     short.run -2  
+Equation short.run 0.7665(0.1988) -0.0040(0.1407) 0.0929(0.2493)
+Equation long.run  0.5050(0.2695) 0.4538(0.1908)  0.0338(0.3380)
+                   long.run -2     short.run -3    long.run -3   
+Equation short.run -0.2866(0.1569) 0.2736(0.2233)  0.0543(0.1179)
+Equation long.run  -0.2722(0.2127) -0.0454(0.3028) 0.1976(0.1599)
+
+
+Threshold value: 3.173
+Percentage of Observations in each regime: 72.2% 27.8% 
+
+$mod_20
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 38 + 2
+AIC -686.5858 	BIC -583.5974 	 SSR 4.848356 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    
+Equation short.run 0.2165(0.2353) 1.0625(0.2060) -0.0156(0.1377)
+Equation long.run  0.3974(0.3250) 0.4924(0.2844) 0.9989(0.1901) 
+                   short.run -2    long.run -2    short.run -3   
+Equation short.run -0.3869(0.2197) 0.1161(0.1916) 0.2274(0.1674) 
+Equation long.run  -0.4588(0.3034) 0.0026(0.2646) -0.1755(0.2312)
+                   long.run -3     short.run -1    long.run -1   
+Equation short.run -0.0622(0.1222) -0.0296(0.3084) 1.0777(0.2755)
+Equation long.run  -0.0055(0.1687) -1.4427(0.4259) 2.5088(0.3804)
+                   short.run -2   long.run -2     short.run -3   
+Equation short.run 2.8363(0.6781) -2.8547(0.6540) -1.7037(0.5608)
+Equation long.run  4.0503(0.9363) -4.0925(0.9031) -2.0405(0.7744)
+                   long.run -3    short.run -1   long.run -1    short.run -2   
+Equation short.run 1.5736(0.4471) 0.4694(0.2634) 0.1489(0.1737) -0.0071(0.3033)
+Equation long.run  1.8220(0.6174) 0.2242(0.3638) 0.7275(0.2398) -0.2077(0.4188)
+                   long.run -2     short.run -3   long.run -3   
+Equation short.run -0.2957(0.1529) 0.6371(0.2687) 0.0004(0.1162)
+Equation long.run  -0.2192(0.2111) 0.2529(0.3710) 0.1126(0.1604)
+
+
+Threshold value: 3.062 3.357
+Percentage of Observations in each regime: 69.1% 10.3% 20.6% 
+
+$mod_21
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 28 + 1
+AIC -661.5168 	BIC -586.8502 	 SSR 6.865831 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.2215(0.3007) 0.9062(0.2349) 0.1300(0.1648) -0.2576(0.3343)
+Equation long.run  0.0596(0.4324) 0.1808(0.3377) 1.1266(0.2369) -0.3319(0.4807)
+                   long.run -2     short.run -3   long.run -3   
+Equation short.run -0.1493(0.2269) 0.2465(0.2378) 0.0618(0.1608)
+Equation long.run  -0.2736(0.3262) 0.1115(0.3419) 0.1864(0.2312)
+
+[[2]]
+                   Intercept       short.run -1   long.run -1   
+Equation short.run 0.1864(0.3709)  0.8571(0.1808) 0.1006(0.1216)
+Equation long.run  -0.2436(0.5333) 0.7044(0.2600) 0.8242(0.1748)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.1110(0.2237) -0.1244(0.1574) 0.3117(0.1881) 
+Equation long.run  -0.0918(0.3216) -0.0937(0.2263) -0.2510(0.2705)
+                   long.run -3    
+Equation short.run -0.0944(0.1082)
+Equation long.run  -0.0608(0.1555)
+
+
+Threshold value: 3.003
+Percentage of Observations in each regime: 64.9% 35.1% 
+
+$mod_22
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 28 + 1
+AIC -689.858 	BIC -615.1914 	 SSR 6.227308 
+
+[[1]]
+                   Trend          short.run -1   long.run -1    short.run -2   
+Equation short.run 0.0013(0.0007) 0.8093(0.1387) 0.0999(0.0879) 0.0792(0.1712) 
+Equation long.run  0.0018(0.0012) 0.3929(0.2174) 1.0272(0.1378) -0.0764(0.2684)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run -0.1085(0.1324) 0.1063(0.1394)  0.0038(0.0991) 
+Equation long.run  -0.0668(0.2075) -0.2641(0.2185) -0.0590(0.1554)
+
+[[2]]
+                   Trend           short.run -1   long.run -1    
+Equation short.run -0.0247(0.0198) 0.9460(0.4696) 0.3983(0.3938) 
+Equation long.run  -0.0962(0.0310) 2.1786(0.7362) -0.2785(0.6174)
+                   short.run -2    long.run -2     short.run -3  
+Equation short.run -0.2030(0.4278) -1.0539(0.3634) 1.6917(0.5080)
+Equation long.run  0.3458(0.6707)  -1.3081(0.5696) 2.4364(0.7963)
+                   long.run -3    
+Equation short.run -0.2882(0.1602)
+Equation long.run  -0.3616(0.2512)
+
+
+Threshold value: 3.713
+Percentage of Observations in each regime: 89.7% 10.3% 
+
+$mod_23
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 24 + 1
+AIC -666.9848 	BIC -602.6171 	 SSR 6.899967 
+
+[[1]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 0.9072(0.2332) 0.1379(0.1632) -0.1940(0.3207)
+Equation long.run  0.1811(0.3342) 1.1287(0.2339) -0.3148(0.4596)
+                   long.run -2     short.run -3   long.run -3   
+Equation short.run -0.1622(0.2246) 0.2786(0.2321) 0.0485(0.1587)
+Equation long.run  -0.2770(0.3218) 0.1202(0.3326) 0.1828(0.2273)
+
+[[2]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 0.8730(0.1768) 0.0904(0.1190) -0.0704(0.2071)
+Equation long.run  0.6837(0.2533) 0.8375(0.1705) -0.1448(0.2967)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run -0.1370(0.1542) 0.3237(0.1853)  -0.0882(0.1067)
+Equation long.run  -0.0771(0.2210) -0.2665(0.2655) -0.0690(0.1529)
+
+
+Threshold value: 3.003
+Percentage of Observations in each regime: 64.9% 35.1% 
+
+$mod_24
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 32 + 1
+AIC -686.5036 	BIC -601.5382 	 SSR 6.077501 
+
+[[1]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 0.3980(0.2635) 0.0027(0.0012) 0.7462(0.1440) 0.1264(0.0891)
+Equation long.run  0.2398(0.4167) 0.0026(0.0019) 0.3549(0.2278) 1.0431(0.1409)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run 0.0189(0.1748)  -0.1005(0.1317) 0.0182(0.1503) 
+Equation long.run  -0.1128(0.2764) -0.0620(0.2082) -0.3171(0.2377)
+                   long.run -3    
+Equation short.run 0.0324(0.1003) 
+Equation long.run  -0.0418(0.1586)
+
+[[2]]
+                   Intercept       Trend           short.run -1  
+Equation short.run -3.3237(3.7999) -0.0280(0.0200) 1.1560(0.5248)
+Equation long.run  -6.7065(6.0098) -0.1029(0.0317) 2.6024(0.8300)
+                   long.run -1     short.run -2   long.run -2    
+Equation short.run 0.2974(0.4080)  0.3328(0.7457) -0.9348(0.3859)
+Equation long.run  -0.4821(0.6453) 1.4270(1.1793) -1.0678(0.6104)
+                   short.run -3   long.run -3    
+Equation short.run 2.0108(0.6228) -0.4464(0.2410)
+Equation long.run  3.0803(0.9850) -0.6808(0.3811)
+
+
+Threshold value: 3.713
+Percentage of Observations in each regime: 89.7% 10.3% 
+
+$mod_25
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 42 + 2
+AIC -681.0605 	BIC -567.7733 	 SSR 5.028484 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.2215(0.2803) 0.9062(0.2189) 0.1300(0.1535) -0.2576(0.3116)
+Equation long.run  0.0596(0.3786) 0.1808(0.2957) 1.1266(0.2074) -0.3319(0.4209)
+                   long.run -2     short.run -3   long.run -3   
+Equation short.run -0.1493(0.2114) 0.2465(0.2216) 0.0618(0.1499)
+Equation long.run  -0.2736(0.2856) 0.1115(0.2993) 0.1864(0.2025)
+
+[[2]]
+                   Intercept      short.run -1   long.run -1    
+Equation short.run 2.4080(4.3303) 1.5049(0.3316) -0.5229(0.2772)
+Equation long.run  7.6863(5.8498) 1.9880(0.4479) -0.1931(0.3745)
+                   short.run -2    long.run -2    short.run -3   
+Equation short.run -1.1034(1.1466) 0.8352(0.4947) 0.1434(0.5454) 
+Equation long.run  -2.7957(1.5490) 1.4929(0.6683) -0.9795(0.7368)
+                   long.run -3    
+Equation short.run -0.6939(0.3667)
+Equation long.run  -1.1526(0.4954)
+
+[[3]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 1.1324(0.5153) 0.7043(0.2204) 0.2812(0.1702) -0.0422(0.2353)
+Equation long.run  0.3852(0.6962) 0.5800(0.2977) 0.8541(0.2299) -0.0148(0.3178)
+                   long.run -2     short.run -3    long.run -3   
+Equation short.run -0.5346(0.2017) 0.2562(0.2070)  0.0182(0.1199)
+Equation long.run  -0.2392(0.2724) -0.4554(0.2796) 0.1486(0.1619)
+
+
+Threshold value: 3.003 3.195
+Percentage of Observations in each regime: 64.9% 10.3% 24.7% 
+
+$mod_26
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 42 + 2
+AIC -677.2671 	BIC -563.9798 	 SSR 4.974008 
+
+[[1]]
+                   Trend          short.run -1   long.run -1    short.run -2   
+Equation short.run 0.0013(0.0010) 0.8774(0.2230) 0.1429(0.1553) -0.1592(0.3062)
+Equation long.run  0.0016(0.0013) 0.1449(0.2926) 1.1348(0.2038) -0.2725(0.4018)
+                   long.run -2     short.run -3   long.run -3   
+Equation short.run -0.1473(0.2139) 0.2451(0.2222) 0.0444(0.1509)
+Equation long.run  -0.2590(0.2807) 0.0795(0.2917) 0.1779(0.1980)
+
+[[2]]
+                   Trend           short.run -1   long.run -1    
+Equation short.run -0.0052(0.0038) 1.9746(0.4784) -0.8190(0.2878)
+Equation long.run  -0.0087(0.0050) 2.7723(0.6279) -0.8079(0.3777)
+                   short.run -2    long.run -2    short.run -3   
+Equation short.run -0.5515(0.4218) 1.1431(0.4074) 0.1311(0.4007) 
+Equation long.run  -0.9694(0.5536) 2.2648(0.5347) -0.6496(0.5259)
+                   long.run -3    
+Equation short.run -0.8494(0.2692)
+Equation long.run  -1.6263(0.3533)
+
+[[3]]
+                   Trend           short.run -1   long.run -1    short.run -2  
+Equation short.run 0.0011(0.0033)  0.8017(0.2208) 0.2274(0.1708) 0.1230(0.2311)
+Equation long.run  -0.0013(0.0043) 0.6332(0.2897) 0.8385(0.2242) 0.0211(0.3034)
+                   long.run -2     short.run -3    long.run -3   
+Equation short.run -0.4883(0.2041) 0.2598(0.2367)  0.0479(0.1251)
+Equation long.run  -0.2318(0.2678) -0.3961(0.3106) 0.1424(0.1641)
+
+
+Threshold value: 3.003 3.195
+Percentage of Observations in each regime: 64.9% 10.3% 24.7% 
+
+$mod_27
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 36 + 2
+AIC -682.2468 	BIC -584.4078 	 SSR 5.251379 
+
+[[1]]
+                   short.run -1   long.run -1    short.run -2   
+Equation short.run 0.9072(0.2227) 0.1379(0.1559) -0.1940(0.3062)
+Equation long.run  0.1811(0.2939) 1.1287(0.2057) -0.3148(0.4042)
+                   long.run -2     short.run -3   long.run -3   
+Equation short.run -0.1622(0.2144) 0.2786(0.2216) 0.0485(0.1515)
+Equation long.run  -0.2770(0.2831) 0.1202(0.2925) 0.1828(0.2000)
+
+[[2]]
+                   short.run -1   long.run -1     short.run -2   
+Equation short.run 1.5049(0.3373) -0.6021(0.2420) -0.5091(0.4224)
+Equation long.run  1.9882(0.4453) -0.4459(0.3194) -0.8985(0.5576)
+                   long.run -2    short.run -3    long.run -3    
+Equation short.run 1.0046(0.3965) 0.3734(0.3616)  -0.8346(0.2701)
+Equation long.run  2.0337(0.5234) -0.2452(0.4773) -1.6015(0.3566)
+
+[[3]]
+                   short.run -1   long.run -1    short.run -2   long.run -2    
+Equation short.run 0.8149(0.2183) 0.2292(0.1715) 0.1096(0.2288) -0.4938(0.2043)
+Equation long.run  0.6176(0.2881) 0.8364(0.2263) 0.0368(0.3020) -0.2253(0.2696)
+                   short.run -3    long.run -3   
+Equation short.run 0.2982(0.2097)  0.0372(0.1216)
+Equation long.run  -0.4411(0.2767) 0.1550(0.1606)
+
+
+Threshold value: 3.003 3.195
+Percentage of Observations in each regime: 64.9% 10.3% 24.7% 
+
+$mod_28
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 48 + 2
+AIC -694.4521 	BIC -565.7165 	 SSR 4.370522 
+
+[[1]]
+                   Intercept      Trend          short.run -1   long.run -1   
+Equation short.run 1.4148(0.4258) 0.0054(0.0015) 0.7780(0.2034) 0.1079(0.1405)
+Equation long.run  1.1395(0.6112) 0.0049(0.0022) 0.0648(0.2919) 1.1066(0.2016)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.4570(0.2904) -0.0194(0.1967) -0.0642(0.2210)
+Equation long.run  -0.5123(0.4168) -0.1560(0.2824) -0.1697(0.3173)
+                   long.run -3   
+Equation short.run 0.1171(0.1379)
+Equation long.run  0.2365(0.1979)
+
+[[2]]
+                   Intercept      Trend           short.run -1  
+Equation short.run 1.7907(3.9798) -0.0051(0.0034) 1.9599(0.4329)
+Equation long.run  6.6971(5.7124) -0.0081(0.0049) 2.7173(0.6213)
+                   long.run -1     short.run -2    long.run -2   
+Equation short.run -0.7533(0.2978) -0.9922(1.0507) 1.0128(0.4679)
+Equation long.run  -0.5623(0.4274) -2.6175(1.5081) 1.7775(0.6716)
+                   short.run -3    long.run -3    
+Equation short.run -0.0324(0.5126) -0.7443(0.3369)
+Equation long.run  -1.2612(0.7357) -1.2334(0.4835)
+
+[[3]]
+                   Intercept      Trend           short.run -1   long.run -1   
+Equation short.run 1.6567(0.5479) 0.0064(0.0034)  0.5775(0.2125) 0.2949(0.1557)
+Equation long.run  0.3753(0.7864) -0.0001(0.0049) 0.5824(0.3050) 0.8538(0.2235)
+                   short.run -2    long.run -2     short.run -3   
+Equation short.run -0.0362(0.2151) -0.5221(0.1844) 0.0176(0.2281) 
+Equation long.run  -0.0150(0.3087) -0.2394(0.2647) -0.4509(0.3273)
+                   long.run -3   
+Equation short.run 0.0706(0.1131)
+Equation long.run  0.1476(0.1623)
+
+
+Threshold value: 3.003 3.195
+Percentage of Observations in each regime: 64.9% 10.3% 24.7% 
+
+$mod_29
+Model TVAR with  1  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 26 + 1
+AIC -665.1815 	BIC -595.6643 	 SSR 6.876853 
+
+[[1]]
+                   Intercept       short.run -1   long.run -1   
+Equation short.run 0.2076(0.2322)  0.9063(0.2335) 0.1305(0.1636)
+Equation long.run  -0.0607(0.3342) 0.1814(0.3361) 1.1309(0.2356)
+                   short.run -2    long.run -2     short.run -3  
+Equation short.run -0.2536(0.3279) -0.1501(0.2252) 0.2485(0.2348)
+Equation long.run  -0.2973(0.4721) -0.2805(0.3242) 0.1290(0.3380)
+                   long.run -3    short.run -1   long.run -1    short.run -2   
+Equation short.run 0.0610(0.1595) 0.8553(0.1781) 0.1017(0.1198) -0.1156(0.2134)
+Equation long.run  0.1792(0.2295) 0.6888(0.2564) 0.8342(0.1725) -0.1316(0.3072)
+                   long.run -2     short.run -3    long.run -3    
+Equation short.run -0.1229(0.1552) 0.3104(0.1861)  -0.0952(0.1071)
+Equation long.run  -0.0812(0.2234) -0.2627(0.2679) -0.0670(0.1542)
+
+
+Threshold value: 3.003
+Percentage of Observations in each regime: 64.9% 35.1% 
+
+$mod_30
+Model TVAR with  2  thresholds
+
+Full sample size: 100 	End sample size: 97
+Number of variables: 2 	Number of estimated parameters: 38 + 2
+AIC -682.912 	BIC -579.9236 	 SSR 5.168062 
+
+[[1]]
+                   Intercept      short.run -1   long.run -1    short.run -2   
+Equation short.run 0.4358(0.2468) 0.9052(0.2197) 0.1223(0.1541) -0.3191(0.3104)
+Equation long.run  0.1583(0.3317) 0.1804(0.2954) 1.1230(0.2071) -0.3602(0.4172)
+                   long.run -2     short.run -3   long.run -3    short.run -1  
+Equation short.run -0.1369(0.2121) 0.2154(0.2216) 0.0748(0.1502) 1.5049(0.3329)
+Equation long.run  -0.2679(0.2851) 0.0972(0.2979) 0.1924(0.2019) 1.9882(0.4475)
+                   long.run -1     short.run -2    long.run -2   
+Equation short.run -0.5878(0.2389) -0.6166(0.4213) 0.9740(0.3917)
+Equation long.run  -0.4407(0.3211) -0.9376(0.5663) 2.0226(0.5265)
+                   short.run -3    long.run -3     short.run -1  
+Equation short.run 0.3318(0.3576)  -0.8091(0.2670) 0.7723(0.2168)
+Equation long.run  -0.2603(0.4807) -1.5923(0.3588) 0.6022(0.2914)
+                   long.run -1    short.run -2   long.run -2    
+Equation short.run 0.2492(0.1696) 0.0512(0.2282) -0.5095(0.2018)
+Equation long.run  0.8436(0.2279) 0.0156(0.3067) -0.2310(0.2712)
+                   short.run -3    long.run -3   
+Equation short.run 0.2820(0.2071)  0.0299(0.1201)
+Equation long.run  -0.4470(0.2784) 0.1523(0.1614)
+
+
+Threshold value: 3.003 3.195
+Percentage of Observations in each regime: 64.9% 10.3% 24.7% 
+
+> sapply(TVAR_outs, AIC)
+    mod_1     mod_2     mod_3     mod_4     mod_5     mod_6     mod_7     mod_8 
+-693.4198 -694.4421 -695.9140 -704.0109 -686.9451 -729.4219 -692.6493 -730.8556 
+    mod_9    mod_10    mod_11    mod_12    mod_13    mod_14    mod_15    mod_16 
+-682.5048 -681.4627 -685.7517 -687.1383 -690.9993 -729.6564 -709.0451 -730.2492 
+   mod_17    mod_18    mod_19    mod_20    mod_21    mod_22    mod_23    mod_24 
+-695.5749 -667.9351 -684.7229 -686.5858 -661.5168 -689.8580 -666.9848 -686.5036 
+   mod_25    mod_26    mod_27    mod_28    mod_29    mod_30 
+-681.0605 -677.2671 -682.2468 -694.4521 -665.1815 -682.9120 
+> sapply(TVAR_outs, BIC)
+    mod_1     mod_2     mod_3     mod_4     mod_5     mod_6     mod_7     mod_8 
+-639.1355 -640.1577 -651.9696 -639.3867 -604.2262 -646.7030 -625.4402 -632.6269 
+    mod_9    mod_10    mod_11    mod_12    mod_13    mod_14    mod_15    mod_16 
+-607.8381 -606.7961 -621.3839 -602.1729 -577.7120 -616.3691 -611.2060 -601.5137 
+   mod_17    mod_18    mod_19    mod_20    mod_21    mod_22    mod_23    mod_24 
+-646.4605 -595.5560 -615.2057 -583.5974 -586.8502 -615.1914 -602.6171 -601.5382 
+   mod_25    mod_26    mod_27    mod_28    mod_29    mod_30 
+-567.7733 -563.9798 -584.4078 -565.7165 -595.6643 -579.9236 
+> sapply(TVAR_outs, logLik)
+    mod_1     mod_2     mod_3     mod_4     mod_5     mod_6     mod_7     mod_8 
+ 89.59795  90.10907  86.84506  98.89351  97.36061 118.59902  94.21271 125.31586 
+    mod_9    mod_10    mod_11    mod_12    mod_13    mod_14    mod_15    mod_16 
+ 94.97830  94.45726  92.60175 101.29509 114.22555 133.55412 117.24845 139.85053 
+   mod_17    mod_18    mod_19    mod_20    mod_21    mod_22    mod_23    mod_24 
+ 88.67549  83.85561  94.08735 108.01883  84.48433  98.65493  83.21834 100.97774 
+   mod_25    mod_26    mod_27    mod_28    mod_29    mod_30 
+109.25619 107.35946 103.84932 121.95195  84.31669 106.18194 
+> sapply(TVAR_outs, deviance)
+   mod_1    mod_2    mod_3    mod_4    mod_5    mod_6    mod_7    mod_8 
+6.033018 6.079709 6.301583 5.442117 5.359576 4.589685 5.794965 4.250102 
+   mod_9   mod_10   mod_11   mod_12   mod_13   mod_14   mod_15   mod_16 
+5.744725 5.793950 5.953759 5.269641 4.537429 3.701224 4.907752 3.405836 
+  mod_17   mod_18   mod_19   mod_20   mod_21   mod_22   mod_23   mod_24 
+6.123373 6.677320 5.822445 4.848356 6.865831 6.227308 6.899967 6.077501 
+  mod_25   mod_26   mod_27   mod_28   mod_29   mod_30 
+5.028484 4.974008 5.251379 4.370522 6.876853 5.168062 
+> sapply(TVAR_outs, df.residual)
+ mod_1  mod_2  mod_3  mod_4  mod_5  mod_6  mod_7  mod_8  mod_9 mod_10 mod_11 
+    88     88     90     86     83     83     86     80     83     83     85 
+mod_12 mod_13 mod_14 mod_15 mod_16 mod_17 mod_18 mod_19 mod_20 mod_21 mod_22 
+    81     76     76     79     73     89     85     84     78     83     83 
+mod_23 mod_24 mod_25 mod_26 mod_27 mod_28 mod_29 mod_30 
+    85     81     76     76     79     73     84     78 
+> 
+> proc.time()
+   user  system elapsed 
+  4.820   0.144   4.959 

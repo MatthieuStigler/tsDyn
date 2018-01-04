@@ -80,7 +80,7 @@ TVAR_outs <- mapply(TVAR,
                     MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=TRUE),
                     SIMPLIFY=FALSE)
 
-names(TVAR_outs) <- paste("mod", 1:length(a), sep="_")
+names(TVAR_outs) <- paste("mod", 1:length(TVAR_outs), sep="_")
 
 ## check outputs
 lapply(TVAR_outs, print)
