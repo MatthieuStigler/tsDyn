@@ -101,14 +101,13 @@ TVAR_thresh<-function(mTh, thDelay, thVar=NULL, y, p){
       z <- thVar
     }
     z<-embed(z,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
+    combin <- matrix(0, ncol=1, nrow=k)
   } ###Combination (or single value indicating position) of contemporaneous variables
   else {
     if (!length(mTh)%in%c(1,k))
       stop("length of 'mTh' should be equal to the number of variables, or just one")
-    if(!all(mTh%in%seq_len(k)))
-      stop("Unable to select the variable ", mTh[which(mTh%in%seq_len(k)==FALSE)], " for the threshold. Please see again mTh ")
     if(length(mTh)==1) {
-      combin <- matrix(0,ncol=1, nrow=k)
+      combin <- matrix(0, ncol=1, nrow=k)
       combin[mTh,]<-1
     } else { 
       combin<-matrix(mTh, ncol=1, nrow=k)
@@ -116,10 +115,8 @@ TVAR_thresh<-function(mTh, thDelay, thVar=NULL, y, p){
     zcombin <- y %*% combin
     z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]		#if thDelay=2, ncol(z)=2
   }
-  zcombin <- y %*% combin
-  z <- embed(zcombin,p+1)[,seq_len(max(thDelay))+1]	
 
-  #res
+  # return result
   res <- list(trans=as.matrix(z), combin=combin)
   res
 }
