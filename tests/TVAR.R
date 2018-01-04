@@ -1,0 +1,93 @@
+library(tsDyn)
+
+data(zeroyld)
+
+
+###TVAR
+tvar<-TVAR(zeroyld[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, include="const")
+class(tvar)
+tvar
+print(tvar)
+coefficients(tvar)
+
+##FIXME ?
+summary(tvar)$VAR
+tvar$VAR
+
+
+
+coefficients(summary(tvar))
+logLik(tvar)
+AIC(tvar)
+BIC(tvar)
+coef(tvar)
+deviance(tvar)
+vcov(tvar)
+df.residual(tvar)
+all.equal(summary(tvar)$VarCov[[1]], vcov(tvar))
+head(residuals(tvar))
+tail(residuals(tvar))
+head(fitted(tvar))
+tail(fitted(tvar))
+
+regime(tvar)
+regime(tvar, initVal=FALSE)
+regime(tvar, time=FALSE)
+regime(tvar, time=FALSE, initVal=FALSE)
+
+
+##FIXME
+options(show.signif.stars=TRUE)
+summary(tvar)
+
+options(show.signif.stars=FALSE)
+summary(tvar)
+
+print(summary(tvar), digits=3)
+
+toLatex(tvar)
+
+if(FALSE) {##FIXME
+  toLatex(summary(tvar), digits=2)
+  tvar$coefficients
+  tvar$StDev
+  options(show.signif.stars=FALSE)
+  toLatex(summary(tvar), digits=2)
+}
+
+
+#################################
+### Many more TVARs
+#################################
+gr_args <- expand.grid(include= c("const", "trend", "none", "both"), 
+                       nthresh=1:2,
+                       lag=1:3,
+                       commonInter=c(FALSE, TRUE),
+                       thDelay=c(1,2),
+                       stringsAsFactors=FALSE)
+
+## remove if commonInter and const
+gr_args_ok <- subset(gr_args, !(commonInter & include!="const") & lag > thDelay) 
+
+
+## run
+TVAR_outs <- mapply(TVAR,
+                    include=gr_args_ok$include,
+                    lag=gr_args_ok$lag,
+                    commonInter=gr_args_ok$commonInter,
+                    thDelay=gr_args_ok$thDelay,
+                    nthresh=gr_args_ok$nthresh,
+                    MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=TRUE),
+                    SIMPLIFY=FALSE)
+
+names(TVAR_outs) <- paste("mod", 1:length(a), sep="_")
+
+## check outputs
+lapply(TVAR_outs, print)
+lapply(TVAR_outs, getTh)
+lapply(TVAR_outs, summary)
+sapply(TVAR_outs, AIC)
+sapply(TVAR_outs, BIC)
+sapply(TVAR_outs, logLik)
+sapply(TVAR_outs, deviance)
+sapply(TVAR_outs, df.residual)

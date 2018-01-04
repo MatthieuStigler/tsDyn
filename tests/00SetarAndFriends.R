@@ -51,56 +51,6 @@ selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid=5), common="no
 selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid="Half"), common="none",criterion = "SSR", plot=FALSE)
 
 
-###TVAR
-tvar<-TVAR(dat[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, include="const")
-class(tvar)
-tvar
-print(tvar)
-coefficients(tvar)
-##FIXME
-summary(tvar)$VAR
-##FIXME
-tvar$VAR
-
-coefficients(summary(tvar))
-logLik(tvar)
-AIC(tvar)
-BIC(tvar)
-coef(tvar)
-deviance(tvar)
-vcov(tvar)
-df.residual(tvar)
-all.equal(summary(tvar)$VarCov[[1]], vcov(tvar))
-head(residuals(tvar))
-tail(residuals(tvar))
-head(fitted(tvar))
-tail(fitted(tvar))
-
-regime(tvar)
-regime(tvar, initVal=FALSE)
-regime(tvar, time=FALSE)
-regime(tvar, time=FALSE, initVal=FALSE)
-
-
-##FIXME
-options(show.signif.stars=TRUE)
-summary(tvar)
-
-options(show.signif.stars=FALSE)
-summary(tvar)
-
-print(summary(tvar), digits=3)
-
-toLatex(tvar)
-
-if(0) {##FIXME
-toLatex(summary(tvar), digits=2)
-tvar$coefficients
-tvar$StDev
-options(show.signif.stars=FALSE)
-toLatex(summary(tvar), digits=2)
-}
-
 ###TVECM
 tvecm<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="All")
 class(tvecm)
