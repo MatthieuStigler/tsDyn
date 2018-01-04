@@ -2,7 +2,6 @@ library(tsDyn)
 
 data(zeroyld)
 
-
 ###TVAR
 tvar<-TVAR(zeroyld[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, include="const")
 class(tvar)
@@ -77,7 +76,7 @@ TVAR_outs <- mapply(TVAR,
                     commonInter=gr_args_ok$commonInter,
                     thDelay=gr_args_ok$thDelay,
                     nthresh=gr_args_ok$nthresh,
-                    MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=TRUE),
+                    MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=FALSE),
                     SIMPLIFY=FALSE)
 
 names(TVAR_outs) <- paste("mod", 1:length(TVAR_outs), sep="_")
@@ -91,3 +90,10 @@ sapply(TVAR_outs, BIC)
 sapply(TVAR_outs, logLik)
 sapply(TVAR_outs, deviance)
 sapply(TVAR_outs, df.residual)
+
+
+## Boot
+gr_args_ok_df <- gr_args_ok
+gr_args_ok_df$models <- TVAR_outs 
+
+sapply(subset(gr_args_ok_df, !commonInter)$models, function(x) head(TVAR.boot(x, seed=123)))

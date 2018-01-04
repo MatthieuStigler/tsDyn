@@ -21,7 +21,6 @@ Type 'q()' to quit R.
 > 
 > data(zeroyld)
 > 
-> 
 > ###TVAR
 > tvar<-TVAR(zeroyld[1:100,], lag=2, nthresh=2,thDelay=1,trim=0.1, plot=FALSE, include="const")
 Best unique threshold 3.173 
@@ -591,98 +590,8 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 +                     commonInter=gr_args_ok$commonInter,
 +                     thDelay=gr_args_ok$thDelay,
 +                     nthresh=gr_args_ok$nthresh,
-+                     MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=TRUE),
++                     MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=FALSE),
 +                     SIMPLIFY=FALSE)
-Best unique threshold 3.173 
-Best unique threshold 3.189 
-Best unique threshold 3.189 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Second best: 2.987 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 5.513542
-Second best: 3.173 (conditionnal on th= 2.987 and Delay= 1 ) 	 SSR/AIC: 5.513542
-
-Second step best thresholds 3.091 3.405 		 SSR: 5.359576 
-Best unique threshold 3.189 
-Second best: 3.526 (conditionnal on th= 3.189 and Delay= 1 ) 	 SSR/AIC: 5.015707
-Second best: 3.058 (conditionnal on th= 3.526 and Delay= 1 ) 	 SSR/AIC: 4.747578
-
-Second step best thresholds 3.058 3.344 		 SSR: 4.589685 
-Best unique threshold 3.189 
-Second best: 3.712 (conditionnal on th= 3.189 and Delay= 1 ) 	 SSR/AIC: 5.854277
-Second best: 3.173 (conditionnal on th= 3.712 and Delay= 1 ) 	 SSR/AIC: 5.831138
-
-Second step best thresholds 3.058 3.344 		 SSR: 5.794965 
-Best unique threshold 3.173 
-Second best: 3.748 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 4.548898
-Second best: 3.173 (conditionnal on th= 3.748 and Delay= 1 ) 	 SSR/AIC: 4.548898
-
-Second step best thresholds 3.058 3.357 		 SSR: 4.250102 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Second best: 3.748 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 4.826086
-Second best: 3.173 (conditionnal on th= 3.748 and Delay= 1 ) 	 SSR/AIC: 4.826086
-
-Second step best thresholds 3.062 3.357 		 SSR: 4.537429 
-Best unique threshold 3.173 
-Second best: 3.748 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 3.883083
-Second best: 3.173 (conditionnal on th= 3.748 and Delay= 1 ) 	 SSR/AIC: 3.883083
-
-Second step best thresholds 3.058 3.369 		 SSR: 3.701224 
-Best unique threshold 3.173 
-Second best: 3.748 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 4.907752
-Second best: 3.173 (conditionnal on th= 3.748 and Delay= 1 ) 	 SSR/AIC: 4.907752
-
-Second step best thresholds 3.173 3.748 		 SSR: 4.907752 
-Best unique threshold 3.173 
-Second best: 3.712 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 3.405836
-Second best: 3.173 (conditionnal on th= 3.712 and Delay= 1 ) 	 SSR/AIC: 3.405836
-
-Second step best thresholds 3.173 3.712 		 SSR: 3.405836 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Second best: 2.957 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 5.604876
-Second best: 3.173 (conditionnal on th= 2.957 and Delay= 1 ) 	 SSR/AIC: 5.604876
-
-Second step best thresholds 3.008 3.214 		 SSR: 5.381184 
-Best unique threshold 3.173 
-Best unique threshold 3.173 
-Second best: 3.748 (conditionnal on th= 3.173 and Delay= 1 ) 	 SSR/AIC: 4.851913
-Second best: 3.173 (conditionnal on th= 3.748 and Delay= 1 ) 	 SSR/AIC: 4.851913
-
-Second step best thresholds 3.062 3.357 		 SSR: 4.754071 
-Best unique threshold 3.003 
-Best unique threshold 3.713 
-Best unique threshold 3.003 
-Best unique threshold 3.713 
-Best unique threshold 3.003 
-Second best: 3.195 (conditionnal on th= 3.003 and Delay= 2 ) 	 SSR/AIC: 5.028484
-Second best: 3.003 (conditionnal on th= 3.195 and Delay= 2 ) 	 SSR/AIC: 5.028484
-
-Second step best thresholds 3.003 3.195 		 SSR: 5.028484 
-Best unique threshold 3.713 
-Second best: 2.987 (conditionnal on th= 3.713 and Delay= 2 ) 	 SSR/AIC: 5.061632
-Second best: 3.713 (conditionnal on th= 2.987 and Delay= 2 ) 	 SSR/AIC: 5.061632
-
-Second step best thresholds 3.003 3.195 		 SSR: 4.974008 
-Best unique threshold 3.003 
-Second best: 3.195 (conditionnal on th= 3.003 and Delay= 2 ) 	 SSR/AIC: 5.251379
-Second best: 3.003 (conditionnal on th= 3.195 and Delay= 2 ) 	 SSR/AIC: 5.251379
-
-Second step best thresholds 3.003 3.195 		 SSR: 5.251379 
-Best unique threshold 3.713 
-Second best: 3.003 (conditionnal on th= 3.713 and Delay= 2 ) 	 SSR/AIC: 4.769659
-Second best: 3.195 (conditionnal on th= 3.003 and Delay= 2 ) 	 SSR/AIC: 4.370522
-
-Second step best thresholds 3.003 3.195 		 SSR: 4.370522 
-Best unique threshold 3.003 
-Best unique threshold 3.003 
-Second best: 3.195 (conditionnal on th= 3.003 and Delay= 2 ) 	 SSR/AIC: 5.092174
-Second best: 3.003 (conditionnal on th= 3.195 and Delay= 2 ) 	 SSR/AIC: 5.092174
-
-Second step best thresholds 3.003 3.195 		 SSR: 5.092174 
 > 
 > names(TVAR_outs) <- paste("mod", 1:length(TVAR_outs), sep="_")
 > 
@@ -2549,6 +2458,52 @@ mod_12 mod_13 mod_14 mod_15 mod_16 mod_17 mod_18 mod_19 mod_20 mod_21 mod_22
 mod_23 mod_24 mod_25 mod_26 mod_27 mod_28 mod_29 mod_30 
     85     81     76     76     79     73     84     78 
 > 
+> 
+> ## Boot
+> gr_args_ok_df <- gr_args_ok
+> gr_args_ok_df$models <- TVAR_outs 
+> 
+> sapply(subset(gr_args_ok_df, !commonInter)$models, function(x) head(TVAR.boot(x, seed=123)))
+         mod_1    mod_2     mod_3    mod_4    mod_5    mod_6    mod_7    mod_8
+ [1,] 2.183000 2.183000  2.183000 2.183000 2.183000 2.183000 2.183000 2.183000
+ [2,] 2.246000 2.246000  2.246000 2.246000 2.246000 2.246000 2.246000 2.246000
+ [3,] 2.310076 2.234346  2.382945 2.432562 2.308666 2.264627 2.598904 2.360682
+ [4,] 2.350171 2.223493  2.552858 2.573153 2.322928 2.318335 2.868416 2.544823
+ [5,] 2.377128 2.233735  2.879007 2.575598 2.326389 2.305865 3.166541 2.547936
+ [6,] 2.569181 2.339747  3.454427 2.707978 2.503366 2.386937 2.927890 2.624894
+ [7,] 1.575000 1.575000  1.575000 1.575000 1.575000 1.575000 1.575000 1.575000
+ [8,] 1.545000 1.545000  1.545000 1.545000 1.545000 1.545000 1.545000 1.545000
+ [9,] 1.828027 1.755711  3.119165 1.862640 1.825246 1.699393 2.819057 1.769241
+[10,] 2.395706 2.223632  5.310619 2.586161 2.336548 1.915350 4.455877 2.107436
+[11,] 2.628954 2.407168  7.794993 2.871858 2.501836 2.019107 5.883104 2.274387
+[12,] 2.655668 2.377010 10.846836 2.863443 2.478072 1.901133 4.978422 2.158609
+         mod_9   mod_10   mod_11   mod_12   mod_13   mod_14   mod_15   mod_16
+ [1,] 2.183000 2.183000 2.183000 2.183000 2.183000 2.183000 2.183000 2.183000
+ [2,] 2.246000 2.246000 2.246000 2.246000 2.246000 2.246000 2.246000 2.246000
+ [3,] 2.308000 2.308000 2.308000 2.308000 2.308000 2.308000 2.308000 2.308000
+ [4,] 2.408191 2.356434 1.873592 2.492711 2.357967 2.351967 1.873592 2.492711
+ [5,] 2.484410 2.366194 1.415442 2.631853 2.433799 2.385931 1.564992 2.416850
+ [6,] 2.555349 2.430552 1.197962 2.660747 2.475991 2.419142 1.331385 2.438517
+ [7,] 1.575000 1.575000 1.575000 1.575000 1.575000 1.575000 1.575000 1.575000
+ [8,] 1.545000 1.545000 1.545000 1.545000 1.545000 1.545000 1.545000 1.545000
+ [9,] 1.762000 1.762000 1.762000 1.762000 1.762000 1.762000 1.762000 1.762000
+[10,] 1.998312 1.948965 2.284061 2.044760 1.959039 1.904827 2.284061 2.044760
+[11,] 2.559575 2.418957 2.877768 2.726655 2.465633 2.012765 2.778823 2.164988
+[12,] 2.746706 2.546696 3.128809 2.950640 2.573730 2.113549 3.089784 2.239105
+        mod_21   mod_22    mod_23   mod_24   mod_25   mod_26    mod_27   mod_28
+ [1,] 2.183000 2.183000 2.1830000 2.183000 2.183000 2.183000 2.1830000 2.183000
+ [2,] 2.246000 2.246000 2.2460000 2.246000 2.246000 2.246000 2.2460000 2.246000
+ [3,] 2.308000 2.308000 2.3080000 2.308000 2.308000 2.308000 2.3080000 2.308000
+ [4,] 2.349490 2.279188 1.6418872 2.375674 2.184101 2.298934 1.6050306 2.405617
+ [5,] 2.355015 2.270944 0.8905274 2.375991 2.220396 2.197743 0.8303636 2.501057
+ [6,] 2.444121 2.192720 0.4131780 2.310272 2.361515 2.247916 0.3600537 2.523088
+ [7,] 1.575000 1.575000 1.5750000 1.575000 1.575000 1.575000 1.5750000 1.575000
+ [8,] 1.545000 1.545000 1.5450000 1.545000 1.545000 1.545000 1.5450000 1.545000
+ [9,] 1.762000 1.762000 1.7620000 1.762000 1.762000 1.762000 1.7620000 1.762000
+[10,] 1.791271 1.823418 1.2187995 1.881550 1.695077 1.642568 1.1829813 1.729399
+[11,] 2.122947 1.732971 0.8061668 1.836036 1.987672 1.880966 0.7227547 2.092544
+[12,] 2.286387 1.605770 0.3106435 1.754243 2.190851 1.997444 0.2271238 2.236842
+> 
 > proc.time()
    user  system elapsed 
-  4.820   0.144   4.959 
+  5.112   0.132   5.238 
