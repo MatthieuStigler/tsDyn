@@ -429,7 +429,7 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   rownames(Bbest) <- paste("Equation", colnames(data))
   LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
   
-  Bnames<-c(switch(include, const="Intercept", trend="Trend", both=c("Intercept","Trend"), none=NULL),LagNames)
+  Bnames<-c(switch(include, const="Intercept", trend="Trend", both=c("Intercept","Trend"), none=NULL), LagNames)
   Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
   BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
   colnames(Bbest)<-BnamesVec
@@ -694,7 +694,7 @@ toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 }
 
 
-nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All", sameName=TRUE){
+nameB <- function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All", sameName=TRUE){
   model<-match.arg(model)
   addRegLetter<-if(sameName) NULL else  c("L ", if(nthresh==1) NULL else "M ", "H ")
   if(model=="TVAR")
@@ -706,8 +706,8 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"),
   if(nthresh==1){
     if(commonInter){
       if(model=="TVAR"){
-        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,2)),sep="")
-      } else if(model=="TVECM"){
+        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,2),sep=""))
+      } else if(model=="TVECM") {
         colnames(mat)<-c("ECT-","ECT+", sBnames)
       }
       Blist<-mat
@@ -718,10 +718,10 @@ nameB<-function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"),
       Blist <- list(Bdown=Bdown, Bup=Bup)
     }
 ##2 thresholds
-  } else{ 
+  } else { 
     if(commonInter){
       if(model=="TVAR")
-        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,3)),sep="")
+        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,3),sep=""))
       else if(model=="TVECM")
         colnames(mat)<-c("ECT-","ECT+", sBnames)
       Blist<-mat}
