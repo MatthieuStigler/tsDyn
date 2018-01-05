@@ -274,46 +274,46 @@ fevd.nlVar <- function(x, n.ahead=10, ...){
 ####### Predict 
 
 
-predict.VECMMiddleold <- function(object, newdata, n.ahead=5, ...){
-  lag <- object$lag
-  k <- object$k
-  include <- object$include
-  LRinclude <- object$model.specific$LRinclude
-
-## get VAR rrepresentation
-  B <- VARrep(object)
-
-## check deterministc specification
-  if(LRinclude!="none"){
-    if(LRinclude=="const"){
-      include <- "const"
-    } else if(LRinclude=="trend"){
-      include <- if(include=="const") "both" else "trend"
-    } else if(LRinclude=="both"){
-      include <- "both"
-    }
-  }
-## setup starting values (data in y), innovations (0)
-  original.data <- object$model[,1:k]
-  starting <-  myTail(original.data,lag+1) 
-  innov <- matrix(0, nrow=n.ahead, ncol=k)
-
-  if(!missing(newdata)) {
-    if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
-    if(nrow(newdata)!=lag+1) stop("Please provide newdata with nrow=lag+1 (note lag=p in VECM representation corresponds to p+1 in VAR rep)")
-    starting <-  newdata 
-  }
-
-## use VAR sim
-  res <- VAR.sim2(B=B, lag=lag+1, n=n.ahead, starting=starting, innov=innov, include=include)
-
-## results
-  colnames(res) <- colnames(original.data )
-  res <- tail(res, n.ahead)
-  rownames(res) <- (nrow(original.data)+1):(nrow(original.data)+n.ahead)
-
-  return(res)
-}
+# predict.VECMMiddleold <- function(object, newdata, n.ahead=5, ...){
+#   lag <- object$lag
+#   k <- object$k
+#   include <- object$include
+#   LRinclude <- object$model.specific$LRinclude
+# 
+# ## get VAR rrepresentation
+#   B <- VARrep(object)
+# 
+# ## check deterministc specification
+#   if(LRinclude!="none"){
+#     if(LRinclude=="const"){
+#       include <- "const"
+#     } else if(LRinclude=="trend"){
+#       include <- if(include=="const") "both" else "trend"
+#     } else if(LRinclude=="both"){
+#       include <- "both"
+#     }
+#   }
+# ## setup starting values (data in y), innovations (0)
+#   original.data <- object$model[,1:k]
+#   starting <-  myTail(original.data,lag+1) 
+#   innov <- matrix(0, nrow=n.ahead, ncol=k)
+# 
+#   if(!missing(newdata)) {
+#     if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
+#     if(nrow(newdata)!=lag+1) stop("Please provide newdata with nrow=lag+1 (note lag=p in VECM representation corresponds to p+1 in VAR rep)")
+#     starting <-  newdata 
+#   }
+# 
+# ## use VAR sim
+#   res <- VAR.sim2(B=B, lag=lag+1, n=n.ahead, starting=starting, innov=innov, include=include)
+# 
+# ## results
+#   colnames(res) <- colnames(original.data )
+#   res <- tail(res, n.ahead)
+#   rownames(res) <- (nrow(original.data)+1):(nrow(original.data)+n.ahead)
+# 
+#   return(res)
+# }
 
 
 myHead <- function(x, n=6){
