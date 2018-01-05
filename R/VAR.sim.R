@@ -11,7 +11,7 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
   k <- nrow(B)
   T <- n   	#Size of start sample
   t <- T-p  #Size of end sample
-  y <- matrix(0,ncol=k, nrow=n+p)
+  y <- matrix(0, ncol=k, nrow=n+p)
   trend<-c(rep(0, p), trendStart+(0:(T-1))) 
   
   ## exogen

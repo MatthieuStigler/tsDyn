@@ -1,206 +1,346 @@
-TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), 
-                     n=200, lag=1, include = c("const", "trend","none", "both"),  
-                     thDelay=1,  thVar=NULL, mTh=1, starting=NULL, 
-                     innov=rmnorm(n, varcov=varcov), varcov=diag(1,k), 
-                     show.parMat=FALSE, round=FALSE, seed){
+TVAR.gen2 <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
+                      Thresh, nthresh=1, thDelay=1,  thVar=NULL, mTh=1, 
+                      starting=NULL, innov, 
+                      trendStart=1,
+                      show.parMat=FALSE, returnStarting=FALSE,
+                      round.dig=16,
+                      add.regime =FALSE,
+                      seed){
   
   ###check correct arguments
+  include<-match.arg(include)
   if(!nthresh%in%c(0,1,2))
     stop("Arg nthresh should  be either 0, 1 or 2")
-  if(!missing(n)&any(!missing(data), !missing(TVARobject)))
-    stop("arg n should not be given with arg data or TVARobject")
-  if(!missing(TVARobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag), !missing(thDelay), !missing(mTh)))
-    warning("When object TVARobject is given, only args 'type' and 'round' are relevant, others are not considered")
-  if(!missing(data)&!missing(B))
-    stop("You have to provide either B or y, but not both")
-  
-  type<-match.arg(type)
-  include<-match.arg(include)
-  
-  ## Create some variables/parameters
-  p <- switch(type, "boot"=if(!missing(TVARobject)) TVARobject$lag else lag, lag)
-  ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
-  add <- switch(type, "simul"=p, 0)
-  if(max(thDelay)>p)
+  if(length(Thresh)!=nthresh)
+    stop("please give as many threshold values as arg nthresh")
+  if(max(thDelay)>lag)
     stop("Max of thDelay should be smaller or equal to the number of lags")
   
+  ## Create some variables/parameters
+  p <- lag
+  k <- nrow(B) 		#Number of variables
+  ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
+  npar <- k*p+ninc
   
-  ### possibility 1: only parameters matrix is given
-  if(!missing(B)){
-    if(type!="simul"){
-      type<-"simul"
-      warning("Type check or boot are only avalaible with pre specified data. The type simul was used")
-    }
-    nB<-nrow(B)
-    ndig<-4
-    esp<-p*nB+ninc 
-    if(esp*(nthresh+1)!=ncol(B)){
-      stop("Matrix B badly specified: expected ", esp*(nthresh+1), " elements ( (lag*K+ n inc)* (nthresh+1) ) but has ", ncol(B), "\n" )
-    }
-    y<-matrix(0,ncol=nB, nrow=n+add)
-    if(!is.null(starting)){
-      if(all(dim(as.matrix(starting))==c(p,nB)))
-        y[seq_len(p),]<- as.matrix(starting)
-      else
-        stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables. But is: ", dim(as.matrix(starting)), sep="")
-    }
-    Bmat<-B
-    temp<-TVAR_thresh(mTh=mTh,thDelay=thDelay,thVar=thVar,y=y, p=p) #Stored in misc.R
-    trans<-temp$trans
-    combin<-temp$combin
+  ### check dims B
+  esp <- p*k+ninc 
+  if(esp*(nthresh+1)!=ncol(B)){
+    stop("Matrix B badly specified: expected ", esp*(nthresh+1), " elements ( (lag*K+ n inc)* (nthresh+1) ) but has ", ncol(B), "\n" )
+  }
+  
+  ## starting values check dims
+  if(!is.null(starting)){
+    if(all(dim(as.matrix(starting))==c(p,k)))
+      y[seq_len(p),]<- as.matrix(starting)
+    else
+      stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables. But is: ", dim(as.matrix(starting)), sep="")
+  }
+  
+  # trans var
+  temp <- tsDyn:::TVAR_thresh(mTh=mTh, thDelay=thDelay, thVar=thVar, y=y, p=p) #Stored in misc.R
+  combin <- temp$combin
     
-    if(nthresh==1){
-      if(missing(Thresh))
-        Thresh<-mean(trans)
-      if(length(Thresh)!=1){
-        warning("Please only one Thresh value if you choose nthresh=1. First one was chosen")
-        Thresh<-Thresh[1]}
-    } else  if(nthresh==2){
-      if(missing(Thresh))
-        Thresh<-quantile(trans, probs=c(0.25, 0.75))
-      if(length(Thresh)!=2)
-        stop("please give two Thresh values if you choose nthresh=2")
-    }
-    if(nthresh%in%c(1,2))
-      Thresh<-round(Thresh,ndig)
-    k <- nB 		#Number of variables
-    T <- nrow(y) 		#Size of start sample
-    T <- n 		#Size of start sample
-  }
-
-  ### possibility 2: only data is given: compute it with linear or selectSETAR
-  else if(!missing(data)){
-    if(nthresh==0){
-      TVARobject<-lineVar(data, lag=p, include=include, model="VAR")
-    } else{ 
-      if(!missing(Thresh)){
-        TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, gamma=Thresh)
-      } else{
-        TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
-      }
-    }
-  }
-  ### possibility 3: setarobject is given by user (or by poss 2)
-  if(!missing(TVARobject)){
-    k<-TVARobject$k
-    T<-TVARobject$T
-    p<-TVARobject$lag
-    modSpe<-TVARobject$model.specific
-    res<-residuals(TVARobject)
-    Bmat<-coefMat(TVARobject)
-    y<-as.matrix(TVARobject$model)[,1:k]
-    ndig<-getndp(y[,1])
-    nthresh<-modSpe$nthresh
-    include <- TVARobject$include
-    if(nthresh>0){
-      if(modSpe$oneMatrix)
-        stop("arg commoninter in TVAR currently not implemented in TVAR.sim")
-      if(attr(TVARobject, "levelTransVar")=="MTAR")
-        stop("arg model=MTAR in TVAR currently not implemented in TVAR.sim")
-      if(attr(TVARobject, "transVar")=="external")
-        stop("arg thVaR in TVAR currently not implemented in TVAR.sim")
-      Thresh<-modSpe$Thresh
-      thDelay<-modSpe$thDelay
-      combin<-modSpe$transCombin
-    }
-  }
-
-  t <- T-p+add 		#Size of end sample
-  npar<-k*(p+ninc)
-
+  
+  if(nthresh%in%c(1,2))
+    Thresh<-round(Thresh, round.dig)
+  
   ##### put coefficients vector in right form according to arg include (arg both need no modif)
   a<-NULL
-  if(include=="none")
-    for(i in 0:nthresh) a<-c(a, i*(p*k)+c(1,2))
-  else if(include=="const")
+  if(include=="none") {
+    for(i in 0:nthresh) a <- c(a, i*(p*k+2)+c(1,2))
+  } else if(include=="const") {
     for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(2))
-  else if(include=="trend")
+  } else if(include=="trend") {
     for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(1))
+  }
   #if (include=="both"): correction useless
-  Bmat<-myInsertCol(Bmat, c=a ,0)
-  nparBmat<-p*k+2
-    
-    
+  
+  Bmat <- tsDyn:::myInsertCol(B, c=a ,0)
+  nparBmat <- p*k+2
+  
+  
   ##############################
   ###Reconstitution boot/simul
   ##############################
-
-  #initial values
-  Yb<-matrix(0, nrow=T+add, ncol=k)
-  Yb[1:p,]<-y[1:p,]		
-
-  if(nthresh>0){
-    z2<-vector("numeric", length=nrow(y))
-    z2[1:p]<-y[1:p,]%*%combin
+  
+  Yb <- matrix(0, ncol=k, nrow=n+p)
+  
+  # fill initial values if provided
+  if(!is.null(starting)){
+    Yb[1:p,] <- as.matrix(starting)
   }
-
-  trend<-1:(T+add) #   trend<-c(NA, 1:(T-1+add))
-
-  ##Innovations Specifications 
-  if(type=="simul"&&dim(innov)!=c(n,k))
-    stop(paste("input innov is not of right dim, should be matrix with", n,"rows and ", k, "cols\n"))
-  if(!missing(seed)) set.seed(seed)
-  innov<-switch(type, "boot"=if(missing(innov)) res[sample(seq_len(t), replace=TRUE),] else innov, "simul"=innov, "check"=res)
-  resb<-rbind(matrix(0,nrow=p, ncol=k),innov)	
-
+  
+  ## Initialise threshold variable
+  if(nthresh>0){
+    z2 <- vector("numeric", length=n+p)
+    z2[1:p] <- Yb[1:p,]%*%combin
+  }
+  regime <- vector("numeric", length=n+p)
+  
+  ## trend, innovations
+  resb <- rbind(matrix(0,nrow=p, ncol=k), 
+                innov)	
+  trend <- 1:(n+p) #   trend<-c(NA, 1:(T-1+add))
+  trend <- c(rep(0, p), trendStart+(0:(T-1)))
+  
   ## MAIN loop:
-
+  
   if(nthresh==0){
-	  for(i in (p+1):(T+add)){
-		  Yb[i,]<-rowSums(cbind(Bmat[,1], Bmat[,2]*trend[i], Bmat[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-	  }
+    for(i in (p+1):(n+p)){
+      Yb[i,]<-rowSums(cbind(B[,1], B[,2]*trend[i], B[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+    }
   } else if(nthresh==1){
-	  BDown<-Bmat[,seq_len(nparBmat)]
-	  BUp<-Bmat[,-seq_len(nparBmat)]
-
-	  for(i in (p+1):(T+add)){
-	    if(round(z2[i-thDelay],ndig)<=Thresh) {
-	      Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-	      if(round)
-	        Yb[i,]<-round(Yb[i,], ndig)
-	    }
-	    else{
-	      Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-	      if(round)
-	        Yb[i,]<-round(Yb[i,], ndig)
-	    }
-	    z2[i]<-Yb[i,]%*%combin
-	  }
+    BDown <- Bmat[, seq_len(nparBmat)]
+    BUp   <- Bmat[,-seq_len(nparBmat)]
+    
+    for(i in (p+1):(n+p)){
+      if(round(z2[i-thDelay], round.dig)<=Thresh) {
+        Yb[i,]<-rowSums(cbind(BDown[,1], 
+                              BDown[,2]*trend[i], 
+                              BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),
+                              resb[i,]))
+        Yb[i,]<-round(Yb[i,], round.dig)
+        regime[i] <- 1
+      } else {
+        Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+        Yb[i,]<-round(Yb[i,], round.dig)
+        regime[i] <- 2
+      }
+      z2[i]<-Yb[i,]%*%combin
+    }
   }  else if(nthresh==2){
     BDown <- Bmat[,seq_len(nparBmat)]
     BMiddle <- Bmat[,seq_len(nparBmat)+nparBmat]
     BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
-    for(i in (p+1):(T+add)){
-      if(round(z2[i-thDelay],ndig)<=Thresh[1]) 
-        Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-      else if(round(z2[i-thDelay],ndig)>Thresh[2]) 
-        Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-      else
-        Yb[i,]<-rowSums(cbind(BMiddle[,1],BMiddle[,2]*trend[i], BMiddle[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+    
+    for(i in (p+1):(n+p)){
+      if(round(z2[i-thDelay], round.dig)<=Thresh[1]) {
+        Yb[i,] <- rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+        regime[i] <- 1
+      } else if(round(z2[i-thDelay], round.dig)>Thresh[2]) {
+        Yb[i,] <- rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+        regime[i] <- 3
+      } else {
+        Yb[i,] <- rowSums(cbind(BMiddle[,1],BMiddle[,2]*trend[i], BMiddle[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+        regime[i] <- 2
+      }
       z2[i]<-Yb[i,]%*%combin
     }
   }
   
-  
-  if(FALSE){
-	  new<-TVAR_thresh(y=Yb,mTh=mTh,thDelay=thDelay,thVar=thVar, p=p)$trans
-	  if(mean(ifelse(new[,thDelay]<Thresh, 1,0))>0.05)
-		  list(B=Bmat,Yb=Yb)
-	  else
-		  Recall(B=Bmat, n=n, lag=lag, nthresh=nthresh, thDelay=thDelay, Thresh, thVar=thVar, mTh=mTh, type=type, starting=starting)
-  }
-  # print(cbind(y, round(Yb,3)))
-
-  if(type=="simul"){
-    Yb <- tail(Yb, -p)
-    rownames(Yb) <- seq_len(nrow(Yb))
-  }
-
+  ## return result
   if(show.parMat)
     print(Bmat)
-  res<-if(round) round(Yb, ndig) else Yb
+  res <- round(Yb, round.dig) 
+  if(add.regime) res <- cbind(res, regime)
   return(res)
 }
+# 
+# TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot", "check"), 
+#                      n=200, lag=1, include = c("const", "trend","none", "both"),  
+#                      thDelay=1,  thVar=NULL, mTh=1, starting=NULL, 
+#                      innov=rmnorm(n, varcov=varcov), varcov=diag(1,k), 
+#                      trendStart=1,
+#                      show.parMat=FALSE, round=FALSE, seed){
+#   
+#   ###check correct arguments
+#   if(!nthresh%in%c(0,1,2))
+#     stop("Arg nthresh should  be either 0, 1 or 2")
+#   if(!missing(n)&any(!missing(data), !missing(TVARobject)))
+#     stop("arg n should not be given with arg data or TVARobject")
+#   if(!missing(TVARobject)&any(!missing(Thresh), !missing(nthresh), !missing(lag), !missing(thDelay), !missing(mTh)))
+#     warning("When object TVARobject is given, only args 'type' and 'round' are relevant, others are not considered")
+#   if(!missing(data)&!missing(B))
+#     stop("You have to provide either B or y, but not both")
+#   
+#   type<-match.arg(type)
+#   include<-match.arg(include)
+#   
+#   ## Create some variables/parameters
+#   p <- switch(type, "boot"=if(!missing(TVARobject)) TVARobject$lag else lag, lag)
+#   ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
+#   add <- switch(type, "simul"=p, 0)
+#   if(max(thDelay)>p)
+#     stop("Max of thDelay should be smaller or equal to the number of lags")
+#   
+#   
+#   ### possibility 1: only parameters matrix is given
+#   if(!missing(B)){
+#     if(type!="simul"){
+#       type<-"simul"
+#       warning("Type check or boot are only avalaible with pre specified data. The type simul was used")
+#     }
+#     nB<-nrow(B)
+#     ndig<-4
+#     esp<-p*nB+ninc 
+#     if(esp*(nthresh+1)!=ncol(B)){
+#       stop("Matrix B badly specified: expected ", esp*(nthresh+1), " elements ( (lag*K+ n inc)* (nthresh+1) ) but has ", ncol(B), "\n" )
+#     }
+#     y<-matrix(0,ncol=nB, nrow=n+add)
+#     if(!is.null(starting)){
+#       if(all(dim(as.matrix(starting))==c(p,nB)))
+#         y[seq_len(p),]<- as.matrix(starting)
+#       else
+#         stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables. But is: ", dim(as.matrix(starting)), sep="")
+#     }
+#     Bmat<-B
+#     temp<-TVAR_thresh(mTh=mTh,thDelay=thDelay,thVar=thVar,y=y, p=p) #Stored in misc.R
+#     trans<-temp$trans
+#     combin<-temp$combin
+#     
+#     if(nthresh==1){
+#       if(missing(Thresh))
+#         Thresh<-mean(trans)
+#       if(length(Thresh)!=1){
+#         warning("Please only one Thresh value if you choose nthresh=1. First one was chosen")
+#         Thresh<-Thresh[1]}
+#     } else  if(nthresh==2){
+#       if(missing(Thresh))
+#         Thresh<-quantile(trans, probs=c(0.25, 0.75))
+#       if(length(Thresh)!=2)
+#         stop("please give two Thresh values if you choose nthresh=2")
+#     }
+#     if(nthresh%in%c(1,2))
+#       Thresh<-round(Thresh,ndig)
+#     k <- nB 		#Number of variables
+#     T <- nrow(y) 		#Size of start sample
+#     T <- n 		#Size of start sample
+#   }
+# 
+#   ### possibility 2: only data is given: compute it with linear or selectSETAR
+#   else if(!missing(data)){
+#     if(nthresh==0){
+#       TVARobject<-lineVar(data, lag=p, include=include, model="VAR")
+#     } else{ 
+#       if(!missing(Thresh)){
+#         TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE, gamma=Thresh)
+#       } else{
+#         TVARobject<-TVAR(data, lag=p, include=include, nthresh=nthresh, plot=FALSE, trace=FALSE)
+#       }
+#     }
+#   }
+#   ### possibility 3: setarobject is given by user (or by poss 2)
+#   if(!missing(TVARobject)){
+#     k<-TVARobject$k
+#     T<-TVARobject$T
+#     p<-TVARobject$lag
+#     modSpe<-TVARobject$model.specific
+#     res<-residuals(TVARobject)
+#     Bmat<-coefMat(TVARobject)
+#     y<-as.matrix(TVARobject$model)[,1:k]
+#     ndig<-getndp(y[,1])
+#     nthresh<-modSpe$nthresh
+#     include <- TVARobject$include
+#     if(nthresh>0){
+#       if(modSpe$oneMatrix)
+#         stop("arg commoninter in TVAR currently not implemented in TVAR.sim")
+#       if(attr(TVARobject, "levelTransVar")=="MTAR")
+#         stop("arg model=MTAR in TVAR currently not implemented in TVAR.sim")
+#       if(attr(TVARobject, "transVar")=="external")
+#         stop("arg thVaR in TVAR currently not implemented in TVAR.sim")
+#       Thresh<-modSpe$Thresh
+#       thDelay<-modSpe$thDelay
+#       combin<-modSpe$transCombin
+#     }
+#   }
+# 
+#   t <- T-p+add 		#Size of end sample
+#   npar<-k*(p+ninc)
+# 
+#   ##### put coefficients vector in right form according to arg include (arg both need no modif)
+#   a<-NULL
+#   if(include=="none")
+#     for(i in 0:nthresh) a<-c(a, i*(p*k)+c(1,2))
+#   else if(include=="const")
+#     for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(2))
+#   else if(include=="trend")
+#     for(i in 0:nthresh) a<-c(a, i*(p*k+2)+c(1))
+#   #if (include=="both"): correction useless
+#   Bmat<-myInsertCol(Bmat, c=a ,0)
+#   nparBmat<-p*k+2
+#     
+#     
+#   ##############################
+#   ###Reconstitution boot/simul
+#   ##############################
+# 
+#   #initial values
+#   Yb<-matrix(0, nrow=T+add, ncol=k)
+#   Yb[1:p,]<-y[1:p,]		
+# 
+#   if(nthresh>0){
+#     z2<-vector("numeric", length=nrow(y))
+#     z2[1:p]<-y[1:p,]%*%combin
+#   }
+# 
+#   trend<-1:(T+add) #   trend<-c(NA, 1:(T-1+add))
+#   # trend<-c(rep(0, p), trendStart+(0:(T-1))) 
+# 
+#   ##Innovations Specifications 
+#   if(type=="simul"&&dim(innov)!=c(n,k))
+#     stop(paste("input innov is not of right dim, should be matrix with", n,"rows and ", k, "cols\n"))
+#   if(!missing(seed)) set.seed(seed)
+#   innov<-switch(type, "boot"=if(missing(innov)) res[sample(seq_len(t), replace=TRUE),] else innov, "simul"=innov, "check"=res)
+#   resb<-rbind(matrix(0,nrow=p, ncol=k),innov)	
+# 
+#   ## MAIN loop:
+# 
+#   if(nthresh==0){
+# 	  for(i in (p+1):(T+add)){
+# 		  Yb[i,]<-rowSums(cbind(Bmat[,1], Bmat[,2]*trend[i], Bmat[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+# 	  }
+#   } else if(nthresh==1){
+# 	  BDown<-Bmat[,seq_len(nparBmat)]
+# 	  BUp<-Bmat[,-seq_len(nparBmat)]
+# 
+# 	  for(i in (p+1):(T+add)){
+# 	    if(round(z2[i-thDelay],ndig)<=Thresh) {
+# 	      Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+# 	      if(round)
+# 	        Yb[i,]<-round(Yb[i,], ndig)
+# 	    }
+# 	    else{
+# 	      Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+# 	      if(round)
+# 	        Yb[i,]<-round(Yb[i,], ndig)
+# 	    }
+# 	    z2[i]<-Yb[i,]%*%combin
+# 	  }
+#   }  else if(nthresh==2){
+#     BDown <- Bmat[,seq_len(nparBmat)]
+#     BMiddle <- Bmat[,seq_len(nparBmat)+nparBmat]
+#     BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
+#     for(i in (p+1):(T+add)){
+#       if(round(z2[i-thDelay],ndig)<=Thresh[1]) 
+#         Yb[i,]<-rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+#       else if(round(z2[i-thDelay],ndig)>Thresh[2]) 
+#         Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+#       else
+#         Yb[i,]<-rowSums(cbind(BMiddle[,1],BMiddle[,2]*trend[i], BMiddle[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+#       z2[i]<-Yb[i,]%*%combin
+#     }
+#   }
+#   
+#   
+#   if(FALSE){
+# 	  new<-TVAR_thresh(y=Yb,mTh=mTh,thDelay=thDelay,thVar=thVar, p=p)$trans
+# 	  if(mean(ifelse(new[,thDelay]<Thresh, 1,0))>0.05)
+# 		  list(B=Bmat,Yb=Yb)
+# 	  else
+# 		  Recall(B=Bmat, n=n, lag=lag, nthresh=nthresh, thDelay=thDelay, Thresh, thVar=thVar, mTh=mTh, type=type, starting=starting)
+#   }
+#   # print(cbind(y, round(Yb,3)))
+# 
+#   if(type=="simul"){
+#     Yb <- tail(Yb, -p)
+#     rownames(Yb) <- seq_len(nrow(Yb))
+#   }
+# 
+#   if(show.parMat)
+#     print(Bmat)
+#   res<-if(round) round(Yb, ndig) else Yb
+#   return(res)
+# }
 
 
 
@@ -291,7 +431,8 @@ TVAR.gen <- function(data,B,TVARobject, Thresh, nthresh=1, type=c("simul","boot"
 #'
 #'
 TVAR.sim <- function(B, Thresh, nthresh=1, n=200, lag=1, include = c("const", "trend","none", "both"),  thDelay=1,  
-thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, varcov=varcov), varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...){
+                     thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, varcov=varcov), 
+                     varcov=diag(1,nrow(B)), show.parMat=FALSE, round=FALSE, seed, ...){
 
 	    TVAR.gen(B=B, Thresh=Thresh, nthresh=nthresh, type="simul", n=n, lag=lag, include = include,  thDelay=thDelay,
 		    thVar=thVar, mTh=mTh, starting=starting, innov=innov, varcov=varcov, show.parMat=show.parMat, round=round, seed=seed, ...)
@@ -334,7 +475,43 @@ thVar=NULL, mTh=1, starting=NULL, innov=rmnorm(n, varcov=varcov), varcov=diag(1,
 #'
 TVAR.boot <- function(TVARobject, innov, seed, ...){
   if(!inherits(TVARobject, "TVAR")) stop("Please provide an object of class 'TVAR' generated by TVAR()")
-  TVAR.gen(TVARobject=TVARobject,type= "boot", innov = innov, seed=seed, ...)
+  TVAR.gen(TVARobject=TVARobject, type= "boot", innov = innov, seed=seed, ...)
+}
+
+TVAR.boot2 <- function(TVARobject, innov, seed, 
+                       boot.scheme=c("resample", "wild1", "wild2", "check"), ...){
+  if(!inherits(TVARobject, "TVAR")) stop("Please provide an object of class 'TVAR' generated by TVAR()")
+  
+  boot.scheme <- match.arg(boot.scheme)
+  
+  t <- TVARobject$t
+  k <- TVARobject$k
+  lags <- TVARobject$lag
+
+  ## retrieve starting values
+  YX <- TVARobject$model
+  yorig <- YX[,1:k]
+  starts <- yorig[1:lags,, drop=FALSE]
+  
+  ## get innov, boot it
+  resids <- residuals(TVARobject)
+  if(!missing(seed)) set.seed(seed) 
+  innov <- switch(boot.scheme, 
+                  "resample"=  resids[sample(seq_len(t), replace=TRUE),], 
+                  "wild1"=resids+rnorm(t), 
+                  "wild2"=resids+sample(c(-1,1), size = t, replace=TRUE),
+                  "check"=  resids)
+  
+  
+  res <- TVAR.gen2(B=TVARobject$coeffmat, n=t, lag=lags, include = TVARobject$include,  
+                   starting=starts, innov=innov,
+                   Thresh=getTh(TVARobject), thDelay=TVARobject$model.specific$thDelay,
+                   nthresh=TVARobject$model.specific$nthresh,
+                   mTh=TVARobject$model.specific$transCombin,
+                   ...)
+                   # show.parMat=FALSE)
+  colnames(res)[1:k] <- colnames(yorig)
+  res
 }
 
 VAR.sim2 <- function(B,  n=200, lag=1, include = c("const", "trend","none", "both"),  starting=NULL, 
