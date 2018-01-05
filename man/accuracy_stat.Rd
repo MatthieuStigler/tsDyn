@@ -15,14 +15,14 @@ accuracy_stat(object, ...)
 \arguments{
 \item{object}{A data-frame, matrix, or object of class \code{pred_roll}}
 
+\item{\dots}{Not used currently.}
+
 \item{true}{If \code{object} is just a matrix or data-frame, true values to
 be compared to should be supplied}
 
 \item{w}{Optional. For objects of class \code{pred_roll} containing multiple
 variables, user can specify the way to aggregate the specific x-step-ahead
 into the \sQuote{all} category}
-
-\item{\dots}{Not used currently.}
 }
 \value{
 A data-frame containing the forecasting accuracy measures.
@@ -60,4 +60,3 @@ accuracy_stat(object=mod_var_pred, w=c(0.7, 0.2, 0.1))
 Matthieu Stigler
 }
 \keyword{ts}
-

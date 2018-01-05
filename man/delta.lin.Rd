@@ -38,12 +38,11 @@ delta test of linearity based on conditional mutual information
 delta.lin(log10(lynx), m=3)
 
 }
-\author{
-Antonio, Fabio Di Narzo
-}
 \references{
 Sebastiano Manzan, Essays in Nonlinear Economic Dynamics, Thela
 Thesis (2003)
 }
+\author{
+Antonio, Fabio Di Narzo
+}
 \keyword{ts}
-

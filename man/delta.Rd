@@ -38,13 +38,11 @@ For details, see Manzan(2003).
 Also, be aware of the course of dimensionality: m can't be too high for
 relatively small time series. See references for further details.
 }
+
 \examples{
 
 delta(log10(lynx), m=3, eps=sd(log10(lynx)))
 
-}
-\author{
-Antonio, Fabio Di Narzo
 }
 \references{
 Sebastiano Manzan, Essays in Nonlinear Economic Dynamics, Thela
@@ -59,5 +57,7 @@ Teraesvirta's neural network test for nonlinearity:
 
 delta test for nonlinearity: \code{\link{delta.lin.test}}
 }
+\author{
+Antonio, Fabio Di Narzo
+}
 \keyword{ts}
-

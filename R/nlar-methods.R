@@ -296,7 +296,7 @@ regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...
 #'Extract threshold coefficient(s)
 #'
 #'
-#'@aliases getTh getTh.default
+#'@aliases getTh
 #'@param object object of class \code{setar}, \code{summary.setar},
 #'\code{nlVar}
 #'@param \dots additional arguments to \code{getTh}
@@ -383,7 +383,7 @@ deviance.nlar<-function(object,...) crossprod(object$residuals)
 #'Generic function to compute the Mean Squared Error of a fitted model.
 #'
 #'
-#'@aliases mse mse.default
+#'@aliases mse
 #'@param object object of class \code{nlar.fit}
 #'@param \dots additional arguments to \code{mse}
 #'@return Computed MSE for the fitted model.
@@ -428,7 +428,7 @@ BIC.nlar <- function(object, ...)
 #'model.
 #'
 #'
-#'@aliases MAPE MAPE.default
+#'@aliases MAPE
 #'@param object object of class \code{nlar.fit}
 #'@param \dots additional arguments to \code{MAPE}
 #'@return Computed Mean Absolute Percent Error for the fitted model.

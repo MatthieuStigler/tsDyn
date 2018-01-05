@@ -18,4 +18,3 @@ Generic NLAR linearity test
 A. F. Di Narzo
 }
 \keyword{ts}
-

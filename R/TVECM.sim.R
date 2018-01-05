@@ -101,7 +101,6 @@ as.matrix.ts <-
 #'One can alternatively give only the series, and then the function will call
 #'internally \code{\link{TVECM}}.
 #'
-#'@aliases TVECM.sim VECM.sim
 #'@param data matrix of parameter to simulate
 #'@param B Matrix of coefficients to simulate
 #'@param TVECMobject,VECMobject Object computed by function \code{\link{TVECM}}

@@ -47,4 +47,3 @@ representation purpose.
 \keyword{VECM}
 \keyword{cointegration}
 \keyword{ts}
-

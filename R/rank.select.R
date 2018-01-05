@@ -7,7 +7,7 @@
 #'\code{lags.max}) and lags (up to \code{lags.max}). This method has been shown
 #'to be useful to select simultaneously the rank and the lags, see references.
 #'
-#'@aliases rank.select print.rank.select summary.rank.select
+#'@aliases rank.select summary.rank.select
 #'@param data multivariate time series.
 #'@param lag.max Maximum number of lags to investigate.
 #'@param r.max Maximum rank to investigate.

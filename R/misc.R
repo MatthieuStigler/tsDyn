@@ -74,7 +74,7 @@ add <- function(...)
 #'Some sigmoid functions. See R sources for their definition
 #'
 #'
-#'@aliases sigmoid dsigmoid d2sigmoid
+#'@aliases sigmoid d2sigmoid
 #'@param x numeric vector
 #'@author J. L. Aznarte
 #'@keywords ts

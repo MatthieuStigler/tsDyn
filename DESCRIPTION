@@ -14,3 +14,4 @@ Description: Implements nonlinear autoregressive (AR) time series models. For un
 License: GPL (>= 2)
 URL: http://github.com/MatthieuStigler/tsDyn/wiki
 MailingList: tsdyn@googlegroups.com
+RoxygenNote: 6.0.1

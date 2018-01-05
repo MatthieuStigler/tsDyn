@@ -38,7 +38,7 @@
 #'summary method.  Note that the \sQuote{effective sample size} for the these
 #'values is different from output in gretl for example.
 #'
-#'@aliases rank.test print.rank.test summary.rank.test
+#'@aliases rank.test summary.rank.test
 #'@param vecm \sQuote{VECM} object computed with the function
 #'\code{\link{VECM}}.
 #'@param type Type of test, either 'trace' or 'eigenvalue'. See details below.

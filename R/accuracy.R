@@ -15,7 +15,7 @@
 #'\code{pred_roll} objects, the true values are contained in the object, so no
 #'need (nor possibility) to provide the true values.
 #'
-#'@aliases accuracy_stat accuracy_stat.default accuracy_stat.pred_roll
+#'@aliases accuracy_stat
 #'@param object A data-frame, matrix, or object of class \code{pred_roll}
 #'@param true If \code{object} is just a matrix or data-frame, true values to
 #'be compared to should be supplied

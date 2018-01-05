@@ -3,7 +3,7 @@
 #'Show the VAR representation of a VECM
 #'
 #'
-#'@aliases VARrep VARrep.VECM VARrep.VAR
+#'@aliases VARrep
 #'@param object An object of class \sQuote{VECM} created by \code{\link{VECM}},
 #'or of class \sQuote{VAR} created by \code{\link{lineVar}}
 #'@param \dots Currently not used

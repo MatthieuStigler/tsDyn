@@ -24,7 +24,7 @@
 #'delta statistic of conditional independence and associated bootstrap test.
 #'For details, see Manzan(2003).
 #'
-#'@aliases delta delta.test
+#'@aliases delta
 #'@param x time series
 #'@param m vector of embedding dimensions
 #'@param d time delay
@@ -82,7 +82,7 @@ delta.test <- function(x, m=2:3, d=1, eps = seq(0.5*sd(x),2*sd(x),length=4), B=4
 #'
 #'delta test of linearity based on conditional mutual information
 #'
-#'@aliases delta.lin delta.lin.test
+#'@aliases delta.lin
 #'@param x time series
 #'@param m vector of embedding dimensions
 #'@param d time delay

@@ -57,14 +57,13 @@ lines(51:55,pred_VECM[,1], lty=2, col=3)
 # so that the first row/element is the earliest value:
 all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(322, 323, 324),]))
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{lineVar}} and \code{\link{VECM}}. \code{\link{VARrep}}
 
 A more sophisticated predict function, allowing to do sub-sample rolling
 predictions: \code{\link{predict_rolling}}.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{regression}
-

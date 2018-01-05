@@ -24,4 +24,3 @@ Generic function to compute the Mean Squared Error of a fitted model.
 Antonio, Fabio Di Narzo
 }
 \keyword{ts}
-

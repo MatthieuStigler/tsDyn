@@ -2,8 +2,8 @@
 % Please edit documentation in R/vec2var.tsDyn.R
 \name{VARrep}
 \alias{VARrep}
-\alias{VARrep.VAR}
 \alias{VARrep.VECM}
+\alias{VARrep.VAR}
 \title{VAR representation}
 \usage{
 VARrep(object, ...)
@@ -40,15 +40,14 @@ VARrep(mod_var)
 
 
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Hamilton (1994) \emph{Time Series Analysis}, Princeton University
 Press
+}
+\author{
+Matthieu Stigler
 }
 \keyword{VAR}
 \keyword{VECM}
 \keyword{cointegration}
 \keyword{ts}
-
