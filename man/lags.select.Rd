@@ -43,14 +43,13 @@ summary(rk_sel)
 
 
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{rank.select}}, the underlying function, to estimate the
 rank also.
 
 \code{\link[vars]{VARselect}} in package \pkg{vars}, does basically the same.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

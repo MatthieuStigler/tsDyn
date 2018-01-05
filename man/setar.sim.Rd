@@ -80,12 +80,11 @@ setar.sim(data=sun,nthresh=2,n=500, type="boot", Thresh=c(6,9))$serie
 cbind(setar.sim(data=sun,nthresh=2,n=500, type="check", Thresh=c(6,9))$serie,sun)
 
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{SETAR}} to estimate a SETAR, \code{\link{arima.sim}} to
 simulate an ARMA.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

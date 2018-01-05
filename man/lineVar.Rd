@@ -108,9 +108,6 @@ options("show.signif.stars"=TRUE)
 
 
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{VECM}} which is just a wrapper for
 \code{lineVar(...,model="VECM")}
@@ -118,5 +115,7 @@ Matthieu Stigler
 \code{\link{TVAR}} and \code{\link{TVECM}} for the corresponding threshold
 models. \code{\link{linear}} for the univariate AR model.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

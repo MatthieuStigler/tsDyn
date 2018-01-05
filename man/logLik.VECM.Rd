@@ -52,12 +52,11 @@ vecm<-VECM(data, lag=1,r=1, estim="ML")
 logLik(vecm)
 
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Hamilton (1994) \emph{Time Series Analysis}, Princeton University
 Press
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

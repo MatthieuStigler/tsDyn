@@ -68,9 +68,6 @@ TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=100, plot=FALSE,check=FALSE)
 }
 
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Seo, Myunghwan, 2006. "Bootstrap testing for the null of no
 cointegration in a threshold vector error correction model," Journal of
@@ -80,5 +77,7 @@ Econometrics, vol. 127(1), pages 129-150, September.
 \code{\link{TVECM}} for estimating a TVECM, \code{\link{TVECM.sim}}
 for simulating/bootstrap a TVECM,
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

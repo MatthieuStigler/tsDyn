@@ -34,4 +34,3 @@ Antonio, Fabio Di Narzo
 \keyword{internal}
 \keyword{ts}
 \keyword{tsDyn:::oneStep.linear}
-

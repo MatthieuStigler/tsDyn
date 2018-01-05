@@ -44,9 +44,6 @@ Each subclass should define at least a \code{print} and, hopefully, a
 \code{oneStep} method, which is used by \code{\link{predict.nlar}} to
 iteratively extend ahead the time series.
 }
-\author{
-Antonio, Fabio Di Narzo
-}
 \references{
 Non-linear time series models in empirical finance, Philip Hans
 Franses and Dick van Dijk, Cambridge: Cambridge University Press (2000).
@@ -58,6 +55,8 @@ Oxford University Press (1990).
 \code{\link{availableModels}} for currently available built-in
 models.  \link{nlar-methods} for available \code{nlar} methods.
 }
+\author{
+Antonio, Fabio Di Narzo
+}
 \keyword{internal}
 \keyword{ts}
-

@@ -37,13 +37,12 @@ autotriples(log(lynx), type="persp")
 autotriples(log(lynx), type="image")
 
 }
-\author{
-Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo
-}
 \seealso{
 For finer control on kernel regression, consider using directly
 \code{\link[sm]{sm.regression}} and, especially,
 \code{\link[sm]{sm.autoregression}} in package \code{\link[sm]{sm}}.
 }
+\author{
+Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo
+}
 \keyword{ts}
-

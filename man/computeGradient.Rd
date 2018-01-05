@@ -22,15 +22,14 @@ Computes the gradient under the null hypothesis
 ##TODO
 
 }
-\author{
-J. L. Aznarte
-}
 \references{
 TODO
 }
 \seealso{
 \code{\link{addRegime}}
 }
+\author{
+J. L. Aznarte
+}
 \keyword{internal}
 \keyword{ts}
-

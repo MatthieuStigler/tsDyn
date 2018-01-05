@@ -23,14 +23,13 @@ addRegime test
 ##TODO
 
 }
-\author{
-J. L. Aznarte
-}
 \references{
 TODO
 }
 \seealso{
 \code{\link{star}}
 }
+\author{
+J. L. Aznarte
+}
 \keyword{ts}
-

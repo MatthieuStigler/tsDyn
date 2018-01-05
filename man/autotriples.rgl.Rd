@@ -30,13 +30,12 @@ if(interactive())
 autotriples.rgl(log(lynx))
 
 }
-\author{
-Wrapper to 'sm' and GUI by Antonio, Fabio Di Narzo
-}
 \seealso{
 \code{\link{autotriples}} for 3d visualization via
 \pkg{scatterplot3d} package and for kernel post-processing of the cloud for
 nonparametric autoregression functions estimates.
 }
+\author{
+Wrapper to 'sm' and GUI by Antonio, Fabio Di Narzo
+}
 \keyword{ts}
-

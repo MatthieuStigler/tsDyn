@@ -40,10 +40,9 @@ TODO
 BBCTest(lynx, m=3, test="Wald", grid="minPerc")
 
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{setarTest}} for a test with stationarity as a null.
 }
-
+\author{
+Matthieu Stigler
+}

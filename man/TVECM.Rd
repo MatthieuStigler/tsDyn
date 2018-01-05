@@ -124,9 +124,6 @@ res.tv<-residuals(tv)
 toLatex(tv)
 
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Hansen, B. and Seo, B. (2002), Testing for two-regime threshold
 cointegration in vector error-correction models, Journal of Econometrics,
@@ -140,5 +137,7 @@ paper
 threshold VAR, \code{\link{TVECM.SeoTest}} to test for TVECM,
 \code{\link{TVECM.sim}} to simulate/bootstrap a TVECM.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

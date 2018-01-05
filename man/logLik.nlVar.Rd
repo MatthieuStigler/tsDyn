@@ -45,9 +45,6 @@ VAR<-lineVar(data, lag=1)
 logLik(VAR)
 
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Hamilton (1994) \emph{Time Series Analysis}, Princeton University
 Press
@@ -58,5 +55,7 @@ Applications}, Oxford Univesity Press
 Luetkepohl (2006) \emph{New Introduction to Multiple Time Series Analysis},
 Springer
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

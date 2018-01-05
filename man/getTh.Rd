@@ -32,4 +32,3 @@ getTh(summary(set))
 Matthieu Stigler
 }
 \keyword{ts}
-

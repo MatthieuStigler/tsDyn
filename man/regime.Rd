@@ -38,4 +38,3 @@ plot(regime(set))
 Matthieu Stigler
 }
 \keyword{ts}
-

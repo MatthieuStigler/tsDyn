@@ -38,13 +38,12 @@ x <- log10(lynx)
 autopairs(x, lag=2, type="lines")
 
 }
-\author{
-Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo
-}
 \seealso{
 For finer control on density estimation, consider using directly
 \code{\link[sm]{sm.density}} and, especially, \code{\link[sm]{sm.ts.pdf}}
 from package \pkg{sm}.
 }
+\author{
+Wrappers to \pkg{sm} by Antonio, Fabio Di Narzo
+}
 \keyword{ts}
-

@@ -99,9 +99,6 @@ data<-zeroyld
 
 TVAR.LRtest(data, lag=2, mTh=1,thDelay=1:2, nboot=3, plot=FALSE, trim=0.1, test="1vs")
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Hansen (1999) Testing for linearity, Journal of Economic Surveys,
 Volume 13, Number 5, December 1999 , pp. 551-576(26) avalaible at:
@@ -115,5 +112,7 @@ Law of One Price," Macroeconomic Dynamics, Cambridge University Press, vol.
 \code{\link{setarTest}} for the univariate version.
 \code{\link{OlsTVAR}} for estimation of the model.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-

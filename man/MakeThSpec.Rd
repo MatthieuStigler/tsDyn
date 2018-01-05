@@ -64,10 +64,9 @@ selectSETAR(sun, m=3, th=MakeThSpec(ngrid="Half"),criterion="SSR", d=1, thDelay=
 
 
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{selectSETAR}}
 }
-
+\author{
+Matthieu Stigler
+}

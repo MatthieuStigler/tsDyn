@@ -117,9 +117,6 @@ options("show.signif.stars"=TRUE)
 
 
 }
-\author{
-Matthieu Stigler
-}
 \references{
 Hamilton (1994) Time Series Analysis, Princeton University Press
 
@@ -133,5 +130,7 @@ to extract the relevant parameter matrices.
 the correspoding threshold models. \code{\link{linear}} for the univariate AR
 model.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{ts}
-
