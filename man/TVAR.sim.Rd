@@ -2,13 +2,12 @@
 % Please edit documentation in R/TVAR.sim.R
 \name{TVAR.sim}
 \alias{TVAR.sim}
-\alias{VAR.sim}
 \title{Simulation of a multivariate Threshold Autoregressive model (TVAR)}
 \usage{
 TVAR.sim(B, Thresh, nthresh = 1, n = 200, lag = 1, include = c("const",
-  "trend", "none", "both"), thDelay = 1, thVar = NULL, mTh = 1,
-  starting = NULL, innov = rmnorm(n, varcov = varcov), varcov = diag(1,
-  nrow(B)), show.parMat = FALSE, round = FALSE, seed, ...)
+  "trend", "none", "both"), thDelay = 1, mTh = 1, starting = NULL,
+  innov = rmnorm(n, varcov = varcov), varcov = diag(1, nrow(B)),
+  show.parMat = FALSE, ...)
 }
 \arguments{
 \item{B}{Matrix of coefficients to simulate}
@@ -29,8 +28,6 @@ embedding time delay d) PLEASE NOTE that the notation is currently different
 to univariate models in tsDyn. The left side variable is taken at time t, and
 not t+1 as in univariate cases.}
 
-\item{thVar}{external transition variable}
-
 \item{mTh}{combination of variables with same lag order for the transition
 variable. Either a single value (indicating which variable to take) or a
 combination}
@@ -46,11 +43,6 @@ identity matrix.}
 
 \item{show.parMat}{Logical. Should the parameter matrix be shown? Useful to
 understand how to give right input}
-
-\item{round}{Rounds the series created to have the same digits (hopefully) as
-original series.}
-
-\item{seed}{Optional. Seed for the random number generation.}
 
 \item{\dots}{Further arguments passed to the underlying (un-exported)
 \code{TVAR.gen} function}
@@ -83,17 +75,6 @@ helping the user to feed the right input.
 }
 \examples{
 
-##simulate VAR as in Enders 2004, p 268
-B1<-matrix(c(0.7, 0.2, 0.2, 0.7), 2)
-var1<-TVAR.sim(B=B1,nthresh=0,n=100, include="none")
-ts.plot(var1, type="l", col=c(1,2))
-
-
-B2<-rbind(c(0.5, 0.5, 0.5), c(0, 0.5, 0.5))
-varcov<-matrix(c(1,0.2, 0.3, 1),2)
-var2<-TVAR.sim(B=B2,nthresh=0,n=100, include="const", varcov=varcov)
-ts.plot(var2, type="l", col=c(1,2))
-
 
 ##Simulation of a TVAR with 1 threshold
 B<-rbind(c(0.11928245, 1.00880447, -0.009974585, -0.089316, 0.95425564, 0.02592617),
@@ -107,14 +88,13 @@ TVAR(sim, lag=1, dummyToBothRegimes=TRUE)
 
 
 }
-\author{
-Matthieu Stigler
-}
 \seealso{
 \code{\link{TVAR}} to estimate a TVAR, \code{\link{VAR.sim}} to
 simulate/bootstrap a VAR, \code{\link{TVECM.sim}} to simulate/bootstrap a
 TVECM.
 }
+\author{
+Matthieu Stigler
+}
 \keyword{bootstrap}
 \keyword{ts}
-
