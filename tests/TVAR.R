@@ -63,6 +63,7 @@ gr_args <- expand.grid(include= c("const", "trend", "none", "both"),
                        lag=1:3,
                        commonInter=c(FALSE, TRUE),
                        thDelay=c(1,2),
+                       mTh=c(1,2),
                        stringsAsFactors=FALSE)
 
 ## remove if commonInter and const
@@ -76,6 +77,7 @@ TVAR_outs <- mapply(TVAR,
                     commonInter=gr_args_ok$commonInter,
                     thDelay=gr_args_ok$thDelay,
                     nthresh=gr_args_ok$nthresh,
+                    mTh=gr_args_ok$mTh,
                     MoreArgs = list(data=zeroyld[1:100,], plot=FALSE, trace=FALSE),
                     SIMPLIFY=FALSE)
 
@@ -96,4 +98,12 @@ sapply(TVAR_outs, df.residual)
 gr_args_ok_df <- gr_args_ok
 gr_args_ok_df$models <- TVAR_outs 
 
-sapply(subset(gr_args_ok_df, !commonInter)$models, function(x) head(TVAR.boot(x, seed=123)))
+gr_args_boot <- subset(gr_args_ok_df, !commonInter)
+
+# sapply(gr_args_boot$models, function(x) head(TVAR.boot(x, seed=123)))
+
+boots_runs <- lapply(gr_args_boot$models, function(x) TVAR.boot(x, boot.scheme="check", round.dig=5))
+boots_checks <- sapply(boots_runs, function(x) all.equal(as.matrix(zeroyld[1:100,]), x, check.attributes = FALSE))
+
+gr_args_boot$boots_checks <- boots_checks
+gr_args_boot[,-7]
