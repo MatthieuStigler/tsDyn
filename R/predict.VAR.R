@@ -1,21 +1,26 @@
-#' Predict method for objects of class \sQuote{\code{VAR}} or \sQuote{\code{VECM}}
+#' Predict method for objects of class \sQuote{\code{VAR}}, \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
 #' 
-#' Forecating the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}}
+#' Forecating the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
 #' 
 #' @aliases  predict.VAR predict.VECM
-#' @param object An object of class  \sQuote{\code{VAR}} or \sQuote{\code{VECM}}
+#' @param object An object of class  \sQuote{\code{VAR}}, \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
 #' @param newdata Optional. A new data frame to predict from. 
 #' This should contain lags of the level of the original series. See Details. 
 #' @param n.ahead An integer specifying the number of forecast steps.
-#' @param exoPred vector/matrix of predictions for the exogeneous variable(s) (with \sQuote{\code{n.ahead}} rows)
+#' @param exoPred vector/matrix of predictions for the exogeneous variable(s) (with \sQuote{\code{n.ahead}} rows).
+#' Only for \sQuote{\code{VAR}}/\sQuote{\code{VECM}}, not for \sQuote{\code{TVAR}}.
 #' @param newdataTrendStart If \sQuote{\code{newdata}} is provided by the user, 
 #' and the estimated model includes a trend, 
 #' this argument specifies where the trend should start
-#' @param \dots Arguments passed to the unexported \sQuote{\code{VAR.gen}} function
+#' @param \dots Arguments passed to the unexported \sQuote{\code{VAR.gen}} or \sQuote{\code{TVAR.gen}} function
 #' 
 #' @details
-#' The forecasts are obtained recursively, and are for the levels of the series.  For VECM, the forecasts are 
-#' obtained by transforming the VECM to a VAR (using function \code{\link{VARrep}}). 
+#' The forecasts are obtained recursively, and are for the levels of the series.  
+#' 
+#' When providing newdata, newdata has to be ordered chronologically, 
+#' so that the first row/element is the earliest value. 
+#' 
+#' For VECM, the forecasts are obtained by transforming the VECM to a VAR (using function \code{\link{VARrep}}). 
 #' Note that a VECM(lag=p) corresponds to a VAR(lag=p+1), so that if the user provides newdata 
 #' for a VECM(lag=p), newdata should actually contain p+1 rows. 
 #' 
@@ -29,23 +34,28 @@
 #' @examples
 #' 
 #' data(barry)
-#' mod_vecm <- VECM(barry, lag=2)
-#' pred_VECM <- predict(mod_vecm)
+#' barry_in <- head(barry, -5)
+#' barry_out <- tail(barry, 5)
 #' 
+#' mod_vecm <- VECM(barry_in, lag=2)
+#' mod_var <- lineVar(barry_in, lag=3)
+#' mod_tvar <- TVAR(barry_in, lag=3, nthresh=1, thDelay=1)
 #' 
-#' mod_var <- lineVar(barry, lag=3)
-#' pred_VAR <- predict(mod_var)
+#' pred_vecm <- predict(mod_vecm)
+#' pred_var  <- predict(mod_var) 
+#' pred_tvar <- predict(mod_tvar)
+#' 
 #'  
-#' ## compare
+#' ## compare forecasts on a plot
+#' n <- 30
+#' plot(1:n, tail(barry[,1], n), type="l", xlim=c(0,n))
+#' lines((n-5+1):n, pred_var[,1], lty=2, col=2)
+#' lines((n-5+1):n, pred_vecm[,1], lty=2, col=3)
+#' lines((n-5+1):n, pred_tvar[,1], lty=2, col=4) 
+#' legend("bottomright", lty=c(1,2,2,2), col=1:4, legend=c("true", "var", "vecm", "tvar"))
 #' 
-#' plot(tail(barry[,1],50), type="l", xlim=c(0,60))
-#' lines(51:55,pred_VAR[,1], lty=2, col=2)
-#' lines(51:55,pred_VECM[,1], lty=2, col=3)
-#' 
-#' 
-#' # note that when providing newdata, newdata has to be ordered chronologically, 
-#' # so that the first row/element is the earliest value:
-#' all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(322, 323, 324),]))
+#' ## example for newdata:
+#' all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(317, 318, 319),]))
 
 
 
@@ -129,7 +139,13 @@ predict.VAR <- function(object, newdata, n.ahead=5,
   ## results
   colnames(res) <- colnames(original.data )
   
-  rownames(res) <- (nrow(original.data)+1):(nrow(original.data)+n.ahead)
+  end_rows <- nrow(original.data) + n.ahead
+  if(hasArg("returnStarting") && isTRUE(list(...)["returnStarting"])) {
+    start_rows <- nrow(original.data)+1 - lag
+  } else {
+    start_rows <- nrow(original.data)+1
+  }
+  rownames(res) <- start_rows : end_rows
   return(res)
 }
 
