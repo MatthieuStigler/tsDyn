@@ -5,25 +5,22 @@
 #' @aliases  predict.TVAR
 #' @param object An object of class  \sQuote{\code{TVAR}}
 #' @param newdata Optional. A new data frame to predict from. 
-#' This should contain lags of the level of the original series. See Details. 
+#' This should contain lags of the original series. See Details. 
 #' @param n.ahead An integer specifying the number of forecast steps.
 #' @param newdataTrendStart If \sQuote{\code{newdata}} is provided by the user, 
 #' and the estimated model includes a trend, 
 #' this argument specifies where the trend should start
-#' @param \dots Arguments passed to the unexported \sQuote{\code{VAR.gen}} function
+#' @param \dots Arguments passed to the unexported \sQuote{\code{TVAR.gen}} function
 #' 
 #' @details
-#' The forecasts are obtained recursively, and are for the levels of the series.  For VECM, the forecasts are 
-#' obtained by transforming the VECM to a VAR (using function \code{\link{VARrep}}). 
-#' Note that a VECM(lag=p) corresponds to a VAR(lag=p+1), so that if the user provides newdata 
-#' for a VECM(lag=p), newdata should actually contain p+1 rows. 
+#' The forecasts are obtained recursively, and are for the levels of the series.  
+#' When providing newdata, newdata has to be ordered chronologically, 
+#' so that the first row/element is the earliest value.
+#' 
 #' 
 #' @return A matrix of predicted values.
 #' @author Matthieu Stigler
-#' @seealso  \code{\link{lineVar}} and \code{\link{VECM}}. \code{\link{VARrep}}
-#' 
-#' A more sophisticated predict function, allowing to do sub-sample rolling
-#' predictions: \code{\link{predict_rolling}}.
+#' @seealso  \code{\link{TVAR}}.
 #' @keywords regression
 #' @examples
 #' 
@@ -42,13 +39,13 @@
 #' lines(51:55,pred_VECM[,1], lty=2, col=3)
 #' 
 #' 
-#' # note that when providing newdata, newdata has to be ordered chronologically, 
-#' # so that the first row/element is the earliest value:
+#' #
 #' all.equal(predict(mod_vecm), predict(mod_vecm, newdata=barry[c(322, 323, 324),]))
 
 
 
 ###################
+#' @S3method predict TVAR
 predict.TVAR <- function(object, newdata, n.ahead=5, 
                         newdataTrendStart, ...){
   

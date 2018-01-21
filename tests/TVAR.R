@@ -107,3 +107,7 @@ boots_checks <- sapply(boots_runs, function(x) all.equal(as.matrix(zeroyld[1:100
 
 gr_args_boot$boots_checks <- boots_checks
 gr_args_boot[,-7]
+
+
+## predict
+predict_runs <- lapply(gr_args_boot$models, function(x) predict(x, n.ahead=3))

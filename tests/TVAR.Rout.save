@@ -4365,6 +4365,10 @@ mod_56 mod_57 mod_58 mod_59 mod_60
 167    none       2   3       FALSE       2   2         TRUE
 168    both       2   3       FALSE       2   2         TRUE
 > 
+> 
+> ## predict
+> predict_runs <- lapply(gr_args_boot$models, function(x) predict(x, n.ahead=3))
+> 
 > proc.time()
    user  system elapsed 
-  7.412   0.228   7.635 
+  7.385   0.268   7.643 
