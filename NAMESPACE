@@ -13,6 +13,7 @@ importFrom("graphics", "abline", "axis", "contour", "curve", "image",
              "layout", "legend", "lines", "lines.default", "par",
              "persp", "plot", "points", "segments", "title")
 importFrom("methods", "new")
+importFrom("methods", "hasArg")
 importFrom("stats", "AIC", "acf", "aggregate", "anova", "ar",
              "arima.sim", "as.formula", "as.ts", "coef", "coefficients",
              "confint", "confint.default", "dchisq", "deltat", "density",
