@@ -1,4 +1,10 @@
-Version 0.9-45: Matthieu Stigler (29/8/2017)
+Version 0.9-46: Matthieu Stigler (21/1/2018)
+ -new: predict.TVAR
+ -new: rewrite TVAR.gen, cleaner TVAR.boot and TVAR.sim
+ -fix bug: nameB in TVAR had issue for some cases.
+ -many minor updates in doc
+
+Version 0.9-45: Matthieu Stigler (29/8/2017)  never published on CRAN
  -minor: change registration of c code
  -minor: add dataset m.unrate, previously in (now archived) FinTs
  -minor: small documentation updates, use canonical urls, etc
