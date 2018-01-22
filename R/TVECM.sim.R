@@ -61,7 +61,7 @@ as.matrix.ts <-
     ans
   }
 
-#'Simulation and bootstrap of bivariate VECM/TVECM
+#'Simulation and bootstrap a VECM or bivariate TVECM
 #'
 #'Estimate or bootstraps a multivariate Threshold VAR
 #'
@@ -124,8 +124,9 @@ as.matrix.ts <-
 #'@param seed Optional. Seed for the random number generation.
 #'@return A matrix with the simulated/bootstraped series.
 #'@author Matthieu Stigler
-#'@seealso \code{\link{TVECM}} to estimate a TVECM, \code{\link{VAR.sim}} to
-#'simulate/bootstrap a VAR.
+#'@seealso \code{\link{VECM}} or \code{\link{TVECM}} to estimate the VECM or TVECM.  
+#'Similar \code{\link{TVAR.sim}} and \code{\link{TVAR.boot}} for \code{\link{TVAR}}, 
+#'\code{\link{VAR.sim}} and \code{\link{VAR.boot}} for VAR models estimated with \code{\link{lineVar}} models. 
 #'@keywords ts
 #'@export
 #'@examples

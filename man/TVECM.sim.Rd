@@ -5,7 +5,7 @@
 \alias{VECM.boot}
 \alias{TVECM.boot}
 \alias{TVECM.sim}
-\title{Simulation and bootstrap of bivariate VECM/TVECM}
+\title{Simulation and bootstrap a VECM or bivariate TVECM}
 \usage{
 VECM.sim(data, B, VECMobject, beta, n = 200, lag = 1, type = c("simul",
   "boot", "check"), include = c("const", "trend", "none", "both"),
@@ -151,8 +151,9 @@ all(TVECM.sim.check==dat)
 
 }
 \seealso{
-\code{\link{TVECM}} to estimate a TVECM, \code{\link{VAR.sim}} to
-simulate/bootstrap a VAR.
+\code{\link{VECM}} or \code{\link{TVECM}} to estimate the VECM or TVECM.  
+Similar \code{\link{TVAR.sim}} and \code{\link{TVAR.boot}} for \code{\link{TVAR}}, 
+\code{\link{VAR.sim}} and \code{\link{VAR.boot}} for VAR models estimated with \code{\link{lineVar}} models.
 }
 \author{
 Matthieu Stigler

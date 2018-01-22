@@ -114,7 +114,8 @@ if(FALSE){
 #'@keywords ts bootstrap
 #'@export
 #'@examples
-#'##simulate VAR as in Enders 2004, p 268
+#'
+#'## VAR.sim: simulate VAR as in Enders 2004, p 268
 #'B1<-matrix(c(0.7, 0.2, 0.2, 0.7), 2)
 #'var1 <- VAR.sim(B=B1, n=100, include="none")
 #'ts.plot(var1, type="l", col=c(1,2))
@@ -154,15 +155,13 @@ VAR.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
 #'@param seed Optional. Seed for the random resampling function.
 #'@param \dots Further arguments passed to the underlying (un-exported)
 #'\code{VAR.gen} function
-#'@return A matrix with the resampled series.
-#'@author Matthieu Stigler
+#'@seealso \code{\link{lineVar}} to estimate the VAR.  Similar \code{\link{TVECM.sim}} and \code{\link{TVECM.boot}} for \code{\link{TVECM}}, 
+#'\code{\link{TVAR.sim}} and \code{\link{TVAR.boot}} for \code{\link{TVAR}} models. 
 #'@keywords ts bootstrap
 #'@export
 #'@examples
 #'
-#'
-#'
-#'##Bootstrap a VAR 
+#'## VAR.boot: Bootstrap a VAR 
 #'data(zeroyld)
 #'mod <- lineVar(data=zeroyld,lag=1)
 #'VAR.boot(mod)

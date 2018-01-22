@@ -38,8 +38,8 @@
 #'end-sample.
 #'@return Fitted model data
 #'@author Matthieu Stigler
-#'@seealso \code{\link{VECM}} which is just a wrapper for
-#'\code{lineVar(...,model="VECM")}
+#'@seealso \code{\link{VECM}} which is just a wrapper for \code{lineVar(..., model="VECM")}. 
+#'Methods \code{\link{predict.VAR}}, \code{\link{VARrep}}, \code{\link{regime}}, \code{\link{irf}} and \code{\link{toLatex}}.
 #'
 #'\code{\link{TVAR}} and \code{\link{TVECM}} for the corresponding threshold
 #'models. \code{\link{linear}} for the univariate AR model.
