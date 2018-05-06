@@ -140,9 +140,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 
     IDS <- as.matrix(expand.grid(Gammas, ths) )
 
-    if(!is.na(start.con$candidates)){
+    if(any(!is.na(start.con$candidates))){
       li <- start.con$candidates
-      if(length(li)!=2 | any(names(li)!=c("th", "gamma")) | length(li[[1]])!=length(li[[2]])){
+      if(length(li)!=2 | any(!names(li) %in% c("th", "gamma")) | length(li[[1]])!=length(li[[2]])){
 	stop("Error in specification of starting.control$candidates: should be a list with element 'th' and 'gamma' of same length\n")
       }
       IDS <- rbind(IDS, cbind(li[["gamma"]], li[["th"]]))
@@ -154,9 +154,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
       cost <- crossprod(lm.fit(F_bind(xxL, xxH, g=IDS[i,1], th=IDS[i,2]), yy)$residuals)
 
       if(cost <= bestCost) {
-	bestCost <- cost;
-	gamma <- IDS[i,1]
-	th <- IDS[i,2]
+        bestCost <- cost;
+        gamma <- IDS[i,1]
+        th <- IDS[i,2]
       }
     }
 
