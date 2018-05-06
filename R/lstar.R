@@ -54,30 +54,27 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if(thDelay>=m) 
       stop(paste("thDelay too high: should be < m (=",m,")"))
     z <- xx[,thDelay+1]
-  }
-  else if(!missing(mTh)) {
+  } else if(!missing(mTh)) {
     if(length(mTh) != m) 
       stop("length of 'mTh' should be equal to 'm'")
     z <- xx %*% mTh #threshold variable
     dim(z) <- NULL
-  }
-  else if(!missing(thVar)) {
+  }  else if(!missing(thVar)) {
     if(length(thVar) > nrow(xx)) {
       z <- thVar[1:nrow(xx)]
       if(trace) 
         cat("Using only first", nrow(xx), "elements of thVar\n")
-    }
-    else {
+    } else {
       z <- thVar
     }
     externThVar <- TRUE
-  }
-  else {
+  } else {
     if(trace) 
       cat("Using default threshold variable: thDelay=0\n")
     z <- xx[,1]
     thDelay = 0
   }
+  
   ## Build regressors matrix
   constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
   incNames<-constMatrix$incNames #vector of names
@@ -110,7 +107,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     }
     
   }
-#Automatic starting values####################
+
+  #Automatic starting values####################
   if(missing(th) || missing(gamma)) {
     if (trace)
       cat("Performing grid search for starting values...\n");
@@ -124,8 +122,8 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
 		    nGamma=40,
 		    gammaInt=c(1,100), 
 		    thInt=NA, 
-		    candidates=NA
-    )
+		    candidates=NA)
+    
     # Add if user defined, check if names correspond (code taken from optim)
     nmsC <- names(start.con)
     start.con[(namc <- names(starting.control))] <- starting.control
@@ -143,7 +141,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     if(any(!is.na(start.con$candidates))){
       li <- start.con$candidates
       if(length(li)!=2 | any(!names(li) %in% c("th", "gamma")) | length(li[[1]])!=length(li[[2]])){
-	stop("Error in specification of starting.control$candidates: should be a list with element 'th' and 'gamma' of same length\n")
+        stop("Error in specification of starting.control$candidates: should be a list with element 'th' and 'gamma' of same length\n")
       }
       IDS <- rbind(IDS, cbind(li[["gamma"]], li[["th"]]))
     }
@@ -224,9 +222,9 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   if(trace){
     if(res$convergence!=0){
       if(res$convergence==1) {
-	cat("Convergence problem code 1. You might want to increase maximum number of iterations by setting 'control=list(maxit=1000)'\n")
+        cat("Convergence problem code 1. You might want to increase maximum number of iterations by setting 'control=list(maxit=1000)'\n")
       } else {
-	cat("Convergence problem. Convergence code: ",res$convergence,"\n")
+        cat("Convergence problem. Convergence code: ",res$convergence,"\n")
       }
     } else {
       cat("Optimization algorithm converged\n")
@@ -236,10 +234,10 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
   coefnames_L <- c(if(ninc>0) paste(incNames,"L",sep="."), paste("phiL", 1:mL, sep="."))
   coefnames_H <- c(if(ninc>0) paste(incNames,"H",sep="."), paste("phiH", 1:mH, sep="."))
   coefnames <- c(coefnames_L, coefnames_H)
-
+  
   names(phi_2) <-coefnames
   names(res$par) <- c("gamma", "th")
-
+  
   ## Optimization: second quick step to get hessian for all parameters ########
   SS_2 <- function(p) {
     phi1 <- p[coefnames_L]	#Extract parms from vector p
@@ -298,7 +296,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
                      fitted.values =res$fitted,
                      residuals =res$residuals,
                      k   =res$k,
-		     model = mod.return,
+                     model = mod.return,
                      model.specific=res),
                 "lstar"))
 }
