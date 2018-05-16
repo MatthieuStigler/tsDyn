@@ -1,3 +1,6 @@
+Version 0.9-47: Matthieu Stigler (15/5/2018)
+ -fix small issue in lstar code.
+
 Version 0.9-46: Matthieu Stigler (21/1/2018)
  -new: predict.TVAR
  -new: rewrite TVAR.gen, cleaner TVAR.boot and TVAR.sim
