@@ -375,9 +375,9 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
     
   }#end n
   
-  #############
-  ###Best Model
-  #############
+  ##################################
+  ###Best Model: set variables
+  ##################################
   val <- if(commonInter) 1 else -(seq_len(ncol(Z)))
   
   if(nthresh==1){
@@ -412,6 +412,9 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   reg<-if(nthresh==1) dummydown+2*dummyup else dummydown+2*dummymid+3*dummyup
   regime <- c(rep(NA, T-t), reg)
   
+  ##################################
+  ### Best Model: estimate
+  ##################################
   
   final <- lm.fit(x=Zbest, y=Y)
   
@@ -422,17 +425,19 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   SSRbest <- as.numeric(crossprod(c(resbest)))
   nparbest<-nrow(Bbest)*ncol(Bbest)
   
-  Sigmabest<-matrix(1/t*crossprod(resbest),ncol=k,dimnames=list(colnames(data), colnames(data)))
-  SigmabestOls<-Sigmabest*(t/(t-ncol(Bbest)))
+  Sigmabest <- matrix(1/t*crossprod(resbest), ncol=k, dimnames=list(colnames(data), colnames(data)))
+  SigmabestOls <- Sigmabest * (t/(t-ncol(Bbest)))
   
   ### naming and splitting B
   rownames(Bbest) <- paste("Equation", colnames(data))
-  LagNames<-c(paste(rep(colnames(data),p), -rep(seq_len(p), each=k)))
+  LagNames <- c(paste(rep(colnames(data), p), -rep(seq_len(p), each=k)))
   
-  Bnames<-c(switch(include, const="Intercept", trend="Trend", both=c("Intercept","Trend"), none=NULL), LagNames)
-  Blist<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
-  BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
-  colnames(Bbest)<-BnamesVec
+  Bnames  <- c(switch(include, const="Intercept", trend="Trend", both=c("Intercept","Trend"), none=NULL), LagNames)
+  Blist <- nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
+  
+  ## name the coefMat:
+  BnamesVec <- if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
+  colnames(Bbest) <- BnamesVec
   
   ##number of obs in each regime
   if(nthresh==1)
@@ -441,36 +446,36 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
     nobs <- c(ndown=ndown, nmiddle=1-nup-ndown,nup=nup)
   
   ###Y and regressors matrix
-  tZbest<-Zbest
-  naX<-rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
-  YnaX<-cbind(data, naX)
-  BlistMod<-nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar,sameName=FALSE )
-  BnamesVecMod<-if(class(BlistMod)=="list") c(sapply(BlistMod, colnames)) else colnames(BlistMod)
-  colnames(YnaX)<-c(colnames(data),BnamesVecMod)
+  tZbest <- Zbest
+  naX <- rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
+  YnaX <- cbind(data, naX)
+  BlistMod <- nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar,sameName=FALSE )
+  BnamesVecMod <- if(class(BlistMod)=="list") c(sapply(BlistMod, colnames)) else colnames(BlistMod)
+  colnames(YnaX) <- c(colnames(data),BnamesVecMod)
   
   ###elements to return
-  specific<-list()
-  specific$allgammas<-allgammas
-  specific$gammas<-gammas
-  specific$thDelay<-bestDelay
-  specific$Thresh<-bestThresh
-  specific$nthresh<-nthresh
-  specific$transCombin<-combin
-  specific$regime<-regime
-  specific$nreg<-nthresh+1
-  specific$nrowB<-npar
-  specific$nobs<-nobs
-  specific$oneMatrix<-commonInter
-  specific$threshEstim<-ifelse(is.null(gamma), TRUE, FALSE)
-  specific$allThSSR<-allThSSR#SSR values for all the th computed
-  specific$Bnames<-Bnames
+  specific <- list()
+  specific$allgammas <- allgammas
+  specific$gammas <- gammas
+  specific$thDelay <- bestDelay
+  specific$Thresh <- bestThresh
+  specific$nthresh <- nthresh
+  specific$transCombin <- combin
+  specific$regime <- regime
+  specific$nreg <- nthresh+1
+  specific$nrowB <- npar
+  specific$nobs <- nobs
+  specific$oneMatrix <- commonInter
+  specific$threshEstim <- ifelse(is.null(gamma), TRUE, FALSE)
+  specific$allThSSR <- allThSSR#SSR values for all the th computed
+  specific$Bnames <- Bnames
   specific$timeAttributes <- attributes(data[,1])
   
   z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model=YnaX, 
           nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, df.residual=t-ncol(Bbest),
           fitted.values=fitted, lag=lag, include=include,model.specific=specific, 
           usedThVar=trans[,bestDelay], trim=trim)
-  class(z)<-c("TVAR","nlVar")
+  class(z) <- c("TVAR","nlVar")
   attr(z, "levelTransVar") <- model
   attr(z, "transVar") <- if(!missing(thVar)) "external" else "internal"
   attr(z, "varsLevel") <- "level"
@@ -503,6 +508,7 @@ summary.TVAR<-function(object,...){
 	t<-x$t
 	p<-x$lag
 	Z<-t(as.matrix(tail.matrix(x$model[,-c(1:k)],t)))
+	
 	###Stdev, VarCov
 	SigmabestOls <- matrix(1/x$df.residual*crossprod(x$residuals),ncol=k)
 	VarCovB <- SigmabestOls %x% solve(tcrossprod(Z))
@@ -694,24 +700,24 @@ toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 }
 
 
-nameB <- function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All", sameName=TRUE){
-  model<-match.arg(model)
-  addRegLetter<-if(sameName) NULL else  c("L ", if(nthresh==1) NULL else "M ", "H ")
+nameB <- function(mat, commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"), TVECMmodel="All", sameName=TRUE){
+  model <- match.arg(model)
+  addRegLetter <- if(sameName) NULL else  c("L ", if(nthresh==1) NULL else "M ", "H ")
   if(model=="TVAR")
-    sBnames<-Bnames[-which(Bnames=="Intercept")]
+    sBnames <- Bnames[-which(Bnames=="Intercept")]
   else if(model=="TVECM")
-    sBnames<-Bnames[-which(Bnames=="ECT")]
+    sBnames <- Bnames[-which(Bnames=="ECT")]
 
 ##1 threshold
   if(nthresh==1){
     if(commonInter){
       if(model=="TVAR"){
-        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,2),sep=""))
+        colnames(mat) <- c("Intercept", paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,2),sep=""))
       } else if(model=="TVECM") {
-        colnames(mat)<-c("ECT-","ECT+", sBnames)
+        colnames(mat) <- c("ECT-","ECT+", sBnames)
       }
-      Blist<-mat
-    }else{
+      Blist <- mat
+    } else {
       colnames(mat) <- paste(rep(addRegLetter, each=length(Bnames)),rep(Bnames,2),sep="")
       Bdown <- mat[,c(1:npar)]
       Bup <- mat[,-c(1:npar)]
@@ -721,12 +727,12 @@ nameB <- function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"
   } else { 
     if(commonInter){
       if(model=="TVAR")
-        colnames(mat)<-c("Intercept",paste(rep(addRegLetter, each=length(sBnames)),rep(sBnames,3),sep=""))
+        colnames(mat) <- c("Intercept", paste(rep(addRegLetter, each=length(sBnames)), rep(sBnames,3),sep=""))
       else if(model=="TVECM")
-        colnames(mat)<-c("ECT-","ECT+", sBnames)
-      Blist<-mat}
+        colnames(mat) <- c("ECT-","ECT+", sBnames)
+      Blist <- mat}
     else{
-      colnames(mat)<-paste(rep(addRegLetter, each=length(Bnames)),rep(Bnames,3),sep="")
+      colnames(mat) <- paste(rep(addRegLetter, each=length(Bnames)), rep(Bnames,3), sep="")
       Bdown <- mat[,c(1:npar)]
       Bmiddle <- mat[,c(1:npar)+npar]
       Bup <- mat[,c(1:npar)+2*npar]		
@@ -738,44 +744,44 @@ nameB <- function(mat,commonInter, Bnames, nthresh, npar, model=c("TVAR","TVECM"
 
 onesearch <- function(thDelay,gammas, fun, trace, gamma, plot){
   grid1 <- expand.grid(thDelay,gammas)				#grid with delay and gammas
-  store<-mapply(fun,thDelay=grid1[,1],gam1=grid1[,2])
+  store <- mapply(fun,thDelay=grid1[,1],gam1=grid1[,2])
   posBestThresh <- which(store==min(store, na.rm=TRUE), arr.ind=TRUE)[1]
   
   if(trace)
     cat("Best unique threshold", grid1[posBestThresh,2],"\n")
   if(length(thDelay)>1&trace)
     cat("Best Delay", grid1[posBestThresh,1],"\n")
-  res<-list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1], allres=cbind(grid1,store))
+  res <- list(bestThresh=grid1[posBestThresh,2],bestDelay=grid1[posBestThresh,1], allres=cbind(grid1,store))
   return(res)
 }#end of function one search
 
-condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL){
+condiStep <- function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL){
   allThUniq <- unique(allTh)
   ng <- length(allTh)
-  down<-ceiling(trim*ng)
+  down <- ceiling(trim*ng)
   
    #correction for case with few unique values
   if(allTh[down]==allTh[down+1]){
-    sames<-which(allTh==allTh[down])
+    sames <- which(allTh==allTh[down])
     down <-sames[length(sames)]+1
   }
-  up<-floor(ng*(1-trim))
+  up <- floor(ng*(1-trim))
   #correction for case with few unique values
   if(allTh[up]==allTh[up-1]){
-    up<-which(allTh==allTh[up])[1]-1
+    up <- which(allTh==allTh[up])[1]-1
   }
-  ninter<-max(down, ng-up)
-  nMin<-ceiling(trim*ng)
+  ninter <- max(down, ng-up)
+  nMin <- ceiling(trim*ng)
 
   possibleThresh <- abs(allTh-threshRef)
   wh.thresh <- max(which(possibleThresh==min(possibleThresh)))
   
 #search for a second threshold smaller than the first one
   if(wh.thresh>down+nMin){
-    upInter<-wh.thresh-nMin
+    upInter <- wh.thresh-nMin
     if(allTh[upInter]==allTh[upInter-1])
-      upInter<-which(allTh==allTh[upInter])[1]-1
-    gammaMinus<-unique(allTh[seq(from=down+1, to=upInter)])
+      upInter <- which(allTh==allTh[upInter])[1]-1
+    gammaMinus <- unique(allTh[seq(from=down+1, to=upInter)])
     #if only one unique value in middle regime
      if(allThUniq[which(allThUniq==allTh[upInter])+1]==allTh[wh.thresh]){
        gammaMinus <- head(gammaMinus, -1)#cut last one
@@ -799,7 +805,7 @@ condiStep<-function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NULL
       samesInter <-which(allTh==allTh[downInter])
       downInter <-samesInter[length(samesInter)]+1
     }
-    gammaPlus<-unique(allTh[seq(from=downInter, to=up)])
+    gammaPlus <- unique(allTh[seq(from=downInter, to=up)])
           #if only one unique value in middle regime
     if(allThUniq[which(allThUniq==allTh[downInter])-1]==allTh[wh.thresh]){
       gammaPlus <- gammaPlus[-1]#cut first one
