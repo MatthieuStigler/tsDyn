@@ -315,6 +315,22 @@ coefMat.nlVar<-function(object,...){
     return(object$coeffmat)
 }
 
+
+### Method coefVec
+coefVec <- function (object, ...)  
+  UseMethod("coefVec")
+
+coefVec.default<-function(object, ...)
+  coefficients(object)
+
+coefVec.nlVar<-function(object,...){
+  coef_M <- coefMat(object)
+  coef_c <- matrix(t(coef_M), ncol=1, byrow = FALSE)
+  rownames(coef_c) <- paste(colnames(coef_M), rep(rownames(coef_M), each=ncol(coef_M)))
+  coef_c
+}
+
+
 ###Method toMlm
 toMlm<- function(x, ...) {
   UseMethod("toMlm")
