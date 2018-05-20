@@ -82,23 +82,22 @@
 #'
 #'
 #'data(zeroyld)
-#'data<-zeroyld
 #'
 #'##Estimate a TVECM (we use here minimal grid, it should be usually much bigger!)
 #'
-#'tv<-TVECM(data, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common="All")
+#'tvec <- TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common="All")
 #'
-#'print(tv)
-#'summary(tv)
+#'print(tvec)
+#'summary(tvec)
 #'
 #'#Obtain diverse infos:
-#'AIC(tv)
-#'BIC(tv)
+#'AIC(tvec)
+#'BIC(tvec)
 #'
-#'res.tv<-residuals(tv)
+#'res.tvec<-residuals(tvec)
 #'
 #'#export the equations as Latex:
-#'toLatex(tv)
+#'toLatex(tvec)
 #'
 TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=TRUE,  th1=list(exact=NULL, int=c("from","to"), around="val"), th2=list(exact=NULL, int=c("from","to"), around="val"), beta=list(exact=NULL, int=c("from","to"), around=c("val","by")), restr=c("none", "equal", "signOp"), common=c("All", "only_ECT"), include = c( "const", "trend","none", "both"),dummyToBothRegimes=TRUE,beta0=0,methodMapply=FALSE, trace=TRUE ) {
 

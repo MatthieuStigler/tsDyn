@@ -105,23 +105,22 @@ tight. It is hence recommended to inspect the plot of the grid search.
 
 
 data(zeroyld)
-data<-zeroyld
 
 ##Estimate a TVECM (we use here minimal grid, it should be usually much bigger!)
 
-tv<-TVECM(data, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common="All")
+tvec <- TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=20, ngridTh=30, plot=TRUE,trim=0.05, common="All")
 
-print(tv)
-summary(tv)
+print(tvec)
+summary(tvec)
 
 #Obtain diverse infos:
-AIC(tv)
-BIC(tv)
+AIC(tvec)
+BIC(tvec)
 
-res.tv<-residuals(tv)
+res.tvec<-residuals(tvec)
 
 #export the equations as Latex:
-toLatex(tv)
+toLatex(tvec)
 
 }
 \references{
