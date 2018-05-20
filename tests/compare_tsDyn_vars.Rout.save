@@ -1,7 +1,6 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -21,6 +20,7 @@ Type 'q()' to quit R.
 > 
 > library(tsDyn)
 > library(vars)
+Loading required package: MASS
 Loading required package: strucchange
 Loading required package: zoo
 
@@ -86,7 +86,7 @@ Loading required package: lmtest
 > comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
 > comp_VECM_coefA <- function(x,...) all.equal(coefA(x[[1]]), coefA(x[[2]]), check.attributes=FALSE,...)
 > comp_VECM_coefB <- function(x,...) all.equal(coefB(x[[1]]), coefB(x[[2]]), check.attributes=FALSE,...)
-> comp_VECM_coefPI <- function(x) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE)
+> comp_VECM_coefPI <- function(x, ...) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE, ...)
 > comp_VECM_logLik <- function(x, r=1) all.equal(logLik(x[[1]], r=r), logLik(x[[2]], r=r), check.attributes=FALSE)
 > 
 > ### Small function to print nicely output of all.equal, rounding the number:
@@ -106,13 +106,13 @@ Loading required package: lmtest
 > ### Compare VECM methods:
 > print(sapply(all_models, comp_teststat ))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> print(sapply(all_models, comp_betas, tol=lowtol)) # 2 and 6
+> print(sapply(all_models, comp_betas, tol=lowtol))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
 [1] "TRUE"                                "TRUE"                               
 [3] "TRUE"                                "TRUE"                               
 [5] "Mean relative difference: 0.0001434" "Mean relative difference: 0.0017993"
-> print(sapply(all_models, comp_LL)) # 2 and 6
+> print(sapply(all_models, comp_LL))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_IRF))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
@@ -120,13 +120,13 @@ Loading required package: lmtest
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_FEVD))
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> print(sapply(all_models, comp_resid, tol=lowtol)) # 5 and 6
+> print(sapply(all_models, comp_resid, tol=lowtol)) # 5
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > print(sapply(all_models, comp_fitted)) 
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > roundAll.Equal(sapply(all_models, comp_predict)) # 5 and 6
 [1] "TRUE" "TRUE" "TRUE" "TRUE" "TRUE" "TRUE"
-> lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=7) # 5 and 6
+> lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=6) # 5 and 6
 [[1]]
 [1] "TRUE"
 
@@ -140,18 +140,18 @@ Loading required package: lmtest
 [1] "TRUE"
 
 [[5]]
-[1] "Mean relative difference: 4.09e-05"  "Mean relative difference: 0.0001349"
-[3] "Mean relative difference: 0.0003335" "Mean relative difference: 0.0070301"
+[1] "Mean relative difference: 4.1e-05"  "Mean relative difference: 0.000135"
+[3] "Mean relative difference: 0.000333" "Mean relative difference: 0.00703" 
 
 [[6]]
-[1] "Mean relative difference: 5.37e-05"  "Mean relative difference: 0.0002086"
-[3] "Mean relative difference: 0.0016372" "Mean relative difference: 0.0181516"
+[1] "Mean relative difference: 5.4e-05"  "Mean relative difference: 0.000209"
+[3] "Mean relative difference: 0.001637" "Mean relative difference: 0.018152"
 
 > sapply(all_models, comp_VECM_coefA, tolerance=1e-07)
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > sapply(all_models, comp_VECM_coefB, tolerance=1e-07)
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
-> sapply(all_models, comp_VECM_coefPI)
+> sapply(all_models, comp_VECM_coefPI, tolerance=1e-07)
 [1] TRUE TRUE TRUE TRUE TRUE TRUE
 > mapply(function(r) sapply(all_models, comp_VECM_logLik, r=r), r=0:4)
      [,1] [,2] [,3] [,4] [,5]
@@ -270,5 +270,5 @@ Loading required package: lmtest
 > 
 > 
 > proc.time()
-utilisateur     système      écoulé 
-      3.940       0.112       4.047 
+   user  system elapsed 
+  2.622   0.083   2.692 

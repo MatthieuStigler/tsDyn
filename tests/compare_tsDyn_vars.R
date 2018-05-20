@@ -54,7 +54,7 @@ comp_predictOld <- function(x) all.equal(predict(vec2var(x[[1]]))$fcst, tsDyn:::
 comp_predict <- function(x) all.equal(sapply(predict(vec2var(x[[1]]), n.ahead=5)$fcst,function(x) x[,"fcst"]), predict(x[[2]]), check.attributes=FALSE)
 comp_VECM_coefA <- function(x,...) all.equal(coefA(x[[1]]), coefA(x[[2]]), check.attributes=FALSE,...)
 comp_VECM_coefB <- function(x,...) all.equal(coefB(x[[1]]), coefB(x[[2]]), check.attributes=FALSE,...)
-comp_VECM_coefPI <- function(x) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE)
+comp_VECM_coefPI <- function(x, ...) all.equal(coefPI(x[[1]]), coefPI(x[[2]]), check.attributes=FALSE, ...)
 comp_VECM_logLik <- function(x, r=1) all.equal(logLik(x[[1]], r=r), logLik(x[[2]], r=r), check.attributes=FALSE)
 
 ### Small function to print nicely output of all.equal, rounding the number:
@@ -73,19 +73,19 @@ roundAll.Equal <- function(x, round=8){
 
 ### Compare VECM methods:
 print(sapply(all_models, comp_teststat ))
-print(sapply(all_models, comp_betas, tol=lowtol)) # 2 and 6
+print(sapply(all_models, comp_betas, tol=lowtol))
 roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
-print(sapply(all_models, comp_LL)) # 2 and 6
+print(sapply(all_models, comp_LL))
 print(sapply(all_models, comp_IRF))
 print(sapply(all_models, comp_IRF_rand))
 print(sapply(all_models, comp_FEVD))
-print(sapply(all_models, comp_resid, tol=lowtol)) # 5 and 6
+print(sapply(all_models, comp_resid, tol=lowtol)) # 5
 print(sapply(all_models, comp_fitted)) 
 roundAll.Equal(sapply(all_models, comp_predict)) # 5 and 6
-lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=7) # 5 and 6
+lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=6) # 5 and 6
 sapply(all_models, comp_VECM_coefA, tolerance=1e-07)
 sapply(all_models, comp_VECM_coefB, tolerance=1e-07)
-sapply(all_models, comp_VECM_coefPI)
+sapply(all_models, comp_VECM_coefPI, tolerance=1e-07)
 mapply(function(r) sapply(all_models, comp_VECM_logLik, r=r), r=0:4)
 
 ## restricted betas:

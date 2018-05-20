@@ -47,7 +47,7 @@ tv_1_boot <-TVECM.sim(TVECMobject=TVECMobject,type="boot", seed=123, show.parMat
 head(tv_1_boot)
 
 ##Check the bootstrap
-all(TVECM.sim(TVECMobject=TVECMobject,type="check")==dat)
+all.equal(TVECM.sim(TVECMobject=TVECMobject,type="check"), as.matrix(dat), check.attributes=FALSE)
 
 ## check correspondance bootstrap/simul:
 tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", beta=TVECMobject$model.specific$beta,

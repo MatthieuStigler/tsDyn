@@ -1,7 +1,6 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -121,7 +120,7 @@ Equation long.run  0.058816293 -0.007954949     0     0.16032265    0.14668443
 [6,] 0.697 -0.067
 > 
 > ##Check the bootstrap
-> all(TVECM.sim(TVECMobject=TVECMobject,type="check")==dat)
+> all.equal(TVECM.sim(TVECMobject=TVECMobject,type="check"), as.matrix(dat), check.attributes=FALSE)
 [1] TRUE
 > 
 > ## check correspondance bootstrap/simul:
@@ -479,5 +478,5 @@ Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  :
 > 
 > 
 > proc.time()
-utilisateur     système      écoulé 
-      3.156       0.092       3.244 
+   user  system elapsed 
+  2.055   0.075   2.118 
