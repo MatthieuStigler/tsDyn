@@ -1,8 +1,5 @@
 library(tsDyn)
 
-data(zeroyld)
-dat<-zeroyld
-
 ###SETAR
 
 mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
@@ -51,56 +48,3 @@ selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid=5), common="no
 selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid="Half"), common="none",criterion = "SSR", plot=FALSE)
 
 
-###TVECM
-tvecm<-TVECM(dat, nthresh=2,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="All")
-class(tvecm)
-tvecm
-print(tvecm)
-coef(tvecm)
-logLik(tvecm)
-AIC(tvecm)
-BIC(tvecm)
-deviance(tvecm)
-head(residuals(tvecm))
-tail(residuals(tvecm))
-head(fitted(tvecm))
-tail(fitted(tvecm))
-summary(tvecm)
-
-regime(tvecm)
-regime(tvecm, initVal=FALSE)
-regime(tvecm, time=FALSE)
-regime(tvecm, time=FALSE, initVal=FALSE)
-
-
-
-toLatex(tvecm)
-options(show.signif.stars=FALSE)
-toLatex(summary(tvecm))
-
-###Linear
-lin<-lineVar(dat,lag=2)
-class(lin)
-lin
-print(lin)
-logLik(lin)
-AIC(lin)
-BIC(lin)
-deviance(lin)
-coef(lin)
-summary(lin)
-toLatex(lin)
-toLatex(summary(lin))
-
-linVECM<-lineVar(dat,lag=2, model="VECM")
-class(linVECM)
-linVECM
-print(linVECM)
-logLik(linVECM)
-AIC(linVECM)
-BIC(linVECM)
-deviance(linVECM)
-coef(linVECM)
-summary(linVECM)
-toLatex(linVECM)
-toLatex(summary(linVECM))

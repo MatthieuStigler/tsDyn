@@ -1,0 +1,809 @@
+
+R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> 
+> data(zeroyld)
+> 
+> ###TVECM
+> tvecm <- TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="All")
+29 (7.2%) points of the grid lead to regimes with percentage of observations < trim and were not computed
+Best threshold from first search -1.195 
+Best cointegrating value 1.057203 
+There were  2  thresholds values which minimize the SSR in the conditional step, the first one was taken
+Second best (conditionnal on the first one) -1.195 0.643 	 SSR 157.1432 
+There were  4  thresholds values which minimize the SSR in the iterative step, the first one was taken
+Second step best thresholds -1.414 0.643 			 SSR 155.6996 
+> tvar <- TVAR(zeroyld, nthresh=2,lag=1,  plot=FALSE, trim=0.05)
+Best unique threshold 11.986 
+Second best: 10.709 (conditionnal on th= 11.986 and Delay= 1 ) 	 SSR/AIC: 162.8903
+Second best: 11.986 (conditionnal on th= 10.709 and Delay= 1 ) 	 SSR/AIC: 162.8903
+
+Second step best thresholds 10.709 11.986 		 SSR: 162.8903 
+> linVECM<-lineVar(zeroyld, lag=2, model="VECM")
+> lin<-lineVar(zeroyld,lag=2)
+> 
+> 
+> mods <- list(tvecm=tvecm, linVECM=linVECM, lin=lin, tvar=tvar)
+> mods_nonLIn <- mods[c("tvecm", "tvar")]
+> 
+> 
+> 
+> ## Standard functions
+> sapply(mods, class)
+$tvecm
+[1] "TVECM" "nlVar"
+
+$linVECM
+[1] "VECM"  "VAR"   "nlVar"
+
+$lin
+[1] "VAR"   "nlVar"
+
+$tvar
+[1] "TVAR"  "nlVar"
+
+> sapply(mods, print)
+Model TVECM with  2  thresholds
+
+$Bdown
+                         ECT     Const short.run t -1 long.run t -1
+Equation short.run 0.2226023 0.5698814      0.2244073  -0.136190681
+Equation long.run  1.0935615 1.9832101      0.8186019  -0.002427001
+
+$Bmiddle
+                            ECT        Const short.run t -1 long.run t -1
+Equation short.run -0.001818286  0.008678988      0.1112658    0.06567174
+Equation long.run   0.021794525 -0.004663874      0.3392230    0.23318881
+
+$Bup
+                           ECT       Const short.run t -1 long.run t -1
+Equation short.run -0.03654149  0.04545852    -0.10772057    0.04261369
+Equation long.run   0.09836556 -0.07041546     0.09321772   -0.03159638
+
+
+Threshold value[1] -1.414  0.643
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
+                   short.run -2 long.run -2
+Equation short.run  -0.04290810 -0.02323537
+Equation long.run   -0.02727195 -0.07024155
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.06729104    1.0311341  0.02329517  -0.05255831 -0.00905873
+Equation long.run  0.03657482    0.4066159  0.95954683  -0.33196199 -0.04690559
+Model TVAR with  2  thresholds
+
+$Bdown
+                    Intercept short.run -1 long.run -1
+Equation short.run 0.04572943    0.9793942  0.01783035
+Equation long.run  0.01061130    0.0474415  0.94923720
+
+$Bmiddle
+                   Intercept short.run -1 long.run -1
+Equation short.run  6.231462    0.2406308   0.2463688
+Equation long.run   9.130317   -1.2924932   1.5753229
+
+$Bup
+                   Intercept short.run -1 long.run -1
+Equation short.run 1.2234188    0.9246711 -0.02455317
+Equation long.run  0.9491886    0.2091544  0.70126696
+
+
+Threshold value[1] "10.709 11.986"
+$tvecm
+[1] -1.414  0.643
+
+$linVECM
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
+                   short.run -2 long.run -2
+Equation short.run  -0.04290810 -0.02323537
+Equation long.run   -0.02727195 -0.07024155
+
+$lin
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.06729104    1.0311341  0.02329517  -0.05255831 -0.00905873
+Equation long.run  0.03657482    0.4066159  0.95954683  -0.33196199 -0.04690559
+
+$tvar
+[1] "10.709 11.986"
+
+> sapply(mods, summary)
+$tvecm
+#############
+###Model TVECM
+#############
+Full sample size: 482 	End sample size: 480
+Number of variables: 2 	Number of estimated parameters 24
+AIC -2220.684 	BIC -2112.165 	SSR 155.6996 
+
+
+Cointegrating vector: (1, - 1.057203 )
+$Bdown
+                   ECT                Const              short.run t -1  
+Equation short.run 0.2226(0.0221)*    0.5699(0.0046)**   0.2244(0.1984)  
+Equation long.run  1.0936(1.6e-11)*** 1.9832(2.6e-09)*** 0.8186(0.0042)**
+                   long.run t -1   
+Equation short.run -0.1362(0.1465) 
+Equation long.run  -0.0024(0.9873) 
+
+$Bmiddle
+                   ECT              Const            short.run t -1 
+Equation short.run -0.0018(0.9620)  0.0087(0.6573)   0.1113(0.3087) 
+Equation long.run  0.0218(0.7263)   -0.0047(0.8839)  0.3392(0.0576).
+                   long.run t -1  
+Equation short.run 0.0657(0.2424) 
+Equation long.run  0.2332(0.0112)*
+
+$Bup
+                   ECT              Const            short.run t -1  
+Equation short.run -0.0365(0.5354)  0.0455(0.5218)   -0.1077(0.2964) 
+Equation long.run  0.0984(0.3070)   -0.0704(0.5434)  0.0932(0.5798)  
+                   long.run t -1   
+Equation short.run 0.0426(0.5534)  
+Equation long.run  -0.0316(0.7878) 
+
+
+Threshold
+Values: -1.414 0.643
+Percentage of Observations in each regime 6.7% 52.9% 40.4% 
+
+$linVECM
+#############
+###Model VECM 
+#############
+Full sample size: 482 	End sample size: 479
+Number of variables: 2 	Number of estimated slope parameters 12
+AIC -2144.536 	BIC -2090.304 	SSR 175.0327
+Cointegrating vector (estimated by 2OLS):
+   short.run  long.run
+r1         1 -1.059351
+
+
+                   ECT                 Intercept           short.run -1      
+Equation short.run -0.0146(0.0151)     0.0157(0.0146)      0.0361(0.0687)    
+Equation long.run  0.0751(0.0258)**    -0.0122(0.0250)     0.3095(0.1178)**  
+                   long.run -1        short.run -2        long.run -2        
+Equation short.run 0.0235(0.0399)     -0.0429(0.0692)     -0.0232(0.0392)    
+Equation long.run  0.0667(0.0684)     -0.0273(0.1185)     -0.0702(0.0672)    
+
+$lin
+#############
+###Model VAR 
+#############
+Full sample size: 482 	End sample size: 480
+Number of variables: 2 	Number of estimated slope parameters 10
+AIC -2156.469 	BIC -2114.731 	SSR 175.6268
+
+                   Intercept          short.run -1      long.run -1       
+Equation short.run 0.0673(0.0348).    1.0311(0.0695)*** 0.0233(0.0395)    
+Equation long.run  0.0366(0.0597)     0.4066(0.1195)*** 0.9595(0.0679)*** 
+                   short.run -2        long.run -2        
+Equation short.run -0.0526(0.0681)     -0.0091(0.0392)    
+Equation long.run  -0.3320(0.1171)**   -0.0469(0.0673)    
+
+$tvar
+Model TVAR with  2  thresholds
+
+Full sample size: 482 	End sample size: 481
+Number of variables: 2 	Number of estimated parameters: 18 + 2
+AIC -2181.938 	BIC -2098.421 	 SSR 162.8903 
+
+[[1]]
+                   Intercept       short.run -1      long.run -1      
+Equation short.run 0.0457(0.0400)  0.9794(0.0184)*** 0.0178(0.0178)   
+Equation long.run  0.0106(0.0678)  0.0474(0.0313)    0.9492(0.0301)***
+
+[[2]]
+                   Intercept        short.run -1       long.run -1      
+Equation short.run 6.2315(1.9818)** 0.2406(0.1879)     0.2464(0.0561)***
+Equation long.run  9.1303(3.3599)** -1.2925(0.3186)*** 1.5753(0.0951)***
+
+[[3]]
+                   Intercept       short.run -1      long.run -1      
+Equation short.run 1.2234(0.9440)  0.9247(0.0814)*** -0.0246(0.0397)  
+Equation long.run  0.9492(1.6005)  0.2092(0.1381)    0.7013(0.0673)***
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Threshold value: 10.709 11.986
+Percentage of Observations in each regime: 88.4% 5.4% 6.2% 
+
+> 
+> sapply(mods, coef)
+$tvecm
+$tvecm$Bdown
+                         ECT     Const short.run t -1 long.run t -1
+Equation short.run 0.2226023 0.5698814      0.2244073  -0.136190681
+Equation long.run  1.0935615 1.9832101      0.8186019  -0.002427001
+
+$tvecm$Bmiddle
+                            ECT        Const short.run t -1 long.run t -1
+Equation short.run -0.001818286  0.008678988      0.1112658    0.06567174
+Equation long.run   0.021794525 -0.004663874      0.3392230    0.23318881
+
+$tvecm$Bup
+                           ECT       Const short.run t -1 long.run t -1
+Equation short.run -0.03654149  0.04545852    -0.10772057    0.04261369
+Equation long.run   0.09836556 -0.07041546     0.09321772   -0.03159638
+
+
+$linVECM
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
+                   short.run -2 long.run -2
+Equation short.run  -0.04290810 -0.02323537
+Equation long.run   -0.02727195 -0.07024155
+
+$lin
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.06729104    1.0311341  0.02329517  -0.05255831 -0.00905873
+Equation long.run  0.03657482    0.4066159  0.95954683  -0.33196199 -0.04690559
+
+$tvar
+$tvar$Bdown
+                    Intercept short.run -1 long.run -1
+Equation short.run 0.04572943    0.9793942  0.01783035
+Equation long.run  0.01061130    0.0474415  0.94923720
+
+$tvar$Bmiddle
+                   Intercept short.run -1 long.run -1
+Equation short.run  6.231462    0.2406308   0.2463688
+Equation long.run   9.130317   -1.2924932   1.5753229
+
+$tvar$Bup
+                   Intercept short.run -1 long.run -1
+Equation short.run 1.2234188    0.9246711 -0.02455317
+Equation long.run  0.9491886    0.2091544  0.70126696
+
+
+> sapply(mods, tsDyn:::coefMat.nlVar)
+$tvecm
+                         ECT     Const short.run t -1 long.run t -1
+Equation short.run 0.2226023 0.5698814      0.2244073  -0.136190681
+Equation long.run  1.0935615 1.9832101      0.8186019  -0.002427001
+                            ECT        Const short.run t -1 long.run t -1
+Equation short.run -0.001818286  0.008678988      0.1112658    0.06567174
+Equation long.run   0.021794525 -0.004663874      0.3392230    0.23318881
+                           ECT       Const short.run t -1 long.run t -1
+Equation short.run -0.03654149  0.04545852    -0.10772057    0.04261369
+Equation long.run   0.09836556 -0.07041546     0.09321772   -0.03159638
+
+$linVECM
+                           ECT   Intercept short.run -1 long.run -1
+Equation short.run -0.01462511  0.01574772   0.03605199  0.02351545
+Equation long.run   0.07510479 -0.01217832   0.30947969  0.06668876
+                   short.run -2 long.run -2
+Equation short.run  -0.04290810 -0.02323537
+Equation long.run   -0.02727195 -0.07024155
+
+$lin
+                    Intercept short.run -1 long.run -1 short.run -2 long.run -2
+Equation short.run 0.06729104    1.0311341  0.02329517  -0.05255831 -0.00905873
+Equation long.run  0.03657482    0.4066159  0.95954683  -0.33196199 -0.04690559
+
+$tvar
+                    Intercept short.run -1 long.run -1 Intercept short.run -1
+Equation short.run 0.04572943    0.9793942  0.01783035  6.231462    0.2406308
+Equation long.run  0.01061130    0.0474415  0.94923720  9.130317   -1.2924932
+                   long.run -1 Intercept short.run -1 long.run -1
+Equation short.run   0.2463688 1.2234188    0.9246711 -0.02455317
+Equation long.run    1.5753229 0.9491886    0.2091544  0.70126696
+
+> sapply(mods, tsDyn:::coefVec.nlVar)
+$tvecm
+                                          [,1]
+ECT Equation short.run             0.222602297
+Const Equation short.run           0.569881377
+short.run t -1 Equation short.run  0.224407341
+long.run t -1 Equation short.run  -0.136190681
+ECT Equation short.run            -0.001818286
+Const Equation short.run           0.008678988
+short.run t -1 Equation short.run  0.111265799
+long.run t -1 Equation short.run   0.065671736
+ECT Equation short.run            -0.036541489
+Const Equation short.run           0.045458524
+short.run t -1 Equation short.run -0.107720572
+long.run t -1 Equation short.run   0.042613692
+ECT Equation long.run              1.093561460
+Const Equation long.run            1.983210084
+short.run t -1 Equation long.run   0.818601881
+long.run t -1 Equation long.run   -0.002427001
+ECT Equation long.run              0.021794525
+Const Equation long.run           -0.004663874
+short.run t -1 Equation long.run   0.339222985
+long.run t -1 Equation long.run    0.233188810
+ECT Equation long.run              0.098365561
+Const Equation long.run           -0.070415458
+short.run t -1 Equation long.run   0.093217722
+long.run t -1 Equation long.run   -0.031596375
+
+$linVECM
+                                       [,1]
+ECT Equation short.run          -0.01462511
+Intercept Equation short.run     0.01574772
+short.run -1 Equation short.run  0.03605199
+long.run -1 Equation short.run   0.02351545
+short.run -2 Equation short.run -0.04290810
+long.run -2 Equation short.run  -0.02323537
+ECT Equation long.run            0.07510479
+Intercept Equation long.run     -0.01217832
+short.run -1 Equation long.run   0.30947969
+long.run -1 Equation long.run    0.06668876
+short.run -2 Equation long.run  -0.02727195
+long.run -2 Equation long.run   -0.07024155
+
+$lin
+                                       [,1]
+Intercept Equation short.run     0.06729104
+short.run -1 Equation short.run  1.03113410
+long.run -1 Equation short.run   0.02329517
+short.run -2 Equation short.run -0.05255831
+long.run -2 Equation short.run  -0.00905873
+Intercept Equation long.run      0.03657482
+short.run -1 Equation long.run   0.40661594
+long.run -1 Equation long.run    0.95954683
+short.run -2 Equation long.run  -0.33196199
+long.run -2 Equation long.run   -0.04690559
+
+$tvar
+                                       [,1]
+Intercept Equation short.run     0.04572943
+short.run -1 Equation short.run  0.97939418
+long.run -1 Equation short.run   0.01783035
+Intercept Equation short.run     6.23146188
+short.run -1 Equation short.run  0.24063084
+long.run -1 Equation short.run   0.24636882
+Intercept Equation short.run     1.22341880
+short.run -1 Equation short.run  0.92467108
+long.run -1 Equation short.run  -0.02455317
+Intercept Equation long.run      0.01061130
+short.run -1 Equation long.run   0.04744150
+long.run -1 Equation long.run    0.94923720
+Intercept Equation long.run      9.13031664
+short.run -1 Equation long.run  -1.29249321
+long.run -1 Equation long.run    1.57532295
+Intercept Equation long.run      0.94918861
+short.run -1 Equation long.run   0.20915436
+long.run -1 Equation long.run    0.70126696
+
+> 
+> sapply(mods, AIC)
+    tvecm   linVECM       lin      tvar 
+-2220.684 -2144.536 -2156.469 -2181.938 
+> sapply(mods, BIC)
+    tvecm   linVECM       lin      tvar 
+-2112.165 -2090.304 -2114.731 -2098.421 
+> sapply(mods, logLik)
+      tvecm     linVECM         lin        tvar 
+-225.839137   -4.531391 -273.946563 -254.049899 
+> sapply(mods, deviance)
+   tvecm  linVECM      lin     tvar 
+155.6996 175.0327 175.6268 162.8903 
+> sapply(mods, function(x) head(residuals(x), 3))
+            tvecm      linVECM         lin        tvar
+[1,]  0.049395340  0.078376233  0.01779303  0.03417027
+[2,]  0.063981282  0.152988743  0.04484708  0.03500335
+[3,]  0.138208376 -0.059585406  0.11091972  0.06341172
+[4,]  0.193936690 -0.044023062  0.12821526 -0.06422468
+[5,] -0.065673036 -0.004666217 -0.07471015  0.17826362
+[6,] -0.005925491 -0.081704546 -0.05732029 -0.01966223
+> sapply(mods, function(x) tail(residuals(x), 3))
+            tvecm      linVECM         lin         tvar
+[1,] -0.178474097 -0.219251054 -0.18756839 -0.216980265
+[2,] -0.052429800 -0.035569506 -0.01003335 -0.034755745
+[3,]  0.006681062 -0.009445123  0.01720701  0.004088895
+[4,] -0.305133646 -0.379418450 -0.33627758 -0.463140023
+[5,] -0.319761342 -0.283437726 -0.26405055 -0.358710699
+[6,] -0.150779325 -0.178760346 -0.14254313 -0.161884919
+> 
+> sapply(mods, function(x) head(fitted(x), 3))
+          tvecm     linVECM      lin     tvar
+[1,] 0.01260466 0.014623767 2.290207 2.211830
+[2,] 0.02901872 0.004011257 2.356153 2.272997
+[3,] 0.01879162 0.008585406 2.447080 2.337588
+[4,] 0.02306331 0.055023062 1.633785 1.609225
+[5,] 0.07667304 0.039666217 1.847710 1.583736
+[6,] 0.04092549 0.083704546 1.865320 1.792662
+> sapply(mods, function(x) tail(fitted(x), 3))
+            tvecm      linVECM      lin     tvar
+[1,] -0.034525903  0.006251054 8.290568 8.319980
+[2,]  0.018429800  0.001569506 8.079033 8.103756
+[3,] -0.006681062  0.009445123 8.051793 8.064911
+[4,] -0.121866354 -0.047581550 7.178278 7.305140
+[5,]  0.008761342 -0.027562274 6.795051 6.889711
+[6,]  0.050779325  0.078760346 6.573543 6.592885
+> 
+> 
+> ## NOn linear functions
+> sapply(mods_nonLIn, function(x) head(regime(x), 3))
+     tvecm tvar
+[1,]    NA   NA
+[2,]    NA    1
+[3,]     2    1
+> sapply(mods_nonLIn, function(x) tail(regime(x), 3))
+     tvecm tvar
+[1,]     2    1
+[2,]     3    1
+[3,]     3    1
+> 
+> sapply(mods_nonLIn, function(x) head(regime(x, initVal=FALSE), 3))
+     tvecm tvar
+[1,]     2    1
+[2,]     2    1
+[3,]     2    1
+> sapply(mods_nonLIn, function(x) tail(regime(x, initVal=FALSE), 3))
+     tvecm tvar
+[1,]     2    1
+[2,]     3    1
+[3,]     3    1
+> 
+> sapply(mods_nonLIn, function(x) head(regime(x, time=FALSE), 3))
+     tvecm tvar
+[1,]    NA   NA
+[2,]    NA    1
+[3,]     2    1
+> sapply(mods_nonLIn, function(x) head(regime(x, time=FALSE, initVal=FALSE), 3))
+     tvecm tvar
+[1,]     2    1
+[2,]     2    1
+[3,]     2    1
+> 
+> 
+> ## toLatex
+> sapply(mods, toLatex)
+$tvecm
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+\Delta X_{t}^{1} \\ \Delta X_{t}^{2}
+\end{smatrix}=
+\left\{
+\begin{array}{ll}
+\begin{smatrix} %ECT
+0.2226 \\ 1.0936
+\end{smatrix}ECT_{-1}+
+\begin{smatrix}     %const
+0.5699 \\ 1.9832
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.2244 & -0.1362 \\
+0.8186 & -0.0024 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}< -1.414 \\
+\begin{smatrix} %ECT
+-0.0018 \\ 0.0218
+\end{smatrix}ECT_{-1}+
+\begin{smatrix}     %const
+0.0087 \\ -0.0047
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.1113 & 0.0657 \\
+0.3392 & 0.2332 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
+& \text{if } -1.414 < \text{Th} < 0.643 \\
+\begin{smatrix} %ECT
+-0.0365 \\ 0.0984
+\end{smatrix}ECT_{-1}+
+\begin{smatrix}     %const
+0.0455 \\ -0.0704
+\end{smatrix}
++\begin{smatrix}      %Lag1
+-0.1077 & 0.0426 \\
+0.0932 & -0.0316 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}> 0.643 \\
+\end{array}
+\right.
+\end{equation}
+
+$linVECM
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+\Delta X_{t}^{1} \\ \Delta X_{t}^{2}
+\end{smatrix}=
++\begin{smatrix}  %ECT
+-0.0146 \\ 0.0751
+\end{smatrix}ECT_{-1}
+\begin{smatrix}     %const
+0.0157 \\ -0.0122
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.0361 & 0.0235 \\
+0.3095 & 0.0667 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
++\begin{smatrix}      %Lag2
+-0.0429 & -0.0232 \\
+-0.0273 & -0.0702 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-2}^{1} \\ \Delta X_{t-2}^{2}
+\end{smatrix}
+\end{equation}
+
+$lin
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+X_{t}^{1} \\ X_{t}^{2}
+\end{smatrix}=
+\begin{smatrix}     %const
+0.0673 \\ 0.0366
+\end{smatrix}
++\begin{smatrix}      %Lag1
+1.0311 & 0.0233 \\
+0.4066 & 0.9595 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
++\begin{smatrix}      %Lag2
+-0.0526 & -0.0091 \\
+-0.3320 & -0.0469 
+\end{smatrix}
+\begin{smatrix}
+X_{t-2}^{1} \\ X_{t-2}^{2}
+\end{smatrix}
+\end{equation}
+
+$tvar
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+X_{t}^{1} \\ X_{t}^{2}
+\end{smatrix}=
+\left\{
+\begin{array}{ll}
+\begin{smatrix}     %const
+0.0457 \\ 0.0106
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.9794 & 0.0178 \\
+0.0474 & 0.9492 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}< 10.709 \\
+\begin{smatrix}     %const
+6.2315 \\ 9.1303
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.2406 & 0.2464 \\
+-1.2925 & 1.5753 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
+& \text{if } 10.709 < \text{Th} < 11.986 \\
+\begin{smatrix}     %const
+1.2234 \\ 0.9492
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.9247 & -0.0246 \\
+0.2092 & 0.7013 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}> 11.986 \\
+\end{array}
+\right.
+\end{equation}
+
+> options(show.signif.stars=FALSE)
+> sapply(mods, function(x) toLatex(summary(x)))
+$tvecm
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+\Delta X_{t}^{1} \\ \Delta X_{t}^{2}
+\end{smatrix}=
+\left\{
+\begin{array}{ll}
+\begin{smatrix} %ECT
+0.2226(0.0970) \\ 1.0936(0.1583)
+\end{smatrix}ECT_{-1}+
+\begin{smatrix}     %const
+0.5699(0.2001) \\ 1.9832(0.3267)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.2244(0.1742) & -0.1362(0.0936) \\
+0.8186(0.2845) & -0.0024(0.1529) 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}< -1.414 \\
+\begin{smatrix} %ECT
+-0.0018(0.0381) \\ 0.0218(0.0622)
+\end{smatrix}ECT_{-1}+
+\begin{smatrix}     %const
+0.0087(0.0195) \\ -0.0047(0.0319)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.1113(0.1092) & 0.0657(0.0561) \\
+0.3392(0.1782) & 0.2332(0.0916) 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
+& \text{if } -1.414 < \text{Th} < 0.643 \\
+\begin{smatrix} %ECT
+-0.0365(0.0589) \\ 0.0984(0.0962)
+\end{smatrix}ECT_{-1}+
+\begin{smatrix}     %const
+0.0455(0.0709) \\ -0.0704(0.1158)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+-0.1077(0.1031) & 0.0426(0.0719) \\
+0.0932(0.1682) & -0.0316(0.1173) 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}> 0.643 \\
+\end{array}
+\right.
+\end{equation}
+
+$linVECM
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+\Delta X_{t}^{1} \\ \Delta X_{t}^{2}
+\end{smatrix}=
++\begin{smatrix}  %ECT
+-0.0146(0.0151) \\ 0.0751(0.0258)
+\end{smatrix}ECT_{-1}
+\begin{smatrix}     %const
+0.0157(0.0146) \\ -0.0122(0.0250)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.0361(0.0687) & 0.0235(0.0399) \\
+0.3095(0.1178) & 0.0667(0.0684) 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-1}^{1} \\ \Delta X_{t-1}^{2}
+\end{smatrix}
++\begin{smatrix}      %Lag2
+-0.0429(0.0692) & -0.0232(0.0392) \\
+-0.0273(0.1185) & -0.0702(0.0672) 
+\end{smatrix}
+\begin{smatrix}
+\Delta X_{t-2}^{1} \\ \Delta X_{t-2}^{2}
+\end{smatrix}
+\end{equation}
+
+$lin
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+X_{t}^{1} \\ X_{t}^{2}
+\end{smatrix}=
+\begin{smatrix}     %const
+0.0673(0.0348) \\ 0.0366(0.0597)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+1.0311(0.0695) & 0.0233(0.0395) \\
+0.4066(0.1195) & 0.9595(0.0679) 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
++\begin{smatrix}      %Lag2
+-0.0526(0.0681) & -0.0091(0.0392) \\
+-0.3320(0.1171) & -0.0469(0.0673) 
+\end{smatrix}
+\begin{smatrix}
+X_{t-2}^{1} \\ X_{t-2}^{2}
+\end{smatrix}
+\end{equation}
+
+$tvar
+%insert in the preamble and uncomment the line you want for usual /medium /small matrix
+%\usepackage{amsmath} \newenvironment{smatrix}{\begin{pmatrix}}{\end{pmatrix}} %USUAL
+%\usepackage{amsmath} \newenvironment{smatrix}{\left(\begin{smallmatrix}}{\end{smallmatrix}\right)} %SMALL
+%\usepackage{nccmath} \newenvironment{smatrix}{\left(\begin{mmatrix}}{\end{mmatrix}\right)} %MEDIUM
+\begin{equation}
+\begin{smatrix} %explained vector
+X_{t}^{1} \\ X_{t}^{2}
+\end{smatrix}=
+\left\{
+\begin{array}{ll}
+\begin{smatrix}     %const
+0.0457(0.0400) \\ 0.0106(0.0678)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.9794(0.0184) & 0.0178(0.0178) \\
+0.0474(0.0313) & 0.9492(0.0301) 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}< 10.709 \\
+\begin{smatrix}     %const
+6.2315(1.9818) \\ 9.1303(3.3599)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.2406(0.1879) & 0.2464(0.0561) \\
+-1.2925(0.3186) & 1.5753(0.0951) 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
+& \text{if } 10.709 < \text{Th} < 11.986 \\
+\begin{smatrix}     %const
+1.2234(0.9440) \\ 0.9492(1.6005)
+\end{smatrix}
++\begin{smatrix}      %Lag1
+0.9247(0.0814) & -0.0246(0.0397) \\
+0.2092(0.1381) & 0.7013(0.0673) 
+\end{smatrix}
+\begin{smatrix}
+X_{t-1}^{1} \\ X_{t-1}^{2}
+\end{smatrix}
+& \text{if Th}> 11.986 \\
+\end{array}
+\right.
+\end{equation}
+
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  2.327   0.092   2.407 
