@@ -1,4 +1,10 @@
-Version 0.9-47: Matthieu Stigler (15/5/2018)
+Version 0.9-48: Matthieu Stigler (20/5/2018)
+ -minor: fix two issues in R test, reduce tolerance
+ -minor: create internal coefVec
+ -minor: new nlVar methods tets file
+ -minor: adjust slightly the example from TVAR, TVECM
+
+Version 0.9-47: Matthieu Stigler (15/5/2018)   never published on CRAN
  -fix small issue in lstar code.
 
 Version 0.9-46: Matthieu Stigler (21/1/2018)
