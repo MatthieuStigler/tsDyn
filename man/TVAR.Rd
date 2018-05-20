@@ -87,15 +87,15 @@ given delay, is there rather to check the consistency of the method nthresh=2
 
 data(zeroyld)
 
-data<-zeroyld
+tv <- TVAR(zeroyld, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=FALSE)
 
-TVAR(data, lag=2, nthresh=2, thDelay=1, trim=0.1, mTh=1, plot=TRUE)
+print(tv)
+summary(tv)
 
-##The one threshold (two regimes) gives a value of 10.698 for the threshold and 1 for the delay. 
-#Conditional on this values, the search for a second threshold (three regimes) gives 8.129. 
-#Starting from this values, a full grid search finds the same values and confims 
-#the first step estimation. 
-
+# a few useful methods:
+plot(tv)
+predict(tv)
+c(AIC(tv), BIC(tv), logLik(tv))
 }
 \references{
 Lo and Zivot (2001) "Threshold Cointegration and Nonlinear
