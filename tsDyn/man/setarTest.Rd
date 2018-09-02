@@ -46,11 +46,11 @@ Three test are avalaible. The both first can be seen as linearity test, whereas 
 
 Test \bold{1vs}2: Linear AR versus 1 threshold TAR
 
-Test \bold{1vs}3: Linear AR versus 2 threshold2 TAR
+Test \bold{1vs}3: Linear AR versus 2 thresholds TAR
 
-Test \bold{2vs3}: 1 threshold TAR versus 2 threshold2 TAR  
+Test \bold{2vs3}: 1 threshold TAR versus 2 thresholds TAR  
 
-The both first are computed together and avalaible with test="1vs". The third test is avalaible with test="2vs3". 
+The two first tests are computed together and avalaible with test="1vs". The third test is avalaible with test="2vs3". 
 
 The homoskedastic bootstrap distribution is based on resampling the residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3), estimating the threshold parameter and then computing the Ftest, so it involves many computations and is pretty slow. 
 }
