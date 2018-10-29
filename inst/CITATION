@@ -1,4 +1,14 @@
- citHeader("To cite package 'tsDyn' in publications use:")
+citHeader("To cite package 'tsDyn' in publications use:")
+
+citEntry(entry="Manual",
+	title = "Threshold cointegration: overview and implementation in R",
+	author = "Matthieu Stigler",
+	booktitle = "Handbook of Statistics, Volume 41",
+	publisher = "Elsevier",
+	editor = "Hrishikesh Vinod",
+	year = 2019,
+	textVersion = "Matthieu Stigler (2019). tsDyn: Threshold cointegration: overview and implementation in R, Handbook of Statistics, Volume 41, Elsevier")
+
 
 citEntry(entry="Manual",
 	title = "tsDyn: Time series analysis based on dynamical systems theory",
@@ -10,10 +20,3 @@ citEntry(entry="Manual",
         url  = "https://cran.r-project.org/package=tsDyn/vignettes/tsDyn.pdf",
 	textVersion = "Antonio, Fabio Di Narzo, Jose Luis Aznarte and Matthieu Stigler (2009). tsDyn: Time series analysis based on dynamical systems theory")
 
-citEntry(entry="Manual",
-	title = "Threshold cointegration: overview and implementation in R",
-	author = "Matthieu Stigler",
-	year = 2010,
-	note = "R package version 0.7-2",
-        url  = "https://cran.r-project.org/package=tsDyn/vignettes/ThCointOverview.pdf",
-	textVersion = "Matthieu Stigler (2010). tsDyn: Threshold cointegration: overview and implementation in R")
