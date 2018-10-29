@@ -503,11 +503,13 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 
   if(test=="1vs"){
     CriticalValBoot<-rbind(CriticalValBoot12,CriticalValBoot13)
+    rownames(CriticalValBoot) <-  c("1vs2", "1vs3")
     PvalBoot<-c(PvalBoot12,PvalBoot13)
     names(PvalBoot)<-c("1vs2", "1vs3")
   } else {
-    CriticalValBoot<-CriticalValBoot23
-    PvalBoot<-PvalBoot23
+    CriticalValBoot <- matrix(CriticalValBoot23, nrow = 1,
+                              dimnames = list("2vs3", names(CriticalValBoot23)))
+    PvalBoot <- PvalBoot23
   }
 
 
@@ -542,7 +544,8 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
 #### RETURN RESULT
 #nlar=extend(nlar(str, coef = res$coef, fit = res$fitted.values, res = res$residuals, k = res$k,
 #list( model.specific = res),"setar")
-  res<-list(bestDelay=bestDelay, LRtest.val=LRs, Pvalueboot=PvalBoot, CriticalValBoot=CriticalValBoot, type="test")
+  res<-list(bestDelay=bestDelay, LRtest.val=LRs, Pvalueboot=PvalBoot, CriticalValBoot=CriticalValBoot,
+            type= test)
   class(res)<-"TVARtest"
   return(res)
 }#End of thw whole function
@@ -559,10 +562,16 @@ summary.TVARtest<-function(object,...){
   LR<-rbind(object$LRtest.val,object$Pvalueboot)
   rownames(LR)<-c("Test", "P-Val")
   print(LR)
-  cat("\n Bootstrap critical values for test 1 vs 2 regimes\n")
-  print(object$CriticalValBoot[1,])
-  cat("\n Bootstrap critical values for test 1 vs 3 regimes\n")
-  print(object$CriticalValBoot[2,])
+  
+  if(object$type == "1vs") {
+    cat("\n Bootstrap critical values for test 1 vs 2 regimes\n")
+    print(object$CriticalValBoot[1,])
+    cat("\n Bootstrap critical values for test 1 vs 3 regimes\n")
+    print(object$CriticalValBoot[2,])
+  } else if(object$type=="2vs3") {
+    cat("\n Bootstrap critical values for test 2 vs 3 regimes\n")
+    print(object$CriticalValBoot[1,])
+  }
 }
 
 
