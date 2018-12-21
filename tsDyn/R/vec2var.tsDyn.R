@@ -195,7 +195,7 @@ vec2var.tsDyn <- function(x){
 
 ## A
   A <- list()
-  for(i in 1:lag) A[[i]] <- co[,grep(paste("\\.l", i, sep=""), colnames(co)), drop=FALSE]
+  for(i in 1:lag) A[[i]] <- co[,grep(paste("\\.l", i, "$", sep=""), colnames(co)), drop=FALSE]
   names(A) <- paste("A", 1:lag, sep="")
 
 ## Rank
