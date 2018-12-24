@@ -1,1 +1,7 @@
-^README\.Rmd$
+^data-raw$
+^man-roxygen$
+^.*\.Rproj$
+^\.Rproj\.user$
+^revdep$
+#^README\.Rmd$
+
