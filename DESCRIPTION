@@ -16,3 +16,4 @@ URL: http://github.com/MatthieuStigler/tsDyn/wiki
 BugReports: https://github.com/MatthieuStigler/tsDyn/issues
 MailingList: tsdyn@googlegroups.com
 RoxygenNote: 6.0.1
+LazyData: true
