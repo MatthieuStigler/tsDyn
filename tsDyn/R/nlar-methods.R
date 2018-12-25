@@ -145,19 +145,19 @@ nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                 ))
 }
 
-#' @S3method print nlar
+#' @export print nlar
 #Print nlar object
 print.nlar <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   cat("\nNon linear autoregressive model\n")
   invisible(x)
 }
 
-#' @S3method coef nlar
+#' @export coef nlar
 #Coefficients of a nlar.fit object
 coef.nlar <- function(object, ...)
   object$coefficients
 
-#' @S3method fitted nlar
+#' @export fitted nlar
 #Fitted values for the fitted nlar object
 fitted.nlar <- function(object, ...) {
   ans <- c(rep(NA, object$str$n.used - length(object$fitted.values)), object$fitted.values)
@@ -166,7 +166,7 @@ fitted.nlar <- function(object, ...) {
   ans
 }
 
-#' @S3method residuals nlar
+#' @export residuals nlar
 #Observed residuals for the fitted nlar object
 residuals.nlar <- function(object, ...) {
   str <- object$str
@@ -211,7 +211,7 @@ regime <- function (object, initVal=TRUE,timeAttr=TRUE,...)
 regime.default <- function(object, initVal=TRUE,timeAttr=TRUE,...)
   NULL
 
-#' @S3method regime setar
+#' @export regime setar
 regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
   str <- object$str
@@ -234,7 +234,7 @@ regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   return(ans)
 }
             
-#' @S3method regime nlVar           
+#' @export regime nlVar           
 regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
   
@@ -256,7 +256,7 @@ regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   return(ans)
 }
 
-#' @S3method regime lstar
+#' @export regime lstar
 regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...){
 
   thVar <- object$model.specific$thVar
@@ -315,7 +315,7 @@ getTh<- function (object, ...)
 
 #' @rdname getTh
 #' @method getTh default
-#' @S3method getTh default
+#' @export getTh default
 getTh.default <- function(object, ...){
   # look first just in object
   allth<-object[grep("th",names(object))]
@@ -330,13 +330,13 @@ getTh.default <- function(object, ...){
   return(allth)
 }
 
-#' @S3method getTh setar
+#' @export getTh setar
 getTh.setar<-function(object,...){
   object<-object$coefficients
   getTh.default(object)
 }
 
-#' @S3method getTh lstar
+#' @export getTh lstar
 getTh.lstar<-function(object,...){
   object<-object$coefficients
   getTh.default(object)
@@ -347,12 +347,12 @@ getTh.lstar<-function(object,...){
   object["th"]
 }
 
-#' @S3method getTh summary.setar
+#' @export getTh summary.setar
 getTh.summary.setar<-function(object,...){
   object$th
 }
 
-#' @S3method getTh nlVar
+#' @export getTh nlVar
 getTh.nlVar<-function(object,...){
   nth <- object$model.specific$nthresh
 
@@ -371,7 +371,7 @@ getTh.nlVar<-function(object,...){
 }
 
 
-#' @S3method deviance nlar
+#' @export deviance nlar
 #Observed residuals for the fitted nlar object
 deviance.nlar<-function(object,...) crossprod(object$residuals)
 
@@ -396,15 +396,15 @@ mse <- function (object, ...)
 
 #' @rdname mse
 #' @method mse default
-#' @S3method mse default
+#' @export mse default
 mse.default <- function(object, ...)
   NULL
 
-#' @S3method mse nlar
+#' @export mse nlar
 mse.nlar <- function(object, ...)
   sum(object$residuals^2)/object$str$n.used
 
-#' @S3method AIC nlar
+#' @export AIC nlar
 #AIC for the fitted nlar model
 AIC.nlar <- function(object,k=2, ...){
   n <- object$str$n.used
@@ -412,7 +412,7 @@ AIC.nlar <- function(object,k=2, ...){
   n * log( mse(object) ) + k * npar
 }
 
-#' @S3method BIC nlar
+#' @export BIC nlar
 #BIC for the fitted nlar model
 BIC.nlar <- function(object, ...)
 	AIC.nlar(object, k=log(getNUsed(object)))
@@ -440,17 +440,17 @@ MAPE <- function(object, ...)
 
 #' @rdname MAPE
 #' @method MAPE default
-#' @S3method MAPE default
+#' @export MAPE default
 MAPE.default <- function(object, ...)
   NULL
 
-#' @S3method MAPE nlar
+#' @export MAPE nlar
 MAPE.nlar <- function(object, ...) {
   e <- abs(object$residuals/object$str$yy)
   mean( e[is.finite(e)] )
 }
 
-#' @S3method summary nlar
+#' @export summary nlar
 #Computes summary infos for the fitted nlar model
 summary.nlar <- function(object, ...) {
   ans <- list()
@@ -463,7 +463,7 @@ summary.nlar <- function(object, ...) {
   return(extend(list(), "summary.nlar", listV=ans))
 }
 
-#' @S3method print summary.nlar
+#' @export print summary.nlar
 #Prints summary infos for the fitted nlar model
 print.summary.nlar <- function(x, ...) {
   print(x$object)
@@ -476,7 +476,7 @@ print.summary.nlar <- function(x, ...) {
   invisible(x)
 }
 
-#' @S3method plot nlar
+#' @export plot nlar
 plot.nlar <- function(x, ask = interactive(), ...) {
   str <- x$str
   op <- par(no.readonly=TRUE)

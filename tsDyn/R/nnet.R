@@ -34,7 +34,7 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 		model.specific=res), "nnetTs"))
 }
 
-#' @S3method print nnetTs
+#' @export print nnetTs
 print.nnetTs <- function(x, ...) {
 	NextMethod(...)
 	cat("\nNNET time series model\n")

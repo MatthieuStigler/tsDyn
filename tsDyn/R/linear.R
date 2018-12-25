@@ -69,7 +69,7 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 		"linear"))
 }
 
-#' @S3method print linear
+#' @export print linear
 print.linear <- function(x, ...) {
 	NextMethod(...)
 	cat("\nAR model\n")
@@ -78,7 +78,7 @@ print.linear <- function(x, ...) {
 	invisible(x)
 }
 
-#' @S3method summary linear
+#' @export summary linear
 summary.linear <- function(object, ...) {
 	ans <- list()
 	obj <- c(object, object$model.specific)
@@ -97,7 +97,7 @@ summary.linear <- function(object, ...) {
 	return( extend(summary.nlar(object, ...), "summary.linear", listV=ans) )
 }
 
-#' @S3method print summary.linear
+#' @export print summary.linear
 print.summary.linear <- function(x, digits=max(3, getOption("digits") - 2),
 	signif.stars = getOption("show.signif.stars"), ...) {
 	NextMethod(...)

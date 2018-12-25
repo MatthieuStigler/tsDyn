@@ -262,7 +262,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 addRegime <- function(object, ...)
   UseMethod("addRegime")
 
-#' @S3method addRegime star
+#' @export addRegime star
 addRegime.star <- function(object, ...)
 {
 
@@ -1003,7 +1003,7 @@ oneStep.star <- function(object, newdata, itime, thVar, ...)
   
 }
 
-#' @S3method print star
+#' @export print star
 print.star <- function(x, ...) {
   NextMethod(...)
   cat("\nMultiple regime STAR model\n\n")

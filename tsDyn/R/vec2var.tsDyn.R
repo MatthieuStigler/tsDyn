@@ -34,7 +34,7 @@ VARrep  <- function (object, ...)
 
 #' @rdname VARrep
 #' @method VARrep VECM
-#' @S3method VARrep VECM
+#' @export VARrep VECM
 VARrep.VECM <- function(object, ...) {
 
   lag <- object$lag
@@ -102,7 +102,7 @@ VARrep.VECM <- function(object, ...) {
 
 #' @rdname VARrep
 #' @method VARrep VAR
-#' @S3method VARrep VAR
+#' @export VARrep VAR
 VARrep.VAR <- function(object, ...) {
 
   I <- attr(object, "varsLevel")
@@ -246,8 +246,8 @@ predictOld.VECM <- function(object,...){
  predict(vec2var.tsDyn(object), ...)
 }
 
-#' @export irf
-#' @S3method irf nlVar
+#' @export irf 
+#' @S3method irf 
 irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
   model <- attr(x, "model")
   if(model=="VECM"){

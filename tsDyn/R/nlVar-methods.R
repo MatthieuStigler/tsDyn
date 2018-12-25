@@ -54,7 +54,7 @@ print.nlVar<-function(object,...){
 #'logLik(VAR)
 #'
 #' @method logLik nlVar
-#' @S3method logLik nlVar
+#' @export logLik nlVar
 logLik.nlVar <- function(object,...){
 	resids<-object$residuals
 	k<-object$k
@@ -112,7 +112,7 @@ logLik.nlVar <- function(object,...){
 #'logLik(vecm)
 #'
 #' @method logLik VECM
-#' @S3method logLik VECM
+#' @export logLik VECM
 logLik.VECM <- function(object,r,...){
   t<-object$t
   k<-object$k
@@ -136,7 +136,7 @@ getP <- function(object) UseMethod("getP")
 getP.ca.jo <- function(object) object@P
 getP.cajo.test <- function(object) ncol(object@Z0)
 
-#' @S3method logLik ca.jo
+#' @export logLik ca.jo
 logLik.ca.jo <- function(object,r,...){
   t<-nrow(object@Z0)
   k<-getP(object)
@@ -156,7 +156,7 @@ logLik.ca.jo <- function(object,r,...){
   return(res)
 }
 
-#' @S3method logLik cajo.test
+#' @export logLik cajo.test
 logLik.cajo.test <- function(object,r,...) logLik.ca.jo(object=object, r=r,...)
 
 #### Small function: get number of estimated parameters
@@ -180,7 +180,7 @@ npar.VECM<-function(object, ..., r) {
   return(nPar)
 }
 
-#' @S3method AIC nlVar
+#' @export AIC nlVar
 #### AIC criterions
 AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
@@ -189,7 +189,7 @@ AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object)
 }
 
-#' @S3method AIC VECM
+#' @export AIC VECM
 AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	Rank<-if(missing(r)) object$model.specific$r else r
@@ -198,7 +198,7 @@ AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object, r=Rank)
 }
 
-#' @S3method BIC nlVar
+#' @export BIC nlVar
 #### BIC criterions
 BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
@@ -207,7 +207,7 @@ BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object)
 }
 
-#' @S3method BIC VECM
+#' @export BIC VECM
 BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
 	fitMeasure <- match.arg(fitMeasure)
 	nVar<-object$k
@@ -217,7 +217,7 @@ BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
 	fit+k*npar(object, r=Rank)
 }
 
-#' @S3method deviance nlVar
+#' @export deviance nlVar
 deviance.nlVar<-function(object,...){
 	as.numeric(crossprod(c(object$residuals)))
 }
@@ -274,7 +274,7 @@ residuals.nlVar<-function(object,...){
 #'
 #'
 
-#' @S3method fitted nlVar
+#' @export fitted nlVar
 fitted.nlVar <- function(object, level=c("model", "original"),...){
 
   level <- match.arg(level)
@@ -296,7 +296,7 @@ fitted.nlVar <- function(object, level=c("model", "original"),...){
   return(res)
 }
 
-#' @S3method coef nlVar
+#' @export coef nlVar
 coef.nlVar<-function(object,...){
 	return(object$coefficients)
 }

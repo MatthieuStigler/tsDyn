@@ -173,7 +173,7 @@ lags.select <- function(data, lag.max=10, include = c( "const", "trend","none", 
 
 #' @rdname rank.select
 #' @method print rank.select
-#' @S3method print rank.select
+#' @export print rank.select
 print.rank.select <- function(x,...){
 
   AIC_rank_info <- if(nrow(x$AICs)>1) paste("rank=",x$AIC_min[1,"rank"])
@@ -186,8 +186,24 @@ print.rank.select <- function(x,...){
 }
 
 #' @rdname rank.select
+#' @method as.data.frame rank.select
+#' @export as.data.frame rank.select
+as.data.frame.rank.select <- function(x,...){
+  
+  rs_mins_list <-  lapply(x[c("AIC_min", "BIC_min", "HQ_min")], as.data.frame)
+  rs_mins_df <- do.call("rbind", rs_mins_list)
+  
+  ## add criterion
+  rs_mins_df$criterion <-  c("AIC", "BIC", "HQ")
+  
+  ## clean
+  rownames(rs_mins_df) <- NULL
+  rs_mins_df[, c("criterion", "rank", "lag")]
+}
+
+#' @rdname rank.select
 #' @method summary rank.select
-#' @S3method summary rank.select
+#' @export summary rank.select
 summary.rank.select <- function(object,...){
 
   print.rank.select(object)
