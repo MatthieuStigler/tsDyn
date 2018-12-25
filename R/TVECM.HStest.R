@@ -241,7 +241,7 @@ return(ret)
 #### END OF FUNCTION
 ##################################################################################################################################################################
 
-#' @S3method print TVECMHanSeo02Test
+#' @export print TVECMHanSeo02Test
 ### Print method
 print.TVECMHanSeo02Test<-function(x,...){
   cat("## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##\n\n", sep="")
@@ -255,7 +255,7 @@ print.TVECMHanSeo02Test<-function(x,...){
 
 }
 
-#' @S3method summary TVECMHanSeo02Test
+#' @export summary TVECMHanSeo02Test
 ### Summary method
 summary.TVECMHanSeo02Test<-function(object,...){
   print(object)
@@ -269,7 +269,7 @@ summary.TVECMHanSeo02Test<-function(object,...){
   cat("\nCointegrating value (estimated under restricted linear model):", object$beta,"\n")
 }	
 
-#' @S3method plot TVECMHanSeo02Test
+#' @export plot TVECMHanSeo02Test
 ### Plot method
 plot.TVECMHanSeo02Test<-function(x,which=c("LM values","Density"),...){
   

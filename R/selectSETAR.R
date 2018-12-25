@@ -459,7 +459,7 @@ class(ret)<-"selectSETAR"
 return(ret)
 }
 
-#' @S3method print selectSETAR
+#' @export print selectSETAR
 print.selectSETAR<-function(x,...){
   cat("Results of the grid search for 1 threshold\n")
   if(x$criterion=="SSR"){
@@ -493,7 +493,7 @@ print.selectSETAR<-function(x,...){
 }
 
 
-#' @S3method plot selectSETAR
+#' @export plot selectSETAR
 plot.selectSETAR<-function(x,...){
   if(x$criterion!="SSR")
     stop("Currently only implemented for criterion SSR")

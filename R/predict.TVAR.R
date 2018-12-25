@@ -1,5 +1,5 @@
 #'@rdname predict.VAR
-#'@S3method predict TVAR
+#'@export predict TVAR
 
 predict.TVAR <- function(object, newdata, n.ahead=5, 
                         newdataTrendStart, ...){

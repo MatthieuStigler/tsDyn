@@ -166,7 +166,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   return(res)
 }
   
-#' @S3method print Hansen99Test
+#' @export print Hansen99Test
 print.Hansen99Test<-function(x,...){
   if(x$args$test=="1vs"){
     cat("Test of linearity against setar(2) and setar(3)\n\n")
@@ -178,7 +178,7 @@ print.Hansen99Test<-function(x,...){
    }
 }
 
-#' @S3method summary Hansen99Test
+#' @export summary Hansen99Test
 summary.Hansen99Test<-function(object, ...){
   print.Hansen99Test(object)
   cat("\nCritical values:\n")
@@ -194,7 +194,7 @@ summary.Hansen99Test<-function(object, ...){
     
 }
 
-#' @S3method plot Hansen99Test
+#' @export plot Hansen99Test
 plot.Hansen99Test<-function(x,show.extended=TRUE, ...){
   m<-x$args$m
   test<-x$args$test
