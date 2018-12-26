@@ -392,7 +392,7 @@ getArNames<-function(ML, type=c("level", "diff", "ADF")){
   }
 }
 
-#' @export print setar
+#' @export
 print.setar <- function(x, ...) {
   NextMethod(...)
   x.old <- x
@@ -451,7 +451,7 @@ print.setar <- function(x, ...) {
   invisible(x)
 }
 
-#' @export summary setar
+#' @export
 summary.setar <- function(object, ...) {
   ans <- list()
   mod <- object$model.specific
@@ -484,7 +484,7 @@ summary.setar <- function(object, ...) {
   extend(summary.nlar(object), "summary.setar", listV=ans)
 }
 
-#' @export print summary.setar
+#' @export
 print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 	signif.stars = getOption("show.signif.stars"), ...) {
 	NextMethod(digits=digits, signif.stars=signif.stars, ...)
@@ -509,7 +509,7 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 	invisible(x)
 }
 
-#' @export coef setar
+#' @export
 #Coef() method: hyperCoef=FALSE won't show the threshold coef
 coef.setar <- function(object, hyperCoef=TRUE, ...){
   co <- object$coefficients
@@ -517,7 +517,7 @@ coef.setar <- function(object, hyperCoef=TRUE, ...){
   co
 }
 
-#' @export vcov setar
+#' @export
 vcov.setar <- function(object,hyperCoef=TRUE, ...){
   mod <- object$model.specific
   
@@ -546,7 +546,7 @@ vcov.setar <- function(object,hyperCoef=TRUE, ...){
   return(res)
 }
 
-#' @export plot setar
+#' @export
 plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop, ...) {
   op <- par(no.readonly=TRUE)
   on.exit(par(op))
@@ -672,8 +672,7 @@ oneStep.setar <- function(object, newdata, itime, thVar, ...){
 #' mod.setar <- setar(log10(lynx), m=2, thDelay=1, th=3.25)
 #' toLatex(mod.setar)
 #'
-#' @method toLatex setar 
-#' @export toLatex setar 
+#' @export
 toLatex.setar <- function(object, digits=3, label, ...) {
   obj <- object
   mod<-obj$model.specific

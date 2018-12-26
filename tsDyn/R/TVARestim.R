@@ -492,7 +492,7 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
 }	#end of the whole function
 
 
-#' @export print TVAR
+#' @export
 print.TVAR<-function(x,...){
 # 	NextMethod(...)
 	cat("Model TVAR with ", x$model.specific$nthresh, " thresholds\n\n")
@@ -501,7 +501,7 @@ print.TVAR<-function(x,...){
 	print(paste(x$model.specific$Thresh, collapse=" "))
 }
 
-#' @export summary TVAR
+#' @export
 summary.TVAR<-function(object,...){
 	x<-object
 	xspe<-x$model.specific
@@ -545,7 +545,7 @@ summary.TVAR<-function(object,...){
 	return(x)
 }
 
-#' @export print summary.TVAR
+#' @export
 print.summary.TVAR<-function(x,digits = max(3, getOption("digits") - 3), signif.stars = getOption("show.signif.stars"),...){
 	coeftoprint<-list()
 	for(i in 1:length(x$bigcoefficients)){
@@ -618,7 +618,7 @@ plot3<-function(th,nthresh, allTh){
     legend("topleft", pch=1, legend=leg, col=c(allDelay+1,c(2:(nthresh+1))), bg="white")
 }
 
-#' @export plot TVAR
+#' @export
 plot.TVAR<-function(x,ask=interactive(), ...){
   th<-x$model.specific$Thresh
   nthresh<-x$model.specific$nthresh
@@ -633,7 +633,7 @@ plot.TVAR<-function(x,ask=interactive(), ...){
 }
 
 
-#' @export toLatex TVAR
+#' @export
 toLatex.TVAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue")){
 	x<-object
 	parenthese<-match.arg(parenthese)

@@ -60,6 +60,7 @@
 
 
 ###################
+#' @export
 predict.VAR <- function(object, newdata, n.ahead=5, 
                         newdataTrendStart, exoPred=NULL, ...){
   

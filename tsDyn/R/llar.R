@@ -45,7 +45,7 @@ llar <- function(x, m, d=1, steps=d, series, eps.min=sd(x)/2, eps.max=diff(range
 	return( res )
 }
 
-#' @export print llar
+#' @export
 print.llar <- function(x, ...) {
 	cat("\nCall: ")
 	print(attr(x,"call"))
@@ -55,13 +55,13 @@ print.llar <- function(x, ...) {
 	cat("Relative error ranging from ", reps[1]," to ", reps[2],"\n\n")
 }
 
-#' @export plot llar
+#' @export
 plot.llar <- function(x, ...)
 	plot(x$eps, x$RMSE, xlab=expression(epsilon), ylab="relative error", log="x", type="l",
 		ylim=c(0,max(1,max(x$RMSE))),
 		main=paste("local linear fit of",attr(x,"series")))
 
-#' @export as.data.frame llar
+#' @export
 as.data.frame.llar <- function(x, row.names, optional, ...)
 	data.frame(unclass(x))
 

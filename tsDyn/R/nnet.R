@@ -18,6 +18,7 @@
 ## Suite 330, Boston, MA  02111-1307  USA.
 
 #Neural Network fitter
+#' @importFrom nnet nnet
 nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) {
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	args <- c(list(getXX(str), getYY(str), size=size, linout=TRUE), control)
@@ -34,7 +35,7 @@ nnetTs <- function(x, m, d=1, steps=d, series, size, control=list(trace=FALSE)) 
 		model.specific=res), "nnetTs"))
 }
 
-#' @export print nnetTs
+#' @export
 print.nnetTs <- function(x, ...) {
 	NextMethod(...)
 	cat("\nNNET time series model\n")

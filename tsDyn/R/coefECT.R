@@ -62,13 +62,12 @@
 coefB <- function(object, ...) UseMethod("coefB")
 
 #' @rdname coefB
-#' @method coefB VECM
-#' @S3method coefB VECM
+#' @export
 coefB.VECM <- function(object,...){
   object$model.specific$beta
 }
 
-#' @S3method coefB list
+#' @export
 coefB.list <- function(object,...){
   if(all(names(object)==c("rlm","beta"))){
     return(object$beta)
@@ -78,8 +77,7 @@ coefB.list <- function(object,...){
 }
 
 #' @rdname coefB
-#' @method coefB ca.jo
-#' @S3method coefB ca.jo
+#' @export
 # Normalize by b (Z')-1, with  (Z')-1 = (C'B)-1, c: (diag|0) 
 #' @param r The cointegrating rank
 #' @param normalize Whether to normalize the A/B coefficients. See details
@@ -94,7 +92,7 @@ coefB.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   beta
 }
 
-#' @S3method coefB cajo.test
+#' @export
 coefB.cajo.test <- function(object,r=1, normalize=TRUE, ...) 
   coefB.ca.jo(object=object,r=r, normalize=normalize, ...)
 
@@ -103,14 +101,13 @@ coefB.cajo.test <- function(object,r=1, normalize=TRUE, ...)
 coefA <- function(object, ...) UseMethod("coefA")
 
 #' @rdname coefB
-#' @method coefA VECM
-#' @S3method coefA VECM
+#' @export
 coefA.VECM <- function(object,...){
   r <- object$model.specific$r
   coef(object)[,1:r, drop=FALSE]
 }
 
-#' @S3method coefA list
+#' @export
 coefA.list <- function(object,...){
   if(all(names(object)==c("rlm","beta"))){
     r <- ncol(object$beta)
@@ -121,8 +118,7 @@ coefA.list <- function(object,...){
 }
 
 #' @rdname coefB
-#' @method coefA ca.jo
-#' @S3method coefA ca.jo
+#' @export
 # BETA: Normalize by b (Z')-1, with  (Z')-1 = (C'B)-1, c: (diag|0)
 # ALPHA: Normalize by Z, i.e. B'C, 
 coefA.ca.jo <- function(object,r=1, normalize=TRUE, ...){
@@ -137,7 +133,7 @@ coefA.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   alpha
 }
 
-#' @S3method coefA cajo.test
+#' @export
 coefA.cajo.test <- function(object,r=1, normalize=TRUE, ...) 
   coefA.ca.jo(object=object,r=r, normalize=normalize, ...)
 
@@ -145,19 +141,19 @@ coefA.cajo.test <- function(object,r=1, normalize=TRUE, ...)
 #' @export
 coefPI <- function(object, ...) UseMethod("coefPI")
 
-#' @S3method coefPI default
+#' @export
 coefPI.default <- function(object, ...){
   coefA(object)%*%t(coefB(object))
 }
 
-#' @S3method coefPI ca.jo
+#' @export
 coefPI.ca.jo <- function(object,r=1, normalize=TRUE, ...){
   alpha <- object@W[,1:r,drop=FALSE]
   beta <- object@V[,1:r,drop=FALSE]
   alpha%*%t(beta)
 }    
 
-#' @S3method coefPI cajo.test
+#' @export
 coefPI.cajo.test <- function(object,r=1, normalize=TRUE, ...) 
   coefPI.ca.jo(object=object,r=r, normalize=normalize, ...)
 

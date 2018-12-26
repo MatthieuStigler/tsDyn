@@ -22,7 +22,7 @@ isLinear <- function(object, ...)
 isLinear.default <- function(object, ...)
   stop("no linearity tests available for this model")
 
-#' @S3method isLinear lstar
+#' @export
 isLinear.lstar <- function(object, mTh, thDelay = 0, thVar, trace=TRUE, ...)
 {
 
