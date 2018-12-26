@@ -4,10 +4,10 @@
 \alias{lineVar}
 \title{Multivariate linear models: VAR and VECM}
 \usage{
-lineVar(data, lag, r = 1, include = c("const", "trend", "none", "both"),
-  model = c("VAR", "VECM"), I = c("level", "diff", "ADF"), beta = NULL,
-  estim = c("2OLS", "ML"), LRinclude = c("none", "const", "trend", "both"),
-  exogen = NULL)
+lineVar(data, lag, r = 1, include = c("const", "trend", "none",
+  "both"), model = c("VAR", "VECM"), I = c("level", "diff", "ADF"),
+  beta = NULL, estim = c("2OLS", "ML"), LRinclude = c("none",
+  "const", "trend", "both"), exogen = NULL)
 }
 \arguments{
 \item{data}{multivariate time series (first row being first=oldest value)}

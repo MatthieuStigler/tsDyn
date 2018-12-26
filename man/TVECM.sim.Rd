@@ -7,10 +7,10 @@
 \alias{TVECM.sim}
 \title{Simulation and bootstrap a VECM or bivariate TVECM}
 \usage{
-VECM.sim(data, B, VECMobject, beta, n = 200, lag = 1, type = c("simul",
-  "boot", "check"), include = c("const", "trend", "none", "both"),
-  starting = NULL, innov = rmnorm(n, varcov = varcov), varcov = diag(1,
-  k), show.parMat = FALSE, seed)
+VECM.sim(data, B, VECMobject, beta, n = 200, lag = 1,
+  type = c("simul", "boot", "check"), include = c("const", "trend",
+  "none", "both"), starting = NULL, innov = rmnorm(n, varcov = varcov),
+  varcov = diag(1, k), show.parMat = FALSE, seed)
 
 VECM.boot(VECMobject, show.parMat = FALSE, seed, check = TRUE)
 

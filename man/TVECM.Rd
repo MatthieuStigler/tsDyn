@@ -7,11 +7,11 @@
 TVECM(data, lag = 1, nthresh = 1, trim = 0.05, ngridBeta = 50,
   ngridTh = 50, plot = TRUE, th1 = list(exact = NULL, int = c("from",
   "to"), around = "val"), th2 = list(exact = NULL, int = c("from", "to"),
-  around = "val"), beta = list(exact = NULL, int = c("from", "to"), around =
-  c("val", "by")), restr = c("none", "equal", "signOp"), common = c("All",
-  "only_ECT"), include = c("const", "trend", "none", "both"),
-  dummyToBothRegimes = TRUE, beta0 = 0, methodMapply = FALSE,
-  trace = TRUE)
+  around = "val"), beta = list(exact = NULL, int = c("from", "to"),
+  around = c("val", "by")), restr = c("none", "equal", "signOp"),
+  common = c("All", "only_ECT"), include = c("const", "trend", "none",
+  "both"), dummyToBothRegimes = TRUE, beta0 = 0,
+  methodMapply = FALSE, trace = TRUE)
 }
 \arguments{
 \item{data}{time series}
