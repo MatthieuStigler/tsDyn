@@ -57,12 +57,12 @@
 #'title("Comparison of true and rolling 1-ahead forecasts\n")
 #'
 #'
-
+#' @importFrom forecast Arima ets forecast
 #' @export
 predict_rolling  <- function (object, ...)  
   UseMethod("predict_rolling")
 
-#' @S3method predict_rolling default
+#' @export
 predict_rolling.default  <- function (object, ...)  NULL
 
 
@@ -146,8 +146,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 
 
 #' @rdname predict_rolling
-#' @method predict_rolling nlVar
-#' @S3method predict_rolling nlVar
+#' @export
 predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newdata, ...){
 
   morgAr <- list(object=object, nroll=nroll)
@@ -178,7 +177,7 @@ predict_rolling.nlVar<- function(object, nroll=10, n.ahead=1, refit.every, newda
   return(res)
 }
 
-#' @S3method predict_rolling nlar
+#' @export
 predict_rolling.nlar <- function(object, n.ahead=1, newdata, ...){
 
   if(missing(newdata)) stop("Providing newdata required for objects nlar")
@@ -273,14 +272,14 @@ predict_rolling_fcstpkg <- function(object, n.ahead=1, newdata, model, check=FAL
   return(res)
 }
 
-#' @S3method predict_rolling Arima
+#' @export
 predict_rolling.Arima <- function(object, n.ahead=1, newdata,  ...){
   res <- predict_rolling_fcstpkg(object=object,  n.ahead=n.ahead, newdata=newdata, model=Arima,check=TRUE,  ...)
   attr(res, "model") <- "Arima"
   return(res)
 }
 
-#' @S3method predict_rolling ets
+#' @export
 predict_rolling.ets <- function(object,  n.ahead=1, newdata,  ...){
   res <- predict_rolling_fcstpkg(object=object, n.ahead=n.ahead, newdata=newdata, model=ets, check=FALSE, ...)
   attr(res, "model") <- "ets"

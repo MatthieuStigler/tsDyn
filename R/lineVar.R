@@ -531,12 +531,12 @@ toLatex(summary(aVAR))
 
 
 
-#' @export print VAR
+#' @export
 print.VAR <- function(x,...){
 	print(coef(x))
 }
 
-#' @export summary VAR
+#' @export
 summary.VAR<-function(object, digits=4,...){
   x<-object
   r<-4
@@ -585,7 +585,7 @@ summary.VAR<-function(object, digits=4,...){
 }
 
 
-#' @export print summary.VAR
+#' @export
 print.summary.VAR<-function(x,...){
   cat("#############\n###Model", attr(x,"model"),"\n#############")
   cat("\nFull sample size:",x$T, "\tEnd sample size:", x$t) 
@@ -600,7 +600,7 @@ print.summary.VAR<-function(x,...){
 
 }
 
-#' @export vcov VAR
+#' @export
 vcov.VAR<-function(object, ...){
   sum<-summary.VAR(object)
   so<-sum$sigma %x% sum$cov.unscaled
@@ -611,7 +611,7 @@ vcov.VAR<-function(object, ...){
   so
 }
 
-#' @export toLatex VAR
+#' @export
 toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue"), label){
   x<-object
   if(attr(x,"model")=="VECM"&&x$model.specific$LRinclude!="none") stop("toLatex not implemented now for models with arg 'LRinclude' different from 'none'") 

@@ -52,6 +52,7 @@
 #'
 #'delta(log10(lynx), m=3, eps=sd(log10(lynx)))
 #'
+#' @importFrom tseriesChaos d2
 delta <- function(x, m, d=1, eps) {
 	if(m<2)
           stop("embedding dimension 'm' should be at least equal to 2")

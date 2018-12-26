@@ -1,6 +1,5 @@
 #'@rdname predict.VAR
-#'@export predict TVAR
-
+#' @export
 predict.TVAR <- function(object, newdata, n.ahead=5, 
                         newdataTrendStart, ...){
   

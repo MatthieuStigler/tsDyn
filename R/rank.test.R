@@ -182,8 +182,7 @@ rank.test <- function(vecm, type=c("eigen","trace"), r_null, cval=0.05){
 }
 
 #' @rdname rank.test
-#' @method print rank.test
-#' @export print rank.test
+#' @export
 print.rank.test <- function(x, ...) {
 
   if(x$call$r_null=="unspec"){
@@ -197,8 +196,7 @@ print.rank.test <- function(x, ...) {
 
 #' @rdname rank.test
 #' @param digits The number of digits to use in \code{\link{format.pval}}
-#' @method summary rank.test
-#' @export summary rank.test
+#' @export
 summary.rank.test <- function(object, digits=max(1, getOption("digits") - 3), ...) {
   res <- object$res_df
   rownames(res) <- NULL

@@ -18,6 +18,7 @@
 ## This program is a translation of Prof. Marcelo Medeiros's Matlab codes
 ##    and is indebted to him.
 
+#' @importFrom MASS ginv
 calculateLinearCoefficients <- function(A, b){
   #x <- lm.fit(x = A, y = b)$coefficients
   #x <- lm(b ~ . -1, data = data.frame(A))$coefficients  
@@ -127,6 +128,7 @@ testRegime <- function(object, ...)
 # 
 # returns a list containing the p-value of the F statistic and a boolean,
 #      true if there is some remaining nonlinearity and false otherwise.
+#' @importFrom Matrix norm Matrix
 testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 {
 
@@ -262,7 +264,7 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 addRegime <- function(object, ...)
   UseMethod("addRegime")
 
-#' @export addRegime star
+#' @export
 addRegime.star <- function(object, ...)
 {
 
@@ -1003,7 +1005,7 @@ oneStep.star <- function(object, newdata, itime, thVar, ...)
   
 }
 
-#' @export print star
+#' @export
 print.star <- function(x, ...) {
   NextMethod(...)
   cat("\nMultiple regime STAR model\n\n")

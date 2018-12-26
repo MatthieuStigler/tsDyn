@@ -15,6 +15,7 @@
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
 #' @export
+#' @importFrom mgcv gam s predict.gam print.gam print.summary.gam plot.gam PredictMat
 #AAR fitter
 aar <- function(x, m, d=1, steps=d, series){
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
@@ -35,7 +36,7 @@ aar <- function(x, m, d=1, steps=d, series){
 		), "aar") )
 }
 
-#' @export print aar
+#' @export
 print.aar <- function(x, ...) {
 	NextMethod(...)
 	cat("\nAAR model\n")
@@ -43,12 +44,12 @@ print.aar <- function(x, ...) {
   invisible(x)
 }
 
-#' @export summary aar
+#' @export
 summary.aar <- function(object, ...) {
 	extend(summary.nlar(object), "summary.aar", internals=summary(object$model.specific, ...))
 }
 
-#' @export print summary.aar
+#' @export
 print.summary.aar <- function(x, digits=max(3, getOption("digits") - 2),
 	signif.stars = getOption("show.signif.stars"), ...) {
 	NextMethod(digits=digits, signif.stars=signif.stars, ...)
@@ -56,7 +57,7 @@ print.summary.aar <- function(x, digits=max(3, getOption("digits") - 2),
   invisible(x)
 }
 
-#' @export plot aar
+#' @export
 plot.aar <- function(x, ask=interactive(), ...) {
 	op <- par(no.readonly=TRUE)
 	par(ask=ask)

@@ -78,7 +78,7 @@
 #' legend("bottomleft", leg=legLabels, lty=1:5, col=1:5)
 #' 
 
-#' @export predict nlar
+#' @export
 #### Predict nlar
 predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"), nboot=100, ci=0.95, block.size=3, boot1Zero=TRUE,...)
 {
@@ -149,7 +149,7 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
 
 
 #### Predict TVECM/TVAR
-#' @export predict TVECM
+#' @export
 predict.TVECM <- function(object, ...) stop("predict() not available for TVECM")
 
 

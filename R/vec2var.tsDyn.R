@@ -33,8 +33,7 @@ VARrep  <- function (object, ...)
   UseMethod("VARrep")
 
 #' @rdname VARrep
-#' @method VARrep VECM
-#' @export VARrep VECM
+#' @export
 VARrep.VECM <- function(object, ...) {
 
   lag <- object$lag
@@ -101,8 +100,7 @@ VARrep.VECM <- function(object, ...) {
 }
 
 #' @rdname VARrep
-#' @method VARrep VAR
-#' @export VARrep VAR
+#' @export
 VARrep.VAR <- function(object, ...) {
 
   I <- attr(object, "varsLevel")
@@ -159,7 +157,7 @@ return(res)
 ############################################################
 
 
-
+#' @importClassesFrom urca ca.jo
 vec2var.tsDyn <- function(x){
 
   model <- if(inherits(x,"VECM")) "VECM" else "VAR"
@@ -246,8 +244,8 @@ predictOld.VECM <- function(object,...){
  predict(vec2var.tsDyn(object), ...)
 }
 
-#' @export irf 
-#' @S3method irf 
+#' @importFrom vars irf
+#' @export
 irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, boot=TRUE, ci=0.95, runs=100, seed=NULL, ...){
   model <- attr(x, "model")
   if(model=="VECM"){
@@ -258,8 +256,8 @@ irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cu
  irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
-#' @export fevd
-#' @S3method fevd nlVar
+#' @importFrom vars fevd
+#' @export
 fevd.nlVar <- function(x, n.ahead=10, ...){
   model <- attr(x, "model")
   if(model=="VECM"){

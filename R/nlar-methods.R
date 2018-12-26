@@ -15,6 +15,7 @@
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
 
+
 nlar.struct <- function(x, m, d=1, steps=d, series) {
   
   if(missing(series))
@@ -145,19 +146,19 @@ nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                 ))
 }
 
-#' @export print nlar
+#' @export
 #Print nlar object
 print.nlar <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   cat("\nNon linear autoregressive model\n")
   invisible(x)
 }
 
-#' @export coef nlar
+#' @export
 #Coefficients of a nlar.fit object
 coef.nlar <- function(object, ...)
   object$coefficients
 
-#' @export fitted nlar
+#' @export
 #Fitted values for the fitted nlar object
 fitted.nlar <- function(object, ...) {
   ans <- c(rep(NA, object$str$n.used - length(object$fitted.values)), object$fitted.values)
@@ -166,7 +167,7 @@ fitted.nlar <- function(object, ...) {
   ans
 }
 
-#' @export residuals nlar
+#' @export
 #Observed residuals for the fitted nlar object
 residuals.nlar <- function(object, ...) {
   str <- object$str
@@ -211,7 +212,7 @@ regime <- function (object, initVal=TRUE,timeAttr=TRUE,...)
 regime.default <- function(object, initVal=TRUE,timeAttr=TRUE,...)
   NULL
 
-#' @export regime setar
+#' @export
 regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
   str <- object$str
@@ -234,7 +235,7 @@ regime.setar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   return(ans)
 }
             
-#' @export regime nlVar           
+#' @export
 regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   reg<-object$model.specific$regime
   
@@ -256,7 +257,7 @@ regime.nlVar <- function(object,initVal=TRUE,timeAttr=TRUE,...) {
   return(ans)
 }
 
-#' @export regime lstar
+#' @export
 regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...){
 
   thVar <- object$model.specific$thVar
@@ -314,8 +315,7 @@ getTh<- function (object, ...)
   UseMethod("getTh")
 
 #' @rdname getTh
-#' @method getTh default
-#' @export getTh default
+#' @export
 getTh.default <- function(object, ...){
   # look first just in object
   allth<-object[grep("th",names(object))]
@@ -330,13 +330,13 @@ getTh.default <- function(object, ...){
   return(allth)
 }
 
-#' @export getTh setar
+#' @export
 getTh.setar<-function(object,...){
   object<-object$coefficients
   getTh.default(object)
 }
 
-#' @export getTh lstar
+#' @export
 getTh.lstar<-function(object,...){
   object<-object$coefficients
   getTh.default(object)
@@ -347,12 +347,12 @@ getTh.lstar<-function(object,...){
   object["th"]
 }
 
-#' @export getTh summary.setar
+#' @export
 getTh.summary.setar<-function(object,...){
   object$th
 }
 
-#' @export getTh nlVar
+#' @export
 getTh.nlVar<-function(object,...){
   nth <- object$model.specific$nthresh
 
@@ -371,7 +371,7 @@ getTh.nlVar<-function(object,...){
 }
 
 
-#' @export deviance nlar
+#' @export
 #Observed residuals for the fitted nlar object
 deviance.nlar<-function(object,...) crossprod(object$residuals)
 
@@ -395,16 +395,15 @@ mse <- function (object, ...)
 
 
 #' @rdname mse
-#' @method mse default
-#' @export mse default
+#' @export
 mse.default <- function(object, ...)
   NULL
 
-#' @export mse nlar
+#' @export
 mse.nlar <- function(object, ...)
   sum(object$residuals^2)/object$str$n.used
 
-#' @export AIC nlar
+#' @export
 #AIC for the fitted nlar model
 AIC.nlar <- function(object,k=2, ...){
   n <- object$str$n.used
@@ -412,7 +411,7 @@ AIC.nlar <- function(object,k=2, ...){
   n * log( mse(object) ) + k * npar
 }
 
-#' @export BIC nlar
+#' @export
 #BIC for the fitted nlar model
 BIC.nlar <- function(object, ...)
 	AIC.nlar(object, k=log(getNUsed(object)))
@@ -439,18 +438,17 @@ MAPE <- function(object, ...)
   UseMethod("MAPE")
 
 #' @rdname MAPE
-#' @method MAPE default
-#' @export MAPE default
+#' @export
 MAPE.default <- function(object, ...)
   NULL
 
-#' @export MAPE nlar
+#' @export
 MAPE.nlar <- function(object, ...) {
   e <- abs(object$residuals/object$str$yy)
   mean( e[is.finite(e)] )
 }
 
-#' @export summary nlar
+#' @export
 #Computes summary infos for the fitted nlar model
 summary.nlar <- function(object, ...) {
   ans <- list()
@@ -463,7 +461,7 @@ summary.nlar <- function(object, ...) {
   return(extend(list(), "summary.nlar", listV=ans))
 }
 
-#' @export print summary.nlar
+#' @export
 #Prints summary infos for the fitted nlar model
 print.summary.nlar <- function(x, ...) {
   print(x$object)
@@ -476,7 +474,7 @@ print.summary.nlar <- function(x, ...) {
   invisible(x)
 }
 
-#' @export plot nlar
+#' @export
 plot.nlar <- function(x, ask = interactive(), ...) {
   str <- x$str
   op <- par(no.readonly=TRUE)
