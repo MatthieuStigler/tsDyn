@@ -4,15 +4,14 @@
 \alias{rank.test}
 \alias{summary.rank.test}
 \alias{print.rank.test}
-\alias{summary.rank.test}
 \title{Test of the cointegrating rank}
 \usage{
 rank.test(vecm, type = c("eigen", "trace"), r_null, cval = 0.05)
 
 \method{print}{rank.test}(x, ...)
 
-\method{summary}{rank.test}(object, digits = max(1, getOption("digits") - 3),
-  ...)
+\method{summary}{rank.test}(object, digits = max(1, getOption("digits") -
+  3), ...)
 }
 \arguments{
 \item{vecm}{\sQuote{VECM} object computed with the function

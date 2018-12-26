@@ -4,10 +4,10 @@
 \alias{TVAR.LRtest}
 \title{Test of linearity}
 \usage{
-TVAR.LRtest(data, lag = 1, trend = TRUE, series, thDelay = 1:m, mTh = 1,
-  thVar, nboot = 10, plot = FALSE, trim = 0.1, test = c("1vs", "2vs3"),
-  model = c("TAR", "MTAR"), hpc = c("none", "foreach"), trace = FALSE,
-  check = FALSE)
+TVAR.LRtest(data, lag = 1, trend = TRUE, series, thDelay = 1:m,
+  mTh = 1, thVar, nboot = 10, plot = FALSE, trim = 0.1,
+  test = c("1vs", "2vs3"), model = c("TAR", "MTAR"), hpc = c("none",
+  "foreach"), trace = FALSE, check = FALSE)
 }
 \arguments{
 \item{data}{multivariate time series}

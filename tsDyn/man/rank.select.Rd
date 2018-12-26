@@ -4,7 +4,7 @@
 \alias{rank.select}
 \alias{summary.rank.select}
 \alias{print.rank.select}
-\alias{summary.rank.select}
+\alias{as.data.frame.rank.select}
 \title{Selection of the cointegrating rank with Information criterion.}
 \usage{
 rank.select(data, lag.max = 10, r.max = ncol(data) - 1,
@@ -12,6 +12,8 @@ rank.select(data, lag.max = 10, r.max = ncol(data) - 1,
   "LL"), sameSample = TRUE, returnModels = FALSE)
 
 \method{print}{rank.select}(x, ...)
+
+\method{as.data.frame}{rank.select}(x, ...)
 
 \method{summary}{rank.select}(object, ...)
 }

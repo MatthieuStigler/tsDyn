@@ -5,8 +5,9 @@
 \title{Simulation and bootstrap of Threshold Autoregressive model}
 \usage{
 setar.sim(data, B, setarObject, n = 200, lag = 1, trend = TRUE,
-  nthresh = 0, thDelay = 0, Thresh, type = c("boot", "simul", "check"),
-  starting = NULL, rand.gen = rnorm, innov = rand.gen(n, ...), ...)
+  nthresh = 0, thDelay = 0, Thresh, type = c("boot", "simul",
+  "check"), starting = NULL, rand.gen = rnorm, innov = rand.gen(n,
+  ...), ...)
 }
 \arguments{
 \item{data}{univariate time series}

@@ -6,7 +6,8 @@
 \alias{predict.VECM}
 \title{Predict method for objects of class \sQuote{\code{VAR}}, \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}}
 \usage{
-\method{predict}{TVAR}(object, newdata, n.ahead = 5, newdataTrendStart, ...)
+\method{predict}{TVAR}(object, newdata, n.ahead = 5, newdataTrendStart,
+  ...)
 
 \method{predict}{VAR}(object, newdata, n.ahead = 5, newdataTrendStart,
   exoPred = NULL, ...)

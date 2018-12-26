@@ -5,8 +5,8 @@
 \title{Estimation of Vector error correction model (VECM)}
 \usage{
 VECM(data, lag, r = 1, include = c("const", "trend", "none", "both"),
-  beta = NULL, estim = c("2OLS", "ML"), LRinclude = c("none", "const",
-  "trend", "both"), exogen = NULL)
+  beta = NULL, estim = c("2OLS", "ML"), LRinclude = c("none",
+  "const", "trend", "both"), exogen = NULL)
 }
 \arguments{
 \item{data}{multivariate time series (first row being first=oldest value)}
