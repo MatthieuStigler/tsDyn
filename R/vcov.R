@@ -1,5 +1,5 @@
 
-
+#' @export
 vcov.TVAR <- function (object, ...) {
   x <- object
   Z<-t(as.matrix(tail.matrix(x$model[,-c(1:x$k)],x$t)))
