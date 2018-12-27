@@ -59,14 +59,16 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	if(type=="level")
 	  is<-isRoot(coef(res), regime=".", lags=seq_len(m))
 	
-	return(extend(nlar(str,
-	  coefficients=res$coefficients,
-	  fitted.values=res$fitted.values,
-	  residuals=res$residuals,
-	  k=res$rank,
-	  model=data.frame(yy,xx),
-	  model.specific=res),
-		"linear"))
+	res <- extend(nlar(str,
+	                   coefficients=res$coefficients,
+	                   fitted.values=res$fitted.values,
+	                   residuals=res$residuals,
+	                   k=res$rank,
+	                   model=data.frame(yy,xx),
+	                   model.specific=res),
+	              "linear")
+	res$include <-  include
+	res
 }
 
 #' @export
