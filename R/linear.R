@@ -55,6 +55,8 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	#evaluate the model
 	res <- lm.fit(xx, yy)
 	res$incNames<-incNames
+	res$nthresh <-  0
+	
 	#check if unit root lie outside unit circle
 	if(type=="level")
 	  is<-isRoot(coef(res), regime=".", lags=seq_len(m))
