@@ -71,22 +71,21 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
                       starting=NULL,  innov, ...){
 
 ## Check arguments
-  if(!nthresh%in%c(0,1,2))
-  stop("arg nthresh should be either 0,1 or 2")
+  if(!nthresh%in%c(0,1,2))  stop("arg nthresh should be either 0,1 or 2")
   include <- match.arg(include)
-  esp<-switch(include, const=lag+1, none=lag)
+  esp <- switch(include, const=lag+1, none=lag)
   ndig <- 10
 
 ## check specification of B
   if(esp*(nthresh+1)!=length(B))
     stop("Matrix B badly specified")
   if(!is.null(starting) && length(starting)!=lag)
-      stop("Bad specification of starting values. Should have so many values as the number of lags")
+      stop("Bad specification of starting values. Should have as many values as the number of lags")
   
 ## y vec, trend vec
-  y<-vector("numeric", length=n+lag)
-  if(!is.null(starting)) y[seq_len(lag)]<-starting  
-  trend<-c(rep(0, lag), trendStart+(0:(n-1)))  ### n-1 a sstarts from zero
+  y <- vector("numeric", length=n+lag)
+  if(!is.null(starting)) y[seq_len(lag)] <- starting  
+  trend <- c(rep(0, lag), trendStart+(0:(n-1)))  ### n-1 a starts from zero
   
 ## Extend B
   addInc <<- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
@@ -107,15 +106,15 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
 
 ### MAIN loop
   
-  thDelay<-thDelay+1
+  thDelay <- thDelay+1
 
 #initial values
-  Yb<-vector("numeric", length=length(y))		#Delta Y term
-  Yb[1:lag]<-y[1:lag]
+  Yb <- vector("numeric", length=length(y))		#Delta Y term
+  Yb[1:lag] <- y[1:lag]
 
-  z2<-vector("numeric", length=length(y))
-  z2[1:lag]<-y[1:lag]
-  resb<-c(rep(0,lag),innov)	
+  z2 <- vector("numeric", length=length(y))
+  z2[1:lag] <- y[1:lag]
+  resb <- c(rep(0,lag), innov)	
 
   if(nthresh==0){
     for(i in (lag+1):length(y)){
@@ -127,10 +126,10 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
   } else if(nthresh==1){
     for(i in (lag+1):length(y)){
       if(round(z2[i-thDelay],ndig)<=Thresh) 
-        y[i]<-sum(BDown[1],BDown[2]*trend[i], BDown[-c(1,2)]*y[i-c(1:lag)],resb[i])
+        y[i] <- sum(BDown[1],BDown[2]*trend[i], BDown[-c(1,2)]*y[i-c(1:lag)], resb[i])
       else 
-        yb[i]<-sum(BUp[1],BUp[2]*trend[i], BUp[-c(1,2)]*y[i-c(1:lag)],resb[i])
-      z2[i]<-y[i]
+        Yb[i] <- sum(BUp[1],BUp[2]*trend[i], BUp[-c(1,2)]*y[i-c(1:lag)], resb[i])
+      z2[i] <- y[i]
     }
   } else if(nthresh==2){
     for(i in (lag+1):length(y)){
@@ -189,6 +188,19 @@ setar.boot <- function(setarObject){
   }
 }
 
+setar.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
+                      nthresh=1, Thresh,
+                      starting=NULL, innov=rnorm(n)){
+  
+  include <- match.arg(include)
+  setar.gen(B=B, n=n, lag=lag, include = include,  
+            nthresh = nthresh, Thresh = Thresh,
+            starting=starting, innov=innov)
+}
+
+
+
+
 if(FALSE){
   Bvals <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
   library(tsDyn)
@@ -196,46 +208,48 @@ if(FALSE){
   sim_new <- setar.gen(B=Bvals,lag=2, nthresh=1, Thresh=2, starting=c(2.8,2.2),
                        innov=rnorm(200))$serie
   
+  setar.sim(B=Bvals, lag=2, nthresh=1, Thresh=2)
 }
 
 if(FALSE){
-library(tsDyn)
-environment(setar.sim)<-environment(star)
+  library(tsDyn)
+  environment(setar.sim)<-environment(star)
+  
+  ##Simulation of a TAR with 1 threshold
+  Bvals <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
+  sim<-setar.sim(B=Bvals,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))$serie
+  mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
+  
+  #check the result
+  selectSETAR(sim, m=2, criterion="SSR")
+  selectSETAR(sim, m=2, th=list(around=2, ngrid=20))
+  
+  
+  ##Bootstrap a TAR with two threshold (three regimes)
+  sun<-(sqrt(sunspot.year+1)-1)*2
+  setar.sim(data=sun,nthresh=2, type="boot", Thresh=c(6,9))$serie
+  
+  ##Check the bootstrap
+  checkBoot<-setar.sim(data=sun,nthresh=0, type="check", Thresh=6.14)$serie
+  cbind(checkBoot,sun)
+  #prob with the digits!
+  
+  ###linear object
+  lin<-linear(sun, m=1)
+  checkBootL<-setar.sim(setarObject=lin, type="check")$serie
+  cbind(checkBootL,sun)
+  linear(checkBootL, m=1)
+  ###setar object
+  setarSun<-setar(sun, m=2, nthresh=1)
+  checkBoot2<-setar.sim(setarObject=setarSun, type="check")$serie
+  cbind(checkBoot2,sun)
 
-##Simulation of a TAR with 1 threshold
-Bvals <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
-sim<-setar.sim(B=Bvals,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))$serie
-mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
+  #does not work
 
-#check the result
-selectSETAR(sim, m=2, criterion="SSR")
-selectSETAR(sim, m=2, th=list(around=2, ngrid=20))
-
-
-##Bootstrap a TAR with two threshold (three regimes)
-sun<-(sqrt(sunspot.year+1)-1)*2
-setar.sim(data=sun,nthresh=2, type="boot", Thresh=c(6,9))$serie
-
-##Check the bootstrap
-checkBoot<-setar.sim(data=sun,nthresh=0, type="check", Thresh=6.14)$serie
-cbind(checkBoot,sun)
-#prob with the digits!
-
-###linear object
-lin<-linear(sun, m=1)
-checkBootL<-setar.sim(setarObject=lin, type="check")$serie
-cbind(checkBootL,sun)
-linear(checkBootL, m=1)
-###setar object
-setarSun<-setar(sun, m=2, nthresh=1)
-checkBoot2<-setar.sim(setarObject=setarSun, type="check")$serie
-cbind(checkBoot2,sun)
-#does not work
-
-setarSun<-setar(sun, m=3, nthresh=2)
-checkBoot3<-setar.sim(setarObject=setarSun, type="check")$serie
-cbind(checkBoot3,sun)
-#ndig approach: works with m=2, m=3, m=4
-#no ndig approach: output has then more digits than input
+  setarSun<-setar(sun, m=3, nthresh=2)
+  checkBoot3<-setar.sim(setarObject=setarSun, type="check")$serie
+  cbind(checkBoot3,sun)
+  #ndig approach: works with m=2, m=3, m=4
+  #no ndig approach: output has then more digits than input
 
 }
