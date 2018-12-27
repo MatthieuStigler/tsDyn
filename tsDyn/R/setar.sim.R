@@ -68,7 +68,8 @@
 setar.gen <- function(B, n=200, lag=1, include=c("const", "none"), 
                       nthresh=0, thDelay=0, Thresh, 
                       trendStart=1, 
-                      starting=NULL,  innov, ...){
+                      starting=NULL,  innov, 
+                      show.parMat = FALSE, ...){
 
 ## Check arguments
   if(!nthresh%in%c(0,1,2))  stop("arg nthresh should be either 0,1 or 2")
@@ -88,18 +89,22 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
   trend <- c(rep(0, lag), trendStart+(0:(n-1)))  ### n-1 a starts from zero
   
 ## Extend B
-  addInc <<- switch(include, "none"=1:2, "trend"=1, "const"=2, "both"=NULL)
-  B <<- B
-  Bfull <- as.vector(tsDyn:::myInsertCol(matrix(B,nrow=1), c=addInc, 0))
-  npar<-esp
+  Bfull <<- matrix(rep(0, (lag+2)*(nthresh+1)), nrow = 1)
+  colnames(Bfull) <- name_coefs(lags = lag, nthresh=nthresh, incNames = c("const", "trend"))
+  add <- switch(include, "const"="const", "trend"="trend", "none"=NULL, "both" = c("const", "trend"))
+  names(B) <- name_coefs(lags = lag, nthresh=nthresh, incNames = add)
+  Bfull[colnames(Bfull) %in% names(B)] <-  B
+  if(show.parMat) print(Bfull)
+  # npar <- esp
   
+  npar_reg <- lag+2
   if(nthresh==1){
-    BDown <- Bfull[seq_len(npar)]
-    BUp   <- Bfull[-seq_len(npar)]
+    BDown <- Bfull[seq_len(npar_reg)]
+    BUp   <- Bfull[-seq_len(npar_reg)]
   } else if(nthresh==2){
-    BDown <- Bfull[seq_len(npar)]
-    BMiddle <- Bfull[seq_len(npar)+npar]
-    BUp <- Bfull[seq_len(npar)+2*npar]
+    BDown <- Bfull[seq_len(npar_reg)]
+    BMiddle <- Bfull[seq_len(npar_reg)+npar_reg]
+    BUp <- Bfull[seq_len(npar_reg)+2*npar_reg]
   }
 
 
@@ -120,72 +125,94 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", "none"),
     for(i in (lag+1):length(y)){
       y[i] <- sum(Bfull[1], # intercept
                   Bfull[2]*trend[i], #trend
-                  Bfull[-c(1,2)]*y[i-c(1:lag)], # lags
+                  Bfull[-c(1,2)] * y[i-c(1:lag)], # lags
                   resb[i]) #residuals
     }
   } else if(nthresh==1){
     for(i in (lag+1):length(y)){
-      if(round(z2[i-thDelay],ndig)<=Thresh) 
-        y[i] <- sum(BDown[1],BDown[2]*trend[i], BDown[-c(1,2)]*y[i-c(1:lag)], resb[i])
+      if(round(z2[i-thDelay], ndig) <= Thresh) 
+        y[i] <- sum(BDown[1], BDown[2]*trend[i], BDown[-c(1,2)] * y[i-c(1:lag)], resb[i])
       else 
-        Yb[i] <- sum(BUp[1],BUp[2]*trend[i], BUp[-c(1,2)]*y[i-c(1:lag)], resb[i])
+        y[i] <- sum(BUp[1], BUp[2]*trend[i], BUp[-c(1,2)] * y[i-c(1:lag)], resb[i])
       z2[i] <- y[i]
     }
   } else if(nthresh==2){
     for(i in (lag+1):length(y)){
       if(round(z2[i-thDelay],ndig)<=Thresh[1]) {
-        Yb[i]<-sum(BDown[1],BDown[-1]*Yb[i-c(1:lag)],resb[i])
-      } else if(round(z2[i-thDelay],ndig)>Thresh[2]) {
-        Yb[i]<-sum(BUp[1],BUp[-1]*Yb[i-c(1:lag)],resb[i])
+        y[i] <- sum(BDown[1], BDown[-1] * y[i-c(1:lag)], resb[i])
+      } else if(round(z2[i-thDelay], ndig)>Thresh[2]) {
+        y[i] <- sum(BUp[1], BUp[-1] * y[i-c(1:lag)], resb[i])
       } else{ 
-        Yb[i]<-sum(BMiddle[1],BMiddle[-1]*Yb[i-c(1:lag)],resb[i])
-      z2[i]<-Yb[i]
+        y[i] <- sum(BMiddle[1], BMiddle[-1] * y[i-c(1:lag)], resb[i])
+      z2[i]<-y[i]
       }
     }
   }
 
 
-  list(B=B, serie=round(Yb,ndig))
+  list(B=B, serie=round(y, ndig))
 }
 
 ### 
-setar.boot <- function(setarObject){
-  if(!missing(setarObject)){
-    mod<-setarObject$model.specific
+setar.boot <- function(setarObject, boot.scheme=c("resample", "wild1", "wild2", "check"),
+                       seed = NULL, ...){
+
+    mod <- setarObject$model.specific
+    nthresh <- mod$nthresh
+    
+    B <- coef(setarObject)
+    y_orig <- setarObject$str$x
+    T_full <- length(y_orig)
+    k <- setarObject$k
+    lags <- setarObject$str$m
+    t <-  T_full- lags
+    include <- setarObject$include
+    
     if(inherits(setarObject,"linear")){
-      B<-coef(setarObject)
-      nthresh<-0
+      B <- coef(setarObject)
+      Thresh <-  NA # irelevant
     }
+    
     if(inherits(setarObject,"setar")){
-      Thresh<-getTh(coef(setarObject))
-      nthresh<-mod$nthresh
-      incNames<-mod$incNames
-      thDelay<-mod$thDelay
+      coefs_mod <- coef(setarObject)
+      TotNpar <- length(coefs_mod)-nthresh
+      B <- coefs_mod[seq_len(TotNpar)]
+      Thresh <- getTh(coefs_mod)
+      
+      incNames <- mod$incNames
+      thDelay <- mod$thDelay
       if(incNames%in%c("none", "trend"))
         stop("Arg include = none or trend currently not implemented")
       if(incNames=="trend")
         trend<-TRUE
-      TotNpar<-length(coef(setarObject))-nthresh
-      B<-coef(setarObject)[seq_len(TotNpar)]
-      BUp<-B[grep("H", names(B))]
-      BDown<-B[grep("L", names(B))]
-      if(mod$nthresh==2)
-        BMiddle<-B[grep("M", names(B))]
-      if(mod$restriction=="OuterSymAll"){
-        BUp<-B[grep("H", names(B))]
-        BMiddle<-B[grep("L", names(B))]
-        BDown<-BUp
-        nthresh<-2
-        Thresh<-c(-Thresh, Thresh)
-      }
+      
+      # BUp<-B[grep("H", names(B))]
+      # BDown<-B[grep("L", names(B))]
+      # if(mod$nthresh==2)
+      #   BMiddle<-B[grep("M", names(B))]
+      # if(mod$restriction=="OuterSymAll"){
+      #   BUp<-B[grep("H", names(B))]
+      #   BMiddle<-B[grep("L", names(B))]
+      #   BDown<-BUp
+      #   nthresh<-2
+      #   Thresh<-c(-Thresh, Thresh)
+      # }
     }
-    y<-setarObject$str$x
-    #   m<-setarObject$str$m
-    #   p<-m
-    lag<-setarObject$str$m
-    res<-na.omit(residuals(setarObject))
-    sigma<-sum(res)/length(res)
-  }
+    
+    ## retrieve starting values
+    starts <- y_orig[1:lags]
+    
+    ## residuals, boot them
+    resids <- residuals(setarObject)[-c(1:lags)]
+    if(!is.null(seed)) set.seed(seed) 
+    innov <- resamp(resids, boot.scheme = boot.scheme, seed=seed)
+    
+    ##
+    setar.gen(B = B, lag = lags,
+              nthresh = nthresh, Thresh = Thresh,
+              include= include, 
+              starting = starts,  
+              innov = innov, n = t, ...)
 }
 
 setar.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
@@ -202,11 +229,45 @@ setar.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "bot
 
 
 if(FALSE){
-  Bvals <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
   library(tsDyn)
-  environment(setar.gen) <- environment(star)
+  # environment(setar.gen) <- environment(star)
+  # environment(setar.boot) <- environment(star)
+  
+  ## nthresh ==0
+  set.seed(123)
+  innov_1 <-  rnorm(200)
+  sim_nth0 <- setar.gen(B=0.5, lag=1, nthresh=0, 
+                        include ="none",
+                        starting= 0.4,
+                        innov=innov_1,
+                        show.parMat = TRUE)$serie
+  head(innov_1)
+  head(sim_nth0)
+  
+  ar_1_noInc <- linear(log(lynx), m = 1, include = "none")
+  ar_2_noInc <- linear(log(lynx), m = 2, include = "none")
+  ar_1_const <- linear(log(lynx), m = 1, include = "const")
+  ar_2_const <- linear(log(lynx), m = 2, include = "const")
+  
+  ar_1_noInc
+  ar_1_noInc_check <- setar.boot(setarObject = ar_1_noInc, boot.scheme = "check")
+  ar_2_noInc_check <- setar.boot(setarObject = ar_2_noInc, boot.scheme = "check")
+  ar_1_const_check <- setar.boot(setarObject = ar_1_const, boot.scheme = "check")
+  ar_2_const_check <- setar.boot(setarObject = ar_2_const, boot.scheme = "check", show.parMat = TRUE)
+  
+  all.equal(ar_1_noInc_check$serie, as.numeric(log(lynx)))
+  all.equal(ar_2_noInc_check$serie, as.numeric(log(lynx)))
+  all.equal(ar_1_const_check$serie, as.numeric(log(lynx)))
+  all.equal(ar_2_const_check$serie, as.numeric(log(lynx)))
+  
+  ## nthresh ==1
+  Bvals <- c(2.9,-0.4,-0.1, 2, 0.2,0.3)
   sim_new <- setar.gen(B=Bvals,lag=2, nthresh=1, Thresh=2, starting=c(2.8,2.2),
-                       innov=rnorm(200))$serie
+                       innov=rnorm(200), show.parMat = TRUE)$serie
+  head(sim_new)
+  set_1 <- setar(sim_new, m = 2)
+  set_1_const_check <- setar.boot(setarObject =  set_1, boot.scheme = "check")$serie
+  all.equal(set_1_const_check, sim_new)
   
   setar.sim(B=Bvals, lag=2, nthresh=1, Thresh=2)
 }
