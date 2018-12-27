@@ -266,6 +266,30 @@ asListIfMat<-function(x){
       return(x)
 }
 
+## function to name coefficients in a setar
+name_coefs <- function(lags, nthresh, incNames=NULL) {
+  names_onereg <- c(incNames, paste("phi", 1:lags, sep="_"))  
+  if(ntresh==0) {
+    return(names_onereg)
+  } else {
+    if(ntresh==1) {
+      regNames <- c("L", "H")
+    } else {
+      regNames <- c("L","M",  "H")
+    }
+    res <- paste(names_onereg, rep(regNames, each = lags+length(incNames)), sep = "_")
+    return(res)
+  }
+}
+
+
+if(FALSE) {
+  name_coefs(2, 1)
+  name_coefs(2, 0)
+  name_coefs(2, 1, incNames = c("const"))
+  name_coefs(2, 0, incNames = c("const"))
+  
+}
 
 myInsertCol<-function (m, c, v = NA) {
 #m: matrix
