@@ -354,6 +354,7 @@ z<-as.matrix(z)
 	  fitted.values=res$fitted.values,
 	  residuals=res$residuals,
 	  k=res$k,
+	  include = include,
 	  model=data.frame(yy,xxLH),
 	  model.specific=res), "setar"))
 	#}
