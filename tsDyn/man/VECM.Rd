@@ -33,13 +33,16 @@ end-sample.}
 }
 \value{
 An object of class \code{VECM} (and higher classes \code{VAR} and
-\code{nlVar}) with methods: \describe{ \item{Usual methods}{Print, summary,
-plot, residuals, fitted, vcov} \item{Fit criteria}{AIC, BIC,
-\code{\link{MAPE}}, \code{\link{mse}}, \code{\link[=logLik.VECM]{logLik}}
-(latter only for models estimated with MLE)} \item{Prediction}{Predict and
-\code{\link{predict_rolling}}} \item{VAR/VECM methods}{Impulse response
-function (\code{\link[=irf.nlVar]{irf}}) and forecast error variance
-decomposition (\code{\link[=fevd.nlVar]{fevd}})} \item{LaTeX}{toLatex} }
+\code{nlVar}) with methods: 
+\describe{ 
+\item{Usual methods:}{Print, summary,  residuals, fitted, vcov} 
+\item{Fit criteria:}{AIC, BIC, \code{\link{MAPE}}, \code{\link{mse}}, \code{\link[=logLik.VECM]{logLik}}
+(the latter only for models estimated with MLE)} 
+\item{Prediction:}{predict and \code{\link{predict_rolling}}} 
+\item{coef extraction:}{Extract cointegrating/adjustment coefficients, \code{\link{coefA}}, \code{\link{coefB}} \code{\link{coefPI}}} 
+\item{VAR/VECM methods:}{Impulse response function (\code{\link[=irf.nlVar]{irf}}) and forecast error variance
+decomposition (\code{\link[=fevd.nlVar]{fevd}})} 
+\item{LaTeX:}{toLatex} }
 }
 \description{
 Estimate a VECM by either Engle-Granger (2OLS) or Johansen (MLE) method.
