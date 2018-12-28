@@ -89,6 +89,14 @@ repmat <- function(a, b, c) kronecker(matrix(1,b,c), a)
 
 norma <- function(v) sqrt(sum(v^2))
 
+## lag, manually
+lag_manual <-  function(x, k=1, time_attr = FALSE) {
+  xlen <- length(x)
+  out <- c(rep(NA, k), x[seq_len(xlen - k)])
+  if(time_attr) attributes(out) <- attributes(x)
+  out
+}
+
 ###Function to create the threshold in TVAR
 TVAR_thresh<-function(mTh, thDelay, thVar=NULL, y, p){
   T <- nrow(y) 
