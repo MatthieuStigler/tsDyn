@@ -3,9 +3,9 @@
 \name{regime}
 \alias{regime}
 \alias{regime.default}
-\title{Extract variable showing regime}
+\title{Extract a variable showing the regime}
 \usage{
-regime(object, initVal = TRUE, timeAttr = TRUE, ...)
+regime(object, initVal = TRUE, timeAttr = TRUE, series = NULL, ...)
 }
 \arguments{
 \item{object}{object of class \code{setar} or \code{nlVar}}
@@ -15,6 +15,8 @@ Default to TRUE.}
 
 \item{timeAttr}{Logical. Whether the time attributes should be returned.
 Default to TRUE.}
+
+\item{series}{Optional. A numeric vector to classify according to the model.}
 
 \item{\dots}{additional arguments to \code{regime}}
 }
