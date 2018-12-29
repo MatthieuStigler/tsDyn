@@ -3,9 +3,13 @@
 \name{regime}
 \alias{regime}
 \alias{regime.default}
+\alias{regime.lstar}
 \title{Extract a variable showing the regime}
 \usage{
 regime(object, initVal = TRUE, timeAttr = TRUE, series = NULL, ...)
+
+\method{regime}{lstar}(object, initVal = TRUE, timeAttr = TRUE, series,
+  discretize = TRUE, ...)
 }
 \arguments{
 \item{object}{object of class \code{setar} or \code{nlVar}}
@@ -19,6 +23,9 @@ Default to TRUE.}
 \item{series}{Optional. A numeric vector to classify according to the model.}
 
 \item{\dots}{additional arguments to \code{regime}}
+
+\item{discretize}{logical (default TRUE) whether the series are discretized to {1,2}, 
+or whether regimeprobabilities are returned.}
 }
 \value{
 Time series of same attributes as input to setar.

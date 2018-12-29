@@ -264,9 +264,13 @@ regime.nlVar <- function(object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...
   return(reg)
 }
 
+#' @rdname regime
+#' @param discretize logical (default TRUE) whether the series are discretized to {1,2}, 
+#' or whether regimeprobabilities are returned. 
 #' @export
-regime.lstar <- function(object, initVal=TRUE,timeAttr=TRUE,discretize=TRUE, ...){
+regime.lstar <- function(object, initVal=TRUE, timeAttr=TRUE, series, discretize=TRUE, ...){
 
+  if(!missing(series)) stop("arg 'series' not implemented for lstar")
   thVar <- object$model.specific$thVar
   str <- object$str
 
