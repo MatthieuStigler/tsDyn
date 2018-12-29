@@ -55,25 +55,30 @@ NULL # for roxygen, do not add
 setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both"), 
                       nthresh=0, thDelay=0, Thresh, 
                       trendStart=1, 
-                      starting=NULL,  innov, 
+                      starting=NULL,  innov, exo, 
                       n_digits = 10,
                       show.parMat = FALSE, ...){
   
   ## Check arguments
-  if(!nthresh%in%c(0,1,2))  stop("arg nthresh should be either 0,1 or 2")
+  if(!nthresh %in% c(0,1,2))  stop("arg nthresh should be either 0,1 or 2")
   include <- match.arg(include)
-  esp <- switch(include, const=lag+1, none=lag, trend = lag +1, both = lag + 2)
+  npar_mat <- switch(include, const=lag+1, none=lag, trend = lag +1, both = lag + 2)
   
   ## check specification of B
-  if(esp*(nthresh+1)!=length(B))
+  if(npar_mat *(nthresh+1)!=length(B))
     stop("Matrix B badly specified")
   if(!is.null(starting) && length(starting)!=lag)
     stop("Bad specification of starting values. Should have as many values as the number of lags")
   
   ## y vec, trend vec
-  y <- vector("numeric", length=n+lag)
+  n_full <- n + lag
+  y <- vector("numeric", length = n_full)
   if(!is.null(starting)) y[seq_len(lag)] <- starting  
   trend <- c(rep(0, lag), trendStart+(0:(n-1)))  ### n-1 a starts from zero
+  
+  ## exo
+  if(missing(exo)) exo <- rep(0, n_full)
+  if(length(exo)!= n_full) stop("'exo' should be of same length as n+lag (though first lag values discarded) ")
   
   ## Extend B
   Bfull <<- matrix(rep(0, (lag+2)*(nthresh+1)), nrow = 1)
@@ -82,7 +87,6 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
   names(B) <- name_coefs(lags = lag, nthresh=nthresh, incNames = add)
   Bfull[colnames(Bfull) %in% names(B)] <-  B
   if(show.parMat) print(Bfull)
-  # npar <- esp
   
   npar_reg <- lag+2
   if(nthresh==1){
@@ -113,7 +117,8 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
       y[i] <- sum(Bfull[1], # intercept
                   Bfull[2]*trend[i], #trend
                   Bfull[-c(1,2)] * y[i-c(1:lag)], # lags
-                  resb[i]) #residuals
+                  resb[i],
+                  exo[i]) #residuals
     }
   } else if(nthresh==1){
     for(i in (lag+1):length(y)){
@@ -124,7 +129,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
         B_here <-  BUp
       }
       #recursive formula: cont, trend, lags, residuals
-      y[i] <- sum(B_here[1], B_here[2]*trend[i], B_here[-c(1,2)] * y[i-c(1:lag)], resb[i])
+      y[i] <- sum(B_here[1], B_here[2]*trend[i], B_here[-c(1,2)] * y[i-c(1:lag)], resb[i], exo[i])
       z2[i] <- y[i]
     }
   } else if(nthresh==2){
@@ -138,7 +143,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
         B_here <-  BMiddle
       }
       #recursive formula: cont, trend, lags, residuals
-      y[i] <- sum(B_here[1], B_here[2]*trend[i], B_here[-c(1,2)] * y[i-c(1:lag)], resb[i])
+      y[i] <- sum(B_here[1], B_here[2]*trend[i], B_here[-c(1,2)] * y[i-c(1:lag)], resb[i], exo[i])
       z2[i] <- y[i]
     }
   }
