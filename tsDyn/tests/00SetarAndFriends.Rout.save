@@ -1,5 +1,5 @@
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -1279,6 +1279,7 @@ Z_t =  X_{t-0}
 \]
 
 
+> 
 > ###SelectSetar
 > selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 Using maximum autoregressive order for low regime: mL = 2 
@@ -1441,7 +1442,27 @@ Results of the grid search for 1 threshold
 8       0 1824 73711421
 > 
 > 
+> ## setar.sim
+> set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check"))
+> set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x$serie, as.numeric(lynx)))
+> set_all_boot_check
+                                    set0 
+   "Mean relative difference: 0.1405485" 
+                                    set1 
+                                  "TRUE" 
+                                    set2 
+"Mean relative difference: 0.0002402376" 
+                                    set3 
+   "Mean relative difference: 0.1405485" 
+                                    set4 
+   "Mean relative difference: 0.2052862" 
+                                    set5 
+  "Mean relative difference: 0.04303492" 
+                                    set6 
+ "Mean relative difference: 0.000522631" 
+                                    set7 
+"Mean relative difference: 0.0008703527" 
 > 
 > proc.time()
    user  system elapsed 
-  1.799   0.118   1.920 
+  1.844   0.094   1.923 
