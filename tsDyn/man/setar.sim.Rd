@@ -3,14 +3,22 @@
 \name{setar.sim}
 \alias{setar.sim}
 \alias{setar.boot}
+\alias{linear.boot}
+\alias{linear.sim}
 \title{Simulation and bootstrap of Threshold Autoregressive model (SETAR)}
 \usage{
 setar.boot(setarObject, boot.scheme = c("resample", "wild1", "wild2",
   "check"), seed = NULL, ...)
 
+linear.boot(linearObject, boot.scheme = c("resample", "wild1", "wild2",
+  "check"), seed = NULL, ...)
+
 setar.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
   "both"), nthresh = 1, Thresh, starting = NULL, innov = rnorm(n),
   ...)
+
+linear.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
+  "both"), starting = NULL, innov = rnorm(n), ...)
 }
 \arguments{
 \item{setarObject}{Bootstrap: the \code{\link{setar}} object to resample data from.}
@@ -20,6 +28,8 @@ setar.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
 \item{seed}{Bootstrap: seed used in the resampling}
 
 \item{\dots}{additional arguments for the unexported \code{rand.gen}.}
+
+\item{linearObject}{Bootstrap: the \code{\link{linear}} object to resample data from.}
 
 \item{B}{Simulation: vector of coefficients to simulate from.}
 
