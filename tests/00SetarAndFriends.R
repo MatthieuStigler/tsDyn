@@ -36,6 +36,7 @@ sapply(set_all, function(x) head(regime(x, initVal=FALSE, time=FALSE),10))
 sapply(set_all, function(x) head(x$model,2))
 
 lapply(set_all[c(1,2,4)], toLatex)
+
 ###SelectSetar
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
@@ -48,3 +49,7 @@ selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid=5), common="no
 selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid="Half"), common="none",criterion = "SSR", plot=FALSE)
 
 
+## setar.sim
+set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check"))
+set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x$serie, as.numeric(lynx)))
+set_all_boot_check
