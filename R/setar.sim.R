@@ -169,33 +169,18 @@ setar.boot <- function(setarObject, boot.scheme = c("resample", "wild1", "wild2"
   
   if(inherits(setarObject,"linear")){
     B <- coef(setarObject)
-    Thresh <-  NA # irelevant
+    Thresh <-  thDelay <- NA # irrelevant
   }
   
   if(inherits(setarObject,"setar")){
+    
+    ## B: no threshold!
     coefs_mod <- coef(setarObject)
     TotNpar <- length(coefs_mod)-nthresh
     B <- coefs_mod[seq_len(TotNpar)]
+    
     Thresh <- getTh(coefs_mod)
-    
-    # incNames <- mod$incNames
     thDelay <- mod$thDelay
-    # if(incNames%in%c("none", "trend"))
-    #   warning("Arg include = none or trend currently not implemented?")
-    # if(incNames=="trend")
-    #   trend<-TRUE
-    
-    # BUp<-B[grep("H", names(B))]
-    # BDown<-B[grep("L", names(B))]
-    # if(mod$nthresh==2)
-    #   BMiddle<-B[grep("M", names(B))]
-    # if(mod$restriction=="OuterSymAll"){
-    #   BUp<-B[grep("H", names(B))]
-    #   BMiddle<-B[grep("L", names(B))]
-    #   BDown<-BUp
-    #   nthresh<-2
-    #   Thresh<-c(-Thresh, Thresh)
-    # }
   }
   
   ## retrieve starting values
@@ -209,11 +194,21 @@ setar.boot <- function(setarObject, boot.scheme = c("resample", "wild1", "wild2"
   ##
   setar.gen(B = B, lag = lags,
             nthresh = nthresh, Thresh = Thresh,
+            thDelay = thDelay, 
             include= include, 
             starting = starts,  
             innov = innov, n = t, ...)
 }
 
+#'@rdname setar.sim
+#'@param linearObject Bootstrap: the \code{\link{linear}} object to resample data from.
+#' @export
+linear.boot <- function(linearObject, boot.scheme = c("resample", "wild1", "wild2", "check"),
+                       seed = NULL, ...){
+  setar.boot(setarObject = linearObject, boot.scheme = boot.scheme, seed = seed, ...)
+}
+
+  
 #'@rdname setar.sim
 #' @export
 setar.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
@@ -226,6 +221,14 @@ setar.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "bot
             starting=starting, innov=innov, ...)
 }
 
+#'@rdname setar.sim
+#' @export
+linear.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
+                       starting=NULL, innov=rnorm(n), ...){
+  include <- match.arg(include)
+  setar.sim(B = B, n=n, lag=lag, include = include,  
+            nthresh=0, starting = starting, innov = innov, ...)
+}
 
 
 
