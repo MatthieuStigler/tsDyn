@@ -81,7 +81,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
   if(length(exo)!= n_full) stop("'exo' should be of same length as n+lag (though first lag values discarded) ")
   
   ## Extend B
-  Bfull <<- matrix(rep(0, (lag+2)*(nthresh+1)), nrow = 1)
+  Bfull <- matrix(rep(0, (lag+2)*(nthresh+1)), nrow = 1)
   colnames(Bfull) <- name_coefs(lags = lag, nthresh=nthresh, incNames = c("const", "trend"))
   add <- switch(include, "const"="const", "trend"="trend", "none"=NULL, "both" = c("const", "trend"))
   names(B) <- name_coefs(lags = lag, nthresh=nthresh, incNames = add)

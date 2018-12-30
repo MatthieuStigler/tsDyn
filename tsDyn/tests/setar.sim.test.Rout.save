@@ -1,0 +1,175 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> 
+> ################
+> ### tets boot
+> ################
+> 
+> setar.boot.check <-  function(object, n_digits = 10) {
++   mod_boot <- setar.boot(object, boot.scheme = "check",n_digits = n_digits)  
++   orig_series <- as.numeric(object$str$x)
++   all.equal(mod_boot$serie, orig_series)
++ }
+> 
+> linear.boot.check <-  function(object, n_digits = 10) {
++   mod_boot <- linear.boot(object, boot.scheme = "check",n_digits = n_digits)  
++   orig_series <- as.numeric(object$str$x)
++   all.equal(mod_boot$serie, orig_series)
++ }
+> 
+> 
+> 
+> ## nthresh ==0
+> ar_1_noInc <- linear(log(lynx), m = 1, include = "none")
+> ar_2_noInc <- linear(log(lynx), m = 2, include = "none")
+> ar_1_const <- linear(log(lynx), m = 1, include = "const")
+> ar_2_const <- linear(log(lynx), m = 2, include = "const")
+> 
+> 
+> setar.boot.check(ar_1_noInc)
+[1] TRUE
+> setar.boot.check(ar_2_noInc)
+[1] TRUE
+> setar.boot.check(ar_1_const)
+[1] TRUE
+> setar.boot.check(ar_2_const)
+[1] TRUE
+> 
+> linear.boot.check(ar_1_noInc)
+[1] TRUE
+> linear.boot.check(ar_2_noInc)
+[1] TRUE
+> linear.boot.check(ar_1_const)
+[1] TRUE
+> linear.boot.check(ar_2_const)
+[1] TRUE
+> 
+> 
+> 
+> ## nthresh ==1
+> set_1th_l1 <-  setar(lynx, nthresh=1, m=1)
+Warning message:
+Possible unit root in the low  regime. Roots are: 0.5005 
+> set_1th_l2 <-  setar(lynx, nthresh=1, m=2)
+Warning message:
+Possible unit root in the low  regime. Roots are: 0.4681 5.0788 
+> set_1th_l1_tr <-  setar(lynx, nthresh=1, m=1, include = "trend")
+Warning message:
+Possible unit root in the low  regime. Roots are: 0.633 
+> 
+> 
+> setar.boot.check(set_1th_l1)
+[1] "Mean relative difference: 0.987262"
+> setar.boot.check(set_1th_l1, n_digits = 2)
+[1] TRUE
+> setar.boot.check(set_1th_l2)
+[1] "Mean relative difference: 0.1405485"
+> setar.boot.check(set_1th_l2, n_digits = 5)
+[1] "Mean relative difference: 0.2019088"
+> setar.boot.check(set_1th_l1_tr)
+[1] "Mean relative difference: 9.138646e-07"
+> setar.boot.check(set_1th_l1_tr, n_digits = 1)
+[1] TRUE
+> 
+> 
+> ## why difference?
+> if(FALSE) {
++   library(tidyverse)
++   getTh(set_1th_l2)
++   filt_diff <-  function(x, minus=2, tol =1) {
++     x2 <- x %>% 
++       mutate(diff = x$boot - x$orig)
++     first <- which(abs(x2$diff)>tol)[1]
++     filter(x2, between(n_row, first -minus, first +minus))
++   }
++   set_1th_l2_b <- setar.boot(setarObject = set_1th_l2, boot.scheme = "check", n_digits = 7)
++   
++   df_comp <- data_frame(orig = lynx, boot = set_1th_l2_b$serie) %>% 
++     mutate(n_row = 1:n(),
++            th1 = getTh(set_1th_l1_tr)[1],
++            th2 = getTh(set_1th_l1_tr)[2],
++            reg = regime(set_1th_l1_tr)) 
++   
++   df_comp %>% 
++     filt_diff(tol = 0.01)   
++   df_comp %>% 
++     qplot(x=n_row, y = as.numeric(orig), data =., geom = "line") +
++     geom_point(aes(colour = as.numeric(reg) %>%  factor))
++     geom_line(aes(y = boot), colour = "red")
++ }
+> 
+> ## nthresh == 2
+> 
+> ### boot
+> set_2th_l1 <-  setar(lynx, nthresh=2, m=1)
+Warning message:
+Possible unit root in the low  regime. Roots are: 0.7924 
+> set_2th_l2 <-  setar(lynx, nthresh=2, m=2)
+Warning message:
+Possible unit root in the low  regime. Roots are: 0.5739 4.6636 
+> set_2th_l1_tr <-  setar(lynx, nthresh=2, m=1, include = "trend")
+Warning message:
+Possible unit root in the low  regime. Roots are: 0.633 
+> 
+> 
+> setar.boot.check(set_2th_l1)
+[1] TRUE
+> setar.boot.check(set_2th_l2)
+[1] "Mean relative difference: 1"
+> setar.boot.check(set_2th_l2, n_digits = 1)
+[1] "Mean relative difference: 0.5431945"
+> setar.boot.check(set_2th_l1_tr)
+[1] "Mean relative difference: 1"
+> setar.boot.check(set_2th_l1_tr, n_digits = 1)
+[1] "Mean relative difference: 0.0001531941"
+> 
+> 
+> ################
+> ### tets sim
+> ################
+> 
+> ## nthresh ==0
+> set.seed(123)
+> innov_1 <-  rnorm(200)
+> sim_nth0 <- setar.sim(B=0.5, lag=1, nthresh=0, 
++                       include ="none",
++                       starting= 0.4,
++                       innov=innov_1,
++                       show.parMat = TRUE)$serie
+     const trend phi_1
+[1,]     0     0   0.5
+> 
+> head(sim_nth0)
+[1]  0.4000000 -0.3604756 -0.4104153  1.3535007  0.7472587  0.5029171
+> 
+> ## nthresh ==1
+> Bvals <- c(2.9,-0.4,-0.1, 2, 0.2,0.3)
+> sim_new <- setar.sim(B=Bvals,lag=2, nthresh=1, Thresh=2, starting=c(2.8,2.2),
++                      innov=innov_1, show.parMat = TRUE)$serie
+     const_L trend_L phi_1_L phi_2_L const_H trend_H phi_1_H phi_2_H
+[1,]     2.9       0    -0.4    -0.1       2       0     0.2     0.3
+> 
+> head(sim_new)
+[1] 2.800000 2.200000 2.719524 2.973727 4.969311 3.956489
+> 
+> proc.time()
+   user  system elapsed 
+  1.712   0.041   1.738 
