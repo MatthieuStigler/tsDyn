@@ -22,4 +22,10 @@ all.equal(coef(all_lin[["none_l_1"]]), ar_1_noMean$ar[,,1], check.attributes = F
 all.equal(coef(all_lin[["const_l_2"]])[-1], ar_2_Mean$ar[,,1], check.attributes = FALSE)
 all.equal(coef(all_lin[["none_l_2"]]), ar_2_noMean$ar[,,1], check.attributes = FALSE)
 
-## mean?
+## predict?
+all_lin_const <- all_lin[grep("const", names(all_lin))]
+all_lin_pred <- lapply(all_lin_const, predict, n.ahead = 5)
+
+ar_1_Mean_pred <- predict(ar_1_Mean, n.ahead = 5)$pred
+
+all.equal(ar_1_Mean_pred, all_lin_pred[["const_l_1"]], check.attributes = TRUE)
