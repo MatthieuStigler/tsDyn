@@ -6,11 +6,13 @@
 \alias{irf.nlVar}
 \title{Impulse response function}
 \usage{
-\method{irf}{linear}(x, n.ahead = 10, cumulative = FALSE,
-  boot = TRUE, ci = 0.95, runs = 100, ...)
+\method{irf}{linear}(x, impulse = NULL, response = NULL,
+  n.ahead = 10, ortho = TRUE, cumulative = FALSE, boot = TRUE,
+  ci = 0.95, runs = 100, seed = NULL, ...)
 
-\method{irf}{ar}(x, n.ahead = 10, cumulative = FALSE, boot = TRUE,
-  ci = 0.95, runs = 100, ...)
+\method{irf}{ar}(x, impulse = NULL, response = NULL, n.ahead = 10,
+  ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+  runs = 100, seed = NULL, ...)
 
 \method{irf}{nlVar}(x, impulse = NULL, response = NULL, n.ahead = 10,
   ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
@@ -21,7 +23,16 @@
 \command{lineVar()}, or object of class \sQuote{\code{VECM}}; generated
 by\command{VECM()}.}
 
+\item{impulse}{A character vector of the impulses, default is all variables.}
+
+\item{response}{A character vector of the responses, default is all
+variables.}
+
 \item{n.ahead}{Integer specifying the steps.}
+
+\item{ortho}{Logical, if \code{TRUE} (the default) the orthogonalised
+impulse response coefficients are computed (only for objects of class
+\sQuote{\code{varest}}).}
 
 \item{cumulative}{Logical, if \code{TRUE} the cumulated impulse response
 coefficients are computed. The default value is false.}
@@ -34,19 +45,10 @@ bands.}
 
 \item{runs}{An integer, specifying the runs for the bootstrap.}
 
-\item{...}{Currently not used.}
-
-\item{impulse}{A character vector of the impulses, default is all variables.}
-
-\item{response}{A character vector of the responses, default is all
-variables.}
-
-\item{ortho}{Logical, if \code{TRUE} (the default) the orthogonalised
-impulse response coefficients are computed (only for objects of class
-\sQuote{\code{varest}}).}
-
 \item{seed}{An integer, specifying the seed for the \code{rng} of the
 bootstrap.}
+
+\item{...}{Currently not used.}
 }
 \value{
 A list of class \sQuote{\code{varirf}} with the following elements
