@@ -11,7 +11,7 @@
 #'
 #'\code{setar.boot} on the other side resample/bootstraps an existing setar output. 
 #'It uses a recursive approach, reconstructing the series. 
-#'Residuals from the original model are resampled using different bootstrap schemes, see  \code{boot.scheme}
+#'Residuals from the original model are resampled using different bootstrap schemes, see  \code{\link{resample_vec}}. 
 #'
 #'@param B Simulation: vector of coefficients to simulate from. 
 #'@param Thresh,nthresh,lag,include Simulation: parameters for the SETAR to simulate. 
@@ -20,7 +20,7 @@
 #'@param n Simulation: Number of observations to simulate.
 #'@param starting Simulation: Starting values (same length as lag)
 #'@param setarObject Bootstrap: the \code{\link{setar}} object to resample data from.
-#'@param boot.scheme Bootstrap: which resampling scheme to use for the residuals?
+#'@param boot.scheme Bootstrap: which resampling scheme to use for the residuals. See \code{\link{resample_vec}}. 
 #'@param seed Bootstrap: seed used in the resampling
 #'@param \dots additional arguments for the unexported \code{rand.gen}.  
 #'@return a list with the simulated/bootstraped data and the parameter matrix
@@ -154,9 +154,10 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
 
 #' @rdname setar.sim
 #' @export
-setar.boot <- function(setarObject, boot.scheme = c("resample", "wild1", "wild2", "check"),
+setar.boot <- function(setarObject, boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
                        seed = NULL, ...){
   
+  boot.scheme <-  match.arg(boot.scheme)
   mod <- setarObject$model.specific
   nthresh <- mod$nthresh
   
@@ -189,7 +190,7 @@ setar.boot <- function(setarObject, boot.scheme = c("resample", "wild1", "wild2"
   ## residuals, boot them
   resids <- residuals(setarObject)[-c(1:lags)]
   if(!is.null(seed)) set.seed(seed) 
-  innov <- resamp(resids, boot.scheme = boot.scheme, seed=seed)
+  innov <- resample_vec(resids, boot.scheme = boot.scheme, seed=seed)
   
   ##
   setar.gen(B = B, lag = lags,
@@ -203,7 +204,7 @@ setar.boot <- function(setarObject, boot.scheme = c("resample", "wild1", "wild2"
 #'@rdname setar.sim
 #'@param linearObject Bootstrap: the \code{\link{linear}} object to resample data from.
 #' @export
-linear.boot <- function(linearObject, boot.scheme = c("resample", "wild1", "wild2", "check"),
+linear.boot <- function(linearObject, boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
                        seed = NULL, ...){
   setar.boot(setarObject = linearObject, boot.scheme = boot.scheme, seed = seed, ...)
 }

@@ -1,4 +1,21 @@
-resamp <- function(x, boot.scheme=c("resample", "wild1", "wild2", "check"), seed = NULL){
+#' Resampling schemes
+#' 
+#' Bootstrap a vector according to multiple resampling schemes: resampling, block resampling, Wild bootstrap. 
+#' @param x A numeric vector
+#' @param boot.scheme The type of resampling scheme used, see Details
+#' @param seed the seed used, see \code{\link{set.seed}}
+#' @param block.size for the \code{resample_block} scheme, the size of the blocks.
+#'  
+#' @details This function offers various bootrsap/resampling schemes:
+#' \describe{
+#'   \item{resample}{Resampling with replacement}
+#'   \item{resample_block}{Resampling contiguous observations (blocks) with replacement. Use argument \code{block.size}}
+#'   \item{wild1}{Wild bootstrap: do not resample, but add a N(0,1) distribution to each value}
+#'   \item{wild12}{Wild bootstrap: same, but add instead -1 or 1. }
+#' }
+
+resample_vec <- function(x, boot.scheme=c("resample","resample_block", "wild1", "wild2", "check"), seed = NULL, 
+                   block.size=2){
   
   boot.scheme <- match.arg(boot.scheme)
   
@@ -9,6 +26,7 @@ resamp <- function(x, boot.scheme=c("resample", "wild1", "wild2", "check"), seed
   if(!is.null(seed)) set.seed(seed) 
   X_boot <- switch(boot.scheme, 
                   "resample" =  X[sample(seq_len(t), replace=TRUE),,drop= FALSE], 
+                  "resample_block" = X[sample.block(seq_len(t), block.size = block.size), , drop= FALSE], 
                   "wild1" = X+rnorm(t), 
                   "wild2" = X+sample(c(-1,1), size = t, replace=TRUE),
                   "check" = X)
@@ -17,9 +35,14 @@ resamp <- function(x, boot.scheme=c("resample", "wild1", "wild2", "check"), seed
 }
 
 if(FALSE) {
-  head(resamp(x=lynx, seed = 123))
-  head(resamp(cbind(lynx, lynx), seed = 123))
+  head(resample_vec(x=lynx, seed = 123))
+  head(resample_vec(cbind(lynx, lynx), seed = 123))
+  
+  head(resample_vec(cbind(lynx, lynx), seed = 123, boot.scheme = "resample_block"))
 }
+
+### for backwards compatibility
+resample_vec
 
 #### Small function to sample in block: sample.block 
 sample.block <- function(x, size=length(x), block.size=2){
@@ -34,4 +57,11 @@ sample.block <- function(x, size=length(x), block.size=2){
   
   if(any(m3>n)) m3[m3>n] <- m3[m3>n]-(max(m3)-n)
   x[m3]
+}
+
+
+
+if(FALSE) {
+  M <-  matrix(1:20, ncol = 2)
+  sample.block(x=M)
 }

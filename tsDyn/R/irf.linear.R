@@ -98,45 +98,6 @@ irf_1_sim <-  function(x, n.ahead = 10, innov, ...) {
   res$serie[-seq_len(lag)]
 }
 
-irf_1_shock <-  function(x, innov, exo, diff_only = FALSE, n.ahead=10) {
-  
-  ## extract
-  y_orig <- x$str$x
-  T_full <- length(y_orig)
-  k <- x$k
-  lag <- x$str$m
-  t <-  T_full- lag
-  include <- x$include
-  B <- coef(x)
-  
-  nthresh <- 0
-  Thresh <- NA
-  
-  ##
-  if(missing(innov)) innov <-  rnorm(t)
-  if(missing(exo)) exo <-  c(rep(0, 10), 1, rep(0, t+lag-11))
-  
-  
-  ## sim 1
-  sim_1 <- setar.gen(B = B, lag = lag,
-                             nthresh = nthresh, Thresh = Thresh,
-                             include= include, 
-                             # starting = starts,  
-                             innov = innov, n = t)$serie
-  
-  sim_2 <- setar.gen(B = B, lag = lag,
-                             nthresh = nthresh, Thresh = Thresh,
-                             include= include, 
-                             # starting = starts,  
-                             innov = innov, n = t, 
-                             exo = exo)$serie
-  
-  # check
-  df <- data.frame(sim_1= sim_1, sim_2 = sim_2)
-  df$diff <- sim_2 - sim_1
-  df
-  
-}
 
 
 
