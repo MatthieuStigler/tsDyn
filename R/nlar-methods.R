@@ -1,4 +1,48 @@
-## Copyright (C) 2005, 2006, 2007/2006, 2008  Antonio, Fabio Di Narzo
+#' NLAR methods
+#' 
+#' Generic \sQuote{nlar} methods. Method \sQuote{nlar} is described in a
+#' separate page: \code{\link{nlar}}
+#' 
+#' \describe{ 
+#'   \item{MAPE}{ Mean Absolute Percent Error } 
+#'   \item{mse}{ Mean Square Error } 
+#'   \item{plot}{ Diagnostic plots } }
+#' 
+#' @param x,object fitted \sQuote{nlar} object
+#' @param ask graphical option. See \code{\link{par}}
+#' @param digits For print method, see \code{\link{printCoefmat}}.
+#' @param label LaTeX label passed to the equation
+#' @param \dots further arguments to be passed to and from other methods
+#' @author Antonio, Fabio Di Narzo
+#' @seealso \code{\link{availableModels}} for listing all currently available
+#' models.
+#' @keywords ts
+#' @examples
+#' 
+#' x <- log10(lynx)
+#' mod.setar <- setar(x, m=2, thDelay=1, th=3.25)
+#' mod.setar
+#' AIC(mod.setar)
+#' mse(mod.setar)
+#' MAPE(mod.setar)
+#' coef(mod.setar)
+#' summary(mod.setar)
+#' 
+#' e <- residuals(mod.setar)
+#' e <- e[!is.na(e)]
+#' plot(e)
+#' acf(e)
+#' 
+#' plot(x)
+#' lines(fitted(mod.setar), lty=2)
+#' legend(x=1910, y=3.9,lty=c(1,2), legend=c("observed","fitted"))
+#' 
+#' plot(mod.setar)
+#'
+#' @name nlar-methods
+NULL
+
+## Copyright (C) 2005, 2006, 2007/2006, 2008, 2018  Antonio, Fabio Di Narzo
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -14,6 +58,7 @@
 ## http://www.gnu.org/copyleft/gpl.html.  You can also obtain it by
 ## writing to the Free Software Foundation, Inc., 59 Temple Place,
 ## Suite 330, Boston, MA  02111-1307  USA.
+
 
 
 nlar.struct <- function(x, m, d=1, steps=d, series) {
@@ -146,6 +191,7 @@ nlar <- function(str, coefficients, fitted.values, residuals, k, model,
                 ))
 }
 
+
 #' @export
 #Print nlar object
 print.nlar <- function(x, digits = max(3, getOption("digits") - 3), ...) {
@@ -153,6 +199,7 @@ print.nlar <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   invisible(x)
 }
 
+#'@rdname nlar-methods
 #' @export
 #Coefficients of a nlar.fit object (actually only for aar, as setar and lstar have dedicated one)
 coef.nlar <- function(object,  ...){
@@ -161,6 +208,7 @@ coef.nlar <- function(object,  ...){
 }
   
 
+#'@rdname nlar-methods
 #' @export
 #Fitted values for the fitted nlar object
 fitted.nlar <- function(object, ...) {
@@ -170,6 +218,9 @@ fitted.nlar <- function(object, ...) {
   ans
 }
 
+#'@rdname nlar-methods
+#' @template param_timeAttr
+#' @template param_initVal
 #' @export
 #Observed residuals for the fitted nlar object
 residuals.nlar <- function(object, initVal=TRUE, timeAttr = TRUE, ...) {
@@ -293,6 +344,7 @@ getTh.nlVar<-function(object,...){
 }
 
 
+#'@rdname nlar-methods
 #' @export
 #Observed residuals for the fitted nlar object
 deviance.nlar<-function(object,...) crossprod(object$residuals)
@@ -321,10 +373,14 @@ mse <- function (object, ...)
 mse.default <- function(object, ...)
   NULL
 
+#' @rdname nlar-methods
 #' @export
 mse.nlar <- function(object, ...)
   sum(object$residuals^2)/object$str$n.used
 
+#' @rdname nlar-methods
+#' @param k numeric, the penalty per parameter to be used for AIC/BIC; the default k = 2 is
+#' the classical AIC
 #' @export
 #AIC for the fitted nlar model
 AIC.nlar <- function(object,k=2, ...){
@@ -333,6 +389,7 @@ AIC.nlar <- function(object,k=2, ...){
   n * log( mse(object) ) + k * npar
 }
 
+#' @rdname nlar-methods
 #' @export
 #BIC for the fitted nlar model
 BIC.nlar <- function(object, ...)
@@ -364,12 +421,14 @@ MAPE <- function(object, ...)
 MAPE.default <- function(object, ...)
   NULL
 
+#' @rdname nlar-methods
 #' @export
 MAPE.nlar <- function(object, ...) {
   e <- abs(object$residuals/object$str$yy)
   mean( e[is.finite(e)] )
 }
 
+#'@rdname nlar-methods
 #' @export
 #Computes summary infos for the fitted nlar model
 summary.nlar <- function(object, ...) {
@@ -396,6 +455,7 @@ print.summary.nlar <- function(x, ...) {
   invisible(x)
 }
 
+#'@rdname nlar-methods
 #' @export
 plot.nlar <- function(x, ask = interactive(), ...) {
   str <- x$str
@@ -452,6 +512,9 @@ plot.nlar <- function(x, ask = interactive(), ...) {
 oneStep <- function(object, newdata, ...)
   UseMethod("oneStep")
 
+
+#'@rdname nlar-methods
+#'@export
 toLatex.nlar <- function(object, digits, label,...) {
   obj <- object
   str <- obj$str
