@@ -17,6 +17,8 @@ sapply(mod, mse)
 sapply(mod, MAPE)
 
 sapply(mod, coef)
+sapply(mod, coef, hyperCoef = FALSE)
+sapply(mod, getTh)
 sapply(mod, function(x) head(residuals(x)))
 sapply(mod, function(x) head(residuals(x, initVal = FALSE)))
 
