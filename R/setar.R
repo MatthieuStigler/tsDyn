@@ -512,9 +512,19 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 
 #' @export
 #Coef() method: hyperCoef=FALSE won't show the threshold coef
-coef.setar <- function(object, hyperCoef=TRUE, ...){
+coef.setar <- function(object, hyperCoef=TRUE, regime = c("all", "L", "M", "H"), ...){
+  regime <-  match.arg(regime)
   co <- object$coefficients
-  if(!hyperCoef) co <- head(co, -length(getTh(object)))
+  
+  ## hyper coef: do not return th
+  if(!hyperCoef) co <- head(co, -length(getTh(object)))  
+  
+  ## select only one regime if requested
+  if(regime != "all") {
+    if(regime=="M" & object$model.specific$nthresh==1) stop("No M regime if nthresh==1")
+    pattern <- paste(c("const.", "trend.", "phi"), regime, sep="")
+    co <- co[grepl(paste(pattern, collapse = "|"), names(co))]
+  }
   co
 }
 
