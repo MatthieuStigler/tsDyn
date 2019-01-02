@@ -18,6 +18,7 @@ sapply(mod, MAPE)
 
 sapply(mod, coef)
 sapply(mod, function(x) head(residuals(x)))
+sapply(mod, function(x) head(residuals(x, initVal = FALSE)))
 
 
 lapply(mod, predict, n.ahead=10)
