@@ -477,9 +477,16 @@ plot.lstar <- function(x, ask=interactive(), legend=FALSE,
 
 #' @export
 #Coef() method: hyperCoef=FALSE won't show the threshold/slope coef
-coef.lstar <- function(object, hyperCoef=TRUE, ...){
+coef.lstar <- function(object, hyperCoef=TRUE, regime = c("all", "L", "H"), ...){
+  regime <-  match.arg(regime)
   co <- object$coefficients
+  
   if(!hyperCoef) co <- head(co, -2)
+  if(regime != "all") {
+    pattern <- paste(c("const.", "trend.", "phi"), regime, sep="")
+    co <- co[grepl(paste(pattern, collapse = "|"), names(co))]
+  }
+  
   co
 }
 

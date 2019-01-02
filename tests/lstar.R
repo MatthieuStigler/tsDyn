@@ -39,7 +39,18 @@ mod.lstar_ALL <- list(mod.lstar=mod.lstar, mod.lstar2=mod.lstar2,
                       mod.lstar_noConst=mod.lstar_noConst,mod.lstar_trend=mod.lstar_trend,
                       mod.lstar_both=mod.lstar_both,mod.lstar3=mod.lstar3)
 
+vec_min_size <- function(x, size = 1, enforce = TRUE) {
+  l <-  length(x)
+  if(l<size) x <-  c(x, rep(NA, size-l))
+  if(enforce) x <- head(x, size)
+  x
+}
+
+
 sapply(mod.lstar_ALL, function(x) c(AIC=AIC(x), BIC=BIC(x), deviance=deviance(x)))
-sapply(mod.lstar_ALL, function(x) tail(coef(x),4))
-sapply(mod.lstar_ALL, function(x) tail(coef(x,hyperCo=FALSE),4))
+sapply(mod.lstar_ALL, function(x) vec_min_size(coef(x),8))
+sapply(mod.lstar_ALL, getTh)
+sapply(mod.lstar_ALL, function(x) vec_min_size(coef(x,hyperCoef=FALSE),8))
+sapply(mod.lstar_ALL, function(x) vec_min_size(coef(x,hyperCoef=FALSE, regime = "L"), 4))
+sapply(mod.lstar_ALL, function(x) vec_min_size(coef(x,hyperCoef=FALSE, regime = "H"), 4))
 sapply(mod.lstar_ALL, function(x) head(x$model,2))
