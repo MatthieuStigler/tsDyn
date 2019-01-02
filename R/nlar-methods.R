@@ -154,9 +154,12 @@ print.nlar <- function(x, digits = max(3, getOption("digits") - 3), ...) {
 }
 
 #' @export
-#Coefficients of a nlar.fit object
-coef.nlar <- function(object, ...)
-  object$coefficients
+#Coefficients of a nlar.fit object (actually only for aar, as setar and lstar have dedicated one)
+coef.nlar <- function(object,  ...){
+  co <- object$coefficients
+  co
+}
+  
 
 #' @export
 #Fitted values for the fitted nlar object
