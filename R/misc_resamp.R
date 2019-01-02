@@ -45,23 +45,50 @@ if(FALSE) {
 resample_vec
 
 #### Small function to sample in block: sample.block 
+sample.block.alter <- function(x, size=length(x), block.size=2){
+  n <- length(x)
+  n.blocks <- ceiling((n/block.size))
+  
+  block <- rep(1:n.blocks, each=block.size)[1:n]
+  
+  # sample the blocks:
+  sam <- sample(1:n.blocks, size=n.blocks, replace=TRUE, prob = table(block))
+  
+  get_pos <- function(x) which(block %in% x)
+  get_pos(sam[4])
+  pos <- unlist(lapply(sam, get_pos))
+  length(pos)
+  
+  ## match first position in each block
+  m <- match(sam, block)
+  m2 <- rep(m, each=block.size)[1:n]   ## repeat "first
+  m3 <- m2 +rep(0:(block.size-1), n)[1:n] # match now next
+  
+  if(any(m3>n)) m3[m3>n] <- m3[m3>n]-(max(m3)-n)
+  x[m3]
+}
+
 sample.block <- function(x, size=length(x), block.size=2){
   n <- length(x)
   n.blocks <- ceiling((n/block.size))
   
   block <- rep(1:n.blocks, each=block.size)[1:n]
-  sam <- sample(1:n.blocks , size=n.blocks , replace=TRUE)
-  m<-match(sam,block)
-  m2 <- rep(m, each=block.size)[1:n]
-  m3 <- m2 +rep(0:(block.size-1), n)[1:n]
+  
+  # sample the blocks:
+  sam <- sample(1:n.blocks, size=n.blocks, replace=TRUE, prob = table(block))
+  
+  ## match first position in each block
+  m <- match(sam, block)
+  m2 <- rep(m, each=block.size)[1:n]   ## repeat "first
+  m3 <- m2 +rep(0:(block.size-1), n)[1:n] # match now next
   
   if(any(m3>n)) m3[m3>n] <- m3[m3>n]-(max(m3)-n)
   x[m3]
 }
 
 
-
 if(FALSE) {
   M <-  matrix(1:20, ncol = 2)
   sample.block(x=M)
+  sample.block(x=1:13, block.size = 3)
 }
