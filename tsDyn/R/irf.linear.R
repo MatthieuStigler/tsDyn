@@ -19,22 +19,42 @@ irf_1.linear <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   res
 }
 
+irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ...) {
+  regime <-  match.arg(regime)
+  coefs <- coef(x, regime = regime, hyperCoef = FALSE)
+  if(any(grepl("const|trend", names(coefs)))) coefs <-  coefs[-grep("const|trend", names(coefs))]
+  
+  empty_series <- c(1, rep(0, n.ahead-1))
+  
+  res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
+  if(cumulative) res <-  cumsum(res)
+  res
+}
+
+
 ## 
 irf_any <-  function(x, n.ahead = 10, cumulative = FALSE, 
                      boot = TRUE, ci = 0.95, runs = 100,
+                     regime = c("L", "M", "H"),
                      ...) {
-  
-  irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative)
+  regime <-  match.arg(regime)
+  irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
   
   ## 
   if(boot) {
     boot_estim <- function(x) {
       x_b <- setar.boot(x)
-      mod_b <- linear(x_b$serie, m = x$str$m, include = x$include)
-      irf_b <- irf_1(x=mod_b , n.ahead = n.ahead, cumulative = cumulative)
+      if(inherits(x, "linear")) {
+        mod_b <- linear(x_b$serie, m = x$str$m, include = x$include)
+      } else if(inherits(x, "setar")) {
+        mod_b <- setar(x_b$serie, m = x$str$m, include = x$include,
+                       nthresh = x$model.specific$nthresh, th = getTh(x))
+      }
+      
+      irf_b <- irf_1(x=mod_b , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
       irf_b
     }
-    boot_estim(x)
+    # boot_estim(x)
     IRF_b <- t(replicate(runs, boot_estim(x)))
     quants <- t(apply(IRF_b, 2, quantile, probs = c(1-ci, ci)))
   }
@@ -67,6 +87,16 @@ irf.linear <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, 
   if(!is.null(impulse) | !is.null(response) | !ortho) stop("Arguments used only for multivariate models")
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
            boot = boot, ci = ci, runs = runs, ...)
+}
+
+#' @rdname irf.nlVar
+#' @param regime For a setar model, which regime (L, M or H) to produce IRF for?
+#' @export
+irf.setar <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, 
+                        boot=TRUE, ci=0.95, runs=100, seed=NULL, regime = c("L", "M", "H"),...) {
+  if(!is.null(impulse) | !is.null(response) | !ortho) stop("Arguments used only for multivariate models")
+  irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
+          boot = boot, ci = ci, runs = runs, regime = regime, ...)
 }
 
 #' @rdname irf.nlVar
@@ -119,6 +149,7 @@ if(FALSE) {
   
   linear_l2_none <- linear(lh, m = 2, include = "none")
   linear_l2_const <- linear(lh, m = 2, include = "const")
+  setar_l2_const <- setar(lh, m = 2, include = "const")
   all.equal(coef(linear_l2_none), ar_2_noMean$ar[,,1], check.attributes = FALSE)
   all.equal(coef(linear_l2_const)[-1], ar_2_Mean$ar[,,1], check.attributes = FALSE)
   
@@ -137,8 +168,8 @@ if(FALSE) {
   
   irf_1(ar_2_noMean)
   irf_1(linear_l2_none)
-  all.equal(irf_1(ar_2_noMean), irf_1(linear_l2_none))
-  all.equal(irf_1(linear_l2_none),   irf_1_sim(linear_l2_none))
+  all.equal(irf_1(x=ar_2_noMean), irf_1(linear_l2_none))
+  all.equal(irf_1(x=linear_l2_none),   irf_1_sim(linear_l2_none))
   
   
   ## irf constant
@@ -185,6 +216,15 @@ if(FALSE) {
   plot(irf_full)
   a(irf_full)
   
+  ## setar
+  irf_1_L <- irf_1(setar_l2_const, regime = "L")
+  irf_1_H <- irf_1(x=setar_l2_const, regime = "H")
+  plot(1:10, irf_1_L, type = "l")
+  lines(1:10, irf_1_H, lty = 2)
+  irf_set_regL <- irf(setar_l2_const, regime = "L", ci = 0.8)
+  irf_set_regH <- irf(setar_l2_const, regime = "H", ci = 0.8)
+  plot(irf_set_regL, ylim = c(0, 1.2))
+  plot(irf_set_regH)
 }
 
 
