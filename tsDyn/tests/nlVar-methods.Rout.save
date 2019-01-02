@@ -1,5 +1,5 @@
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -400,6 +400,14 @@ long.run -1 Equation long.run    0.70126696
 > sapply(mods, deviance)
    tvecm  linVECM      lin     tvar 
 155.6996 175.0327 175.6268 162.8903 
+> sapply(mods, function(x) dim(residuals(x, initVal=FALSE)))
+     tvecm linVECM lin tvar
+[1,]   480     479 480  481
+[2,]     2       2   2    2
+> sapply(mods, function(x) dim(residuals(x, initVal=TRUE)))
+     tvecm linVECM lin tvar
+[1,]   482     482 482  482
+[2,]     2       2   2    2
 > sapply(mods, function(x) head(residuals(x), 3))
             tvecm      linVECM         lin        tvar
 [1,]  0.049395340  0.078376233  0.01779303  0.03417027
@@ -408,6 +416,14 @@ long.run -1 Equation long.run    0.70126696
 [4,]  0.193936690 -0.044023062  0.12821526 -0.06422468
 [5,] -0.065673036 -0.004666217 -0.07471015  0.17826362
 [6,] -0.005925491 -0.081704546 -0.05732029 -0.01966223
+> sapply(mods, function(x) head(residuals(x, initVal=TRUE), 3))
+          tvecm linVECM        lin        tvar
+[1,]         NA      NA         NA          NA
+[2,]         NA      NA         NA  0.03417027
+[3,] 0.04939534      NA 0.01779303  0.03500335
+[4,]         NA      NA         NA          NA
+[5,]         NA      NA         NA -0.06422468
+[6,] 0.19393669      NA 0.12821526  0.17826362
 > sapply(mods, function(x) tail(residuals(x), 3))
             tvecm      linVECM         lin         tvar
 [1,] -0.178474097 -0.219251054 -0.18756839 -0.216980265
@@ -806,4 +822,4 @@ X_{t-1}^{1} \\ X_{t-1}^{2}
 > 
 > proc.time()
    user  system elapsed 
-  2.327   0.092   2.407 
+  2.454   0.094   2.534 

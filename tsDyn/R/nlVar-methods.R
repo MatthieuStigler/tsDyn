@@ -216,13 +216,20 @@ BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
 }
 
 #' @export
-deviance.nlVar<-function(object,...){
+deviance.nlVar<-function(object, ...){
 	as.numeric(crossprod(c(object$residuals)))
 }
 
 #' @export
-residuals.nlVar<-function(object,...){
-	object$residuals
+residuals.nlVar<-function(object, initVal=FALSE, ...){
+  resids <- object$residuals
+  
+  if(initVal) {
+    n_init <- object$T - object$t
+    resids <- rbind(matrix(NA,  nrow=n_init, ncol = object$k),
+                    resids)
+  } 
+  resids
 }
 
 #'fitted method for objects of class nlVar, i.e. VAR and VECM models.

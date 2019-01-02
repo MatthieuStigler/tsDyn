@@ -1,7 +1,6 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -85,6 +84,14 @@ $aar
 [4,] -0.07368020 -0.07301664 -0.07994243 -0.10249452
 [5,]  0.11071953  0.04888145  0.02963628  0.02850267
 [6,]  0.20491541  0.11531771  0.09356303  0.11476657
+> sapply(mod, function(x) head(residuals(x, initVal = FALSE)))
+          linear        setar       lstar         aar
+[1,]  0.05686638  0.050773403  0.04395966  0.03301780
+[2,] -0.07368020 -0.073016636 -0.07994243 -0.10249452
+[3,]  0.11071953  0.048881450  0.02963628  0.02850267
+[4,]  0.20491541  0.115317711  0.09356303  0.11476657
+[5,]  0.12993869  0.001064474  0.01332241  0.06337584
+[6,]  0.32134522  0.350663610  0.36470166  0.34847606
 > 
 > 
 > lapply(mod, predict, n.ahead=10)
@@ -222,5 +229,5 @@ $aar
 > 
 > 
 > proc.time()
-utilisateur     système      écoulé 
-     17.210       0.220      17.438 
+   user  system elapsed 
+  2.523   0.094   2.603 
