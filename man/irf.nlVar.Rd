@@ -2,6 +2,7 @@
 % Please edit documentation in R/irf.linear.R, R/irf.nlVar.R
 \name{irf.linear}
 \alias{irf.linear}
+\alias{irf.setar}
 \alias{irf.ar}
 \alias{irf.nlVar}
 \title{Impulse response function}
@@ -9,6 +10,10 @@
 \method{irf}{linear}(x, impulse = NULL, response = NULL,
   n.ahead = 10, ortho = TRUE, cumulative = FALSE, boot = TRUE,
   ci = 0.95, runs = 100, seed = NULL, ...)
+
+\method{irf}{setar}(x, impulse = NULL, response = NULL, n.ahead = 10,
+  ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
+  runs = 100, seed = NULL, regime = c("L", "M", "H"), ...)
 
 \method{irf}{ar}(x, impulse = NULL, response = NULL, n.ahead = 10,
   ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95,
@@ -49,6 +54,8 @@ bands.}
 bootstrap.}
 
 \item{...}{Currently not used.}
+
+\item{regime}{For a setar model, which regime (L, M or H) to produce IRF for?}
 }
 \value{
 A list of class \sQuote{\code{varirf}} with the following elements
