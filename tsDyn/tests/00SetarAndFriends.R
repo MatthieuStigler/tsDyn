@@ -37,6 +37,11 @@ sapply(set_all, function(x) head(x$model,2))
 
 lapply(set_all[c(1,2,4)], toLatex)
 
+## coefs
+sapply(set_all, function(x) tail(coef(x, regime = "L"),4))
+sapply(set_all, function(x) tail(coef(x, regime = "H"),4))
+
+
 ###SelectSetar
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
 selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
