@@ -169,136 +169,44 @@ fitted.nlar <- function(object, ...) {
 
 #' @export
 #Observed residuals for the fitted nlar object
-residuals.nlar <- function(object, ...) {
+residuals.nlar <- function(object, initVal=TRUE, timeAttr = TRUE, ...) {
   str <- object$str
   data <- str$x
-  ans <- c(rep(NA, str$n.used - length(object$residuals) ), object$residuals)
-  tsp(ans) <- tsp(data)
-  ans <- as.ts(ans)
-  ans
-}
-
-#'Extract a variable showing the regime
-#'
-#'This function allows to extract the indicator variable specifying the regime
-#'in which the process is at time t.
-#'
-#'
-#'@aliases regime regime.default
-#'@param object object of class \code{setar} or \code{nlVar}
-#'@param initVal Logical. Whether the NA initial values should be returned.
-#'Default to TRUE.
-#'@param timeAttr Logical. Whether the time attributes should be returned.
-#'Default to TRUE.
-#'@param series Optional. A numeric vector to classify according to the model. 
-#'@param \dots additional arguments to \code{regime}
-#'@return Time series of same attributes as input to setar.
-#'@author Matthieu Stigler
-#'@keywords ts
-#'@export
-#'@examples
-#'
-#'set<-setar(lynx, m=3)
-#'regime(set)
-#'regime(set, time=FALSE, initVal=FALSE)
-#'
-#'plot(regime(set))
-#'
-
-#indicator of the regime of the obs
-regime <- function (object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...)  
-  UseMethod("regime")
-
-#'@export
-regime.default <- function(object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...)
-  NULL
-
-
-#' @export
-regime.setar <- function(object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...) {
-  if(!is.null(series)) {
-    thDelay <- object$model.specific$thDelay
-    series_lagged <- lag_manual(series, k = thDelay+1, time_attr = timeAttr)
-    reg <- as.numeric(cut(series_lagged, 
-                           breaks = c(-Inf,getTh(object), Inf),
-                           labels = 1: (object$model.specific$nthresh+1)))
-    # reg2[1:object$str$m] <- NA
-    if(timeAttr) attributes(reg) <- attributes(series)
-    initVal <-  TRUE
-    timeAttr <-  FALSE
+  resids <- object$residuals
+  n_init <- str$n.used - length(resids)
+  
+  if(initVal) {
+    res <- c(rep(NA,  n_init), resids)  
   } else {
-    reg <- object$model.specific$regime  
+    res <- resids
   }
   
-  str <- object$str
-  
-  if(timeAttr){
-    attributes(reg) <- object$model.specific$timeAttributes
+  if(timeAttr) {
     if(!initVal) {
-      reg <- window(reg, start=time(reg)[length(str$x)-length(str$yy)+1])
+      data <- tail(data, -n_init)
     }
-  } else {
-    if(!initVal){
-      reg <- reg[-seq_len(length(str$x)-length(str$yy))]
-    }
+    tsp(res) <- tsp(data)
+    res <- as.ts(res)
   }
   
-  return(reg)
+  res
 }
-            
-#' @export
-regime.nlVar <- function(object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...) {
-  reg <- object$model.specific$regime
+
+
+if(FALSE) {
+  library(tsDyn)
+  linear_l2_none <- linear(lh, m = 2, include = "none")
+  residuals(linear_l2_none)
+  residuals(linear_l2_none, timeAttr = FALSE)
+  residuals(linear_l2_none, initVal = FALSE)
+  residuals(linear_l2_none, initVal = FALSE, timeAttr = FALSE)
   
-  if(timeAttr){
-    attributes(reg) <- object$model.specific$timeAttributes
-    if(!initVal) {
-      reg <- window(reg, start=time(reg)[object$T-object$t+1])
-    }
-  } else {
-    if(!initVal){
-      reg <- reg[-c(1:(object$T-object$t))]
-    }
-  }
-  
-  return(reg)
+  linear_l2_none_num <- linear(as.numeric(lh), m = 2, include = "none")
+  residuals(linear_l2_none_num)
+  residuals(linear_l2_none_num, timeAttr = FALSE)
+  residuals(linear_l2_none_num, initVal = FALSE)
+  residuals(linear_l2_none_num, initVal = FALSE, timeAttr = FALSE)
 }
-
-#' @rdname regime
-#' @param discretize logical (default TRUE) whether the series are discretized to {1,2}, 
-#' or whether regimeprobabilities are returned. 
-#' @export
-regime.lstar <- function(object, initVal=TRUE, timeAttr=TRUE, series, discretize=TRUE, ...){
-
-  if(!missing(series)) stop("arg 'series' not implemented for lstar")
-  thVar <- object$model.specific$thVar
-  str <- object$str
-
-  reg <- G(z=thVar, gamma=coef(object)["gamma"], th=getTh(object))
-
-  if(discretize) {
-    reg <- ifelse(reg <=0.5, 1,2)
-  }
-
-  if(timeAttr){
-    attributes(reg) <- object$model.specific$timeAttributes
-    if(initVal) {
-      ans <- reg
-    } else {
-      ans <- window(reg, start=time(reg)[length(str$x)-length(str$yy)+1])
-    }
-  } else {
-    if(initVal){
-      ans <- reg
-    } else {
-      ans <- reg[-c(1:(length(str$x)-length(str$yy)))]
-    }
-  }
-
-  return(ans)
-
-}
-
 
 #get the threshold for setar and nlVar
 
