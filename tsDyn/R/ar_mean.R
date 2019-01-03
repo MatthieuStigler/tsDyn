@@ -30,13 +30,15 @@ ar_mean <- function(object, ...) UseMethod("ar_mean")
 
 ## compute the mean if has constant
 ar_mean_const <- function(x) {
-  x[1]/(1- sum(x[-1]))
+  res <- x[1]/(1- sum(x[-1]))
+  names(res) <-  "ar_mean" # might be overwritten
+  res
 }
 
 ## check parameters, use fo_const if constant
 check_inc <-  function(include, coef, fo_const) {
   if(include == "none") {
-    return(0)
+    return(c("ar_mean"=0))
   } else if(include == "const") {
     return(fo_const(coef))
   } else if(include %in% c("trend", "both")) {
@@ -59,7 +61,7 @@ ar_mean.setar <-  function(object, ...) {
     reg_co <- gsub('const\\.|phi|\\.[0-9]+$','', names(x))
     coefs_by_regime <- split(x, reg_co)
     res <- sapply(coefs_by_regime, ar_mean_const)
-    names(res) <- names(coefs_by_regime)
+    names(res) <- paste("ar_mean", names(coefs_by_regime), sep = "_")
     res
   }
   
@@ -81,7 +83,7 @@ if(FALSE) {
   lin_cst_l2 <-  linear(lh, m = 2, include = "const")
 
   ## collect all
-  ar_mean(lin_cst_l1)
+  ar_mean(lin_non_l1)
   lin_all <-  list(lin_cst_l1 = lin_cst_l1,
                    lin_trd_l1 = lin_trd_l1,
                    lin_bth_l1 = lin_bth_l1,
