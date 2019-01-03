@@ -1,3 +1,6 @@
+Version 0.9-50: Matthieu Stigler (20/5/2018)
+ -new: ar_mean, to compute the long-term mean of an AR process
+
 Version 0.9-48: Matthieu Stigler (20/5/2018)
  -minor: fix two issues in R test, reduce tolerance
  -minor: create internal coefVec
