@@ -5,7 +5,7 @@
 #' @importFrom graphics abline axis contour curve image layout legend lines lines.default par
 #' @importFrom graphics persp plot points segments title
 #' @importFrom methods new hasArg
-#' @importFrom stats AIC acf aggregate anova ar arima.sim as.formula as.ts coef coefficients
+#' @importFrom stats AIC BIC acf aggregate anova ar arima.sim as.formula as.ts coef coefficients
 #' @importFrom stats confint confint.default dchisq deltat density deviance embed frequency is.ts lm lm.fit
 #' @importFrom stats logLik na.omit optim optimHess pacf pf pgamma plogis plot.ts pnorm predict
 #' @importFrom stats princomp printCoefmat pt qgamma quantile residuals rnorm sd symnum time ts
