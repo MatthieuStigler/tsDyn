@@ -1,7 +1,7 @@
 ^data-raw$
+<<<<<<< HEAD
 ^man-roxygen$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^revdep$
 #^README\.Rmd$
-
