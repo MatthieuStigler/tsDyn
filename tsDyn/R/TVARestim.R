@@ -822,11 +822,13 @@ condiStep <- function(allTh, threshRef, delayRef, fun, trim, trace=TRUE, More=NU
 	#results
   store2 <- c(storeMinus, storePlus)
   positionSecond <- which(store2==min(store2, na.rm=TRUE), arr.ind=TRUE)
-  if(positionSecond<=length(storeMinus))
-    newThresh<-gammaMinus[positionSecond]
-  else
-    newThresh<-gammaPlus[positionSecond-length(storeMinus)]
-  SSR<-min(store2, na.rm=TRUE)
+  positionSecond <-  positionSecond[1] ## arbitrary, in case multiple values
+  if(positionSecond<=length(storeMinus)) {
+    newThresh <- gammaMinus[positionSecond]
+  } else {
+    newThresh <- gammaPlus[positionSecond - length(storeMinus)]
+  }
+  SSR <- min(store2, na.rm = TRUE)
   if(trace)
     cat("Second best: ",newThresh, " (conditionnal on th= ",threshRef, " and Delay= ", delayRef," ) \t SSR/AIC: ", SSR, "\n", sep="")
   list(threshRef=threshRef, newThresh=newThresh, SSR=SSR)

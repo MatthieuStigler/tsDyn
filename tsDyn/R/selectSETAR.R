@@ -306,21 +306,27 @@ pooledAIC <- function(parms) {
   }
 
 ###selectSETAR 6: Computation for 1 thresh
-  funBuild<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
+  funBuild<-switch(common, 
+                   "include"=buildXth1Common, 
+                   "none"=buildXth1NoCommon, 
+                   "both"=buildXth1LagsIncCommon, 
+                   "lags"=buildXth1LagsCommon)
 
   if (criterion == "pooled-AIC") {
       computedCriterion <- apply(IDS, 1, pooledAIC)
   }  else if(criterion%in%c("AIC","BIC")){
-    kaic<-switch(criterion, "AIC"=2, "BIC"=log(N))
-    mHPos<-ifelse(same.lags, 2,3)
-    computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=funBuild, k=kaic, T=N, temp=TRUE))	
+    kaic <- switch(criterion, "AIC" = 2, "BIC" = log(N))
+    mHPos <- ifelse(same.lags, 2, 3)
+    computedCriterion <- mapply(AIC_1thresh, gam1=IDS[,"th"], thDelay=IDS[,1],ML=IDS[,2],MH=IDS[,mHPos], 
+                                MoreArgs=list(xx=xx,yy=yy,trans=z,const=const,trim=trim,fun=funBuild, k=kaic, T=N, temp=TRUE))	
   } else if(criterion=="SSR"){
     if(hpc=="none"){ 
-      computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild))
+      computedCriterion <- mapply(SSR_1thresh, gam1=IDS[,2],thDelay=IDS[,1],
+                                  MoreArgs=list(xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild, trace = trace))
     } else {
       computedCriterion <- foreach(i = th, .combine="c", .export="SSR_1thresh") %:% 
         foreach(j = thDelay, .combine="c", .export="SSR_1thresh") %dopar% 
-        SSR_1thresh(gam1=i,thDelay=j,xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild)
+        SSR_1thresh(gam1=i,thDelay=j,xx=xx,yy=yy,trans=z, ML=ML, MH=MH, const=const,trim=trim, fun=funBuild, trace = trace)
     }
   }
 
@@ -346,7 +352,7 @@ pooledAIC <- function(parms) {
     }
   }
   
-  firstBests<-bests
+  firstBests <- bests
 ###selectSETAR 8: Computation for 2 thresh 
 #use function condistep (see TVARestim.r) to estimate the second th given the first
 #iterate the algortihm: once the second is estimate, reestimate the first, and alternatively until convergence
@@ -364,30 +370,33 @@ pooledAIC <- function(parms) {
     }
     
     ###set lags according to first search
-    potMM<-list()
+    potMM <- list()
     
     if(criterion%in%c("AIC", "BIC")){
       if(same.lags){
-	ML<-1:firstBests["m"]
-	MH<-ML
-	potMM[[1]]<-ML
+        ML <- 1:firstBests["m"]
+        MH <- ML
+        potMM[[1]] <- ML
+      }  else {
+        ML <- 1:firstBests["mL"]
+        MH <- 1:firstBests["mH"]
+        for(i in 1:length(MM))
+          potMM[[i]] <- seq_len(MM[i])
       }
-      else{
-	ML<-1:firstBests["mL"]
-	MH<-1:firstBests["mH"]
-	for(i in 1:length(MM))
-	  potMM[[i]]<-seq_len(MM[i])
-      }
+    } else {
+      potMM[[1]] <- ML
     }
-    else
-      potMM[[1]]<-ML
     
-    funBuild2<-switch(common, "include"=buildXth2Common, "none"=buildXth2NoCommon, "both"=buildXth2LagsIncCommon, "lags"=buildXth2LagsCommon)
+    funBuild2 <- switch(common, 
+                        "include"=buildXth2Common, 
+                        "none"=buildXth2NoCommon, 
+                        "both"=buildXth2LagsIncCommon, 
+                        "lags"=buildXth2LagsCommon)
     func<-switch(criterion, "AIC" = AIC_2th,"BIC" = AIC_2th, "SSR" = SSR_2th)	
 
     
-    Bests<-matrix(NA, nrow=length(potMM), ncol=4)
-    colnames(Bests)<-c("th1", "th2", criterion, "pos")
+    Bests <- matrix(NA, nrow = length(potMM), ncol = 4)
+    colnames(Bests) <- c("th1", "th2", criterion, "pos")
     
 ###loop for 2 th when different lags to test for      
     for(j in 1:length(potMM)){
