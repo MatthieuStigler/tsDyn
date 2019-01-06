@@ -104,7 +104,8 @@ get_tests <- function(object, n) {
   # Bound <- (n / (2 * log(log(n)))) * Ftest12
   Ftest13 <- as.numeric(n * (SSR - SSR_2thresh) / SSR_2thresh)
   Ftest23 <- as.numeric(n * (SSR_1thresh - SSR_2thresh) / SSR_2thresh)
-  Ftests <- matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
+  # Ftests <- matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
+  Ftests <- c("1vs2" = Ftest12, "1vs3" = Ftest13, "2vs3" = Ftest23)
   Ftests
 }
 
@@ -197,8 +198,8 @@ setarTest <- function(x, m, thDelay = 0, trim=0.1,
   ###res
   res <- list(Ftests = Ftest_orig,
               SSRs = SSR_orig[1:3],
-              firstBests = search$firstBests["th"],
-              secBests = search$bests[c("th1", "th2")],
+              firstBests = SSR_orig[,"th_1"],
+              secBests = SSR_orig[,c("th_2_1", "th_2_2")],
               CriticalValBoot = CriticalValBoot,
               PvalBoot = PvalBoot,
               Ftestboot = Ftestboot,
