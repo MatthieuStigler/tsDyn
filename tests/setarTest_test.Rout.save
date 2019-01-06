@@ -1,0 +1,115 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> library(tidyverse)
+── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──
+✔ ggplot2 3.1.0     ✔ purrr   0.2.5
+✔ tibble  1.4.2     ✔ dplyr   0.7.7
+✔ tidyr   0.8.2     ✔ stringr 1.3.1
+✔ readr   1.3.1     ✔ forcats 0.3.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+> 
+> data(IIPUs)
+> 
+> ### grid ###
+> grid <-  crossing(include = c( "const", "trend","none", "both"),
++                   lag = 1:2L, 
++                   thDelay = 0:1L, 
++                   test = c("1vs", "2vs3")) %>% 
++   filter(thDelay<lag)
+> 
+> 
+> ### run ###
+> res <- grid %>% 
++   mutate(dat = pmap(list(include, lag, thDelay, test),
++                     ~setarTest(IIPUs, 
++                                include= ..1,
++                                m = ..2,
++                                thDelay = ..3,
++                                test = ..4,
++                                nboot = 2)))
+Warning messages:
+1: 
+With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
+ 
+2: Possible unit root in the high  regime. Roots are: 0.981 11.6058 
+3: 
+With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
+ 
+4: Possible unit root in the high  regime. Roots are: 0.9871 13.2387 
+5: 
+With the threshold you gave (-3.19877483971203) there is a regime with less than trim=15% observations (10.18%, 89.82%, )
+ 
+6: 
+With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
+ 
+7: 
+With the threshold you gave (-3.19877483971203) there is a regime with less than trim=15% observations (10.18%, 89.82%, )
+ 
+8: 
+With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
+ 
+> 
+> 
+> ### show F tests ###
+> res %>% 
++   mutate(Ftests = map(dat, ~as_data_frame(.$Ftests %>%  t))) %>% 
++   select(-dat) %>% 
++   unnest(Ftests)
+# A tibble: 24 x 7
+   include   lag thDelay test  `1vs2` `1vs3` `2vs3`
+   <chr>   <int>   <int> <chr>  <dbl>  <dbl>  <dbl>
+ 1 both        1       0 1vs     5.16   10.2   5.01
+ 2 both        1       0 2vs3    5.16   10.2   5.01
+ 3 both        2       0 1vs    15.0    28.8  13.4 
+ 4 both        2       0 2vs3   15.0    28.8  13.4 
+ 5 both        2       1 1vs    21.0    27.6   6.28
+ 6 both        2       1 2vs3   21.0    27.6   6.28
+ 7 const       1       0 1vs     5.60   13.4   7.67
+ 8 const       1       0 2vs3    5.60   13.4   7.67
+ 9 const       2       0 1vs    15.0    28.4  12.9 
+10 const       2       0 2vs3   15.0    28.4  12.9 
+# ... with 14 more rows
+> 
+> res %>% 
++   mutate(Ftests = map(dat, ~as_data_frame(.$SSRs %>%  t))) %>% 
++   select(-dat) %>% 
++   unnest(Ftests)
+# A tibble: 24 x 7
+   include   lag thDelay test     V1    V2    V3
+   <chr>   <int>   <int> <chr> <dbl> <dbl> <dbl>
+ 1 both        1       0 1vs    606.  599.  593.
+ 2 both        1       0 2vs3   606.  599.  593.
+ 3 both        2       0 1vs    533.  516.  501.
+ 4 both        2       0 2vs3   533.  516.  501.
+ 5 both        2       1 1vs    533.  509.  502.
+ 6 both        2       1 2vs3   533.  509.  502.
+ 7 const       1       0 1vs    609.  601.  591.
+ 8 const       1       0 2vs3   609.  601.  591.
+ 9 const       2       0 1vs    535.  517.  503.
+10 const       2       0 2vs3   535.  517.  503.
+# ... with 14 more rows
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 39.262   0.140  39.732 
