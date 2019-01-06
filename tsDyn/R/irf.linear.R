@@ -45,9 +45,9 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
     boot_estim <- function(x) {
       x_b <- setar.boot(x)
       if(inherits(x, "linear")) {
-        mod_b <- linear(x_b$serie, m = x$str$m, include = x$include)
+        mod_b <- linear(x_b, m = x$str$m, include = x$include)
       } else if(inherits(x, "setar")) {
-        mod_b <- setar(x_b$serie, m = x$str$m, include = x$include,
+        mod_b <- setar(x_b, m = x$str$m, include = x$include,
                        nthresh = x$model.specific$nthresh, th = getTh(x))
       }
       
@@ -122,10 +122,11 @@ irf_1_sim <-  function(x, n.ahead = 10, innov, ...) {
   #                 "none" = 1)
   if(missing(innov)) innov <-  c(1, rep(0, n.ahead+lag))
   res <- setar.gen(B=B, n=n.ahead, lag=lag, include = include,  
-                           nthresh = 0,
-                           starting=start_vals, innov=innov, ...)
+                   nthresh = 0,
+                   returnStarting = FALSE,
+                   starting=start_vals, innov=innov, ...)
   
-  res$serie[-seq_len(lag)]
+  res
 }
 
 

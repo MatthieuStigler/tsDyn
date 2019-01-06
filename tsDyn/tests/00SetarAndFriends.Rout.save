@@ -1512,8 +1512,8 @@ Results of the grid search for 1 threshold
 > 
 > 
 > ## setar.sim
-> set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check"))
-> set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x$serie, as.numeric(lynx)))
+> set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check", returnStarting = TRUE))
+> set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x, as.numeric(lynx)))
 > set_all_boot_check
                                     set0 
    "Mean relative difference: 0.1405485" 
@@ -1534,4 +1534,4 @@ Results of the grid search for 1 threshold
 > 
 > proc.time()
    user  system elapsed 
-  1.809   0.095   1.889 
+  2.120   0.091   2.894 

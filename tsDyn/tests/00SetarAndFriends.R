@@ -55,6 +55,6 @@ selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid="Half"), commo
 
 
 ## setar.sim
-set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check"))
-set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x$serie, as.numeric(lynx)))
+set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check", returnStarting = TRUE))
+set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x, as.numeric(lynx)))
 set_all_boot_check

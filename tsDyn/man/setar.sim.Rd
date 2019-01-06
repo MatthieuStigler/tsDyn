@@ -64,7 +64,7 @@ Residuals from the original model are resampled using different bootstrap scheme
 
 ##Simulation of a TAR with 1 threshold
 TvarMat <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
-sim<-setar.sim(B=TvarMat,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))$serie
+sim<-setar.sim(B=TvarMat,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))
 mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
 
 #check the result
@@ -73,11 +73,11 @@ selectSETAR(sim, m=2)
 ##Bootstrap a TAR with two threshold (three regimes)
 sun <- (sqrt(sunspot.year+1)-1)*2
 sun_est <- setar(sun, nthresh=2, m=2)
-sun_est_boot <- setar.boot(sun_est)$serie
+sun_est_boot <- setar.boot(sun_est)
 head(sun_est_boot)
 
 ##Check the bootstrap: with no resampling, is it the same series?
-sun_est_boot <- setar.boot(sun_est, boot.scheme = "check")$serie
+sun_est_boot <- setar.boot(sun_est, boot.scheme = "check")
 all.equal(as.numeric(sun), sun_est_boot)
 
 }
