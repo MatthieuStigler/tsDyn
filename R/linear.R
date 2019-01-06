@@ -97,7 +97,7 @@ summary.linear <- function(object, ...) {
 	tval <- est/se
 	coef <- cbind(est, se, tval, 2*pt(abs(tval), n-p, lower.tail = FALSE))
 	dimnames(coef) <- list(names(est), c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
-	ans$coef <- coef
+	ans$coefficients <- coef
 	return( extend(summary.nlar(object, ...), "summary.linear", listV=ans) )
 }
 
