@@ -93,7 +93,7 @@ $both_l_3
 > all.equal(coef(all_lin[["none_l_2"]]), ar_2_noMean$ar[,,1], check.attributes = FALSE)
 [1] TRUE
 > 
-> ## compare means: intercept in ar is (1-phi)(diff means)
+> ## compare means: intercept in ar is (1-phi)(diff means), ch Hamilton 3.4.35
 > ## diff means is difference between estimated mean, and c/(1- phi)
 > linear_1_Mean <-  all_lin[["const_l_1"]] 
 > comp_means <- function(ar, linear) {
@@ -127,4 +127,4 @@ In object$var.pred * vars :
 > 
 > proc.time()
    user  system elapsed 
-  1.762   0.079   1.834 
+  1.624   0.078   1.690 
