@@ -1,5 +1,5 @@
 ###Build the xx matrix with 1 thresh and common=TRUE
-buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE, trace=FALSE) {
   if(temp){
     ML<-seq_len(ML)
     MH<-seq_len(MH)
@@ -8,7 +8,7 @@ buildXth1Common <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FA
   LH<-cbind(const,xx[,ML]*isL,xx[,MH]*(1-isL))
 }
 
-buildXth1LagsIncCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+buildXth1LagsIncCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE, trace=FALSE) {
   if(temp){
     ML<-seq_len(ML)
     MH<-seq_len(MH)
@@ -17,7 +17,7 @@ buildXth1LagsIncCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, 
   LH<-cbind(const,xx[,1]*isL,xx[,1]*(1-isL), xx[,-1])
 }
 
-buildXth1LagsCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+buildXth1LagsCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE, trace=FALSE) {
   if(temp){
     ML<-seq_len(ML)
     MH<-seq_len(MH)
@@ -27,7 +27,7 @@ buildXth1LagsCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, tem
 }
 
 ###Build the xx matrix with 1 thresh and common=FALSE
-buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE) {
+buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=FALSE, trace=FALSE) {
   if(temp){
       ML<-seq_len(ML)
       MH<-seq_len(MH)
@@ -37,7 +37,7 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=
 	xxH <- cbind(const,xx[,MH])*(1-isL)
 	xxLH<-cbind(xxL,xxH)
 	nisL<-mean(isL)
-	if(min(nisL, 1-nisL)<trim){
+	if(trace & min(nisL, 1-nisL)<trim){
 		cat("\n 1 T: Trim not respected: ", c(nisL, 1-nisL), "from th:", gam1)
 	}
 	return(xxLH)
@@ -48,7 +48,7 @@ buildXth1NoCommon <- function(gam1, thDelay, xx,trans, ML, MH,const, trim, temp=
 
 
 ###Build the xx matrix with 2 thresh and common=TRUE
-buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE, trace=FALSE){
   if(temp){
     ML<-seq_len(ML)
     MH<-seq_len(MH)
@@ -74,7 +74,7 @@ buildXth2Common<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, tem
 	return(res)
 }
 
-buildXth2LagsIncCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+buildXth2LagsIncCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE, trace=FALSE){
   if(temp){
       ML<-seq_len(ML)
       MH<-seq_len(MH)
@@ -91,7 +91,7 @@ buildXth2LagsIncCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,tr
 }
 
 
-buildXth2LagsCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+buildXth2LagsCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE, trace=FALSE){
   if(temp){
     ML<-seq_len(ML)
     MH<-seq_len(MH)
@@ -109,7 +109,7 @@ buildXth2LagsCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim,
 
 
 ###Build the xx matrix with 2 thresh and common=FALSE
-buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE){
+buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, temp=FALSE, trace=FALSE){
   if(temp){
     ML<-seq_len(ML)
     MH<-seq_len(MH)
@@ -131,7 +131,7 @@ buildXth2NoCommon<-function(gam1,gam2,thDelay,xx,trans, ML, MH,MM, const,trim, t
 	if(min(nup, ndown, 1-nup-ndown)>=trim-0.01){
 		res <- xxLMH	#SSR
 	}	else {
-		cat("\nTrim not respected: ", c( ndown,1-nup-ndown, nup), "from", c(gam1, gam2))
+		if(trace) cat("\nTrim not respected: ", c( ndown,1-nup-ndown, nup), "from", c(gam1, gam2))
 		res <- xxLMH
 	}
 	return(res)
@@ -146,10 +146,10 @@ getSSR <- function(X,y){
 }
 
 ### Functions to assemble and return the SSR :
-SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim, fun=buildXth1Common){
-	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH,const, trim)
+SSR_1thresh<- function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim, fun=buildXth1Common, trace=FALSE){
+	XX <- fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH,const, trim, trace = trace)
 	if(any(is.na(XX))){
-		res<-NA
+	  res <- NA
 	}	else {
 		res <- getSSR(XX,yy)
 	}
@@ -165,8 +165,8 @@ AIC.matrices<-function(X,y, T, k=2){
 
 
 
-SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim){
-	XX<-buildXth2Common(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, trace=FALSE){
+	XX<-buildXth2Common(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, trace = trace)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
@@ -179,8 +179,8 @@ SSR_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, 
 #   SSR_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,fun=buildXth2NoCommon,trim=trim)
 # }
 
-SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim){
-  	XX<-buildXth2NoCommon(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, trace=FALSE){
+  	XX<-buildXth2NoCommon(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, trace = trace)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else{
@@ -189,8 +189,8 @@ SSR_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML
 	return(res)
 }
 
-AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common , k=2, T, temp=FALSE){
-	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim, temp=temp)
+AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=const,trim=trim,fun=buildXth1Common , k=2, T, temp=FALSE, trace=FALSE){
+	XX<-fun(gam1,thDelay, xx,trans=trans, ML=ML, MH=MH, const, trim=trim, temp=temp, trace = trace)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else{
@@ -200,8 +200,8 @@ AIC_1thresh<-function(gam1,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH,const=
 	return(res)
 }
 
-AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T, temp=FALSE){
-	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, temp=temp)
+AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T, temp=FALSE, trace=FALSE){
+	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, temp=temp, trace = trace)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
@@ -211,8 +211,8 @@ AIC_2threshCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, 
 	return(res)
 }
 
-AIC_2th <-function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T, temp=FALSE){
-	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, temp=temp)
+AIC_2th <-function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2, T, temp=FALSE, trace=FALSE){
+	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, temp=temp, trace = trace)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
@@ -222,8 +222,8 @@ AIC_2th <-function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=
 	return(res)
 }
 
-SSR_2th<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon){
-  	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim)
+SSR_2th<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, trace=FALSE){
+  	XX<-fun(gam1,gam2,thDelay,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim,trace = trace)
 	if(any(is.na(XX))){
 		res<-NA
 	}	else {
@@ -234,8 +234,8 @@ SSR_2th<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=
 
 
 
-AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2,T, temp=FALSE){
-  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, k=k,T, temp=temp)
+AIC_2threshNoCommon<- function(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2Common, k=2,T, temp=FALSE, trace=FALSE){
+  AIC_2threshCommon(gam1,gam2,thDelay, yy=yy,xx=xx,trans=trans, ML=ML, MH=MH, MM=MM,const=const,trim=trim, fun=buildXth2NoCommon, k=k,T, temp=temp, trace = trace)
 }
 
 
