@@ -5,15 +5,15 @@ library(tsDyn)
 ################
 
 setar.boot.check <-  function(object, n_digits = 10) {
-  mod_boot <- setar.boot(object, boot.scheme = "check",n_digits = n_digits)  
+  mod_boot <- setar.boot(object, boot.scheme = "check", n_digits = n_digits, returnStarting = TRUE)  
   orig_series <- as.numeric(object$str$x)
-  all.equal(mod_boot$serie, orig_series)
+  all.equal(mod_boot, orig_series)
 }
 
 linear.boot.check <-  function(object, n_digits = 10) {
-  mod_boot <- linear.boot(object, boot.scheme = "check",n_digits = n_digits)  
+  mod_boot <- linear.boot(object, boot.scheme = "check",n_digits = n_digits, returnStarting = TRUE)  
   orig_series <- as.numeric(object$str$x)
-  all.equal(mod_boot$serie, orig_series)
+  all.equal(mod_boot, orig_series)
 }
 
 
@@ -25,7 +25,7 @@ ar_1_const <- linear(log(lynx), m = 1, include = "const")
 ar_2_const <- linear(log(lynx), m = 2, include = "const")
 
 
-setar.boot.check(ar_1_noInc)
+setar.boot.check(object=ar_1_noInc)
 setar.boot.check(ar_2_noInc)
 setar.boot.check(ar_1_const)
 setar.boot.check(ar_2_const)
@@ -63,7 +63,7 @@ if(FALSE) {
   }
   set_1th_l2_b <- setar.boot(setarObject = set_1th_l2, boot.scheme = "check", n_digits = 7)
   
-  df_comp <- data_frame(orig = lynx, boot = set_1th_l2_b$serie) %>% 
+  df_comp <- data_frame(orig = lynx, boot = set_1th_l2_b) %>% 
     mutate(n_row = 1:n(),
            th1 = getTh(set_1th_l1_tr)[1],
            th2 = getTh(set_1th_l1_tr)[2],
@@ -103,13 +103,13 @@ sim_nth0 <- setar.sim(B=0.5, lag=1, nthresh=0,
                       include ="none",
                       starting= 0.4,
                       innov=innov_1,
-                      show.parMat = TRUE)$serie
+                      show.parMat = TRUE)
 
 head(sim_nth0)
 
 ## nthresh ==1
 Bvals <- c(2.9,-0.4,-0.1, 2, 0.2,0.3)
 sim_new <- setar.sim(B=Bvals,lag=2, nthresh=1, Thresh=2, starting=c(2.8,2.2),
-                     innov=innov_1, show.parMat = TRUE)$serie
+                     innov=innov_1, show.parMat = TRUE)
 
 head(sim_new)

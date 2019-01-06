@@ -33,7 +33,7 @@
 #'
 #'##Simulation of a TAR with 1 threshold
 #' TvarMat <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
-#'sim<-setar.sim(B=TvarMat,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))$serie
+#'sim<-setar.sim(B=TvarMat,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))
 #'mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
 #'
 #'#check the result
@@ -42,11 +42,11 @@
 #'##Bootstrap a TAR with two threshold (three regimes)
 #'sun <- (sqrt(sunspot.year+1)-1)*2
 #'sun_est <- setar(sun, nthresh=2, m=2)
-#'sun_est_boot <- setar.boot(sun_est)$serie
+#'sun_est_boot <- setar.boot(sun_est)
 #'head(sun_est_boot)
 #'
 #'##Check the bootstrap: with no resampling, is it the same series?
-#'sun_est_boot <- setar.boot(sun_est, boot.scheme = "check")$serie
+#'sun_est_boot <- setar.boot(sun_est, boot.scheme = "check")
 #'all.equal(as.numeric(sun), sun_est_boot)
 #'
 #' @name setar.sim
@@ -57,6 +57,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
                       trendStart=1, 
                       starting=NULL,  innov, exo, 
                       n_digits = 10,
+                      returnStarting = FALSE,
                       show.parMat = FALSE, ...){
   
   ## Check arguments
@@ -148,8 +149,9 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
     }
   }
   
-  
-  list(B=B, serie=round(y, n_digits))
+  res <- round(y, n_digits)
+  if(!returnStarting) res <- res[-seq_len(lag)] 
+  res
 }
 
 #' @rdname setar.sim
@@ -241,7 +243,7 @@ linear.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "bo
 #   
 #   ##Simulation of a TAR with 1 threshold
 #   Bvals <- c(2.9,-0.4,-0.1,-1.5, 0.2,0.3)
-#   sim<-setar.sim(B=Bvals,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))$serie
+#   sim<-setar.sim(B=Bvals,lag=2, type="simul", nthresh=1, Thresh=2, starting=c(2.8,2.2))
 #   mean(ifelse(sim>2,1,0))	#approximation of values over the threshold
 #   
 #   #check the result
@@ -251,27 +253,27 @@ linear.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "bo
 #   
 #   ##Bootstrap a TAR with two threshold (three regimes)
 #   sun<-(sqrt(sunspot.year+1)-1)*2
-#   setar.sim(data=sun,nthresh=2, type="boot", Thresh=c(6,9))$serie
+#   setar.sim(data=sun,nthresh=2, type="boot", Thresh=c(6,9))
 #   
 #   ##Check the bootstrap
-#   checkBoot<-setar.sim(data=sun,nthresh=0, type="check", Thresh=6.14)$serie
+#   checkBoot<-setar.sim(data=sun,nthresh=0, type="check", Thresh=6.14)
 #   cbind(checkBoot,sun)
 #   #prob with the digits!
 #   
 #   ###linear object
 #   lin<-linear(sun, m=1)
-#   checkBootL<-setar.sim(setarObject=lin, type="check")$serie
+#   checkBootL<-setar.sim(setarObject=lin, type="check")
 #   cbind(checkBootL,sun)
 #   linear(checkBootL, m=1)
 #   ###setar object
 #   setarSun<-setar(sun, m=2, nthresh=1)
-#   checkBoot2<-setar.sim(setarObject=setarSun, type="check")$serie
+#   checkBoot2<-setar.sim(setarObject=setarSun, type="check")
 #   cbind(checkBoot2,sun)
 # 
 #   #does not work
 # 
 #   setarSun<-setar(sun, m=3, nthresh=2)
-#   checkBoot3<-setar.sim(setarObject=setarSun, type="check")$serie
+#   checkBoot3<-setar.sim(setarObject=setarSun, type="check")
 #   cbind(checkBoot3,sun)
 #   #ndig approach: works with m=2, m=3, m=4
 #   #no ndig approach: output has then more digits than input

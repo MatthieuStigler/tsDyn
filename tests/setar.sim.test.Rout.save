@@ -24,15 +24,15 @@ Type 'q()' to quit R.
 > ################
 > 
 > setar.boot.check <-  function(object, n_digits = 10) {
-+   mod_boot <- setar.boot(object, boot.scheme = "check",n_digits = n_digits)  
++   mod_boot <- setar.boot(object, boot.scheme = "check", n_digits = n_digits, returnStarting = TRUE)  
 +   orig_series <- as.numeric(object$str$x)
-+   all.equal(mod_boot$serie, orig_series)
++   all.equal(mod_boot, orig_series)
 + }
 > 
 > linear.boot.check <-  function(object, n_digits = 10) {
-+   mod_boot <- linear.boot(object, boot.scheme = "check",n_digits = n_digits)  
++   mod_boot <- linear.boot(object, boot.scheme = "check",n_digits = n_digits, returnStarting = TRUE)  
 +   orig_series <- as.numeric(object$str$x)
-+   all.equal(mod_boot$serie, orig_series)
++   all.equal(mod_boot, orig_series)
 + }
 > 
 > 
@@ -44,7 +44,7 @@ Type 'q()' to quit R.
 > ar_2_const <- linear(log(lynx), m = 2, include = "const")
 > 
 > 
-> setar.boot.check(ar_1_noInc)
+> setar.boot.check(object=ar_1_noInc)
 [1] TRUE
 > setar.boot.check(ar_2_noInc)
 [1] TRUE
@@ -102,7 +102,7 @@ Possible unit root in the low  regime. Roots are: 0.633
 +   }
 +   set_1th_l2_b <- setar.boot(setarObject = set_1th_l2, boot.scheme = "check", n_digits = 7)
 +   
-+   df_comp <- data_frame(orig = lynx, boot = set_1th_l2_b$serie) %>% 
++   df_comp <- data_frame(orig = lynx, boot = set_1th_l2_b) %>% 
 +     mutate(n_row = 1:n(),
 +            th1 = getTh(set_1th_l1_tr)[1],
 +            th2 = getTh(set_1th_l1_tr)[2],
@@ -153,23 +153,23 @@ Possible unit root in the low  regime. Roots are: 0.633
 +                       include ="none",
 +                       starting= 0.4,
 +                       innov=innov_1,
-+                       show.parMat = TRUE)$serie
++                       show.parMat = TRUE)
      const trend phi_1
 [1,]     0     0   0.5
 > 
 > head(sim_nth0)
-[1]  0.4000000 -0.3604756 -0.4104153  1.3535007  0.7472587  0.5029171
+[1] -0.3604756 -0.4104153  1.3535007  0.7472587  0.5029171  1.9665235
 > 
 > ## nthresh ==1
 > Bvals <- c(2.9,-0.4,-0.1, 2, 0.2,0.3)
 > sim_new <- setar.sim(B=Bvals,lag=2, nthresh=1, Thresh=2, starting=c(2.8,2.2),
-+                      innov=innov_1, show.parMat = TRUE)$serie
++                      innov=innov_1, show.parMat = TRUE)
      const_L trend_L phi_1_L phi_2_L const_H trend_H phi_1_H phi_2_H
 [1,]     2.9       0    -0.4    -0.1       2       0     0.2     0.3
 > 
 > head(sim_new)
-[1] 2.800000 2.200000 2.719524 2.973727 4.969311 3.956489
+[1] 2.719524 2.973727 4.969311 3.956489 4.411379 5.784287
 > 
 > proc.time()
    user  system elapsed 
-  1.712   0.041   1.738 
+  2.098   0.093   3.662 
