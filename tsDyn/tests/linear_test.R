@@ -22,7 +22,7 @@ all.equal(coef(all_lin[["none_l_1"]]), ar_1_noMean$ar[,,1], check.attributes = F
 all.equal(coef(all_lin[["const_l_2"]])[-1], ar_2_Mean$ar[,,1], check.attributes = FALSE)
 all.equal(coef(all_lin[["none_l_2"]]), ar_2_noMean$ar[,,1], check.attributes = FALSE)
 
-## compare means: intercept in ar is (1-phi)(diff means)
+## compare means: intercept in ar is (1-phi)(diff means), ch Hamilton 3.4.35
 ## diff means is difference between estimated mean, and c/(1- phi)
 linear_1_Mean <-  all_lin[["const_l_1"]] 
 comp_means <- function(ar, linear) {
