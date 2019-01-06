@@ -264,11 +264,19 @@ z<-as.matrix(z)
 
 	 
   if(nthresh==1){
-    funBuild1<-switch(common, "include"=buildXth1Common, "none"=buildXth1NoCommon, "both"=buildXth1LagsIncCommon, "lags"=buildXth1LagsCommon)
-    xxLH<-funBuild1(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const, trim=trim)
+    funBuild1 <-switch(common,
+                       "include" = buildXth1Common,
+                       "none" = buildXth1NoCommon,
+                       "both" = buildXth1LagsIncCommon,
+                       "lags" = buildXth1LagsCommon)
+    xxLH <- funBuild1(gam1=th, thDelay=0, xx=xx,trans=transV, ML=exML, MH=exMH,const, trim=trim, trace = trace)
   } else{
-    funBuild2<-switch(common, "include"=buildXth2Common, "none"=buildXth2NoCommon, "both"=buildXth2LagsIncCommon, "lags"=buildXth2LagsCommon)
-    xxLH<-funBuild2(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim)
+    funBuild2 <- switch(common,
+                        "include" = buildXth2Common,
+                        "none" = buildXth2NoCommon,
+                        "both" = buildXth2LagsIncCommon,
+                        "lags" = buildXth2LagsCommon)
+    xxLH <- funBuild2(gam1=th[1],gam2=th[2],thDelay=0,xx=xx,trans=transV, ML=exML, MH=exMH, MM=exMM,const,trim=trim, trace = trace)
   }
 
 ### SETAR 6: compute the model, extract and name the vec of coeff
@@ -480,7 +488,7 @@ summary.setar <- function(object, ...) {
   tval <- est/se			# t values
   coef <- cbind(est, se, tval, 2*pt(abs(tval), n-p, lower.tail = FALSE))
   dimnames(coef) <- list(names(est), c(" Estimate"," Std. Error"," t value","Pr(>|t|)"))
-  ans$coef <- coef
+  ans$coefficients <- coef
   ans$mTh <- mod$mTh
   extend(summary.nlar(object), "summary.setar", listV=ans)
 }
@@ -490,7 +498,7 @@ print.summary.setar <- function(x, digits=max(3, getOption("digits") - 2),
 	signif.stars = getOption("show.signif.stars"), ...) {
 	NextMethod(digits=digits, signif.stars=signif.stars, ...)
 	cat("\nCoefficient(s):\n\n")
-	printCoefmat(x$coef, digits = digits, signif.stars = signif.stars, ...)		
+	printCoefmat(x$coefficients, digits = digits, signif.stars = signif.stars, ...)		
 	cat("\nThreshold")
 	cat("\nVariable: ")
         if(x$externThVar)
