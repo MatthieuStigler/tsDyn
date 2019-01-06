@@ -1,3 +1,79 @@
+#' Test of linearity against threshold (SETAR)
+#' 
+#' Test of linearity against threshold of Hansen (1999) with bootstrap
+#' distribution
+#' 
+#' Estimation of the first threshold parameter is made with CLS, a conditional
+#' search with one iteration is made for the second threshold. The Ftest
+#' comparing the residual sum of squares (SSR) of each model is computed.
+#' 
+#' \deqn{ F_{ij}=T( (S_{i}-S_{j})/S_{j} )}
+#' 
+#' where \eqn{S_{i}} is the SSR of the model with i regimes (and so i-1
+#' thresholds).
+#' 
+#' Three test are avalaible. The both first can be seen as linearity test,
+#' whereas the third can be seen as a specification test: once the 1vs2 or/and
+#' 1vs3 rejected the linearity and henceforth accepted the presence of a
+#' threshold, is a model with one or two thresholds preferable?
+#' 
+#' Test \bold{1vs}2: Linear AR versus 1 threshold TAR
+#' 
+#' Test \bold{1vs}3: Linear AR versus 2 thresholds TAR
+#' 
+#' Test \bold{2vs3}: 1 threshold TAR versus 2 thresholds TAR
+#' 
+#' The two first tests are computed together and avalaible with test="1vs". The
+#' third test is avalaible with test="2vs3".
+#' 
+#' The homoskedastic bootstrap distribution is based on resampling the
+#' residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3),
+#' estimating the threshold parameter and then computing the Ftest, so it
+#' involves many computations and is pretty slow.
+#' 
+#' @aliases setarTest setartest
+#' @param x time series
+#' @param m lag
+#' @param series time series name (optional)
+#' @param thDelay 'time delay' for the threshold variable
+#' @param nboot number of bootstrap replications
+#' @param trim trimming parameter indicating the minimal percentage of
+#' observations in each regime
+#' @template boot.scheme
+#' @param hpc Possibility to run the bootstrap on parallel core. See details in
+#' \code{\link{TVECM.HStest}}
+#' @return A object of class "Hansen99Test" containing:
+#' 
+#' \item{SSRs}{The residual Sum of squares of model AR, 1 threshold TAR and 2
+#' thresholds TAR}
+#' 
+#' \item{Ftests}{The Ftest statistic for the test}
+#' 
+#' \item{PvalBoot}{The bootstrap p-values for the test selected}
+#' \item{CriticalValBoot}{The critical values for the test selected}
+#' \item{Ftestboot}{All the F-test computed} \item{firstBests, secBests}{The
+#' thresholds for the original series, obtained from search for 1 thresh
+#' (firstBests) and conditional search for 2 thresh (secBests)}
+#' \item{nboot,m}{The number of bootstrap replications (\code{nboot}), the
+#' lags used (\code{m})}
+#' }
+#' @author Matthieu Stigler
+#' @seealso \code{\link{TVAR.LRtest}} for the multivariate version.
+#' \code{\link{SETAR}} for estimation of the model.
+#' @references Hansen (1999) Testing for linearity, Journal of Economic
+#' Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26) avalaible at:
+#' \url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
+#' @keywords ts
+#' @examples
+#' 
+#' #Data used by Hansen
+#' sun <- (sqrt(sunspot.year + 1) - 1) * 2
+#' 
+#' #Test 1vs2 and 1vs3
+#' #setarTest(sun, m=11, thDelay=0:1, nboot=5,trim=0.1, test="1vs")
+#' 
+
+
 #' @export
 #' 
 ###tests
@@ -25,10 +101,12 @@
 
 setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, trim=0.1, 
                        test=c("1vs", "2vs3"), hpc=c("none", "foreach"), 
-                       check=FALSE){
+                       boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check")){
   
-  test<-match.arg(test)
-  hpc<-match.arg(hpc)
+  test <- match.arg(test)
+  hpc <- match.arg(hpc)
+  boot.scheme <- match.arg(boot.scheme)
+  
   
   include<-"const" #other types not implemented in setar.sim
   if(missing(series))
@@ -40,10 +118,10 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   
 
 ###setarTest 2: search best thresholds: call selectSETAR
-  search <- selectSETAR(x, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, 
-                        include =include, common="none", model="TAR",
-                        nthresh=2,trim=trim,criterion = "SSR",
-                        thSteps = 7,  plot=FALSE,
+  search <- selectSETAR(x, m=m, d=1, steps=1, thDelay=thDelay, trace=FALSE, 
+                        include =include, nthresh=2,
+                        trim=trim,criterion = "SSR",
+                        plot=FALSE,
                         max.iter=3) 
 
   firstBests <- search$firstBests
@@ -60,10 +138,6 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
                 trace=FALSE, nested=FALSE, include = c("const", "trend","none", "both"), 
                 common="none", model=c("TAR", "MTAR"), nthresh=2, trim=trim)
   
-  #RESTRICTED currently:
-  #common: FALSE
-  #nthresh=2
-  #max.iter=1
  
   n <- length(na.omit(residuals(set2)))
   ###setarTest 10: SSR of TAR(+) and (2),compute F stat and print
@@ -76,21 +150,24 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
   Bound <- (n / (2 * log(log(n)))) * Ftest12
   Ftest13 <- as.numeric(n * (SSR - SSR2thresh) / SSR2thresh)
   Ftest23 <- as.numeric(n * (SSR1thresh - SSR2thresh) / SSR2thresh)
-  Ftests<-matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
+  Ftests <- matrix(c(Ftest12, Ftest13, Ftest23),ncol=3, dimnames=list("Ftest", c("1vs2", "1vs3", "2vs3")))
+  
   if(nboot>0){   
     ########
     ###Boot
     ########
-    bootHoAr<-function(linearObject, type){
+    bootHoAr<-function(linearObject, boot.scheme){
       ### Bootstrap under null: ar model
-      bootLin<-setar.sim(setarObject=linearObject, type=type)
+      bootLin <- setar.boot(setarObject = linearObject, boot.scheme = boot.scheme)
       
       ###setarTest 1: SSR and check linear model
       linearBoot <- linear(bootLin, m = m)
       SSR <- deviance(linearBoot)
       
       ###setarTest 2: search best thresholds: call selectSETAR
-      searchBoot<-selectSETAR(bootLin, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,  plot=FALSE,max.iter=3) 
+      searchBoot<-selectSETAR(bootLin, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, 
+                              common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),
+                              plot=FALSE,max.iter=3) 
       
       firstBests <- searchBoot$firstBests
       bests <- searchBoot$bests
@@ -105,15 +182,15 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
       return(c(Ftest12, Ftest13))
     }
     
-    bootHoSetar1<-function(setarObject, type ){
+    bootHoSetar1 <- function(setarObject, type ){
       ### Bootstrap under null: Setar(1t) model
       bootSet<-setar.sim(setarObject=set1, type=type, nthresh=1)
-      if(check)
-        print(all(bootSet-set1$str$x<0.00005))
       
       
       ###setarTest 2: search best thresholds: call selectSETAR
-      searchBoot<-selectSETAR(bootSet, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,criterion = c("SSR"),thSteps = 7,  plot=FALSE,max.iter=3) 
+      searchBoot<-selectSETAR(bootSet, m=m,d=1, steps=d, thDelay=thDelay, trace=FALSE, include =include, 
+                              common="none", model=c("TAR", "MTAR"),nthresh=2,trim=trim,
+                              criterion = c("SSR"), plot=FALSE, max.iter=3) 
       
       firstBests <- searchBoot$firstBests
       bests <- searchBoot$bests
@@ -138,9 +215,9 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
     probs <- c(0.9, 0.95, 0.975, 0.99)
     if(test=="1vs"){
       Ftestboot<-if(hpc=="none"){
-        replicate(nboot, bootHoAr(linear, type))
+        replicate(nboot, bootHoAr(linear, boot.scheme))
       } else {
-        foreach(i=1:nboot, .export="bootHoAr", .combine="rbind") %dopar% bootHoAr(linear, type)
+        foreach(i=1:nboot, .export="bootHoAr", .combine="rbind") %dopar% bootHoAr(linear, boot.scheme)
       }
       Ftestboot12 <- Ftestboot[1, ]
       Ftestboot13 <- Ftestboot[2, ]
@@ -151,11 +228,11 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
       CriticalValBoot <- matrix(c(CriticalValBoot12,CriticalValBoot13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
       PvalBoot <- c(PvalBoot12, PvalBoot13)
     } else {
-      Ftestboot<-replicate(nboot, bootHoSetar1(set1, type))
+      Ftestboot<-replicate(nboot, bootHoSetar1(set1, boot.scheme))
       Ftestboot<-if(hpc=="none"){
-        replicate(nboot, bootHoSetar1(set1, type))
+        replicate(nboot, bootHoSetar1(set1, boot.scheme))
       } else {
-        foreach(i=1:nboot, .export="bootHoSetar1", .combine="rbind") %dopar% bootHoSetar1(set1, type)
+        foreach(i=1:nboot, .export="bootHoSetar1", .combine="rbind") %dopar% bootHoSetar1(set1, boot.scheme)
       }
       Ftestboot23 <- Ftestboot
       PvalBoot23 <- mean(ifelse(Ftestboot23 > Ftest23, 1, 0))
@@ -169,7 +246,7 @@ setarTest <- function (x, m, d = 1, steps = d, series, thDelay = 0, nboot=10, tr
     Ftestboot<-NULL
   }
   
-  args <- list(x=x, m=m, d = d, steps = steps, series=series, thDelay = thDelay, nboot=nboot, trim=trim, test=test, check=FALSE)
+  args <- list(x=x, m=m, d = d, steps = steps, series=series, thDelay = thDelay, nboot=nboot, trim=trim, test=test)
   
   ###res
   res <- list(Ftests = Ftests,
@@ -274,7 +351,8 @@ extendBoot<-function(x, nboot){
     stop("Function only works for setarTest object")
   args <- x$args
   n <- nboot
-  newTestRuns <-setarTest(x=args$x, m=args$m, d = args$d, steps = args$steps, series=args$series, thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test, check=args$check)
+  newTestRuns <- setarTest(x=args$x, m=args$m, d = args$d, steps = args$steps, series=args$series, 
+                          thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test)
   if(any(x$Ftests!=newTestRuns$Ftests))
     stop("Problem..")
   OldVal <- x$Ftestboot
