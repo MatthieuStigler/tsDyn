@@ -43,8 +43,8 @@ sapply(set_all, function(x) tail(coef(x, regime = "H"),4))
 
 
 ###SelectSetar
-selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
-selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
+selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR", plot=FALSE,max.iter=2)
+selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR", plot=FALSE,max.iter=3)
 selectSETAR(lynx, m=2, d=1, th=MakeThSpec(ngrid="Half"), common="none",trim=0.15,criterion = "SSR", plot=FALSE)
 selectSETAR(lynx, m=2, d=1, th=MakeThSpec(ngrid=20), common="none",trim=0.15,criterion = "SSR", plot=FALSE)
 selectSETAR(lynx, m=2, d=1, th=MakeThSpec(exact=1388), common="none",trim=0.15,criterion = "SSR", plot=FALSE)

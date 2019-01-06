@@ -1350,7 +1350,7 @@ $set7
 > 
 > 
 > ###SelectSetar
-> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=2)
+> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=1,trim=0.15,criterion = "SSR", plot=FALSE,max.iter=2)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
 Searching on 74 possible threshold values within regimes with sufficient ( 15% ) number of observations
@@ -1368,7 +1368,7 @@ Results of the grid search for 1 threshold
 8        0  808 68250304
 9        0  957 68288887
 10       0  784 68734556
-> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR",thSteps = 7,  plot=FALSE,max.iter=3)
+> selectSETAR(lynx, m=2, d=1,  trace=TRUE, include = "const", common="none", model="TAR", nthresh=2,trim=0.15,criterion = "SSR", plot=FALSE,max.iter=3)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
 Using maximum autoregressive order for middle regime: mM = 2 
@@ -1534,4 +1534,4 @@ Results of the grid search for 1 threshold
 > 
 > proc.time()
    user  system elapsed 
-  2.120   0.091   2.894 
+  1.931   0.048   1.969 
