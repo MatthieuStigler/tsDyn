@@ -33,13 +33,13 @@
 #' 
 #' @aliases setarTest setartest
 #' @param x time series
-#' @param m lag
-#' @param series time series name (optional)
-#' @param thDelay 'time delay' for the threshold variable
+#' @param m,thDelay lag and 'time delay' for the threshold variable
+#' @param test whether ot test AR against SETAR, or SETAR(1 reg) against SETAR(2 reg)
+#' @template param_include
 #' @param nboot number of bootstrap replications
 #' @param trim trimming parameter indicating the minimal percentage of
 #' observations in each regime
-#' @template boot.scheme
+#' @template param_boot.scheme
 #' @param hpc Possibility to run the bootstrap on parallel core. See details in
 #' \code{\link{TVECM.HStest}}
 #' @return A object of class "Hansen99Test" containing:
@@ -70,14 +70,13 @@
 #' 
 #' #Test 1vs2 and 1vs3
 #' #setarTest(sun, m=11, thDelay=0:1, nboot=5,trim=0.1, test="1vs")
-#' 
-#' @export
-
+#' @name setarTest
+NULL
 
 test_AR_SETAR <-  function(x, m, thDelay, include, trim, return_th = FALSE) {
   
   ### setarTest 1: SSR and check linear model
-  linear <- linear(x=x, m=m)
+  linear <- linear(x=x, m=m, include =include)
   
   ###setarTest 2: search best thresholds: call selectSETAR
   search <- selectSETAR(x, m=m, thDelay=thDelay, trace=FALSE, 
@@ -96,7 +95,7 @@ test_AR_SETAR <-  function(x, m, thDelay, include, trim, return_th = FALSE) {
   SSRs
 }
 
-get_tests <- function(object) {
+get_tests <- function(object, n) {
   SSR <-  object[,"AR"]
   SSR_1thresh <- object[,"TAR(1)"]
   SSR_2thresh <- object[,"TAR(2)"]
@@ -109,24 +108,27 @@ get_tests <- function(object) {
   Ftests
 }
 
-setarTest <- function (x, m, series, thDelay = 0, nboot=10, trim=0.1, 
-                       test=c("1vs", "2vs3"), hpc=c("none", "foreach"), 
-                       boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check")){
+#' @rdname setarTest
+#' @export
+setarTest <- function(x, m, thDelay = 0, trim=0.1, 
+                      include = c("const", "trend","none", "both"),
+                      nboot = 10, 
+                      test=c("1vs", "2vs3"), hpc=c("none", "foreach"), 
+                      boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check")){
   
   test <- match.arg(test)
   hpc <- match.arg(hpc)
   boot.scheme <- match.arg(boot.scheme)
+  include <- match.arg(include)
   
-  
-  include<-"const" #other types not implemented in setar.sim
-  if(missing(series))
-    series <- deparse(substitute(x))
+  N <-  length(x)
+  n <- N - m
   
   ### run test
   SSR_orig <- test_AR_SETAR(x=x, m=m, thDelay=thDelay, include= include, trim=trim, 
                             return_th = TRUE)
     
-  Ftest_orig <- get_tests(object=SSR_orig)
+  Ftest_orig <- get_tests(object=SSR_orig, n = n)
   
   ## estimate H0 model (for later bootstrap)
   null_model <- switch(test, 
@@ -141,19 +143,20 @@ setarTest <- function (x, m, series, thDelay = 0, nboot=10, trim=0.1,
   
   
   ################
+  ### boot
   ################
   if(nboot>0){   
     
+    ## define function
     boot_test <- function(null_model, boot.scheme) {
       null_model_boot <- setar.boot(null_model, boot.scheme=boot.scheme)
       SSR_boot <- test_AR_SETAR(x=null_model_boot, m=m, thDelay=thDelay, include= include, trim=trim)
-      get_tests(object=SSR_boot)
+      get_tests(object=SSR_boot, n = n)
     }
     
-    boot_test(null_model, boot.scheme=boot.scheme)
+    # boot_test(null_model, boot.scheme=boot.scheme)
     
-    
-### run bootstrap
+    ### run bootstrap
     if(hpc=="none"){
       Ftestboot <- replicate(nboot, boot_test(null_model, boot.scheme=boot.scheme), simplify = FALSE)
       Ftestboot <- do.call("rbind", Ftestboot)
@@ -161,14 +164,14 @@ setarTest <- function (x, m, series, thDelay = 0, nboot=10, trim=0.1,
       Ftestboot <- foreach(i=1:nboot, .export="boot_test", .combine="rbind") %dopar% boot_test(null_model, boot.scheme)
     }
     
-### analyse bootstrap stats
+    ### analyse bootstrap stats
     probs <- c(0.9, 0.95, 0.975, 0.99)      
     if(test=="1vs"){
       Ftest_boot_12 <- Ftestboot[, 1]
       Ftest_boot_13 <- Ftestboot[, 2]
       
-      Pval_boot_12 <- mean(Ftest_boot_12 > Ftest12)
-      Pval_boot_13 <- mean(Ftest_boot_13 > Ftest13)
+      Pval_boot_12 <- mean(Ftest_boot_12 > Ftest_orig["1vs2"])
+      Pval_boot_13 <- mean(Ftest_boot_13 > Ftest_orig["1vs3"])
       
       Cval_boot_12 <- quantile(Ftest_boot_12, probs = probs)
       Cval_boot_13 <- quantile(Ftest_boot_13, probs = probs)
@@ -177,7 +180,7 @@ setarTest <- function (x, m, series, thDelay = 0, nboot=10, trim=0.1,
       PvalBoot <- c(Pval_boot_12, Pval_boot_13)
     } else {
       Ftest_boot_23 <- Ftestboot[,3]
-      Pval_boot_23 <- mean(Ftest_boot_23 > Ftest23)
+      Pval_boot_23 <- mean(Ftest_boot_23 > Ftest_orig["2vs3"])
       Cval_boot_23 <- quantile(Ftest_boot_23, probs = probs)
       CriticalValBoot <- matrix(Cval_boot_23, nrow=1, dimnames=list("2vs3", probs))
       PvalBoot <- Pval_boot_23
@@ -192,8 +195,8 @@ setarTest <- function (x, m, series, thDelay = 0, nboot=10, trim=0.1,
                test = test)
   
   ###res
-  res <- list(Ftests = Ftests,
-              SSRs = SSRs,
+  res <- list(Ftests = Ftest_orig,
+              SSRs = SSR_orig[1:3],
               firstBests = search$firstBests["th"],
               secBests = search$bests[c("th1", "th2")],
               CriticalValBoot = CriticalValBoot,
@@ -289,52 +292,51 @@ plot.Hansen99Test<-function(x,show.extended=TRUE, ...){
 
 
 
-#' @export
-extendBoot<-function(x, nboot){
-  if(class(x)!="Hansen99Test")
-    stop("Function only works for setarTest object")
-  args <- x$args
-  n <- nboot
-  newTestRuns <- setarTest(x=args$x, m=args$m, d = args$d, steps = args$steps, series=args$series, 
-                          thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test)
-  if(any(x$Ftests!=newTestRuns$Ftests))
-    stop("Problem..")
-  OldVal <- x$Ftestboot
-  NewVal <- newTestRuns$Ftestboot
-  
-  probs<-c(0.9, 0.95, 0.975,0.99)
-  if(args$test=="1vs"){
-    Ftestboot <- cbind(OldVal, NewVal)
-    Ftest_boot_12 <- Ftestboot[1, ]
-    Ftest_boot_13 <- Ftestboot[2, ]
-    Pval_boot_12 <- mean(ifelse(Ftest_boot_12 > x$Ftests[1], 1, 0))
-    Cval_boot_12 <- quantile(Ftest_boot_12, probs = probs)
-    Pval_boot_13 <- mean(ifelse(Ftest_boot_13 > x$Ftests[2], 1, 0))
-    Cval_boot_13 <- quantile(Ftest_boot_13, probs = probs)
-    CriticalValBoot <- matrix(c(Cval_boot_12,Cval_boot_13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
-    PvalBoot <- c(Pval_boot_12,Pval_boot_13)
-  }
-  else{
-    Ftestboot <- c(OldVal, NewVal)
-    Ftest_boot_23 <- Ftestboot
-    Pval_boot_23 <- mean(ifelse(Ftest_boot_23 > x$Ftests[3], 1, 0))
-    Cval_boot_23 <- quantile(Ftest_boot_23, probs = probs)
-    CriticalValBoot <- matrix(Cval_boot_23, nrow=1, dimnames=list("2vs3", probs))
-    PvalBoot <- Pval_boot_23
-  }
-  newNboot <- ifelse(args$test=="1vs", ncol(Ftestboot), length(Ftestboot))
-  
-  #second check
-  if(x$nboot+newTestRuns$nboot!=newNboot)
-    stop("Problem2")
-  
-  res <- list(Ftests=x$Ftests, SSRs=x$SSRs, firstBests=x$firstBests, secBests=x$secBests, 
-            CriticalValBoot=CriticalValBoot, PvalBoot=PvalBoot, Ftestboot=Ftestboot, 
-            nboot=newNboot, args=args, updated=x$nboot)
-  
-  class(res) <- "Hansen99Test"
-  return(res)
-}
+#' #' @export
+#' extendBoot<-function(x, nboot){
+#'   if(class(x)!="Hansen99Test")
+#'     stop("Function only works for setarTest object")
+#'   args <- x$args
+#'   n <- nboot
+#'   newTestRuns <- setarTest(x=args$x, m=args$m, thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test)
+#'   if(any(x$Ftests!=newTestRuns$Ftests))
+#'     stop("Problem..")
+#'   OldVal <- x$Ftestboot
+#'   NewVal <- newTestRuns$Ftestboot
+#'   
+#'   probs<-c(0.9, 0.95, 0.975,0.99)
+#'   if(args$test=="1vs"){
+#'     Ftestboot <- cbind(OldVal, NewVal)
+#'     Ftest_boot_12 <- Ftestboot[1, ]
+#'     Ftest_boot_13 <- Ftestboot[2, ]
+#'     Pval_boot_12 <- mean(ifelse(Ftest_boot_12 > x$Ftests[1], 1, 0))
+#'     Cval_boot_12 <- quantile(Ftest_boot_12, probs = probs)
+#'     Pval_boot_13 <- mean(ifelse(Ftest_boot_13 > x$Ftests[2], 1, 0))
+#'     Cval_boot_13 <- quantile(Ftest_boot_13, probs = probs)
+#'     CriticalValBoot <- matrix(c(Cval_boot_12,Cval_boot_13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
+#'     PvalBoot <- c(Pval_boot_12,Pval_boot_13)
+#'   }
+#'   else{
+#'     Ftestboot <- c(OldVal, NewVal)
+#'     Ftest_boot_23 <- Ftestboot
+#'     Pval_boot_23 <- mean(ifelse(Ftest_boot_23 > x$Ftests[3], 1, 0))
+#'     Cval_boot_23 <- quantile(Ftest_boot_23, probs = probs)
+#'     CriticalValBoot <- matrix(Cval_boot_23, nrow=1, dimnames=list("2vs3", probs))
+#'     PvalBoot <- Pval_boot_23
+#'   }
+#'   newNboot <- ifelse(args$test=="1vs", ncol(Ftestboot), length(Ftestboot))
+#'   
+#'   #second check
+#'   if(x$nboot+newTestRuns$nboot!=newNboot)
+#'     stop("Problem2")
+#'   
+#'   res <- list(Ftests=x$Ftests, SSRs=x$SSRs, firstBests=x$firstBests, secBests=x$secBests, 
+#'             CriticalValBoot=CriticalValBoot, PvalBoot=PvalBoot, Ftestboot=Ftestboot, 
+#'             nboot=newNboot, args=args, updated=x$nboot)
+#'   
+#'   class(res) <- "Hansen99Test"
+#'   return(res)
+#' }
   
   
   
@@ -343,8 +345,8 @@ if(FALSE){
   library(tsDyn)
   sun <- (sqrt(sunspot.year + 1) - 1) * 2
   
-  test_1vs <- setarTest(x=sun, m=2, thDelay = 0, trim = 0.15, nboot = 100)
-  test_2vs3 <- setarTest(x=sun, m=2, thDelay = 0, trim = 0.15, nboot = 100, test = "2vs3")
+  test_1vs <- setarTest(x=sun, m=2, thDelay = 0, trim = 0.15, nboot = 10)
+  test_2vs3 <- setarTest(x=sun, m=2, thDelay = 0, trim = 0.15, nboot = 10, test = "2vs3")
   
   print(test_1vs)
   summary(test_1vs)
