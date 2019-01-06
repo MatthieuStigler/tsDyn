@@ -33,7 +33,6 @@ selectSETAR(x, m, d=1, steps=d, series, mL, mH,mM, thDelay=0, mTh, thVar,
 \item{nthresh}{Number of threshold of the model}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime. Default to 0.15}
 \item{criterion}{ Model selection criterion}
-\item{thSteps}{Not used}
 \item{plot}{Should a plot showing the criterion values be printed? (logical)}
 \item{max.iter}{Number of iterations for the alogorithm}
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}

@@ -337,7 +337,7 @@ MakeThSpec<-function(ngrid=c("All", "Half", "Third", "Quarter"), exact=NULL, int
   return(list(exact=exact, int=int, around=around, ngrid=ngrid))
 } 
 
-makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val",ngrid=c("All", "Half", "Third", "Quarter")), thSteps = 7, trace=FALSE, nthresh=1){
+makeTh<-function(allTh, trim, th=list(exact=NULL, int=c("from","to"), around="val",ngrid=c("All", "Half", "Third", "Quarter")), trace=FALSE, nthresh=1){
   ng <- length(allTh)
   down<-ceiling(trim*ng)
   up<-floor(ng*(1-trim))
