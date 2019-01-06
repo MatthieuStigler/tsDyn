@@ -291,56 +291,6 @@ plot.Hansen99Test<-function(x,show.extended=TRUE, ...){
 }
 
 
-
-#' #' @export
-#' extendBoot<-function(x, nboot){
-#'   if(class(x)!="Hansen99Test")
-#'     stop("Function only works for setarTest object")
-#'   args <- x$args
-#'   n <- nboot
-#'   newTestRuns <- setarTest(x=args$x, m=args$m, thDelay = args$thDelay, nboot=n, trim=args$trim, test=args$test)
-#'   if(any(x$Ftests!=newTestRuns$Ftests))
-#'     stop("Problem..")
-#'   OldVal <- x$Ftestboot
-#'   NewVal <- newTestRuns$Ftestboot
-#'   
-#'   probs<-c(0.9, 0.95, 0.975,0.99)
-#'   if(args$test=="1vs"){
-#'     Ftestboot <- cbind(OldVal, NewVal)
-#'     Ftest_boot_12 <- Ftestboot[1, ]
-#'     Ftest_boot_13 <- Ftestboot[2, ]
-#'     Pval_boot_12 <- mean(ifelse(Ftest_boot_12 > x$Ftests[1], 1, 0))
-#'     Cval_boot_12 <- quantile(Ftest_boot_12, probs = probs)
-#'     Pval_boot_13 <- mean(ifelse(Ftest_boot_13 > x$Ftests[2], 1, 0))
-#'     Cval_boot_13 <- quantile(Ftest_boot_13, probs = probs)
-#'     CriticalValBoot <- matrix(c(Cval_boot_12,Cval_boot_13), nrow=2, byrow=TRUE, dimnames=list(c("1vs2", "1vs3"), probs))
-#'     PvalBoot <- c(Pval_boot_12,Pval_boot_13)
-#'   }
-#'   else{
-#'     Ftestboot <- c(OldVal, NewVal)
-#'     Ftest_boot_23 <- Ftestboot
-#'     Pval_boot_23 <- mean(ifelse(Ftest_boot_23 > x$Ftests[3], 1, 0))
-#'     Cval_boot_23 <- quantile(Ftest_boot_23, probs = probs)
-#'     CriticalValBoot <- matrix(Cval_boot_23, nrow=1, dimnames=list("2vs3", probs))
-#'     PvalBoot <- Pval_boot_23
-#'   }
-#'   newNboot <- ifelse(args$test=="1vs", ncol(Ftestboot), length(Ftestboot))
-#'   
-#'   #second check
-#'   if(x$nboot+newTestRuns$nboot!=newNboot)
-#'     stop("Problem2")
-#'   
-#'   res <- list(Ftests=x$Ftests, SSRs=x$SSRs, firstBests=x$firstBests, secBests=x$secBests, 
-#'             CriticalValBoot=CriticalValBoot, PvalBoot=PvalBoot, Ftestboot=Ftestboot, 
-#'             nboot=newNboot, args=args, updated=x$nboot)
-#'   
-#'   class(res) <- "Hansen99Test"
-#'   return(res)
-#' }
-  
-  
-  
-
 if(FALSE){  
   library(tsDyn)
   sun <- (sqrt(sunspot.year + 1) - 1) * 2
