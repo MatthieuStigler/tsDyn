@@ -1,0 +1,35 @@
+library(tsDyn)
+library(tidyverse)
+
+data(IIPUs)
+
+### grid ###
+grid <-  crossing(include = c( "const", "trend","none", "both"),
+                  lag = 1:2L, 
+                  thDelay = 0:1L, 
+                  test = c("1vs", "2vs3")) %>% 
+  filter(thDelay<lag)
+
+
+### run ###
+res <- grid %>% 
+  mutate(dat = pmap(list(include, lag, thDelay, test),
+                    ~setarTest(IIPUs, 
+                               include= ..1,
+                               m = ..2,
+                               thDelay = ..3,
+                               test = ..4,
+                               nboot = 2)))
+
+
+### show F tests ###
+res %>% 
+  mutate(Ftests = map(dat, ~as_data_frame(.$Ftests %>%  t))) %>% 
+  select(-dat) %>% 
+  unnest(Ftests)
+
+res %>% 
+  mutate(Ftests = map(dat, ~as_data_frame(.$SSRs %>%  t))) %>% 
+  select(-dat) %>% 
+  unnest(Ftests)
+
