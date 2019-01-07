@@ -540,6 +540,7 @@ get_include.linear <-  function(object) object$include
 get_include.setar <-  function(object) object$include
 get_include.lstar <-  function(object) object$model.specific$include
 get_include.aar <-  function(object) "const"
+get_include.star <-  function(object) "const"
 
 
 # LM linearity testing against 2 regime STAR

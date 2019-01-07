@@ -241,7 +241,10 @@ testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
   }
 }
   
-
+#'@export
+coef.star <- function(object, hyperCoef=TRUE, regime = c("all", "L", "H"), ...){
+  coef.lstar(object, hyperCoef=hyperCoef, regime = regime, ...)
+}
 
 #'addRegime test
 #'
