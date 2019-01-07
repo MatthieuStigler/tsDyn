@@ -125,6 +125,31 @@ In object$var.pred * vars :
 > all.equal(ar_1_Mean_pred, all_lin_pred[["const_l_1"]], check.attributes = TRUE)
 [1] TRUE
 > 
+> ## ar_mean
+> all_lin_noTrend <- all_lin[grep("const|none", names(all_lin))]
+> sapply(all_lin_noTrend, ar_mean)
+const_l_1.ar_mean  none_l_1.ar_mean const_l_2.ar_mean  none_l_2.ar_mean 
+         2.415057          0.000000          2.404750          0.000000 
+const_l_3.ar_mean  none_l_3.ar_mean 
+         2.391820          0.000000 
+> 
+> 
+> ## charac root
+> do.call("rbind", lapply(all_lin_noTrend, charac_root))
+            root value_all
+const_l_1      1  1.706523
+none_l_1       1  1.016634
+const_l_2.1    1  2.123638
+const_l_2.2    2  2.123638
+none_l_2.1     1  1.015604
+none_l_2.2     2 31.600320
+const_l_3.1    1  1.360258
+const_l_3.2    2  2.301410
+const_l_3.3    3  1.360258
+none_l_3.1     1  1.011858
+none_l_3.2     2  3.289381
+none_l_3.3     3  3.289381
+> 
 > proc.time()
    user  system elapsed 
-  1.624   0.078   1.690 
+  1.585   0.060   1.642 
