@@ -318,10 +318,10 @@ z<-as.matrix(z)
 
 ###check for unit roots
   if(type=="level"){
-    isRootH<-isRoot(res$coefficients, regime="H", lags=MH)
-    isRootL<-isRoot(res$coefficients, regime="L", lags=ML)
+    isRootH <- root_oneReg(res$coefficients, regime = "H", lags = MH)
+    isRootL <- root_oneReg(res$coefficients, regime = "L", lags = ML)
     if(nthresh==2)
-      isRootM<-isRoot(res$coefficients, regime="M", lags=MM)
+      isRootM <- root_oneReg(res$coefficients, regime = "M", lags = MM)
   }
 
 ### SETAR 7: return the infos

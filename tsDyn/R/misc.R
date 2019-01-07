@@ -225,31 +225,6 @@ is.InUnitCircle<-function(B,ninc,m, nthresh){
     list(warn=FALSE, root=root)
 }
 
-isRoot <- function(coef, regime=c("L", "M", "H", "."), lags){
-  regime <- match.arg(regime)
-  coefName <- paste("phi", regime, sep = "")
-  phi <- coef[grep(coefName, names(coef))]
-  vec <- rep(0, max(lags))
-  vec[lags] <- phi
-  charPol <- c(1,-vec)
-  if(any(is.na(charPol))) {
-    warning("some NA coefficients?")
-    charPol <-  charPol[!is.na(charPol)]
-  }
-  val <- polyroot(charPol)
-  root <- Mod(val)
-  if(any(root<=1)){
-    regimeName<-switch(regime, "L"="low", "M"="medium", "H"="high", "."="")
-    message<-paste("Possible unit root in the", regimeName, " regime. Roots are:", paste(round(root,4), collapse=" "))
-    warn<-TRUE
-    warning(message, call.=FALSE)
-  }
-  else{
-    message<-NA
-    warn<-FALSE
-  }
-  return(list(warn=FALSE, root=root, message=message))
-}
 
 
 percent<-function(x,digits=3,by100=FALSE){

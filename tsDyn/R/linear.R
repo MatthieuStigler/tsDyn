@@ -20,20 +20,20 @@
 #linear model fitter (via OLS)
 #str: call to nlar.struct
 linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none", "both"), type=c("level", "diff", "ADF")) {
+  
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
-	type<-match.arg(type)
+	type <- match.arg(type)
+	include <- match.arg(include)
 	
 	###Build regressor matrix
 	if(type=="level"){
 	  xx <- getXX(str)
 	  yy <- getYY(str)
-	}
-	else{ 
+	}	else{ 
 	  if(type=="diff"){
 	    xx <- getdXX(str)
 	    yy <- getdYY(str)
-	  }
-	  else if(type=="ADF"){
+	  } else if(type=="ADF"){
 	    xx <- cbind(getdX1(str),getdXX(str))
 	    yy <- getdYY(str)
 	  }
@@ -41,15 +41,15 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	  str$yy<-yy
 	}
 	
-	constMatrix<-buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
-	incNames<-constMatrix$incNames #vector of names
-	const<-constMatrix$const #matrix of none, const, trend, both
-	ninc<-constMatrix$ninc #number of terms (0,1, or 2)
-	xx <- cbind(const,xx)
+	constMatrix <- buildConstants(include=include, n=nrow(xx)) #stored in miscSETAR.R
+	incNames <- constMatrix$incNames #vector of names
+	const <- constMatrix$const #matrix of none, const, trend, both
+	ninc <- constMatrix$ninc #number of terms (0,1, or 2)
+	xx <- cbind(const, xx)
 	###name the regressor matrix
-	phi<-ifelse(type=="level", "phi", "Dphi")
-	dX1<- if(type=="ADF") "phi.1" else NULL
-	nlags<-if(type=="ADF") ncol(xx)-ninc-1 else ncol(xx)-ninc
+	phi <- ifelse(type == "level", "phi", "Dphi")
+	dX1 <- if(type=="ADF") "phi.1" else NULL
+	nlags <-if(type=="ADF") ncol(xx)-ninc-1 else ncol(xx)-ninc
 	colnames(xx) <- c(incNames, dX1, paste(phi,1:nlags, sep="."))
 	
 	#evaluate the model
@@ -59,7 +59,7 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	
 	#check if unit root lie outside unit circle
 	if(type=="level")
-	  is<-isRoot(coef(res), regime=".", lags=seq_len(m))
+	  is <- root_oneReg(coef(res), regime = ".", lags = seq_len(m))
 	
 	res <- extend(nlar(str,
 	                   coefficients=res$coefficients,
