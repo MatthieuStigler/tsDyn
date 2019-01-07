@@ -75,6 +75,16 @@ lm(Y~M-1)
   #test 2vs3 is also different of the version in the article (27)
 }
 
+## results from the test is stored in: setarTest_IIPUs_results
+data(setarTest_IIPUs_results)
 
+## Table 5 and 6
+test_1vs <- setarTest_IIPUs_results$test_1
+test_1vs
+
+## Table 7
+test_2vs <- setarTest_IIPUs_results$test_2
+test_2vs
+plot(test_2vs)
 }
 \keyword{datasets}
