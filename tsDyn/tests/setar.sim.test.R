@@ -1,7 +1,59 @@
 library(tsDyn)
+library(tidyverse)
+
+############################
+### Load data
+############################
+path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
+if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
+
+models_univariate <- readRDS(path_mod_uni) %>% 
+  filter(model %in% c("lineaar", "setar"))
 
 ################
-### tets boot
+### run boot
+################
+
+models_univariate %>% 
+  mutate(boot = map(object, ~ data_frame(n = 1:3, boot =head(setar.boot(., seed = 123), 3)))) %>% 
+  select(-object) %>% 
+  unnest(boot)  %>% 
+  spread(include, boot)
+
+models_univariate %>% 
+  mutate(boot = map(object, ~ data_frame(n = 1:3, boot =head(setar.boot(., seed = 123, returnStarting = TRUE), 3)))) %>% 
+  select(-object) %>% 
+  unnest(boot)  %>% 
+  spread(include, boot)
+
+## add regime
+models_univariate %>% 
+  mutate(boot = map(object, ~ setar.boot(., seed = 123, add.regime = TRUE) %>% 
+                      head(3) %>% 
+                      as_data_frame() %>% 
+                      mutate(n = 1:3))) %>% 
+  select(-object) %>% 
+  unnest(boot)  %>% 
+  gather(stat, value, res, regime) %>% 
+  unite(stat_n, stat, n) %>% 
+  spread(stat_n, value) %>% 
+  as.data.frame()
+
+## add regime and starting
+models_univariate %>% 
+  mutate(boot = map(object, ~ setar.boot(., seed = 123, add.regime = TRUE, returnStarting = TRUE) %>% 
+                      head(3) %>% 
+                      as_data_frame() %>% 
+                      mutate(n = 1:3))) %>% 
+  select(-object) %>% 
+  unnest(boot)  %>% 
+  gather(stat, value, res, regime) %>% 
+  unite(stat_n, stat, n) %>% 
+  spread(stat_n, value) %>% 
+  as.data.frame()
+
+################
+### test boot
 ################
 
 setar.boot.check <-  function(object, n_digits = 10) {

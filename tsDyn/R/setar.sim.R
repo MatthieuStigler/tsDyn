@@ -58,6 +58,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
                       starting=NULL,  innov, exo, 
                       n_digits = 10,
                       returnStarting = FALSE,
+                      add.regime =FALSE,
                       show.parMat = FALSE, ...){
   
   ## Check arguments
@@ -76,6 +77,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
   y <- vector("numeric", length = n_full)
   if(!is.null(starting)) y[seq_len(lag)] <- starting  
   trend <- c(rep(0, lag), trendStart+(0:(n-1)))  ### n-1 a starts from zero
+  regime <- vector("numeric", length=n_full)
   
   ## exo
   if(missing(exo)) exo <- rep(0, n_full)
@@ -120,14 +122,17 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
                   Bfull[-c(1,2)] * y[i-c(1:lag)], # lags
                   resb[i],
                   exo[i]) #residuals
+      regime[i] <- 1
     }
   } else if(nthresh==1){
     for(i in (lag+1):length(y)){
       # switch every time the coef matrix to use
       if(round(z2[i-thDelay], n_digits) <= Thresh) {
         B_here <-  BDown
+        regime[i] <- 1
       } else {
         B_here <-  BUp
+        regime[i] <- 2
       }
       #recursive formula: cont, trend, lags, residuals
       y[i] <- sum(B_here[1], B_here[2]*trend[i], B_here[-c(1,2)] * y[i-c(1:lag)], resb[i], exo[i])
@@ -138,10 +143,13 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
       # switch every time the coef matrix to use
       if(round(z2[i-thDelay],n_digits)<=Thresh[1]) {
         B_here <-  BDown
+        regime[i] <- 1
       } else if(round(z2[i-thDelay], n_digits)>Thresh[2]) {
         B_here <-  BUp
+        regime[i] <- 3
       } else{ 
         B_here <-  BMiddle
+        regime[i] <- 2
       }
       #recursive formula: cont, trend, lags, residuals
       y[i] <- sum(B_here[1], B_here[2]*trend[i], B_here[-c(1,2)] * y[i-c(1:lag)], resb[i], exo[i])
@@ -150,7 +158,13 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
   }
   
   res <- round(y, n_digits)
-  if(!returnStarting) res <- res[-seq_len(lag)] 
+  if(!returnStarting) {
+    res <- res[-seq_len(lag)] 
+    regime <- regime[-seq_len(lag)] 
+  } else {
+    regime[seq_len(lag)]  <-  NA
+  }
+  if(add.regime) res <- cbind(res, regime)
   res
 }
 
