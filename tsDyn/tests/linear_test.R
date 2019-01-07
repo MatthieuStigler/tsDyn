@@ -45,3 +45,11 @@ all_lin_pred <- lapply(all_lin_const, predict, n.ahead = 5)
 ar_1_Mean_pred <- predict(ar_1_Mean, n.ahead = 5)$pred
 
 all.equal(ar_1_Mean_pred, all_lin_pred[["const_l_1"]], check.attributes = TRUE)
+
+## ar_mean
+all_lin_noTrend <- all_lin[grep("const|none", names(all_lin))]
+sapply(all_lin_noTrend, ar_mean)
+
+
+## charac root
+do.call("rbind", lapply(all_lin_noTrend, charac_root))

@@ -27,6 +27,7 @@ Type 'q()' to quit R.
 > mod[["setar"]] <- setar(x, m=2, thDelay=1)
 Warning message:
 Possible unit root in the high  regime. Roots are: 0.9943 0.9943 
+> mod[["star"]] <- star(x, m=2, thDelay=1, trace = FALSE)
 > mod[["lstar"]] <- lstar(x, m=2, thDelay=1)
 Using maximum autoregressive order for low regime: mL = 2 
 Using maximum autoregressive order for high regime: mH = 2 
@@ -39,17 +40,17 @@ Optimized values fixed for regime 2  : gamma =  11.15383 , th =  3.339199 ; SSE 
 > 
 > ### Extract methods
 > sapply(mod, AIC)
-   linear     setar     lstar       aar 
--333.8737 -358.3740 -356.6509 -328.0813 
+   linear     setar      star     lstar       aar 
+-333.8737 -358.3740 -356.6509 -356.6509 -328.0813 
 > sapply(mod, BIC)
-   linear     setar     lstar       aar 
--325.6651 -339.2206 -334.7613 -276.0935 
+   linear     setar      star     lstar       aar 
+-325.6651 -339.2206 -334.7613 -334.7613 -276.0935 
 > sapply(mod, mse)
-    linear      setar      lstar        aar 
-0.05072439 0.03814203 0.03804950 0.04030663 
+    linear      setar       star      lstar        aar 
+0.05072439 0.03814203 0.03804950 0.03804950 0.04030663 
 > sapply(mod, MAPE)
-    linear      setar      lstar        aar 
-0.06801955 0.05648596 0.05580035 0.05951108 
+    linear      setar       star      lstar        aar 
+0.06801955 0.05648596 0.05580035 0.05580035 0.05951108 
 > 
 > sapply(mod, coef)
 $linear
@@ -59,6 +60,12 @@ $linear
 $setar
    const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2         th 
  0.5884369  1.2642793 -0.4284292  1.1656919  1.5992541 -1.0115755  3.3100557 
+
+$star
+   const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2      gamma 
+ 0.4891014  1.2465399 -0.3664328 -1.0240758  0.4232669 -0.2546088 11.1538344 
+        th 
+ 3.3391985 
 
 $lstar
    const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2      gamma 
@@ -85,6 +92,10 @@ $setar
    const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2 
  0.5884369  1.2642793 -0.4284292  1.1656919  1.5992541 -1.0115755 
 
+$star
+   const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2 
+ 0.4891014  1.2465399 -0.3664328 -1.0240758  0.4232669 -0.2546088 
+
 $lstar
    const.L     phiL.1     phiL.2    const.H     phiH.1     phiH.2 
  0.4891014  1.2465399 -0.3664328 -1.0240758  0.4232669 -0.2546088 
@@ -99,37 +110,22 @@ $aar
  s(V1..1).9 
 -0.95424576 
 
-> sapply(mod, getTh)
-$linear
-NULL
-
-$setar
-      th 
-3.310056 
-
-$lstar
-      th 
-3.339199 
-
-$aar
-NULL
-
 > sapply(mod, function(x) head(residuals(x)))
-          linear       setar       lstar         aar
-[1,]          NA          NA          NA          NA
-[2,]          NA          NA          NA          NA
-[3,]  0.05686638  0.05077340  0.04395966  0.03301780
-[4,] -0.07368020 -0.07301664 -0.07994243 -0.10249452
-[5,]  0.11071953  0.04888145  0.02963628  0.02850267
-[6,]  0.20491541  0.11531771  0.09356303  0.11476657
+          linear       setar        star       lstar         aar
+[1,]          NA          NA          NA          NA          NA
+[2,]          NA          NA          NA          NA          NA
+[3,]  0.05686638  0.05077340  0.04395966  0.04395966  0.03301780
+[4,] -0.07368020 -0.07301664 -0.07994243 -0.07994243 -0.10249452
+[5,]  0.11071953  0.04888145  0.02963628  0.02963628  0.02850267
+[6,]  0.20491541  0.11531771  0.09356303  0.09356303  0.11476657
 > sapply(mod, function(x) head(residuals(x, initVal = FALSE)))
-          linear        setar       lstar         aar
-[1,]  0.05686638  0.050773403  0.04395966  0.03301780
-[2,] -0.07368020 -0.073016636 -0.07994243 -0.10249452
-[3,]  0.11071953  0.048881450  0.02963628  0.02850267
-[4,]  0.20491541  0.115317711  0.09356303  0.11476657
-[5,]  0.12993869  0.001064474  0.01332241  0.06337584
-[6,]  0.32134522  0.350663610  0.36470166  0.34847606
+          linear        setar        star       lstar         aar
+[1,]  0.05686638  0.050773403  0.04395966  0.04395966  0.03301780
+[2,] -0.07368020 -0.073016636 -0.07994243 -0.07994243 -0.10249452
+[3,]  0.11071953  0.048881450  0.02963628  0.02963628  0.02850267
+[4,]  0.20491541  0.115317711  0.09356303  0.09356303  0.11476657
+[5,]  0.12993869  0.001064474  0.01332241  0.01332241  0.06337584
+[6,]  0.32134522  0.350663610  0.36470166  0.36470166  0.34847606
 > 
 > 
 > lapply(mod, predict, n.ahead=10)
@@ -149,6 +145,14 @@ Frequency = 1
  [1] 3.348576 2.949075 2.494675 2.478933 2.653709 2.881419 3.094429 3.266175
  [9] 3.392051 3.477612
 
+$star
+Time Series:
+Start = 1935 
+End = 1944 
+Frequency = 1 
+ [1] 3.346300 2.913213 2.560114 2.607046 2.800682 3.024814 3.232268 3.397452
+ [9] 3.444542 3.254686
+
 $lstar
 Time Series:
 Start = 1935 
@@ -166,6 +170,67 @@ Frequency = 1
  [9] 3.354504 3.188338
 
 > 
+> 
+> ## charac root
+> lapply(mod[-grep("aar", names(mod))], charac_root)
+$linear
+  root value_all
+1    1  1.156417
+2    2  1.156417
+
+$setar
+  root  value_L  value_H
+1    1 1.527779 0.994262
+2    2 1.527779 0.994262
+
+$star
+  root  value_L  value_H
+1    1 1.295834 1.981816
+2    2 2.105990 1.981816
+
+$lstar
+  root  value_L  value_H
+1    1 1.295834 1.981816
+2    2 2.105990 1.981816
+
+> lapply(mod[-grep("aar", names(mod))], ar_mean)
+$linear
+ ar_mean 
+2.909188 
+
+$setar
+ar_mean_H ar_mean_L 
+ 2.827144  3.584753 
+
+$star
+ar_mean_H ar_mean_L 
+-1.231835  4.079487 
+
+$lstar
+ar_mean_H ar_mean_L 
+-1.231835  4.079487 
+
+> 
+> ### Utility functions
+> sapply(mod, getTh)
+$linear
+NULL
+
+$setar
+      th 
+3.310056 
+
+$star
+      th 
+3.339199 
+
+$lstar
+      th 
+3.339199 
+
+$aar
+NULL
+
 > 
 > ### Pred Roll, acc_stat:
 > x_small <- x[1:100]
@@ -268,4 +333,4 @@ $aar
 > 
 > proc.time()
    user  system elapsed 
-  2.489   0.076   2.549 
+  3.221   0.104   3.313 
