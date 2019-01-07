@@ -36,12 +36,15 @@ irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "
 irf_any <-  function(x, n.ahead = 10, cumulative = FALSE, 
                      boot = TRUE, ci = 0.95, runs = 100,
                      regime = c("L", "M", "H"),
+                     seed = NULL, 
                      ...) {
   regime <-  match.arg(regime)
   irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
+  if(runs ==0) boot <-  FALSE
   
   ## 
   if(boot) {
+    if(!is.null(seed)) set.seed(seed) 
     boot_estim <- function(x) {
       x_b <- setar.boot(x)
       if(inherits(x, "linear")) {
@@ -86,7 +89,7 @@ irf.linear <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, 
                         boot=TRUE, ci=0.95, runs=100, seed=NULL, ...) {
   if(!is.null(impulse) | !is.null(response) | !ortho) stop("Arguments used only for multivariate models")
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
-           boot = boot, ci = ci, runs = runs, ...)
+           boot = boot, ci = ci, runs = runs, seed = seed, ...)
 }
 
 #' @rdname irf.nlVar
@@ -96,7 +99,7 @@ irf.setar <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, c
                         boot=TRUE, ci=0.95, runs=100, seed=NULL, regime = c("L", "M", "H"),...) {
   if(!is.null(impulse) | !is.null(response) | !ortho) stop("Arguments used only for multivariate models")
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
-          boot = boot, ci = ci, runs = runs, regime = regime, ...)
+          boot = boot, ci = ci, runs = runs, regime = regime, seed = seed, ...)
 }
 
 #' @rdname irf.nlVar
@@ -105,7 +108,7 @@ irf.ar <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumu
                     boot=TRUE, ci=0.95, runs=100, seed=NULL, ...) {
   if(!is.null(impulse) | !is.null(response) | !ortho) stop("Arguments used only for multivariate models")
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
-          boot = boot, ci = ci, runs = runs, ...)
+          boot = boot, ci = ci, runs = runs, seed = seed,  ...)
 }
 
 ## 
