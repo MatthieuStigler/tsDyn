@@ -199,14 +199,14 @@ if(FALSE) {
     filter(between(n_row, 11, 20)) %>% 
     qplot(x = n_row, y = diff, data = ., geom = "line")
   
-  irf_dat <- data_frame(n_row =11 :(11+10-1), irf = irf_1_sim(x=linear_l2_const))
+  irf_dat <- tibble(n_row =11 :(11+10-1), irf = irf_1_sim(x=linear_l2_const))
   qplot(x = n_row, y = irf, data = irf_dat, geom = "line")
   
   ## irf filter
   irf_filt <- irf.linear(x=linear_l2_const)
   all.equal(irf_filt$irf$x, linear_l2_const_sh$diff[11:20])
   
-  data_frame(irf_filter = irf.linear(x=linear_l2_const),
+  tibble(irf_filter = irf.linear(x=linear_l2_const),
              n_row = 1:10) %>% 
     qplot(x = n_row, y = irf_filter, data = ., geom = "line")
   
