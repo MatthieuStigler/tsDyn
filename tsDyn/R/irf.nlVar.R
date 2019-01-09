@@ -88,3 +88,81 @@ irf.nlVar <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cu
   irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
+### new way
+get_series <- function(x) {
+  if(inherits(x ,"nlVar")) {
+    res <- colnames(x$model)[seq_len(x$k)]
+  }
+  res
+}
+
+irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ...) {
+  regime <-  match.arg(regime)
+  series <- get_series(x)
+  
+  ##
+  lag <-  x$lag
+  k <-  x$k
+  thDelay <-  x$thDelay
+  nthresh <-  x$model.specific$nthresh
+
+  coefs <- coef(x)
+
+  ## 
+  start <-  matrix(0, nrow= lag, ncol = k)
+  innovs <-  matrix(0, nrow= n.ahead +1, ncol = k)
+  
+  if(any(grepl("Intercept|trend", colnames(coefs)))) coefs <-  coefs[,-grep("Intercept|trend", colnames(coefs))]
+
+  ## shock first
+  gen_1 <- function(k) {
+    innov_k <- innovs
+    innov_k[1, k] <-  1
+    out <- VAR.gen(B = coefs, n=n.ahead + 1, lag=lag, include = "none",  
+                    starting = start, 
+                    innov = innov_k, 
+                    returnStarting = FALSE)
+    colnames(out) <- series
+    out
+  }
+  res_M <- lapply(seq_len(k), gen_1 )
+  names(res_M) <- series
+  
+  if(cumulative) res <-  apply(res, 2, cumsum)
+  
+  ### results
+  res <- list()
+  res$irf <- res_M
+  res$boot <- FALSE
+  class(res) <- "varirf"
+  res
+}
+
+
+if(FALSE){
+  
+  VAR.gen <- tsDyn:::VAR.gen
+  irf_1.VAR <- tsDyn:::irf_1.VAR
+  
+  
+  ## vars
+  library(vars)
+  data(Canada)
+  var.2c <- VAR(Canada, p = 1, type = "const")
+  irf_vars <- irf(var.2c, boot = FALSE, ortho = FALSE)
+  lapply(irf_vars$irf, head, 2)
+  
+  # tsDyn
+  library(tsDyn)
+  x <- lineVar(Canada, lag=1)
+  coef(x)[1,]
+  coef(var.2c)$e[, 1]
+  irf_tsD <- irf_1.VAR(x)
+  irf_tsD$irf
+  irf_tsD
+  plot(irf_tsD)
+  
+  ## compare
+  all.equal(irf_vars$irf, irf_tsD$irf)
+  
+}
