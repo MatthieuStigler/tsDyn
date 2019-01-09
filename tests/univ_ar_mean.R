@@ -39,7 +39,7 @@ stopifnot(all(check_2$include == c("const", "none")))
 ## show results
 models_ar_mean %>% 
   filter(!map_lgl(ar_mean, is.null)) %>% 
-  mutate(ar_mean = map(ar_mean, ~as_data_frame(t(.)))) %>% 
+  mutate(ar_mean = map(ar_mean, ~as_tibble(t(.)))) %>% 
   unnest(ar_mean) %>% 
   select(-object) %>% 
   print(n = Inf)

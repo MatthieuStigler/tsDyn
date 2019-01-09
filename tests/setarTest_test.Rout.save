@@ -21,7 +21,7 @@ Type 'q()' to quit R.
 > library(tidyverse)
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──
 ✔ ggplot2 3.1.0     ✔ purrr   0.2.5
-✔ tibble  1.4.2     ✔ dplyr   0.7.7
+✔ tibble  2.0.0     ✔ dplyr   0.7.7
 ✔ tidyr   0.8.2     ✔ stringr 1.3.1
 ✔ readr   1.3.1     ✔ forcats 0.3.0
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
@@ -72,7 +72,7 @@ With the threshold you gave (-2.72533309207574) there is a regime with less than
 > 
 > ### show F tests ###
 > res %>% 
-+   mutate(Ftests = map(dat, ~as_data_frame(.$Ftests %>%  t))) %>% 
++   mutate(Ftests = map(dat, ~as_tibble(.$Ftests %>%  t))) %>% 
 +   select(-dat) %>% 
 +   unnest(Ftests)
 # A tibble: 24 x 7
@@ -88,10 +88,10 @@ With the threshold you gave (-2.72533309207574) there is a regime with less than
  8 const       1       0 2vs3    5.60   13.4   7.67
  9 const       2       0 1vs    15.0    28.4  12.9 
 10 const       2       0 2vs3   15.0    28.4  12.9 
-# ... with 14 more rows
+# … with 14 more rows
 > 
 > res %>% 
-+   mutate(Ftests = map(dat, ~as_data_frame(.$SSRs %>%  t))) %>% 
++   mutate(Ftests = map(dat, ~as_tibble(.$SSRs %>%  t))) %>% 
 +   select(-dat) %>% 
 +   unnest(Ftests)
 # A tibble: 24 x 7
@@ -107,9 +107,12 @@ With the threshold you gave (-2.72533309207574) there is a regime with less than
  8 const       1       0 2vs3   609.  601.  591.
  9 const       2       0 1vs    535.  517.  503.
 10 const       2       0 2vs3   535.  517.  503.
-# ... with 14 more rows
+# … with 14 more rows
+Warning message:
+`as_tibble.matrix()` requires a matrix with column names or a `.name_repair` argument. Using compatibility `.name_repair`.
+This warning is displayed once per session. 
 > 
 > 
 > proc.time()
    user  system elapsed 
- 39.262   0.140  39.732 
+ 24.977   0.072  25.036 

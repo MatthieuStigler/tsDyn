@@ -24,12 +24,12 @@ res <- grid %>%
 
 ### show F tests ###
 res %>% 
-  mutate(Ftests = map(dat, ~as_data_frame(.$Ftests %>%  t))) %>% 
+  mutate(Ftests = map(dat, ~as_tibble(.$Ftests %>%  t))) %>% 
   select(-dat) %>% 
   unnest(Ftests)
 
 res %>% 
-  mutate(Ftests = map(dat, ~as_data_frame(.$SSRs %>%  t))) %>% 
+  mutate(Ftests = map(dat, ~as_tibble(.$SSRs %>%  t))) %>% 
   select(-dat) %>% 
   unnest(Ftests)
 
