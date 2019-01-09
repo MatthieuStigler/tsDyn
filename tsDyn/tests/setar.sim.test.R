@@ -15,13 +15,13 @@ models_univariate <- readRDS(path_mod_uni) %>%
 ################
 
 models_univariate %>% 
-  mutate(boot = map(object, ~ data_frame(n = 1:3, boot =head(setar.boot(., seed = 123), 3)))) %>% 
+  mutate(boot = map(object, ~ tibble(n = 1:3, boot =head(setar.boot(., seed = 123), 3)))) %>% 
   select(-object) %>% 
   unnest(boot)  %>% 
   spread(include, boot)
 
 models_univariate %>% 
-  mutate(boot = map(object, ~ data_frame(n = 1:3, boot =head(setar.boot(., seed = 123, returnStarting = TRUE), 3)))) %>% 
+  mutate(boot = map(object, ~ tibble(n = 1:3, boot =head(setar.boot(., seed = 123, returnStarting = TRUE), 3)))) %>% 
   select(-object) %>% 
   unnest(boot)  %>% 
   spread(include, boot)
@@ -30,7 +30,7 @@ models_univariate %>%
 models_univariate %>% 
   mutate(boot = map(object, ~ setar.boot(., seed = 123, add.regime = TRUE) %>% 
                       head(3) %>% 
-                      as_data_frame() %>% 
+                      as_tibble() %>% 
                       mutate(n = 1:3))) %>% 
   select(-object) %>% 
   unnest(boot)  %>% 
@@ -43,7 +43,7 @@ models_univariate %>%
 models_univariate %>% 
   mutate(boot = map(object, ~ setar.boot(., seed = 123, add.regime = TRUE, returnStarting = TRUE) %>% 
                       head(3) %>% 
-                      as_data_frame() %>% 
+                      as_tibble() %>% 
                       mutate(n = 1:3))) %>% 
   select(-object) %>% 
   unnest(boot)  %>% 
@@ -115,7 +115,7 @@ if(FALSE) {
   }
   set_1th_l2_b <- setar.boot(setarObject = set_1th_l2, boot.scheme = "check", n_digits = 7)
   
-  df_comp <- data_frame(orig = lynx, boot = set_1th_l2_b) %>% 
+  df_comp <- tibble(orig = lynx, boot = set_1th_l2_b) %>% 
     mutate(n_row = 1:n(),
            th1 = getTh(set_1th_l1_tr)[1],
            th2 = getTh(set_1th_l1_tr)[2],

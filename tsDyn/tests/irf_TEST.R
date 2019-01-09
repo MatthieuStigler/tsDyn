@@ -20,13 +20,13 @@ models_irf <- models_univariate %>%
   mutate(irf = map(object, ~suppressWarnings(irf(.,  boot = TRUE, runs = 2, seed = 7))))
 
 ## IRF
-df_irf <- map_df(models_irf$irf, ~ head(.$irf[[1]], 2) %>%  as_data_frame) %>% 
+df_irf <- map_df(models_irf$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
   as.data.frame()
 
 ## Lower
-df_low <- map_df(models_irf$irf, ~ head(.$Lower[[1]], 2) %>%  as_data_frame) %>% 
+df_low <- map_df(models_irf$irf, ~ head(.$Lower[[1]], 2) %>%  as_tibble) %>% 
   as.data.frame()
-df_upp <- map_df(models_irf$irf, ~ head(.$Upper[[1]], 2) %>%  as_data_frame) %>% 
+df_upp <- map_df(models_irf$irf, ~ head(.$Upper[[1]], 2) %>%  as_tibble) %>% 
   as.data.frame()
 
 cbind(df_irf, df_low, df_upp)
