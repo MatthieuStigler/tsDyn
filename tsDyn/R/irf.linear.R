@@ -5,7 +5,7 @@ irf_1.ar <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   empty_series <- c(1, rep(0, n.ahead-1))
   res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
   if(cumulative) res <-  cumsum(res)
-  res
+  data.frame(x=res, n.ahead = 1:n.ahead)
 }
 
 irf_1.linear <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
@@ -16,7 +16,7 @@ irf_1.linear <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   
   res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
   if(cumulative) res <-  cumsum(res)
-  res
+  data.frame(x=res, n.ahead = 1:n.ahead)
 }
 
 irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ...) {
@@ -28,7 +28,13 @@ irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "
   
   res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
   if(cumulative) res <-  cumsum(res)
-  res
+  data.frame(x=res, n.ahead = 1:n.ahead)
+}
+
+irf_1_tolist <- function(x) {
+    irf_origM <- as.matrix(x[, "x", drop = FALSE])
+    # colnames(irf_origM) <-  "x"
+    list(x = irf_origM)
 }
 
 
@@ -42,36 +48,50 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
   irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
   if(runs ==0) boot <-  FALSE
   
+  ## if univariate
+  if(inherits(x, c("nlar"))) {
+    irf_orig <-  irf_1_tolist(irf_orig)
+  }
+  
   ## 
   if(boot) {
     if(!is.null(seed)) set.seed(seed) 
-    boot_estim <- function(x) {
-      x_b <- setar.boot(x)
-      if(inherits(x, "linear")) {
-        mod_b <- linear(x_b, m = x$str$m, include = x$include)
-      } else if(inherits(x, "setar")) {
-        mod_b <- setar(x_b, m = x$str$m, include = x$include,
-                       nthresh = x$model.specific$nthresh, th = getTh(x))
-      }
+    boot_estim_irf <- function(x) {
+      mod_b <- mod_boot_estim(x)
       
       irf_b <- irf_1(x=mod_b , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
+      if(!is.list(irf_b)) irf_b <-  irf_1_tolist(irf_b)
       irf_b
     }
-    # boot_estim(x)
-    IRF_b <- t(replicate(runs, boot_estim(x)))
-    quants <- t(apply(IRF_b, 2, quantile, probs = c(1-ci, ci)))
+    
+    # univariate: 1 vector
+    ## multi: a list of k components, with k rows? use rather df way!
+    
+    # boot_estim_irf(x)
+    IRF_b <- replicate(runs, as.data.frame(boot_estim_irf(x)), simplify = FALSE)
+    IRF_b_2 <- lapply(1:length(IRF_b), function(i) {IRF_b[[i]]$n_rep <- i; IRF_b[[i]]})
+    IRF_b_3 <- do.call("rbind", IRF_b_2) %>%  as_tibble
+    IRF_b_3$n.ahead <- rep(1:n.ahead, length.out = nrow(IRF_b_3))
+    if(!"impulse" %in% colnames(IRF_b_3)) IRF_b_3$impulse <- "x"
+    q_low <- aggregate(IRF_b_3[, 1:(ncol(IRF_b_3)-3)], 
+                       list(impulse = IRF_b_3$impulse, n.ahead = IRF_b_3$n.ahead), 
+                       quantile, probs = 1-ci)
+    q_high <- aggregate(IRF_b_3[, 1:(ncol(IRF_b_3)-3)], 
+                       list(impulse = IRF_b_3$impulse, n.ahead = IRF_b_3$n.ahead), 
+                       quantile, probs = ci)
+    q_low_li <- split(q_low[, -c(1,2), drop = FALSE], f = q_low$impulse )
+    q_high_li <- split(q_high[, -c(1,2), drop = FALSE], f = q_high$impulse )
   }
   
   ## results
   res <- list()
-  res$irf$x <- as.matrix(irf_orig)
-  colnames(res$irf$x) <-  "x"
+  res$irf <- irf_orig
   res$model <-  "varest"
   res$runs <- runs
   res$ci <- ci
   if(boot) {
-    res$Lower$x <-  matrix(quants[, 1], dimnames = list(NULL, "x"))
-    res$Upper$x <-  matrix(quants[, 2], dimnames = list(NULL, "x"))
+    res$Lower <-  q_low_li #matrix(quants[, 1], dimnames = list(NULL, "x"))
+    res$Upper <-  q_high_li #matrix(quants[, 2], dimnames = list(NULL, "x"))
   }
   res$response <- "x"
   res$ortho <-  FALSE
@@ -148,6 +168,25 @@ if(FALSE) {
 ## TEST
 if(FALSE) {
   library(tsDyn)
+  library(tidyverse)
+  environment(irf_any) <-  environment(star)
+  setar.gen <- tsDyn:::setar.gen
+  irf_1_shock <- tsDyn:::irf_1_shock
+  irf_any <- tsDyn:::irf_any
+  irf_1 <- tsDyn:::irf_1
+  irf_1.linear <-  tsDyn:::irf_1.linear
+  irf_1.setar <-  tsDyn:::irf_1.setar
+  irf_1.ar <-  tsDyn:::irf_1.ar
+  irf_1_sim <-  tsDyn:::irf_1_sim
+  ci = 0.95
+  n.ahead = 10
+  cumulative = FALSE
+  boot = TRUE
+  runs = 10
+  regime = "L"
+  # environment(irf_1) <- environment(star)
+  
+  
   ar_2_noMean <- ar(lh, aic = FALSE, order.max = 2, method = "ols", demean = FALSE)  
   ar_2_Mean <- ar(lh, aic = FALSE, order.max =2, demean = TRUE, method = "ols")
   
@@ -172,8 +211,8 @@ if(FALSE) {
   
   irf_1(ar_2_noMean)
   irf_1(linear_l2_none)
-  all.equal(irf_1(x=ar_2_noMean), irf_1(linear_l2_none))
-  all.equal(irf_1(x=linear_l2_none),   irf_1_sim(linear_l2_none))
+  all.equal(irf_1(x=ar_2_noMean)$x, irf_1(linear_l2_none)$x)
+  all.equal(irf_1(x=linear_l2_none)$x,   irf_1_sim(linear_l2_none))
   
   
   ## irf constant
@@ -190,41 +229,45 @@ if(FALSE) {
   
   ## irf shock
   # library(tidyverse)
-  linear_l2_const_sh <- irf_1_shock(x= linear_l2_const) %>% 
+  linear_l2_const_sh <- irf_1_shock(object= linear_l2_const, hist = c(1, 2),
+                                    shock = 0) %>% 
     mutate(n_row = 1:n())
-  plot(1:48, linear_l2_const_sh$sim_1, type = "l")
-  lines(1:48, linear_l2_const_sh$sim_2, lty = 2, col = 2)
-  
-  linear_l2_const_sh %>% 
-    filter(between(n_row, 11, 20)) %>% 
-    qplot(x = n_row, y = diff, data = ., geom = "line")
+  # plot(1:48, linear_l2_const_sh$sim_1, type = "l")
+  # lines(1:48, linear_l2_const_sh$sim_2, lty = 2, col = 2)
+  # 
+  # linear_l2_const_sh %>% 
+  #   filter(between(n_row, 11, 20)) %>% 
+  #   qplot(x = n_row, y = diff, data = ., geom = "line")
   
   irf_dat <- tibble(n_row =11 :(11+10-1), irf = irf_1_sim(x=linear_l2_const))
   qplot(x = n_row, y = irf, data = irf_dat, geom = "line")
   
-  ## irf filter
-  irf_filt <- irf.linear(x=linear_l2_const)
-  all.equal(irf_filt$irf$x, linear_l2_const_sh$diff[11:20])
+  ## IFR NOW
+  irf_filt <- irf_any(x=linear_l2_const)
+  irf_filt$irf
+  irf_filt$Lower
+  plot(irf_filt)
+  # all.equal(irf_filt$irf$x, linear_l2_const_sh$diff[11:20])
   
-  tibble(irf_filter = irf.linear(x=linear_l2_const),
+  tibble(irf_filter = irf(x=linear_l2_const, boot = FALSE)$irf$x[, 1],
              n_row = 1:10) %>% 
     qplot(x = n_row, y = irf_filter, data = ., geom = "line")
   
   
   ### IRF full
+  irf_full <-  irf_any(x=linear_l2_const)
   irf_full <-  irf(linear_l2_const)
   
-  irf_full$boot <-  FALSE
-  irf_full$model <- "varest"
+  # irf_full$boot <-  FALSE
+  # irf_full$model <- "varest"
   # fixInNamespace(plot.varirf,  "vars")
   plot(irf_full)
-  a(irf_full)
   
   ## setar
   irf_1_L <- irf_1(setar_l2_const, regime = "L")
   irf_1_H <- irf_1(x=setar_l2_const, regime = "H")
-  plot(1:10, irf_1_L, type = "l")
-  lines(1:10, irf_1_H, lty = 2)
+  plot(1:10, irf_1_L$x, type = "l")
+  lines(1:10, irf_1_H$x, lty = 2)
   irf_set_regL <- irf(setar_l2_const, regime = "L", ci = 0.8)
   irf_set_regH <- irf(setar_l2_const, regime = "H", ci = 0.8)
   plot(irf_set_regL, ylim = c(0, 1.2))
