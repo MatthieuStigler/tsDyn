@@ -96,7 +96,8 @@ get_series <- function(x) {
   res
 }
 
-irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ...) {
+#' @importFrom stats df.residual
+irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ortho =FALSE,  ...) {
   regime <-  match.arg(regime)
   series <- get_series(x)
   
@@ -113,11 +114,24 @@ irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"
   innovs <-  matrix(0, nrow= n.ahead +1, ncol = k)
   
   if(any(grepl("Intercept|trend", colnames(coefs)))) coefs <-  coefs[,-grep("Intercept|trend", colnames(coefs))]
+  init_vals_M <- diag(k)
+  
+  ## orthogonoalise
+  if(ortho) {
+    # coef_li <- lapply(seq(1, length.out =lag, by = k), function(x) coefs[, x: (x+k-1)])
+    sigma.u <- crossprod(residuals(x)) / df.residual(x)
+    P <- t(chol(sigma.u))
+    init_vals_M <- init_vals_M %*% P
+    # for(i in 1:lag){
+    #   coef_li[[i]] <- coef_li[[i]] %*% P
+    # }
+    # coefs <- do.call("cbind", coef_li)
+  } 
 
   ## shock first
   gen_1 <- function(k) {
     innov_k <- innovs
-    innov_k[1, k] <-  1
+    innov_k[1, ] <-  init_vals_M[, k]
     out <- VAR.gen(B = coefs, n=n.ahead + 1, lag=lag, include = "none",  
                     starting = start, 
                     innov = innov_k, 
@@ -128,41 +142,102 @@ irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"
   res_M <- lapply(seq_len(k), gen_1 )
   names(res_M) <- series
   
-  if(cumulative) res <-  apply(res, 2, cumsum)
+  if(cumulative) stop("TODO") #res <-  apply(res, 2, cumsum)
   
   ### results
-  res <- list()
-  res$irf <- res_M
+  res_df <- as.data.frame(do.call("rbind", res_M))
+  res_df$impulse <-  rep(names(res_M), each = n.ahead +1)
+  res_df
+}
+
+## small function for internal checks
+irf_1_check <-  function(x) {
+  res <-  list()
+  res$irf <-  split(x[, -ncol(x)], x$impulse)
+  to_mat <-  function(x){
+    x2 <- as.matrix(x)
+    rownames(x2) <- NULL
+    x2
+  }
+  res$irf <- lapply(res$irf, to_mat)
   res$boot <- FALSE
   class(res) <- "varirf"
   res
 }
 
 
+#' @rdname irf.nlVar
+### #' @export
+irf.VAR <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, 
+                     boot=TRUE, ci=0.95, runs=100, seed=NULL, ...) {
+  irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
+          boot = boot, ci = ci, runs = runs, seed = seed, ...)
+}
+
 if(FALSE){
   
+  library(tsDyn)
+  library(tidyverse)
   VAR.gen <- tsDyn:::VAR.gen
   irf_1.VAR <- tsDyn:::irf_1.VAR
-  
+  irf_1_check <-  tsDyn:::irf_1_check  
+  environment(irf_any) <-  environment(star)
   
   ## vars
   library(vars)
   data(Canada)
-  var.2c <- VAR(Canada, p = 1, type = "const")
-  irf_vars <- irf(var.2c, boot = FALSE, ortho = FALSE)
-  lapply(irf_vars$irf, head, 2)
+  var_vars_l1 <- VAR(Canada, p = 1, type = "const")
+  var_vars_l4 <- VAR(Canada, p = 4, type = "const")
+  irf_l1_vars <- irf(var_vars_l1, runs = 10, ortho = FALSE)
+  irf_l1_vars_ortho <- irf(var_vars_l1, boot = FALSE, ortho = TRUE)
+  irf_l4_vars <- irf(var_vars_l4, boot = FALSE, ortho = FALSE)
+  irf_l4_vars_ortho <- irf(var_vars_l4, boot = FALSE, ortho = TRUE)
+  lapply(irf_l1_vars$irf, head, 2)
   
   # tsDyn
   library(tsDyn)
-  x <- lineVar(Canada, lag=1)
-  coef(x)[1,]
-  coef(var.2c)$e[, 1]
-  irf_tsD <- irf_1.VAR(x)
-  irf_tsD$irf
-  irf_tsD
-  plot(irf_tsD)
+  # x <- lineVar(Canada, lag=4)
+  var_tsD_l1 <- lineVar(Canada, lag=1)
+  var_tsD_l4 <- lineVar(Canada, lag=4)
+  coef(var_tsD_l1)[1,]
+  coef(var_vars_l1)$e[, 1]
+  
+  ## deg freedom
+  all.equal(var_vars_l1$obs,   var_tsD_l1$t)
+  df.residual(var_tsD_l1)
+  
+  ##
+  irf_l1_tsD <- irf_1.VAR(var_tsD_l1) %>% irf_1_check
+  irf_l4_tsD <- irf_1.VAR(var_tsD_l4) %>% irf_1_check
+  irf_l4_tsD$irf
+  irf_l1_tsD
+  # plot(irf_l1_tsD)
+  
+  ## irf tsD ortho
+  irf_l1_tsD_ortho <- irf_1.VAR(x=var_tsD_l1, ortho = TRUE) %>% irf_1_check
+  irf_l4_tsD_ortho <- irf_1.VAR(var_tsD_l4, ortho = TRUE) %>% irf_1_check
+  
   
   ## compare
-  all.equal(irf_vars$irf, irf_tsD$irf)
+  all.equal(irf_l1_vars$irf, irf_l1_tsD$irf)
+  all.equal(irf_l1_vars_ortho$irf, irf_l1_tsD_ortho$irf)
   
+  all.equal(irf_l4_vars$irf, irf_l4_tsD$irf)
+  all.equal(irf_l4_vars_ortho$irf, irf_l4_tsD_ortho$irf)
+  
+  
+  ##
+  a <- irf_1.VAR(x=var_tsD_l1, ortho = TRUE)
+  
+  #### Now irf_any
+  irf_any_VAR <- tsDyn:::irf_any(x=var_tsD_l1, boot = TRUE, ortho = FALSE)
+  irf_any_VAR <- irf_any(x=var_tsD_l1, boot = TRUE, ortho = FALSE)
+  irf_any_VAR
+  
+  ##
+  r1 <- irf_l1_vars$irf[[1]]
+  all.equal(irf_l1_vars$irf, irf_any_VAR$irf)
+  irf_any_VAR$irf[[1]]
+  irf_any_VAR$Lower[[1]]
+  all.equal(irf_l1_vars$Lower[[1]], irf_any_VAR$Lower[[1]])
 }
