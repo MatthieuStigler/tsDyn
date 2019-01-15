@@ -2,21 +2,21 @@ irf_1 <- function(x, n.ahead = 10, cumulative = FALSE, ...) UseMethod("irf_1")
 
 irf_1.ar <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   coefs <- as.numeric(x$ar)
-  empty_series <- c(1, rep(0, n.ahead-1))
+  empty_series <- c(1, rep(0, n.ahead))
   res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
   if(cumulative) res <-  cumsum(res)
-  data.frame(x=res, n.ahead = 1:n.ahead)
+  data.frame(x=res, n.ahead = 0:n.ahead)
 }
 
 irf_1.linear <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   coefs <- coef(x)
   if(any(grepl("const|trend", names(coefs)))) coefs <-  coefs[-grep("const|trend", names(coefs))]
   
-  empty_series <- c(1, rep(0, n.ahead-1))
+  empty_series <- c(1, rep(0, n.ahead))
   
   res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
   if(cumulative) res <-  cumsum(res)
-  data.frame(x=res, n.ahead = 1:n.ahead)
+  data.frame(x=res, n.ahead = 0:n.ahead)
 }
 
 irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ...) {
@@ -24,34 +24,49 @@ irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "
   coefs <- coef(x, regime = regime, hyperCoef = FALSE)
   if(any(grepl("const|trend", names(coefs)))) coefs <-  coefs[-grep("const|trend", names(coefs))]
   
-  empty_series <- c(1, rep(0, n.ahead-1))
+  empty_series <- c(1, rep(0, n.ahead))
   
   res <- as.numeric(stats::filter(empty_series, coefs, method = "recursive"))
   if(cumulative) res <-  cumsum(res)
-  data.frame(x=res, n.ahead = 1:n.ahead)
+  data.frame(x=res, n.ahead = 0:n.ahead)
 }
 
-irf_1_tolist <- function(x) {
+irf_1_tolist_old <- function(x) {
     irf_origM <- as.matrix(x[, "x", drop = FALSE])
     # colnames(irf_origM) <-  "x"
     list(x = irf_origM)
 }
 
+as_mat_norow <- function(x) {
+  x2 <- as.matrix(x)
+  row.names(x2) <-  NULL
+  x2
+}
+
+li_df_to_M <- function(li) lapply(li, as_mat_norow)
+
+irf_1_tolist <- function(x) {
+  if(!"impulse" %in% colnames(x)) x$impulse <- "x"
+  if("n.ahead" %in% colnames(x)) x$n.ahead <- NULL
+  x2 <- x
+  x2$impulse <-  NULL
+  li <- split(x2, x$impulse)
+  li_df_to_M(li)
+}
 
 ## 
 irf_any <-  function(x, n.ahead = 10, cumulative = FALSE, 
                      boot = TRUE, ci = 0.95, runs = 100,
                      regime = c("L", "M", "H"),
-                     seed = NULL, 
+                     seed = NULL,
+                     ortho = TRUE, 
                      ...) {
   regime <-  match.arg(regime)
-  irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
+  irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative, regime = regime, ortho = ortho)
   if(runs ==0) boot <-  FALSE
   
-  ## if univariate
-  if(inherits(x, c("nlar"))) {
-    irf_orig <-  irf_1_tolist(irf_orig)
-  }
+  ## formatting
+  irf_orig <-  irf_1_tolist(irf_orig)
   
   ## 
   if(boot) {
@@ -59,7 +74,7 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
     boot_estim_irf <- function(x) {
       mod_b <- mod_boot_estim(x)
       
-      irf_b <- irf_1(x=mod_b , n.ahead = n.ahead, cumulative = cumulative, regime = regime)
+      irf_b <- irf_1(x=mod_b , n.ahead = n.ahead, cumulative = cumulative, regime = regime, ortho = ortho)
       if(!is.list(irf_b)) irf_b <-  irf_1_tolist(irf_b)
       irf_b
     }
@@ -70,8 +85,8 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
     # boot_estim_irf(x)
     IRF_b <- replicate(runs, as.data.frame(boot_estim_irf(x)), simplify = FALSE)
     IRF_b_2 <- lapply(1:length(IRF_b), function(i) {IRF_b[[i]]$n_rep <- i; IRF_b[[i]]})
-    IRF_b_3 <- do.call("rbind", IRF_b_2) %>%  as_tibble
-    IRF_b_3$n.ahead <- rep(1:n.ahead, length.out = nrow(IRF_b_3))
+    IRF_b_3 <- do.call("rbind", IRF_b_2)
+    IRF_b_3$n.ahead <- rep(0:n.ahead, length.out = nrow(IRF_b_3))
     if(!"impulse" %in% colnames(IRF_b_3)) IRF_b_3$impulse <- "x"
     q_low <- aggregate(IRF_b_3[, 1:(ncol(IRF_b_3)-3)], 
                        list(impulse = IRF_b_3$impulse, n.ahead = IRF_b_3$n.ahead), 
@@ -90,8 +105,8 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
   res$runs <- runs
   res$ci <- ci
   if(boot) {
-    res$Lower <-  q_low_li #matrix(quants[, 1], dimnames = list(NULL, "x"))
-    res$Upper <-  q_high_li #matrix(quants[, 2], dimnames = list(NULL, "x"))
+    res$Lower <-  li_df_to_M(q_low_li) #matrix(quants[, 1], dimnames = list(NULL, "x"))
+    res$Upper <-  li_df_to_M(q_high_li) #matrix(quants[, 2], dimnames = list(NULL, "x"))
   }
   res$response <- "x"
   res$ortho <-  FALSE
@@ -212,7 +227,7 @@ if(FALSE) {
   irf_1(ar_2_noMean)
   irf_1(linear_l2_none)
   all.equal(irf_1(x=ar_2_noMean)$x, irf_1(linear_l2_none)$x)
-  all.equal(irf_1(x=linear_l2_none)$x,   irf_1_sim(linear_l2_none))
+  all.equal(irf_1(x=linear_l2_none)$x[-11],   irf_1_sim(linear_l2_none))
   
   
   ## irf constant
@@ -250,7 +265,7 @@ if(FALSE) {
   # all.equal(irf_filt$irf$x, linear_l2_const_sh$diff[11:20])
   
   tibble(irf_filter = irf(x=linear_l2_const, boot = FALSE)$irf$x[, 1],
-             n_row = 1:10) %>% 
+             n_row = 0:10) %>% 
     qplot(x = n_row, y = irf_filter, data = ., geom = "line")
   
   
@@ -266,8 +281,8 @@ if(FALSE) {
   ## setar
   irf_1_L <- irf_1(setar_l2_const, regime = "L")
   irf_1_H <- irf_1(x=setar_l2_const, regime = "H")
-  plot(1:10, irf_1_L$x, type = "l")
-  lines(1:10, irf_1_H$x, lty = 2)
+  plot(0:10, irf_1_L$x, type = "l")
+  lines(0:10, irf_1_H$x, lty = 2)
   irf_set_regL <- irf(setar_l2_const, regime = "L", ci = 0.8)
   irf_set_regH <- irf(setar_l2_const, regime = "H", ci = 0.8)
   plot(irf_set_regL, ylim = c(0, 1.2))
