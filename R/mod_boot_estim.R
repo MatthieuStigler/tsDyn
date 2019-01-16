@@ -74,6 +74,7 @@ mod_refit.TVAR <-  function(x, data) {
        thDelay = x_mod$thDelay,
        model = inpt_args$model,
        commonInter = inpt_args$commonInter,
+       nthresh = x_mod$nthresh,
        mTh = inpt_args$mTh,
        dummyToBothRegimes = inpt_args$dummyToBothRegimes,
        trim = x$trim, 
@@ -86,6 +87,7 @@ mod_refit.TVECM <-  function(x, data) {
   TVECM(data, 
        lag = x$lag, 
        include = x$include, 
+       nthresh = x_mod$nthresh,
        dummyToBothRegimes = inpt_args$dummyToBothRegimes,
        trim = inpt_args$trim, 
        trace = FALSE, plot = FALSE)

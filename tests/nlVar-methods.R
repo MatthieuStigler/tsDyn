@@ -51,6 +51,9 @@ sapply(mods, function(x) head(fitted(x), 3))
 sapply(mods, function(x) tail(fitted(x), 3))
 
 
+##
+suppressMessages(suppressWarnings(sapply(mods, tsDyn:::mod_refit_check)))
+
 ## NOn linear functions
 sapply(mods_nonLIn, function(x) head(regime(x), 3))
 sapply(mods_nonLIn, function(x) tail(regime(x), 3))
