@@ -171,11 +171,11 @@ vec2var.tsDyn <- function(x){
     LRinclude <- x$model.specific$LRinclude
     if(LRinclude!="none"){
       if(LRinclude=="const"){
-	include <- "const"
+        include <- "const"
       } else if(LRinclude=="trend"){
-	include <- if(include=="const") "both" else "trend"
+        include <- if(include=="const") "both" else "trend"
       } else if(LRinclude=="both"){
-	include <- "both"
+        include <- "both"
       }
     }
   }
