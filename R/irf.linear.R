@@ -57,7 +57,7 @@ irf_1_tolist <- function(x) {
 ## 
 irf_any <-  function(x, n.ahead = 10, cumulative = FALSE, 
                      boot = TRUE, ci = 0.95, runs = 100,
-                     regime = c("L", "M", "H"),
+                     regime = c("all", "L", "M", "H"),
                      seed = NULL,
                      ortho = TRUE, 
                      ...) {
@@ -132,6 +132,7 @@ irf.linear <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, 
 #' @export
 irf.setar <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, 
                         boot=TRUE, ci=0.95, runs=100, seed=NULL, regime = c("L", "M", "H"),...) {
+  regime <-  match.arg(regime)
   if(!is.null(impulse) | !is.null(response) | !ortho) stop("Arguments used only for multivariate models")
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
           boot = boot, ci = ci, runs = runs, regime = regime, seed = seed, ...)
@@ -184,22 +185,15 @@ if(FALSE) {
 if(FALSE) {
   library(tsDyn)
   library(tidyverse)
-  environment(irf_any) <-  environment(star)
-  setar.gen <- tsDyn:::setar.gen
-  irf_1_shock <- tsDyn:::irf_1_shock
-  irf_any <- tsDyn:::irf_any
-  irf_1 <- tsDyn:::irf_1
-  irf_1.linear <-  tsDyn:::irf_1.linear
-  irf_1.setar <-  tsDyn:::irf_1.setar
-  irf_1.ar <-  tsDyn:::irf_1.ar
-  irf_1_sim <-  tsDyn:::irf_1_sim
+  library(devtools)
+  load_all()
   ci = 0.95
   n.ahead = 10
   cumulative = FALSE
   boot = TRUE
   runs = 10
   regime = "L"
-  # environment(irf_1) <- environment(star)
+  ortho = TRUE
   
   
   ar_2_noMean <- ar(lh, aic = FALSE, order.max = 2, method = "ols", demean = FALSE)  
