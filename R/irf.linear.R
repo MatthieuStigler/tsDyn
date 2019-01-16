@@ -50,7 +50,7 @@ irf_1_tolist <- function(x) {
   if("n.ahead" %in% colnames(x)) x$n.ahead <- NULL
   x2 <- x
   x2$impulse <-  NULL
-  li <- split(x2, x$impulse)
+  li <- split(x2, x$impulse)[unique(x$impulse)]
   li_df_to_M(li)
 }
 
