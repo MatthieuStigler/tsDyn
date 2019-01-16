@@ -177,3 +177,6 @@ roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),7)
 roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_predOld),7)
 sapply(all_var_models_noNoBo, comp_var_IRF)
 
+
+mod_1_VAR <- all_var_models_noNoBo[[1]]
+all.equal(irf(mod_1_VAR[[1]], boot=FALSE)$irf, irf(mod_1_VAR[[2]], boot=FALSE)$irf, check.attributes=FALSE)
