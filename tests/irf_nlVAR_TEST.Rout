@@ -1,0 +1,328 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> library(tidyverse)
+── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──
+✔ ggplot2 3.1.0     ✔ purrr   0.2.5
+✔ tibble  2.0.0     ✔ dplyr   0.7.8
+✔ tidyr   0.8.2     ✔ stringr 1.3.1
+✔ readr   1.3.1     ✔ forcats 0.3.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+> library(collateral)
+> 
+> ############################
+> ### Load data
+> ############################
+> path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
+> if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+> 
+> models_multivariate <- readRDS(path_mod_multi)
+> 
+> models_multivariate
+# A tibble: 48 x 6
+     lag include model object     object_vars  nthresh
+   <dbl> <chr>   <chr> <list>     <list>         <int>
+ 1     1 both    VAR   <S3: VAR>  <S3: varest>      NA
+ 2     1 const   VAR   <S3: VAR>  <S3: varest>      NA
+ 3     1 none    VAR   <S3: VAR>  <S3: varest>      NA
+ 4     1 trend   VAR   <S3: VAR>  <S3: varest>      NA
+ 5     2 both    VAR   <S3: VAR>  <S3: varest>      NA
+ 6     2 const   VAR   <S3: VAR>  <S3: varest>      NA
+ 7     2 none    VAR   <S3: VAR>  <S3: varest>      NA
+ 8     2 trend   VAR   <S3: VAR>  <S3: varest>      NA
+ 9     1 both    VECM  <S3: VECM> <NULL>            NA
+10     1 const   VECM  <S3: VECM> <S4: ca.jo>       NA
+# … with 38 more rows
+> 
+> ############################
+> ### VAR
+> ############################
+> 
+> irf_any <- tsDyn:::irf_any
+> irf_1 <- tsDyn:::irf_1
+> irf_1.nlVar <- tsDyn:::irf_1.nlVar
+> 
+> ## manual comparisons
+> mod_random_1 <- filter(models_multivariate, lag ==2)$object[[2]]
+> mod_random_1_vars <- filter(models_multivariate, lag ==2)$object_vars[[2]]
+> 
+> irf_any(mod_random_1, boot = FALSE)$irf[[1]]
+          dolcan        cpiUSA        cpiCAN
+ [1,] 0.01276998 -0.0048795134 -0.0125329345
+ [2,] 0.01457990 -0.0003050413 -0.0090101859
+ [3,] 0.01454930  0.0018422630 -0.0050736143
+ [4,] 0.01423393  0.0017779679 -0.0023393791
+ [5,] 0.01388787  0.0005650593 -0.0003851082
+ [6,] 0.01354745 -0.0011597063  0.0011740840
+ [7,] 0.01321540 -0.0030870320  0.0025424613
+ [8,] 0.01289057 -0.0050761614  0.0038160907
+ [9,] 0.01257198 -0.0070647525  0.0050384137
+[10,] 0.01225911 -0.0090256962  0.0062288433
+[11,] 0.01195166 -0.0109475037  0.0073960680
+> irf(mod_random_1, boot = FALSE)$irf[[1]]
+          dolcan        cpiUSA        cpiCAN
+ [1,] 0.01263041 -0.0048261838 -0.0123959584
+ [2,] 0.01442056 -0.0003017074 -0.0089117109
+ [3,] 0.01439029  0.0018221283 -0.0050181633
+ [4,] 0.01407837  0.0017585360 -0.0023138114
+ [5,] 0.01373609  0.0005588836 -0.0003808992
+ [6,] 0.01339939 -0.0011470315  0.0011612521
+ [7,] 0.01307097 -0.0030532930  0.0025146740
+ [8,] 0.01274968 -0.0050206825  0.0037743835
+ [9,] 0.01243458 -0.0069875398  0.0049833475
+[10,] 0.01212512 -0.0089270518  0.0061607665
+[11,] 0.01182103 -0.0108278553  0.0073152342
+> irf(mod_random_1_vars, boot = FALSE)$irf[[1]]
+          dolcan        cpiUSA        cpiCAN
+ [1,] 0.01276998 -0.0048795134 -0.0125329345
+ [2,] 0.01457990 -0.0003050413 -0.0090101859
+ [3,] 0.01454930  0.0018422630 -0.0050736143
+ [4,] 0.01423393  0.0017779679 -0.0023393791
+ [5,] 0.01388787  0.0005650593 -0.0003851082
+ [6,] 0.01354745 -0.0011597063  0.0011740840
+ [7,] 0.01321540 -0.0030870320  0.0025424613
+ [8,] 0.01289057 -0.0050761614  0.0038160907
+ [9,] 0.01257198 -0.0070647525  0.0050384137
+[10,] 0.01225911 -0.0090256962  0.0062288433
+[11,] 0.01195166 -0.0109475037  0.0073960680
+> 
+> irf_any(mod_random_1, boot = FALSE, ortho = FALSE)$irf[[1]]
+         dolcan      cpiUSA    cpiCAN
+ [1,] 1.0000000  0.00000000 0.0000000
+ [2,] 1.1399804  0.50577416 0.3767774
+ [3,] 1.1364400  0.73950148 0.7287921
+ [4,] 1.1111098  0.76351772 0.9616417
+ [5,] 1.0836443  0.68144305 1.1222952
+ [6,] 1.0567483  0.55218116 1.2470927
+ [7,] 1.0305675  0.40394178 1.3547727
+ [8,] 1.0049803  0.24950381 1.4540674
+ [9,] 0.9798976  0.09452170 1.5489111
+[10,] 0.9552711 -0.05854221 1.6410584
+[11,] 0.9310753 -0.20863925 1.7312929
+> irf(mod_random_1, boot = FALSE, ortho = FALSE)$irf[[1]]
+         dolcan      cpiUSA    cpiCAN
+ [1,] 1.0000000  0.00000000 0.0000000
+ [2,] 1.1399804  0.50577416 0.3767774
+ [3,] 1.1364400  0.73950148 0.7287921
+ [4,] 1.1111098  0.76351772 0.9616417
+ [5,] 1.0836443  0.68144305 1.1222952
+ [6,] 1.0567483  0.55218116 1.2470927
+ [7,] 1.0305675  0.40394178 1.3547727
+ [8,] 1.0049803  0.24950381 1.4540674
+ [9,] 0.9798976  0.09452170 1.5489111
+[10,] 0.9552711 -0.05854221 1.6410584
+[11,] 0.9310753 -0.20863925 1.7312929
+> irf(mod_random_1_vars, boot = FALSE, ortho = FALSE)$irf[[1]]
+         dolcan      cpiUSA    cpiCAN
+ [1,] 1.0000000  0.00000000 0.0000000
+ [2,] 1.1399804  0.50577416 0.3767774
+ [3,] 1.1364400  0.73950148 0.7287921
+ [4,] 1.1111098  0.76351772 0.9616417
+ [5,] 1.0836443  0.68144305 1.1222952
+ [6,] 1.0567483  0.55218116 1.2470927
+ [7,] 1.0305675  0.40394178 1.3547727
+ [8,] 1.0049803  0.24950381 1.4540674
+ [9,] 0.9798976  0.09452170 1.5489111
+[10,] 0.9552711 -0.05854221 1.6410584
+[11,] 0.9310753 -0.20863925 1.7312929
+> 
+> ### irf _1
+> models_IRF_1 <- models_multivariate %>% 
++   filter(model == "VAR") %>% 
++   mutate(irf = map(object, ~irf_1(.,  boot = TRUE, runs = 2, seed = 7)))
+> 
+> models_IRF_1$irf %>% 
++   bind_rows() %>% 
++   as_tibble() %>% 
++   head()
+# A tibble: 6 x 4
+  dolcan cpiUSA  cpiCAN impulse
+   <dbl>  <dbl>   <dbl> <chr>  
+1  1      0     0       dolcan 
+2  0.981 -0.186 0.0138  dolcan 
+3  0.962 -0.370 0.0214  dolcan 
+4  0.944 -0.553 0.0227  dolcan 
+5  0.925 -0.734 0.0180  dolcan 
+6  0.907 -0.913 0.00725 dolcan 
+> 
+> ### irf_any
+> # irf.NULL <- function(x) NULL
+> # irf.ca.jo <- function(x) irf(vec2var(ca.jo))
+> 
+> models_VAR <- models_multivariate %>% 
++   filter(model == "VAR")
+> 
+> ## older method
+> models_IRF_any <- models_multivariate %>% 
++   filter(model == "VAR") %>% 
++   mutate(ortho = list(tibble(ortho =c(TRUE, FALSE)))) %>% 
++   unnest(ortho, .preserve = c("object", "object_vars")) %>% 
++   mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 2, seed = 7, ortho = .y)),
++          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
++          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))
+> 
+> models_IRF_any
+# A tibble: 16 x 10
+     lag include model nthresh object  object_vars ortho irf   irf_vars irf_vec2
+   <dbl> <chr>   <chr>   <int> <list>  <list>      <lgl> <lis> <list>   <list>  
+ 1     1 both    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+ 2     1 both    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+ 3     1 const   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+ 4     1 const   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+ 5     1 none    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+ 6     1 none    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+ 7     1 trend   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+ 8     1 trend   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+ 9     2 both    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+10     2 both    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+11     2 const   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+12     2 const   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+13     2 none    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+14     2 none    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+15     2 trend   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
+16     2 trend   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+> 
+> ## show head of irf any
+> map_df(models_IRF_any$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
++   as.data.frame() %>% 
++   as_tibble()
+# A tibble: 32 x 3
+   dolcan     cpiUSA   cpiCAN
+    <dbl>      <dbl>    <dbl>
+ 1 0.0129 -0.00939   -0.0180 
+ 2 0.0127 -0.0118    -0.0180 
+ 3 1       0          0      
+ 4 0.981  -0.186      0.0138 
+ 5 0.0129 -0.00886   -0.0151 
+ 6 0.0127 -0.0111    -0.0142 
+ 7 1       0          0      
+ 8 0.982  -0.175      0.0751 
+ 9 0.0129 -0.00440   -0.0119 
+10 0.0129 -0.0000607 -0.00625
+# … with 22 more rows
+> 
+> 
+> ## compare with vars
+> all.equal(models_IRF_any$irf[[1]]$irf, 
++           models_IRF_any$irf_vars[[1]]$irf)
+[1] TRUE
+> models_IRF_any$irf[[1]]$irf[[1]]
+          dolcan       cpiUSA      cpiCAN
+ [1,] 0.01289584 -0.009385296 -0.01800202
+ [2,] 0.01265326 -0.011783018 -0.01797647
+ [3,] 0.01241266 -0.014158531 -0.01803082
+ [4,] 0.01217406 -0.016511596 -0.01816367
+ [5,] 0.01193752 -0.018841985 -0.01837365
+ [6,] 0.01170307 -0.021149481 -0.01865939
+ [7,] 0.01147073 -0.023433879 -0.01901950
+ [8,] 0.01124055 -0.025694986 -0.01945262
+ [9,] 0.01101255 -0.027932619 -0.01995739
+[10,] 0.01078677 -0.030146607 -0.02053245
+[11,] 0.01056323 -0.032336787 -0.02117644
+> models_IRF_any$irf_vars[[1]]$irf[[1]]
+          dolcan       cpiUSA      cpiCAN
+ [1,] 0.01289584 -0.009385296 -0.01800202
+ [2,] 0.01265326 -0.011783018 -0.01797647
+ [3,] 0.01241266 -0.014158531 -0.01803082
+ [4,] 0.01217406 -0.016511596 -0.01816367
+ [5,] 0.01193752 -0.018841985 -0.01837365
+ [6,] 0.01170307 -0.021149481 -0.01865939
+ [7,] 0.01147073 -0.023433879 -0.01901950
+ [8,] 0.01124055 -0.025694986 -0.01945262
+ [9,] 0.01101255 -0.027932619 -0.01995739
+[10,] 0.01078677 -0.030146607 -0.02053245
+[11,] 0.01056323 -0.032336787 -0.02117644
+> models_IRF_any$irf_vec2[[1]]$irf[[1]]
+          dolcan       cpiUSA      cpiCAN
+ [1,] 0.01279564 -0.009312372 -0.01786214
+ [2,] 0.01255495 -0.011691463 -0.01783679
+ [3,] 0.01231621 -0.014048518 -0.01789072
+ [4,] 0.01207947 -0.016383299 -0.01802254
+ [5,] 0.01184477 -0.018695580 -0.01823089
+ [6,] 0.01161213 -0.020985147 -0.01851440
+ [7,] 0.01138160 -0.023251795 -0.01887171
+ [8,] 0.01115321 -0.025495333 -0.01930147
+ [9,] 0.01092698 -0.027715580 -0.01980232
+[10,] 0.01070295 -0.029912364 -0.02037291
+[11,] 0.01048115 -0.032085526 -0.02101190
+> 
+> comp <- models_IRF_any %>% 
++   mutate(comp_irf_tsD_vars = map2(irf, irf_vars,  ~all.equal(.x$irf, .y$irf)),
++          is_same = map_lgl(comp_irf_tsD_vars, ~isTRUE(.)),
++          comp_irf_tsDOld_vars = map2(irf_vec2, irf_vars,  ~all.equal(.x$irf, .y$irf)),
++          is_same_tssDvec2 = map_lgl(comp_irf_tsDOld_vars, ~isTRUE(.)),
++          comp_irf_tsDOld_tsDNew = map2(irf, irf_vec2,  ~all.equal(.x$irf, .y$irf)),
++          is_same_tsD_2ver = map_lgl(comp_irf_tsDOld_tsDNew, ~isTRUE(.))) %>% 
++   dplyr::select(-starts_with("irf"), -starts_with("comp_irf"), comp_irf_tsDOld_tsDNew)
+> 
+> comp %>% 
++   dplyr::select(-starts_with("object"))
+# A tibble: 16 x 9
+     lag include model nthresh ortho is_same is_same_tssDvec2 is_same_tsD_2ver
+   <dbl> <chr>   <chr>   <int> <lgl> <lgl>   <lgl>            <lgl>           
+ 1     1 both    VAR        NA TRUE  TRUE    FALSE            FALSE           
+ 2     1 both    VAR        NA FALSE TRUE    TRUE             TRUE            
+ 3     1 const   VAR        NA TRUE  TRUE    FALSE            FALSE           
+ 4     1 const   VAR        NA FALSE TRUE    TRUE             TRUE            
+ 5     1 none    VAR        NA TRUE  TRUE    FALSE            FALSE           
+ 6     1 none    VAR        NA FALSE TRUE    TRUE             TRUE            
+ 7     1 trend   VAR        NA TRUE  FALSE   FALSE            FALSE           
+ 8     1 trend   VAR        NA FALSE FALSE   FALSE            TRUE            
+ 9     2 both    VAR        NA TRUE  TRUE    FALSE            FALSE           
+10     2 both    VAR        NA FALSE TRUE    TRUE             TRUE            
+11     2 const   VAR        NA TRUE  TRUE    FALSE            FALSE           
+12     2 const   VAR        NA FALSE TRUE    TRUE             TRUE            
+13     2 none    VAR        NA TRUE  TRUE    FALSE            FALSE           
+14     2 none    VAR        NA FALSE TRUE    TRUE             TRUE            
+15     2 trend   VAR        NA TRUE  FALSE   FALSE            FALSE           
+16     2 trend   VAR        NA FALSE FALSE   FALSE            TRUE            
+# … with 1 more variable: comp_irf_tsDOld_tsDNew <list>
+> 
+> ## regime specific for TVAR
+> models_TVAR <- models_multivariate %>% 
++   filter(model == "TVAR") 
+> 
+> models_TVAR %>% 
++   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
+# A tibble: 16 x 7
+     lag include model object     object_vars nthresh irf_L       
+   <dbl> <chr>   <chr> <list>     <list>        <int> <list>      
+ 1     1 both    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+ 2     1 both    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+ 3     1 const   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+ 4     1 const   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+ 5     1 none    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+ 6     1 none    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+ 7     1 trend   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+ 8     1 trend   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+ 9     2 both    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+10     2 both    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+11     2 const   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+12     2 const   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+13     2 none    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+14     2 none    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+15     2 trend   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
+16     2 trend   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+> 
+> proc.time()
+   user  system elapsed 
+ 10.214   0.240  11.166 
