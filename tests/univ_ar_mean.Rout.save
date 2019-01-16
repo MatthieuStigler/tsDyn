@@ -18,15 +18,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
-> library(tidyverse)
-── Attaching packages ─────────────────────────────────────── tidyverse 1.2.1 ──
-✔ ggplot2 3.1.0     ✔ purrr   0.2.5
-✔ tibble  2.0.0     ✔ dplyr   0.7.7
-✔ tidyr   0.8.2     ✔ stringr 1.3.1
-✔ readr   1.3.1     ✔ forcats 0.3.0
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
+> suppressMessages(library(tidyverse))
 > 
 > ############################
 > ### Load data
@@ -99,4 +91,4 @@ Type 'q()' to quit R.
 > 
 > proc.time()
    user  system elapsed 
-  2.361   0.078   2.425 
+  3.182   0.142   3.521 

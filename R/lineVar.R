@@ -356,6 +356,11 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     } 
   }
 
+  inputArgs <-  list()
+  inputArgs$I <-  I
+  inputArgs$estim <-  estim
+  inputArgs$LRinclude <- LRinclude
+  inputArgs$call <- match.call()
 
   z<-list(residuals=res,  
           coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", 
@@ -368,7 +373,8 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
           exogen = !is.null(exogen),
           num_exogen = if(!is.null(exogen)) NCOL(exogen) else 0,
           model.specific=model.specific,
-          qr=lmReg$qr)
+          qr=lmReg$qr,
+          inputArgs = inputArgs)
   if(model=="VAR"){
     class(z)<-c("VAR","nlVar")
   } else {

@@ -471,11 +471,21 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   specific$Bnames <- Bnames
   specific$timeAttributes <- attributes(data[,1])
   
+  ## input arguments to return
+  inputArgs <-  list()
+  inputArgs$model <-  model
+  inputArgs$commonInter <-  commonInter
+  inputArgs$trim <- trim
+  inputArgs$mTh <- mTh
+  inputArgs$dummyToBothRegimes <- dummyToBothRegimes
+  inputArgs$call <- match.call()
+  
+  
   z<-list(coefficients=Blist, coeffmat=Bbest, residuals=resbest, model=YnaX, 
           nobs_regimes=nobs, k=k, t=t, T=T,nparB=nparbest, df.residual=t-ncol(Bbest),
           fitted.values=fitted, lag=lag, include=include,model.specific=specific, 
           usedThVar=trans[,bestDelay], trim=trim, 
-          qr = final$qr)
+          qr = final$qr, inputArgs = inputArgs)
   class(z) <- c("TVAR","nlVar")
   attr(z, "levelTransVar") <- model
   attr(z, "transVar") <- if(!missing(thVar)) "external" else "internal"
