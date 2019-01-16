@@ -48,8 +48,8 @@ mod_refit.lstar <-  function(x, data) {
   lstar(data, 
         m = x$str$m, d = x$str$d, steps = x$str$steps, series = x$str$series,
         mL = x_mod$mL, mH = x_mod$mH, 
-        thDelay = x_mod$thDelay, mTh = x_mod$mTh,
-        include = x$include, 
+        mTh = x_mod$mTh,
+        include = x_mod$include, 
         trace = FALSE)
 }
 
