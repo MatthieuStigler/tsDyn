@@ -695,7 +695,17 @@ TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=
   specific$r <- 1
   # specific$commonInter<-commonInter
   
-  z<-list(coefficients=Blist, residuals=resbest, model=YnaX, coeffmat=Bbest,nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, fitted.values=fitted, lag=lag, include=include,model.specific=specific)
+  ## input arguments to return
+  inputArgs <-  list()
+  inputArgs$restr <-  restr
+  inputArgs$trim <-  trim
+  inputArgs$dummyToBothRegimes <-  dummyToBothRegimes
+  inputArgs$call <- match.call()
+  
+  z<-list(coefficients=Blist, residuals=resbest, model=YnaX, coeffmat=Bbest,
+          nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, 
+          fitted.values=fitted, lag=lag, include=include,model.specific=specific,
+          inputArgs = inputArgs)
   
   
   class(z)<-c("TVECM","nlVar")
