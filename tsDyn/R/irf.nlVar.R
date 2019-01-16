@@ -97,7 +97,25 @@ get_series <- function(x) {
 }
 
 #' @importFrom stats df.residual
-irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ortho =FALSE,  ...) {
+
+irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE, regime = "all",  ...) {
+  irf_1.nlVar(x, n.ahead = n.ahead,
+              cumulative = cumulative,
+              regime = regime,
+              ortho = ortho, ...)
+
+}
+
+irf_1.TVAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,  
+                        regime = c("all", "L", "M", "H"), ...) {
+  irf_1.nlVar(x, n.ahead = n.ahead, 
+              cumulative = cumulative, 
+              regime = regime, 
+              ortho = ortho, ...)
+  
+}
+
+irf_1.nlVar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("all", "L", "M", "H"), ortho =FALSE,  ...) {
   regime <-  match.arg(regime)
   series <- get_series(x)
   
@@ -107,25 +125,20 @@ irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"
   thDelay <-  x$thDelay
   nthresh <-  x$model.specific$nthresh
 
-  coefs <- coef(x)
+  coefs <- coef(x, regime = regime)
 
   ## 
   start <-  matrix(0, nrow= lag, ncol = k)
   innovs <-  matrix(0, nrow= n.ahead +1, ncol = k)
   
-  if(any(grepl("Intercept|trend", colnames(coefs)))) coefs <-  coefs[,-grep("Intercept|trend", colnames(coefs))]
+  if(any(grepl("Intercept|Trend", colnames(coefs)))) coefs <-  coefs[,-grep("Intercept|Trend", colnames(coefs))]
   init_vals_M <- diag(k)
   
   ## orthogonoalise
   if(ortho) {
-    # coef_li <- lapply(seq(1, length.out =lag, by = k), function(x) coefs[, x: (x+k-1)])
     sigma.u <- crossprod(residuals(x)) / df.residual(x)
     P <- t(chol(sigma.u))
     init_vals_M <- init_vals_M %*% P
-    # for(i in 1:lag){
-    #   coef_li[[i]] <- coef_li[[i]] %*% P
-    # }
-    # coefs <- do.call("cbind", coef_li)
   } 
 
   ## shock first
@@ -166,22 +179,19 @@ irf_1_check <-  function(x) {
 }
 
 
-#' @rdname irf.nlVar
+## #' @rdname irf.nlVar
 ### #' @export
-irf.VAR <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, 
-                     boot=TRUE, ci=0.95, runs=100, seed=NULL, ...) {
-  irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
-          boot = boot, ci = ci, runs = runs, seed = seed, ...)
-}
+# irf.VAR <-  function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumulative=FALSE, 
+#                      boot=TRUE, ci=0.95, runs=100, seed=NULL, ...) {
+#   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, 
+#           boot = boot, ci = ci, runs = runs, seed = seed, ...)
+# }
 
 if(FALSE){
-  
   library(tsDyn)
   library(tidyverse)
-  VAR.gen <- tsDyn:::VAR.gen
-  irf_1.VAR <- tsDyn:::irf_1.VAR
-  irf_1_check <-  tsDyn:::irf_1_check  
-  environment(irf_any) <-  environment(star)
+  library(devtools)
+  load_all()
   
   ## vars
   library(vars)
@@ -207,15 +217,15 @@ if(FALSE){
   df.residual(var_tsD_l1)
   
   ##
-  irf_l1_tsD <- irf_1.VAR(var_tsD_l1) %>% irf_1_check
-  irf_l4_tsD <- irf_1.VAR(var_tsD_l4) %>% irf_1_check
+  irf_l1_tsD <- irf_1(var_tsD_l1) %>% irf_1_check
+  irf_l4_tsD <- irf_1(var_tsD_l4) %>% irf_1_check
   irf_l4_tsD$irf
   irf_l1_tsD
   # plot(irf_l1_tsD)
   
   ## irf tsD ortho
-  irf_l1_tsD_ortho <- irf_1.VAR(x=var_tsD_l1, ortho = TRUE) %>% irf_1_check
-  irf_l4_tsD_ortho <- irf_1.VAR(var_tsD_l4, ortho = TRUE) %>% irf_1_check
+  irf_l1_tsD_ortho <- irf_1(x=var_tsD_l1, ortho = TRUE) %>% irf_1_check
+  irf_l4_tsD_ortho <- irf_1(var_tsD_l4, ortho = TRUE) %>% irf_1_check
   
   
   ## compare
@@ -227,10 +237,10 @@ if(FALSE){
   
   
   ##
-  a <- irf_1.VAR(x=var_tsD_l1, ortho = TRUE)
+  a <- irf_1(x=var_tsD_l1, ortho = TRUE)
   
   #### Now irf_any
-  irf_any_VAR <- tsDyn:::irf_any(x=var_tsD_l1, boot = TRUE, ortho = FALSE)
+  irf_any_VAR <- irf_any(x=var_tsD_l1, boot = TRUE, ortho = FALSE)
   irf_any_VAR <- irf_any(x=var_tsD_l1, boot = TRUE, ortho = FALSE)
   irf_any_VAR
   
