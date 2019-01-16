@@ -1,15 +1,22 @@
 library(tsDyn)
 
-x <- log10(lynx)
 
-### Estimate models
-mod <- list()
-mod[["linear"]] <- linear(x, m=2)
-mod[["setar"]] <- setar(x, m=2, thDelay=1)
-mod[["star"]] <- star(x, m=2, thDelay=1, trace = FALSE)
-mod[["lstar"]] <- lstar(x, m=2, thDelay=1)
-mod[["aar"]] <- aar(x, m=2)
 
+############################
+### Load data
+############################
+path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
+if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
+
+models_univariate <- readRDS(path_mod_uni)
+
+
+
+mod <-  models_univariate$object
+mod_no_aar <-  subset(models_univariate,  model != "aar")$object
+mod_notrend_noaar <-  subset(models_univariate,  !include %in% c("trend", "both") & model != "aar")$object
+mod_notrend <-  subset(models_univariate,  !include %in% c("trend", "both") )$object
+mod_const_only <-  subset(models_univariate,  include =="const" )$object
 
 ### Extract methods
 sapply(mod, AIC)
@@ -23,22 +30,36 @@ sapply(mod, function(x) head(residuals(x)))
 sapply(mod, function(x) head(residuals(x, initVal = FALSE)))
 
 
-lapply(mod, predict, n.ahead=10)
+lapply(mod_const_only, predict, n.ahead=10)
 
 
 ## charac root
-lapply(mod[-grep("aar", names(mod))], charac_root)
-lapply(mod[-grep("aar", names(mod))], ar_mean)
+lapply(mod_notrend_noaar, charac_root)
+lapply(mod_notrend_noaar, ar_mean)
 
 ### Utility functions
 sapply(mod, getTh)
 
+
+##
+suppressMessages(suppressWarnings(sapply(mod_no_aar, tsDyn:::mod_refit_check)))
+
+
 ### Pred Roll, acc_stat:
+x <- log10(lynx)
+mod <- list()
+mod[["linear"]] <- linear(x, m=2)
+mod[["setar"]] <- setar(x, m=2, thDelay=1, trace = FALSE)
+mod[["star"]] <- star(x, m=2, thDelay=1, trace = FALSE)
+mod[["lstar"]] <- lstar(x, m=2, thDelay=1, trace = FALSE)
+mod[["aar"]] <- aar(x, m=2)
+
+
 x_small <- x[1:100]
 mod_small <- list()
 mod_small[["linear"]] <- linear(x_small, m=2)
-mod_small[["setar"]] <- setar(x_small, m=2, thDelay=1, th=getTh(mod[["setar"]]))
-mod_small[["lstar"]] <- lstar(x_small, m=2, thDelay=1, th=getTh(mod[["lstar"]]), gamma=coef(mod[["lstar"]])["gamma"])
+mod_small[["setar"]] <- setar(x_small, m=2, thDelay=1, th=getTh(mod[["setar"]]), trace = FALSE)
+mod_small[["lstar"]] <- lstar(x_small, m=2, thDelay=1, th=getTh(mod[["lstar"]]), gamma=coef(mod[["lstar"]])["gamma"], trace = FALSE)
 mod_small[["aar"]] <- aar(x_small, m=2)
 
 pred_rolls_1 <- lapply(mod_small, predict_rolling, n.ahead=1, newdata=x[101:114])
