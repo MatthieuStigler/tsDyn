@@ -1,5 +1,7 @@
+WARNING: unknown option '-no-save'
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -16,6 +18,8 @@ Type 'contributors()' for more information and
 Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
+
+[Previously saved workspace restored]
 
 > 
 > library(tsDyn)
@@ -269,6 +273,13 @@ Loading required package: lmtest
 [1] FALSE FALSE FALSE FALSE
 > 
 > 
+> mod_1_VAR <- all_var_models_noNoBo[[1]]
+> all.equal(irf(mod_1_VAR[[1]], boot=FALSE)$irf, irf(mod_1_VAR[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+[1] "Component “e”: Mean relative difference: 0.03155347"   
+[2] "Component “prod”: Mean relative difference: 0.03155347"
+[3] "Component “rw”: Mean relative difference: 0.03155347"  
+[4] "Component “U”: Mean relative difference: 0.03155347"   
+> 
 > proc.time()
    user  system elapsed 
-  2.622   0.083   2.692 
+  2.775   0.084   2.862 
