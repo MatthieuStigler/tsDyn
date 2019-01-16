@@ -1,17 +1,21 @@
 library(tsDyn)
+suppressMessages(library(tidyverse))
 
-data(zeroyld)
+############################
+### Load data
+############################
+path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
+if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
 
-###TVECM
-tvecm <- TVECM(zeroyld, nthresh=2,lag=1, ngridBeta=20, ngridTh=20, plot=FALSE,trim=0.05, common="All")
-tvar <- TVAR(zeroyld, nthresh=2,lag=1,  plot=FALSE, trim=0.05)
-linVECM<-lineVar(zeroyld, lag=2, model="VECM")
-lin<-lineVar(zeroyld,lag=2)
+models_multivariate <- readRDS(path_mod_multi)
 
 
-mods <- list(tvecm=tvecm, linVECM=linVECM, lin=lin, tvar=tvar)
-mods_nonLIn <- mods[c("tvecm", "tvar")]
+mods <- models_multivariate$object
+mods_nonLIn <- subset(models_multivariate, model %in% c("TVAR", "TVECM"))$object
 
+############################
+### tests
+############################
 
 
 ## Standard functions
@@ -26,10 +30,17 @@ sapply(mods_nonLIn, coef, regime = "L")
 sapply(mods_nonLIn, coef, regime = "H")
 
 
-sapply(mods, AIC)
-sapply(mods, BIC)
-sapply(mods, logLik)
-sapply(mods, deviance)
+uni_stats <- models_multivariate %>% 
+  mutate_at("object", funs(deviance = map_dbl(., deviance),
+                           AIC = map_dbl(., AIC),
+                           BIC = map_dbl(., BIC),
+                           logLik = map_dbl(., logLik))) %>% 
+  select(-starts_with("object"))
+
+as.data.frame(uni_stats)
+
+
+
 sapply(mods, function(x) dim(residuals(x, initVal=FALSE)))
 sapply(mods, function(x) dim(residuals(x, initVal=TRUE)))
 sapply(mods, function(x) head(residuals(x), 3))
