@@ -22,6 +22,9 @@ sapply(mods, summary)
 sapply(mods, coef)
 sapply(mods, tsDyn:::coefMat.nlVar)
 sapply(mods, tsDyn:::coefVec.nlVar)
+sapply(mods_nonLIn, coef, regime = "L")
+sapply(mods_nonLIn, coef, regime = "H")
+
 
 sapply(mods, AIC)
 sapply(mods, BIC)

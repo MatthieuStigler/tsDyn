@@ -387,6 +387,29 @@ Intercept Equation long.run      0.94918861
 short.run -1 Equation long.run   0.20915436
 long.run -1 Equation long.run    0.70126696
 
+> sapply(mods_nonLIn, coef, regime = "L")
+$tvecm
+                         ECT     Const short.run t -1 long.run t -1
+Equation short.run 0.2226023 0.5698814      0.2244073  -0.136190681
+Equation long.run  1.0935615 1.9832101      0.8186019  -0.002427001
+
+$tvar
+                    Intercept short.run -1 long.run -1
+Equation short.run 0.04572943    0.9793942  0.01783035
+Equation long.run  0.01061130    0.0474415  0.94923720
+
+> sapply(mods_nonLIn, coef, regime = "H")
+$tvecm
+                           ECT       Const short.run t -1 long.run t -1
+Equation short.run -0.03654149  0.04545852    -0.10772057    0.04261369
+Equation long.run   0.09836556 -0.07041546     0.09321772   -0.03159638
+
+$tvar
+                   Intercept short.run -1 long.run -1
+Equation short.run 1.2234188    0.9246711 -0.02455317
+Equation long.run  0.9491886    0.2091544  0.70126696
+
+> 
 > 
 > sapply(mods, AIC)
     tvecm   linVECM       lin      tvar 
@@ -822,4 +845,4 @@ X_{t-1}^{1} \\ X_{t-1}^{2}
 > 
 > proc.time()
    user  system elapsed 
-  2.454   0.094   2.534 
+  2.527   0.067   2.579 

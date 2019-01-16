@@ -302,9 +302,36 @@ fitted.nlVar <- function(object, level=c("model", "original"),...){
   return(res)
 }
 
+## #' @param regime Optional, allows to extract regime-specific coefficients. 
 #' @export
-coef.nlVar<-function(object,...){
-	return(object$coefficients)
+coef.nlVar <- function(object,  regime = c("all", "L", "M", "H"), ...){
+  regime <-  match.arg(regime)
+  co <- object$coefficients
+  commonInter <- object$model.specific$nthresh >0 & !is.list(co)
+  
+  ## select only one regime if requested
+  if(regime != "all") {
+    if(regime=="M" & object$model.specific$nthresh!=2) stop("No M regime if nthresh %in% 1, 2")
+    if(commonInter) {
+      # inc_terms <- switch(object$include, 
+      #                     "const" =1,
+      #                     "both" = 2,
+      #                     "trend" = 1,
+      #                     "none" = 0)
+      # get <- switch(regime, 
+      #               "L" = 1:object$lag * object$k,
+      #               "M" = object$lag * object$k)
+      # co <- co[inc_terms + object$lag * object$k]
+      # 
+      stop("Not implemented yet!")
+    } else {
+      co <- switch(regime, 
+                   "L" = co$Bdown, 
+                   "H" = co$Bup, 
+                   "M" = co$Bmiddle)
+    }
+  }
+  co
 }
 
 ### Method coefMat
