@@ -15,5 +15,5 @@ License: GPL (>= 2)
 URL: http://github.com/MatthieuStigler/tsDyn/wiki
 BugReports: https://github.com/MatthieuStigler/tsDyn/issues
 MailingList: tsdyn@googlegroups.com
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 LazyData: true
