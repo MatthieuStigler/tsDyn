@@ -1,6 +1,5 @@
 library(tsDyn)
 library(tidyverse)
-library(collateral)
 
 ############################
 ### Load data
@@ -80,10 +79,10 @@ comp <- models_IRF_any %>%
          is_same_tssDvec2 = map_lgl(comp_irf_tsDOld_vars, ~isTRUE(.)),
          comp_irf_tsDOld_tsDNew = map2(irf, irf_vec2,  ~all.equal(.x$irf, .y$irf)),
          is_same_tsD_2ver = map_lgl(comp_irf_tsDOld_tsDNew, ~isTRUE(.))) %>% 
-  dplyr::select(-starts_with("irf"), -starts_with("comp_irf"), comp_irf_tsDOld_tsDNew)
+  select(-starts_with("irf"), -starts_with("comp_irf"), comp_irf_tsDOld_tsDNew)
 
 comp %>% 
-  dplyr::select(-starts_with("object"))
+  select(-starts_with("object"))
 
 ## regime specific for TVAR
 models_TVAR <- models_multivariate %>% 
