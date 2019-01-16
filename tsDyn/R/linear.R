@@ -56,6 +56,7 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	res <- lm.fit(xx, yy)
 	res$incNames<-incNames
 	res$nthresh <-  0
+	res$type <-  type
 	
 	#check if unit root lie outside unit circle
 	if(type=="level")
