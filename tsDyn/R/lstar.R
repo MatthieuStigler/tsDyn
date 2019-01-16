@@ -277,6 +277,7 @@ lstar <- function(x, m, d=1, steps=d, series, mL, mH, mTh, thDelay,
     res$mTh <- mTh
   }
   res$thVar <- c(rep(NA, length(x)-length(z)),z)
+  res$thDelay <- thDelay
   res$fitted <- F(coefs[coefnames_L], 
                   coefs[coefnames_H], gamma, th, type=1)
   res$residuals <- yy - res$fitted
