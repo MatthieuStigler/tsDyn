@@ -8,6 +8,8 @@ data(barry)
 grid_simple <- crossing(lag  =c(1, 2), 
                         include = c("const", "trend", "none", "both"))
 
+data_inp <-  barry[, 1:2]
+
 ## VAR, VECM
 var_upd <- function(data, p, type){
   res <- VAR(data, p = p, type = type)
@@ -18,20 +20,20 @@ var_upd <- function(data, p, type){
 
 models_VAR <-  grid_simple %>% 
   mutate(model = "VAR",
-         object = map2(lag, include, ~ lineVar(barry, lag =.x, include = .y)),
-         object_vars = map2(lag, include, ~ var_upd(barry, .x, .y)))
+         object = map2(lag, include, ~ lineVar(data_inp, lag =.x, include = .y)),
+         object_vars = map2(lag, include, ~ var_upd(data_inp, .x, .y)))
 
 models_VAR$object_vars[[1]]$call
 
 
 models_VECM_tsD <-  grid_simple %>% 
   mutate(model = "VECM",
-         object = map2(lag, include, ~ VECM(barry, lag =.x, include = .y)))
+         object = map2(lag, include, ~ VECM(data_inp, lag =.x, include = .y)))
 
 models_VECM_vars <- grid_simple %>% 
   filter(include == "const") %>% 
   mutate(model = "VECM",
-         object_vars = map2(lag, include, ~ ca.jo(barry, K =.x+1, spec = "transitory")))
+         object_vars = map2(lag, include, ~ ca.jo(data_inp, K =.x+1, spec = "transitory")))
 
 models_VECM <- models_VECM_tsD %>% 
   left_join(models_VECM_vars, by = c("lag", "include", "model"))
@@ -44,13 +46,13 @@ grid_tvar <- crossing(lag  =c(1, 2),
 models_TVAR <-  grid_tvar %>% 
   mutate(model = "TVAR",
          object = pmap(list(lag, include, nthresh), 
-                       ~suppressWarnings(TVAR(barry, lag =..1, include = ..2, nthresh=..3, 
+                       ~suppressWarnings(TVAR(data_inp, lag =..1, include = ..2, nthresh=..3, 
                                                trace = FALSE))))
 
 models_TVECM <-  grid_tvar %>% 
   mutate(model = "TVECM",
          object = pmap(list(lag, include, nthresh), 
-                       ~suppressWarnings(TVECM(barry[, 1:2], lag =..1, include = ..2, nthresh=..3, 
+                       ~suppressWarnings(TVECM(data_inp, lag =..1, include = ..2, nthresh=..3, 
                                               trace = FALSE, plot = FALSE))))
 
 
