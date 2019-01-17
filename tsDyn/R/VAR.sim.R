@@ -6,13 +6,12 @@ VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"
   if(!is.matrix(B)) stop("B should be a matrix")
   ## Create some variables/parameters
   p <- lag
-  plast <- if(lag==0) 1 else p
   ninc <- switch(include, "none"=0, "const"=1, "trend"=1, "both"=2)
   k <- nrow(B)
   T <- n   	#Size of start sample
   t <- T-p  #Size of end sample
   y <- matrix(0, ncol=k, nrow=n+p)
-  trend<-c(rep(0, p), trendStart+(0:(T-1))) 
+  trend <- c(rep(0, p), trendStart+(0:(T-1))) 
   
   ## exogen
   if(!is.null(exogen)){

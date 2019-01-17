@@ -145,10 +145,14 @@ lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
 lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ## VECM boot
-vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo|l0", names(vecm_all))]
 options(warn=-1)
-sapply(vecm_all_noExo_noLRinc, function(x) try(tsDyn:::check.VECM.boot(x), silent=TRUE))
+sapply(vecm_all, function(x) try(tsDyn:::TVECM.boot.check(x), silent=TRUE))
 options(warn=0)
+
+vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo|l0", names(vecm_all))]
+sapply(vecm_all_noExo_noLRinc, tsDyn:::TVECM.boot.check)
+
+
 
 ### CoefA, coefB, coefPI
 lapply(vecm_all, coefB)
