@@ -13,6 +13,7 @@
 #'   \item{wild1}{Wild bootstrap: do not resample, but add a N(0,1) distribution to each value}
 #'   \item{wild12}{Wild bootstrap: same, but add instead -1 or 1. }
 #' }
+#' @export
 
 resample_vec <- function(x, boot.scheme=c("resample","resample_block", "wild1", "wild2", "check"), seed = NULL, 
                    block.size=2){
