@@ -114,6 +114,20 @@ as.matrix.ts <- function(x, ...)  {
 #' @name TVECM.sim
 NULL # for roxygen, do not add 
 
+VECM.gen <- function(B, beta, n=200, lag=1, 
+                      include = c("const", "trend","none", "both"), 
+                      starting=NULL, innov,
+                      returnStarting = FALSE, 
+                      show.parMat=FALSE, seed,
+                      ndig = 4){
+  TVECM.gen(B=B, beta=beta, n=n, lag=lag, 
+            include = include, 
+            nthresh=0,
+            starting=starting, innov = innov,
+            returnStarting = returnStarting, show.parMat=show.parMat, seed= seed, ndig = ndig)
+    
+}
+  
 TVECM.gen <- function(B, beta, n=200, lag=1, 
                       include = c("const", "trend","none", "both"), 
                       nthresh=1, Thresh, 
@@ -166,7 +180,7 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
 
   if(!is.null(starting)){
     if(!is.matrix(starting)) stop("Provide 'starting' as matrix")
-    if(!all(dim(starting) == c(p+1, k))) stop("Bad specification of starting values. Should have nrow = lag and ncol = number of variables")
+    if(!all(dim(starting) == c(p+1, k))) stop("Bad specification of starting values. Should have nrow = lag +1 and ncol = number of variables")
   }
   Bmat <- B
   
@@ -245,9 +259,9 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
     colnames(Bmat)<- colnames_Matrix_system
     print(Bmat)
   }
-  res <- round(Yb, ndig)
-  if(!returnStarting) res <- res[-seq_len(p+1), ] 
-  return(res)
+  # res <- round(Yb, ndig)
+  if(!returnStarting) Yb <- Yb[-seq_len(p+1), ] 
+  return(Yb)
 }
 
 #' @export
