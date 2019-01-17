@@ -1,0 +1,237 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> library(tsDyn)
+> suppressMessages(library(tidyverse))
+> 
+> ############################
+> ### Load data
+> ############################
+> path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
+> if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
+> 
+> models_ar_setar <- readRDS(path_mod_uni) %>% 
++   filter(model %in% c("ar", "setar"))
+> 
+> ############################
+> ### Univariate
+> ############################
+> 
+> models_ar_setar
+# A tibble: 24 x 6
+     lag include model object      nthresh thDelay
+   <dbl> <chr>   <chr> <list>        <int>   <int>
+ 1     1 both    setar <S3: setar>       1       0
+ 2     1 both    setar <S3: setar>       2       0
+ 3     1 const   setar <S3: setar>       1       0
+ 4     1 const   setar <S3: setar>       2       0
+ 5     1 none    setar <S3: setar>       1       0
+ 6     1 none    setar <S3: setar>       2       0
+ 7     1 trend   setar <S3: setar>       1       0
+ 8     1 trend   setar <S3: setar>       2       0
+ 9     2 both    setar <S3: setar>       1       0
+10     2 both    setar <S3: setar>       1       1
+# … with 14 more rows
+> 
+> 
+> ## Simple, given shocks
+> models_ar_setar %>% 
++   head(2) %>% 
++   mutate(girf = map2(object, lag, ~GIRF(object=.x, n.ahead = 3,
++                                         hist_li = list(rep(1.6, .y)),
++                                         shock_li = list(0.01), R = 20, seed = 123) %>% as_tibble)) %>% 
++   unnest(girf) %>% 
++   as.data.frame()
+  lag include model nthresh thDelay n_rep last_hist shock n.ahead    sim_1
+1   1    both setar       1       0     1       1.6  0.01       0 2.923388
+2   1    both setar       1       0     1       1.6  0.01       1 2.376632
+3   1    both setar       1       0     1       1.6  0.01       2 1.967913
+4   1    both setar       1       0     1       1.6  0.01       3 2.193045
+5   1    both setar       2       0     1       1.6  0.01       0 2.744994
+6   1    both setar       2       0     1       1.6  0.01       1 2.622677
+7   1    both setar       2       0     1       1.6  0.01       2 2.307350
+8   1    both setar       2       0     1       1.6  0.01       3 2.254976
+     sim_2        girf
+1 2.913388 0.010000000
+2 2.371358 0.005274143
+3 1.965131 0.002781658
+4 2.191281 0.001763747
+5 2.734994 0.010000000
+6 2.613671 0.009005873
+7 2.299335 0.008014439
+8 2.225508 0.029467997
+> 
+> ## Simple, random
+> models_ar_setar %>% 
++   head(2) %>% 
++   mutate(girf = map(object, ~GIRF(object=., n.ahead = 3, n.hist = 3, n.shock = 3,
++                                   R = 20, seed = 123) %>% as_tibble)) %>% 
++   unnest(girf) %>% 
++   as.data.frame()
+   lag include model nthresh thDelay n_rep last_hist      shock n.ahead
+1    1    both setar       1       0     1        14  0.6035682       0
+2    1    both setar       1       0     1        14  0.6035682       1
+3    1    both setar       1       0     1        14  0.6035682       2
+4    1    both setar       1       0     1        14  0.6035682       3
+5    1    both setar       1       0     2        38  0.6035682       0
+6    1    both setar       1       0     2        38  0.6035682       1
+7    1    both setar       1       0     2        38  0.6035682       2
+8    1    both setar       1       0     2        38  0.6035682       3
+9    1    both setar       1       0     3        20  0.6035682       0
+10   1    both setar       1       0     3        20  0.6035682       1
+11   1    both setar       1       0     3        20  0.6035682       2
+12   1    both setar       1       0     3        20  0.6035682       3
+13   1    both setar       1       0     4        14  0.5690856       0
+14   1    both setar       1       0     4        14  0.5690856       1
+15   1    both setar       1       0     4        14  0.5690856       2
+16   1    both setar       1       0     4        14  0.5690856       3
+17   1    both setar       1       0     5        38  0.5690856       0
+18   1    both setar       1       0     5        38  0.5690856       1
+19   1    both setar       1       0     5        38  0.5690856       2
+20   1    both setar       1       0     5        38  0.5690856       3
+21   1    both setar       1       0     6        20  0.5690856       0
+22   1    both setar       1       0     6        20  0.5690856       1
+23   1    both setar       1       0     6        20  0.5690856       2
+24   1    both setar       1       0     6        20  0.5690856       3
+25   1    both setar       1       0     7        14 -0.1653949       0
+26   1    both setar       1       0     7        14 -0.1653949       1
+27   1    both setar       1       0     7        14 -0.1653949       2
+28   1    both setar       1       0     7        14 -0.1653949       3
+29   1    both setar       1       0     8        38 -0.1653949       0
+30   1    both setar       1       0     8        38 -0.1653949       1
+31   1    both setar       1       0     8        38 -0.1653949       2
+32   1    both setar       1       0     8        38 -0.1653949       3
+33   1    both setar       1       0     9        20 -0.1653949       0
+34   1    both setar       1       0     9        20 -0.1653949       1
+35   1    both setar       1       0     9        20 -0.1653949       2
+36   1    both setar       1       0     9        20 -0.1653949       3
+37   1    both setar       2       0     1        14  0.9648504       0
+38   1    both setar       2       0     1        14  0.9648504       1
+39   1    both setar       2       0     1        14  0.9648504       2
+40   1    both setar       2       0     1        14  0.9648504       3
+41   1    both setar       2       0     2        38  0.9648504       0
+42   1    both setar       2       0     2        38  0.9648504       1
+43   1    both setar       2       0     2        38  0.9648504       2
+44   1    both setar       2       0     2        38  0.9648504       3
+45   1    both setar       2       0     3        20  0.9648504       0
+46   1    both setar       2       0     3        20  0.9648504       1
+47   1    both setar       2       0     3        20  0.9648504       2
+48   1    both setar       2       0     3        20  0.9648504       3
+49   1    both setar       2       0     4        14  0.3116402       0
+50   1    both setar       2       0     4        14  0.3116402       1
+51   1    both setar       2       0     4        14  0.3116402       2
+52   1    both setar       2       0     4        14  0.3116402       3
+53   1    both setar       2       0     5        38  0.3116402       0
+54   1    both setar       2       0     5        38  0.3116402       1
+55   1    both setar       2       0     5        38  0.3116402       2
+56   1    both setar       2       0     5        38  0.3116402       3
+57   1    both setar       2       0     6        20  0.3116402       0
+58   1    both setar       2       0     6        20  0.3116402       1
+59   1    both setar       2       0     6        20  0.3116402       2
+60   1    both setar       2       0     6        20  0.3116402       3
+61   1    both setar       2       0     7        14 -0.1519284       0
+62   1    both setar       2       0     7        14 -0.1519284       1
+63   1    both setar       2       0     7        14 -0.1519284       2
+64   1    both setar       2       0     7        14 -0.1519284       3
+65   1    both setar       2       0     8        38 -0.1519284       0
+66   1    both setar       2       0     8        38 -0.1519284       1
+67   1    both setar       2       0     8        38 -0.1519284       2
+68   1    both setar       2       0     8        38 -0.1519284       3
+69   1    both setar       2       0     9        20 -0.1519284       0
+70   1    both setar       2       0     9        20 -0.1519284       1
+71   1    both setar       2       0     9        20 -0.1519284       2
+72   1    both setar       2       0     9        20 -0.1519284       3
+       sim_1     sim_2        girf
+1   8.906190  8.302622  0.60356823
+2   5.532047  5.213717  0.31833049
+3   3.632124  3.464232  0.16789204
+4   2.764943  2.676394  0.08854865
+5  21.564132 20.960564  0.60356823
+6  12.208026 11.889696  0.31833049
+7   7.153130  6.985238  0.16789204
+8   4.621972  4.533423  0.08854865
+9  12.070675 11.467107  0.60356823
+10  7.201042  6.882711  0.31833049
+11  4.512375  4.344483  0.16789204
+12  3.229200  3.140651  0.08854865
+13  8.871707  8.302622  0.56908564
+14  5.513860  5.213717  0.30014388
+15  3.622532  3.464232  0.15830016
+16  2.759884  2.676394  0.08348976
+17 21.529649 20.960564  0.56908564
+18 12.189840 11.889696  0.30014388
+19  7.143538  6.985238  0.15830016
+20  4.616913  4.533423  0.08348976
+21 12.036193 11.467107  0.56908564
+22  7.182855  6.882711  0.30014388
+23  4.502783  4.344483  0.15830016
+24  3.224141  3.140651  0.08348976
+25  8.137227  8.302622 -0.16539490
+26  5.126485  5.213717 -0.08723163
+27  3.418224  3.464232 -0.04600720
+28  2.652129  2.676394 -0.02426486
+29 20.795169 20.960564 -0.16539490
+30 11.802464 11.889696 -0.08723163
+31  6.939231  6.985238 -0.04600720
+32  4.509158  4.533423 -0.02426486
+33 11.301712 11.467107 -0.16539490
+34  6.795480  6.882711 -0.08723163
+35  4.298476  4.344483 -0.04600720
+36  3.116387  3.140651 -0.02426486
+37 14.219566 13.254715  0.96485044
+38 13.380261 12.477951  0.90230999
+39 12.418221 11.574398  0.84382333
+40 11.671949 10.882821  0.78912771
+41 36.663914 35.699064  0.96485044
+42 34.369794 33.467484  0.90230999
+43 32.047238 31.203414  0.84382333
+44 30.028635 29.239508  0.78912771
+45 19.830653 18.865802  0.96485044
+46 18.627644 17.725334  0.90230999
+47 17.325475 16.481652  0.84382333
+48 16.261120 15.471993  0.78912771
+49 13.566355 13.254715  0.31164017
+50 12.769391 12.477951  0.29144002
+51 11.846947 11.574398  0.27254923
+52 11.137704 10.882821  0.25488291
+53 36.010704 35.699064  0.31164017
+54 33.758924 33.467484  0.29144002
+55 31.475963 31.203414  0.27254923
+56 29.494390 29.239508  0.25488291
+57 19.177443 18.865802  0.31164017
+58 18.016774 17.725334  0.29144002
+59 16.754201 16.481652  0.27254923
+60 15.726875 15.471993  0.25488291
+61 13.102787 13.254715 -0.15192837
+62 12.335870 12.477951 -0.14208056
+63 11.441527 11.574398 -0.13287106
+64 10.758562 10.882821 -0.12425852
+65 35.547135 35.699064 -0.15192837
+66 33.325403 33.467484 -0.14208056
+67 31.070543 31.203414 -0.13287106
+68 29.115249 29.239508 -0.12425852
+69 18.713874 18.865802 -0.15192837
+70 17.583254 17.725334 -0.14208056
+71 16.348781 16.481652 -0.13287106
+72 15.347734 15.471993 -0.12425852
+> 
+> proc.time()
+   user  system elapsed 
+  3.478   0.192   3.790 

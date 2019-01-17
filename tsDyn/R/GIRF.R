@@ -21,7 +21,8 @@ GIRF <-  function(object, n.ahead, seed = NULL, ...) UseMethod("GIRF")
 ### here, innov is input, is missing, ONE set is drawn
 irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_both = TRUE,
                          returnStarting = FALSE, 
-                         add.regime = FALSE) {
+                         add.regime = FALSE, 
+                         seed = NULL) {
   
 
   ## extract model infos
@@ -35,6 +36,7 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   ## 
   if(is.null(innov)) {
     res_obj <- residuals(object)[-seq_len(lag)]
+    if(!is.null(seed)) set.seed(seed)
     innov <-  sample(res_obj, N, replace = FALSE)
   }
   
@@ -77,7 +79,10 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
 ### Output: average IRF
 irf_1_shock_ave <- function(object, shock, hist, R=10, n.ahead=10, innov= NULL, shock_both = TRUE,
                             returnStarting = FALSE, 
-                            add.regime = FALSE) {
+                            add.regime = FALSE, 
+                            seed = NULL) {
+  
+  if(!is.null(seed)) set.seed(seed)
   out <- replicate(R, irf_1_shock(object = object, shock = shock, hist = hist, n.ahead = n.ahead, 
                                   innov = innov, shock_both  =shock_both,
                                   returnStarting = returnStarting, add.regime = add.regime), simplify = FALSE)
@@ -117,6 +122,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
     (hist_M - lag+ 1) : hist_M
   }
   if(is.null(hist_li)) {
+    if(!is.null(seed)) set.seed(seed)
     hist_li <- replicate(n.hist, sample_hist(), simplify = FALSE)  
   } else {
     if(!is.list(hist_li)) stop("hist_li should be a list of vectors")
@@ -125,6 +131,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   
   ## construct shock_li if not provided
   if(is.null(shock_li)) {
+    if(!is.null(seed)) set.seed(seed)
     shock_li <- replicate(n.shock, sample(resids, size = 1), simplify = FALSE)
   } else {
     if(!is.list(shock_li)) stop("shock_li should be a list of vectors")
@@ -138,7 +145,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   sims <- lapply(1:nrow(M), function(x) irf_1_shock_ave(object = object, 
                                                 shock = M$shock[[x]], hist = M$hist[[x]],
                                                 n.ahead = n.ahead, 
-                                                R = R, ...))
+                                                R = R, seed = seed, ...))
   
   ## extend the data frame
   sims_df <- do.call("rbind", sims)
@@ -169,6 +176,10 @@ GIRF.linear <- function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
 if(FALSE) {
   library(tsDyn)
   library(tidyverse)
+  
+  library(devtools)
+  load_all()
+  
   set_l2_const <- setar(lh, m = 2, include = "const")
   linear_l2_none <- linear(lh, m = 2, include = "none")
   linear_l2_const <- linear(lh, m = 2, include = "const")
@@ -251,9 +262,10 @@ if(FALSE) {
   set_l2_c_irf_1_L <- tsDyn:::irf_1.setar(set_l2_const, regime = "L")
   set_l2_c_irf_1_H <- tsDyn:::irf_1.setar(set_l2_const, regime = "H")
   
-  set_l2_c_irf_1_df <- tibble(n.ahead = 1:10,
-                                  reg_L = set_l2_c_irf_1_L, 
-                                  reg_H = set_l2_c_irf_1_H)
+  set_l2_c_irf_1_df <- tibble(n.ahead = set_l2_c_irf_1_L$n.ahead,
+                              reg_L = set_l2_c_irf_1_L$x, 
+                              reg_H = set_l2_c_irf_1_H$x)
+  
   set_l2_c_irf_1_df_l <-  set_l2_c_irf_1_df %>% 
     gather(regime, irf, starts_with("reg"))
   qplot(x = n.ahead, y= irf, geom="line", colour = regime, data = set_l2_c_irf_1_df_l)
