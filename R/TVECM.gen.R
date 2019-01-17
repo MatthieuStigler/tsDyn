@@ -1,65 +1,11 @@
 
-#' @export
-#' @rdname TVECM.sim
-VECM.sim <- function(data,B,VECMobject,  beta, n=200, lag=1, 
-                     type=c("simul","boot", "check"),  
-                     include = c("const", "trend","none", "both"), 
-                     starting=NULL, innov=rmnorm(n,  varcov=varcov), varcov=diag(1,k), 
-                     show.parMat=FALSE, seed){
-  k<- if(!missing(VECMobject)) VECMobject$k else if(!missing(B)) nrow(B) else if(!missing(data)) ncol(data)
-  TVECM.sim(data=data,B=B,TVECMobject=VECMobject, nthresh=0,  beta=beta, n=n, 
-            lag=lag, type=type,  include = include, 
-            starting=starting, innov=innov, varcov=varcov, 
-            show.parMat=show.parMat, seed=seed)
-}
-
-#' @export
-#' @rdname TVECM.sim
-#' @param check When performing a bootstrap replication, check if taking original residuals (instead of resampled) 
-#' leads to the original data. 
-VECM.boot <- function(VECMobject, show.parMat=FALSE,  seed, check=TRUE){
-  if(VECMobject$num_exogen!=0) stop("VECM.boot() does not work for VECM() with exogen variables")
-  if(check){
-    ch <- TVECM.sim(TVECMobject=VECMobject,  type="check")
-    if(!isTRUE(all.equal(as.matrix(ch), as.matrix(VECMobject$model[,1:VECMobject$k]), check.attributes=FALSE)))
-      warning("Pseudo Bootstrap was not able to replicate original data, there might be an issue")
-  }
-  TVECM.sim(TVECMobject=VECMobject,  type="boot", show.parMat=show.parMat, seed=seed)
-}
-
-#' @export
-#' @rdname TVECM.sim
-TVECM.boot <- function(TVECMobject, show.parMat=FALSE,  seed, check=TRUE){
-  if(check){
-    ch <- TVECM.sim(TVECMobject=TVECMobject,  type="check")
-    if(!isTRUE(all.equal(as.matrix(ch), as.matrix(TVECMobject$model[,1:TVECMobject$k]), check.attributes=FALSE)))
-      warning("Pseudo Bootstrap was not able to replicate original data, there might be an issue")
-  }
-  TVECM.sim(TVECMobject=TVECMobject,  type="boot", show.parMat=show.parMat, seed=seed)
-}
-
-check.VECM.boot <- function(VECMobject, show.parMat=FALSE,  seed, check=TRUE){
-  if(VECMobject$num_exogen!=0) stop("VECM.boot() does not work for VECM() with exogen variables")
-  ch <- TVECM.sim(TVECMobject=VECMobject,  type="check")
-  res <- isTRUE(all.equal(as.matrix(ch), as.matrix(VECMobject$model[,1:VECMobject$k]), check.attributes=FALSE))
-  res
-}
-
-check.TVECM.boot <- function(TVECMobject){
-  ch <- TVECM.sim(TVECMobject=TVECMobject,  type="check")
-  res <- isTRUE(all.equal(as.matrix(ch), as.matrix(TVECMobject$model[,1:TVECMobject$k]), check.attributes=FALSE))
-  res
-}
-
-as.matrix.ts <-
-  function(x, ...)
-  {
+as.matrix.ts <- function(x, ...)  {
     # A function implemented by Diethelm Wuertz
     ans = as.matrix.default(unclass(x))
     attr(ans, "tsp")<-NULL
      rownames(ans)<-NULL # colnames(ans)<-NULL
     ans
-  }
+}
 
 #'Simulation and bootstrap a VECM or bivariate TVECM
 #'
@@ -101,27 +47,20 @@ as.matrix.ts <-
 #'One can alternatively give only the series, and then the function will call
 #'internally \code{\link{TVECM}}.
 #'
-#'@param data matrix of parameter to simulate
-#'@param B Matrix of coefficients to simulate
-#'@param TVECMobject,VECMobject Object computed by function \code{\link{TVECM}}
+#'@param B Simulation: Matrix of coefficients to simulate
+#'@param Thresh,nthresh,lag,include Simulation: parameters for the VECM/TVECM to simulate. 
+#'See \code{\link{TVECM}} for their description.  
+#'@param object Object computed by function \code{\link{TVECM}}
 #'or linear \code{\link{VECM}}
-#'@param nthresh number of threshold (see details)
-#'@param Thresh The threshold value(s). Vector of length nthresh
 #'@param beta The cointegrating value
-#'@param n Number of observations to create when type="simul"
-#'@param lag Number of lags to include in each regime
-#'@param type Whether a bootstrap or simulation is to employ. See details
-#'@param include Type of deterministic regressors to include. NOT WORKING
-#'PROPERLY CURRENTLY if not const
-#'@param starting Starting values when a simulation with given parameter matrix
-#'is made
-#'@param innov Innovations used for simulation. Should be matrix of dim nxk. By
-#'default multivariate normal.
-#'@param varcov Variance-covariance matrix for the innovations. By default
-#'multivariate normal is used.
-#'@param show.parMat Logical. Should the parameter matrix be shown? Useful to
-#'understand how to give right input
-#'@param seed Optional. Seed for the random number generation.
+#'@param n Simulation: Number of observations to simulate. 
+#'@param starting Simulation: Starting values (same length as lag = 1)
+#'@param innov Simulation: time series of innovations/residuals. 
+#'@param boot.scheme Bootstrap: which resampling scheme to use for the residuals. See \code{\link{resample_vec}}. 
+#'@template param_show.parMat
+#'@template param_returnStarting
+#'@param seed Bootstrap: seed used in the resampling
+#'@param \dots additional arguments for the unexported \code{TVECM.gen}.  
 #'@return A matrix with the simulated/bootstraped series.
 #'@author Matthieu Stigler
 #'@seealso \code{\link{VECM}} or \code{\link{TVECM}} to estimate the VECM or TVECM.  
@@ -149,14 +88,13 @@ as.matrix.ts <-
 #'# The a matrix is the input under argument B, while the b matrix is under argument beta: 
 #' # (the other zeros in B are for the not-specified lags)
 #'  innov<-rmnorm(100, varcov=diag(2))
-#'  startVal <- matrix(0, nrow=2, ncol=1)
 #'  Bvecm <- rbind(c(-0.2, 0,0), c(0.2, 0,0))
-#'  vecm1 <- VECM.sim(B=Bvecm, beta=1,n=100, lag=1,include="none", innov=innov, starting=startVal)
+#'  vecm1 <- VECM.sim(B=Bvecm, beta=1,n=100, lag=1,include="none", innov=innov)
 #'  ECT <- vecm1[,1]-vecm1[,2]
 #'
 #'#add an intercept as in panel B
 #'  Bvecm2 <- rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0))
-#'  vecm2 <- VECM.sim(B=Bvecm2,  n=100,beta=1, lag=1,include="const", innov=innov, starting=startVal)
+#'  vecm2 <- VECM.sim(B=Bvecm2,  n=100,beta=1, lag=1,include="const", innov=innov)
 #'
 #'  par(mfrow=c(2,1))
 #'  plot(vecm1[,1], type="l", main="Panel a: no drift or intercept", ylab="", xlab="")
@@ -166,25 +104,23 @@ as.matrix.ts <-
 #'}
 #'##Bootstrap a TVAR with 1 threshold (two regimes)
 #'data(zeroyld)
-#'dat<-zeroyld
-#'TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE)
-#'TVECM.sim(TVECMobject=TVECMobject,type="boot")
+#'TVECMobject <- TVECM(zeroyld, nthresh=1, lag=1, ngridBeta=20, ngridTh=20, plot=FALSE, trace = FALSE)
+#'TVECM.boot(TVECMobject)
 #'
-#'##Check the bootstrap
-#' TVECM.sim.check <- TVECM.sim(TVECMobject=TVECMobject,type="check")
-#' all(TVECM.sim.check==dat)
+#'##Check the bootstrap: do we get original series, when not resampling residuals?
+#' TVECM.boot.check <- TVECM.boot(TVECMobject, boot.scheme = "check")
+#' all.equal(as.data.frame(TVECM.boot.check), zeroyld)
 #'
+#' @name TVECM.sim
+NULL # for roxygen, do not add 
 
-# VAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
-#                     starting=NULL, innov, exogen=NULL, trendStart=1,
-#                     show.parMat=FALSE, returnStarting=FALSE)
-  
 TVECM.gen <- function(B, beta, n=200, lag=1, 
                       include = c("const", "trend","none", "both"), 
                       nthresh=1, Thresh, 
                       starting=NULL, innov,
                       returnStarting = FALSE, 
-                      show.parMat=FALSE, seed){
+                      show.parMat=FALSE, seed,
+                      ndig = 4){
   
 
   p <- lag
@@ -203,8 +139,16 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
   
   ### 
   k <- nrow(B)
-  ndig <- 4
-  esp <- p*k+1+ninc #number of lags +ecm
+  if(is.vector(beta)){
+    if(length(beta)==k-1) beta <- c(1, -beta)
+    tBETA<-matrix(beta, nrow=1)
+    r <- 1
+  } else {
+    if(nrow(beta)!=k ) stop("beta should have k rows and r cols")
+    r <- ncol(beta)
+    tBETA <- t(beta)
+  }
+  esp <- p*k+r+ninc #number of lags +ecm
   
   ## naming of variables:
   pa <- switch(as.character(nthresh), "0"="", "1"=c("_low", "_upr"),"2"=c("_low", "_mid","_upr"))
@@ -212,7 +156,7 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
   lags2 <- paste(rep(lags, times=p),"}{", rep(1:p,each=p),"}",sep="")
   
   if(esp*(nthresh+1)!=ncol(B)){
-    colnames_Matrix_input<-as.vector(outer(c("ECT",incVal, lags2), pa, paste, sep=""))
+    colnames_Matrix_input <- as.vector(outer(c(rep("ECT", r), incVal, lags2), pa, paste, sep=""))
     cat("Matrix B badly specified: should have ", esp*(nthresh+1), "columns, but has", ncol(B), "\n")
     print(matrix(NA, nrow=k, ncol=esp*(nthresh+1), dimnames=list(paste("Equ x", 1:k, sep=""), colnames_Matrix_input)))
     stop()
@@ -226,26 +170,13 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
   }
   Bmat <- B
   
-  if(is.vector(beta)){
-    if(length(beta)==k-1) beta <- c(1, -beta)
-    tBETA<-matrix(beta, nrow=1)
-    r <- 1
-  } else {
-    if(nrow(beta)!=k) stop("beta should have k rows and r cols")
-    r <- ncol(beta)
-    tBETA <- t(beta)
-  }
-  
-
-  npar <- k*(p+ninc+1)
-  
   ##### put coefficients vector in right form according to arg include (arg both need no modif)
   if(include!="both"){
     aa1 <- r+switch(include, "none"=1:2, "const"=2, "trend"=1, "both"=NULL)
     aa <- sort(rep(aa1, each=nthresh+1)+ (0:nthresh)*(p*k+max(aa1)))
     Bmat <- myInsertCol(Bmat, c=aa, 0)
   }
-  nparBmat <- p * k + 2 + 1
+  nparBmat <- p * k + 2 + r
   
   
   ##############################
@@ -310,7 +241,7 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
   }
   
   if(show.parMat){
-    colnames_Matrix_system <- as.vector(outer(c("ECT","Const", "Trend", lags2), pa, paste, sep=""))
+    colnames_Matrix_system <- as.vector(outer(c(rep("ECT",r), "Const", "Trend", lags2), pa, paste, sep=""))
     colnames(Bmat)<- colnames_Matrix_system
     print(Bmat)
   }
@@ -319,24 +250,52 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
   return(res)
 }
 
-
+#' @export
+#' @rdname TVECM.sim
 TVECM.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
+                      beta, 
                       nthresh = 1, Thresh,
-                      starting=NULL, innov=rmnorm(n, varcov=varcov), 
-                      varcov=diag(1,nrow(B)), 
+                      starting=NULL, 
+                      innov=rmnorm(n, varcov= diag(1,nrow(B))), 
                       show.parMat=FALSE, returnStarting=FALSE, ...){
   
   TVECM.gen(B=B, n=n, lag=lag, include = include,  
+            beta = beta,
             nthresh = nthresh, Thresh = Thresh,
             starting=starting, innov=innov, 
             show.parMat=show.parMat, returnStarting=returnStarting, ...)
 }
 
+#' @export
+#' @rdname TVECM.sim
+VECM.sim <- function(B, n=200, lag=1, include = c("const", "trend","none", "both"),  
+                     beta, 
+                     starting=NULL, 
+                     innov=rmnorm(n, varcov= diag(1,nrow(B))), 
+                     show.parMat=FALSE, returnStarting=FALSE, ...){
+  
+  TVECM.gen(B=B, n=n, lag=lag, include = include,  
+            beta = beta,
+            nthresh = 0, 
+            starting=starting, innov=innov, 
+            show.parMat=show.parMat, returnStarting=returnStarting, ...)
+}
+
+#' @export
+#' @rdname TVECM.sim
+VECM.boot <- function(object, boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+                       seed = NULL, ...){
+  TVECM.boot(object, boot.scheme = boot.scheme, seed = seed, ...)
+}
+  
+
+#' @export
+#' @rdname TVECM.sim
 TVECM.boot <- function(object, boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
                        seed = NULL, ...){
   
   ## check bad cases
-  if(object$exogen) stop("Cannot handle exo variables")
+  if(!is.null(object$exogen) && object$exogen) stop("Cannot handle exo variables")
   if(object$model.specific$LRinclude != "none") stop("Cannot handle cases with LRinclude != 'none' ")
   
   
@@ -381,20 +340,22 @@ TVECM.boot <- function(object, boot.scheme = c("resample", "resample_block", "wi
                    Thresh = getTh(object), 
                    starting=starts, innov=innov, 
                    # exogen=exogen, 
-                   show.parMat=FALSE, returnStarting=TRUE)
+                   returnStarting=TRUE,
+                   ...)
   colnames(res) <- colnames(yorig)
   res
 }
 
-TVECM.boot.check <- function(object) {
+TVECM.boot.check <- function(object, ...) {
   dat_orig <-  as.data.frame(object$model[, 1:object$k])
   rownames(dat_orig) <- seq_len(nrow(dat_orig))
-  boot <-  TVECM.boot(object, boot.scheme = "check")
+  boot <-  TVECM.boot(object, boot.scheme = "check", ...)
   all.equal(dat_orig, as.data.frame(boot))
 }
 
 if(FALSE){
   library(tsDyn)
+  TVECM.boot.check <-  tsDyn:::TVECM.boot.check
   library(devtools)
   load_all()
   # environment(TVECM.gen)<-environment(star)
@@ -427,14 +388,17 @@ if(FALSE){
   
   ### BOOT
   v_l1 <- VECM(zeroyld, lag=1, estim = "ML")
+  v_l1_tr <- VECM(zeroyld, lag=1, estim = "ML", include = "trend")
+  v_l1_r2 <- VECM(barry, lag=1, estim = "ML", r = 2)
   v_l1_lrInc <- VECM(zeroyld, lag=1, LRinclude = "const", estim = "ML")
   v_l1_lrInc$model.specific$coint
   v_l2 <- VECM(zeroyld, lag=2)
   
   TVECM.boot.check(object=v_l1)
   TVECM.boot.check(object = v_l2)
-  v_l1_lrInc$model.specific$coint <- v_l1_lrInc$model.specific$coint[1:2,]
   TVECM.boot.check(object = v_l1_lrInc)
+  TVECM.boot.check(object = v_l1_r2)
+  TVECM.boot.check(object = v_l1_tr)
   
   
   tv_1th_l1 <- TVECM(zeroyld, lag=1, nthresh=1, plot=FALSE, trace=FALSE)

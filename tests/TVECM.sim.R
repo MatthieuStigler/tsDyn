@@ -1,6 +1,9 @@
 library(tsDyn)
 library(mnormt)
 
+
+TVECM.boot.check <- tsDyn:::TVECM.boot.check
+
 ################################################################
 ######### From man file:
 ################################################################
@@ -43,18 +46,18 @@ all.equal(b,b_beta_mat)
 data(zeroyld)
 dat<-zeroyld
 TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, th1=list(exact=-1.195), plot=FALSE)
-tv_1_boot <-TVECM.sim(TVECMobject=TVECMobject,type="boot", seed=123, show.parMat=TRUE)
+tv_1_boot <-TVECM.boot(TVECMobject, seed=123, show.parMat=TRUE)
 head(tv_1_boot)
 
 ##Check the bootstrap
-all.equal(TVECM.sim(TVECMobject=TVECMobject,type="check"), as.matrix(dat), check.attributes=FALSE)
+TVECM.boot.check(TVECMobject)
 
 ## check correspondance bootstrap/simul:
-tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", beta=TVECMobject$model.specific$beta,
+tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),beta=TVECMobject$model.specific$beta,
                         Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123, innov=matrix(0,200,2))
 head(tv_1_boot)
 
-tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", 
+tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject), 
                      beta=TVECMobject$model.specific$beta,
                      Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
 head(tv_1_boot)
@@ -74,23 +77,19 @@ tv_2_const_common <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=l
 tv_2_const_l2 <- TVECM(dat, nthresh=2, lag=2, ngridBeta=5,  plot=FALSE, include="none",
                        th1=list(exact=-1.312),th2=list(exact=0.774), trace=FALSE)
 
-TVECM.sim(TVECMobject=tv_2_const, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-TVECM.sim(TVECMobject=tv_2_none, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-TVECM.sim(TVECMobject=tv_2_trend, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-TVECM.sim(TVECMobject=tv_2_both, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-try(TVECM.sim(TVECMobject=tv_2_const_common, type="boot", show.parMat=TRUE, seed=456)[1:5,], silent=TRUE)
+TVECM.boot(tv_2_const, show.parMat=TRUE, seed=456)[1:5,]
+TVECM.boot(tv_2_none, show.parMat=TRUE, seed=456)[1:5,]
+TVECM.boot(tv_2_trend,show.parMat=TRUE, seed=456)[1:5,]
+TVECM.boot(tv_2_both, show.parMat=TRUE, seed=456)[1:5,]
+try(TVECM.boot(tv_2_const_common, show.parMat=TRUE, seed=456)[1:5,], silent=TRUE)
 
-tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const)
-tsDyn:::check.TVECM.boot(TVECMobject=tv_2_none)
-tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const_l2)
-
+TVECM.boot.check(tv_2_const)
+TVECM.boot.check(tv_2_none)
+TVECM.boot.check(tv_2_const_l2)
+TVECM.boot.check(tv_2_both)
 
 ## does not work:
-tsDyn:::check.TVECM.boot(TVECMobject=tv_2_trend)
-tsDyn:::check.TVECM.boot(TVECMobject=tv_2_both)
-
-
-
+TVECM.boot.check(tv_2_trend)
 
 ###############
 #### p>2
@@ -99,22 +98,22 @@ tsDyn:::check.TVECM.boot(TVECMobject=tv_2_both)
 data(barry)
 
 ve_r1_l1 <- VECM(barry, lag=1)
-tsDyn:::check.VECM.boot(ve_r1_l1)
-VECM.boot(ve_r1_l1, show.parMat=TRUE, seed=234)[1:5,]
-
 ve_r1_l3 <- VECM(barry, lag=3)
-tsDyn:::check.VECM.boot(ve_r1_l3)
-VECM.boot(ve_r1_l3, show.parMat=TRUE, seed=234)[1:5,]
-
 ve_r2_l3 <- VECM(barry, lag=3, estim="ML", r=2)
-tsDyn:::check.VECM.boot(ve_r2_l3)
+
+TVECM.boot.check(ve_r1_l1)
+TVECM.boot.check(ve_r1_l3)
+TVECM.boot.check(ve_r2_l3)
+
+VECM.boot(ve_r1_l1, show.parMat=TRUE, seed=234)[1:5,]
+VECM.boot(ve_r1_l3, show.parMat=TRUE, seed=234)[1:5,]
 VECM.boot(ve_r2_l3, show.parMat=TRUE, seed=234)[1:5,]
 
 ################################################################
 ######### Check error message when matrix badly specified:
 ################################################################
 
-B<-matrix(rnorm(14), byrow=TRUE,ncol=7)
+B <- matrix(rnorm(14), byrow=TRUE,ncol=7)
 
 ## 0 thresh
 try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="none"))
