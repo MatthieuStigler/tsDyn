@@ -110,8 +110,8 @@ Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
 P-Value:	 0 		( Residual Bootstrap )
 
 Critical values:
-    0.90%    0.95%   0.99%
- 16.30446 17.18609 17.8914
+   0.90%    0.95%    0.99%
+ 16.3054 17.18791 17.89392
 Number of bootstrap replications:	 5 
 
 Cointegrating value (estimated under restricted linear model): -1.022065 
@@ -127,12 +127,12 @@ Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
 P-Value:	 0.2 		( Residual Bootstrap )
 
 Critical values:
-    0.90%    0.95%   0.99%
- 16.30446 17.18609 17.8914
+   0.90%    0.95%    0.99%
+ 16.3054 17.18791 17.89392
 Number of bootstrap replications:	 5 
 
 Cointegrating value (estimated under restricted linear model): -1.022065 
 > 
 > proc.time()
    user  system elapsed 
-  2.626   0.090   2.699 
+  3.866   0.136   6.678 

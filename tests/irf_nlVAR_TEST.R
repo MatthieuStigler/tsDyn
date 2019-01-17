@@ -34,7 +34,7 @@ irf(mod_random_1_vars, boot = FALSE, ortho = FALSE)$irf[[1]]
 ### irf _1
 models_IRF_1 <- models_multivariate %>% 
   filter(model == "VAR") %>% 
-  mutate(irf = map(object, ~irf_1(.,  boot = TRUE, runs = 2, seed = 7)))
+  mutate(irf = map(object, ~irf_1(.)))
 
 models_IRF_1$irf %>% 
   bind_rows() %>% 
@@ -83,6 +83,20 @@ comp <- models_IRF_any %>%
 
 comp %>% 
   select(-starts_with("object"))
+
+############################
+### VECM
+############################
+
+models_VECM <- models_multivariate %>% 
+  filter(model == "VECM")
+
+models_VECM
+
+
+############################
+### TVAR
+############################
 
 ## regime specific for TVAR
 models_TVAR <- models_multivariate %>% 

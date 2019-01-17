@@ -4,6 +4,10 @@ library(mnormt)
 
 TVECM.boot.check <- tsDyn:::TVECM.boot.check
 
+all.equal2 <-  function(target, current, ...) {
+  iconv(all.equal(target, current, ...), "latin1", "ASCII", sub="")
+}
+
 ################################################################
 ######### From man file:
 ################################################################
@@ -89,7 +93,7 @@ TVECM.boot.check(tv_2_const_l2)
 TVECM.boot.check(tv_2_both)
 
 ## does not work:
-TVECM.boot.check(tv_2_trend)
+iconv(TVECM.boot.check(tv_2_trend), "latin1", "ASCII", sub="")
 
 ###############
 #### p>2

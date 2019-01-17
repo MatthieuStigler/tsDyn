@@ -130,10 +130,11 @@ sapply(vecm_all, function(x) x$model.specific$beta)
 lapply(vecm_all, function(x) round(VARrep(x),9))
 
 ### fevd
-lapply(vecm_all, function(x) sapply(fevd(x, n.ahead=2), head))
+vecm_all_no_l0 <- vecm_all[-grep("l0", names(vecm_all))] ## does not work for these models
+lapply(vecm_all_no_l0, function(x) sapply(fevd(x, n.ahead=2), head))
 
 ### irf
-vecm_irf <- vecm_all[-grep("l1_no|bo|exo|Exo|l0", names(vecm_all))] ## does not work for these models
+vecm_irf <- vecm_all[-grep("l1_no|exo|Exo|l0|LR", names(vecm_all))] ## does not work for these models
 lapply(vecm_irf, function(x) sapply(irf(x, runs=1)$irf,head,2))
 
 ## predict
@@ -141,8 +142,8 @@ vecm_all_pred <- vecm_all[-grep("_bo|_no|_noCo|LRbo|coAsExo|exo", names(vecm_all
 lapply(vecm_all_pred, predict,  n.ahead=2)
 lapply(vecm_all_pred, function(x) sapply(tsDyn:::predictOld.VECM(x, n.ahead=2)$fcst, function(y) y[,"fcst"]))
 
-lapply(vecm_all, function(x) predict_rolling(x,nroll=2)$pred)
-lapply(vecm_all, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
+lapply(vecm_all_no_l0, function(x) predict_rolling(x,nroll=2)$pred)
+lapply(vecm_all_no_l0, function(x) predict_rolling(x,nroll=2, refit.every=1)$pred)
 
 ## VECM boot
 options(warn=-1)
