@@ -4,6 +4,10 @@ library(vars)
 
 data(Canada)
 
+all.equal2 <-  function(target, current, ...) {
+  iconv(all.equal(target, current, ...), "latin1", "ASCII", sub="")
+}
+
 
 #########################
 ##### VECM #####
@@ -15,6 +19,15 @@ vecm_l3_co_tsD <-VECM(Canada, lag=3, include="const", estim="ML")
 
 vecm_l1_co_var <- ca.jo(Canada, K=2, ecdet="none", spec="transitory")
 vecm_l3_co_var <- ca.jo(Canada, K=4, ecdet="none", spec="transitory")
+
+### unrestricted cons and trend
+vecm_l1_bo_tsD <-VECM(Canada, lag=1, include="both", estim="ML")
+vecm_l3_bo_tsD <-VECM(Canada, lag=3, include="both", estim="ML")
+
+trend_it <- function(start = 3) matrix(c(rep(0, start-1), seq_len(nrow(Canada)-start+1)), ncol =1, dimnames = list(NULL, "trend"))
+vecm_l1_bo_var <- ca.jo(Canada, K=2, ecdet="none", spec="transitory", dumvar = trend_it(3))
+vecm_l3_bo_var <- ca.jo(Canada, K=4, ecdet="none", spec="transitory", dumvar = trend_it(5))
+
 
 ### restricted cons
 vecm_l1_LRco_tsD <-VECM(Canada, lag=1, LRinclude="const", estim="ML")
@@ -31,12 +44,14 @@ vecm_l3_LRtr_tsD <-VECM(Canada, lag=3, LRinclude="trend", estim="ML")
 vecm_l3_LRtr_var <- ca.jo(Canada, K=4, ecdet="trend", spec="transitory")
 
 all_models <- list(
-		    list(vecm_l1_co_var, vecm_l1_co_tsD), 
-		    list(vecm_l3_co_var, vecm_l3_co_tsD), 
-		    list(vecm_l1_LRco_var, vecm_l1_LRco_tsD),
-		    list(vecm_l3_LRco_var, vecm_l3_LRco_tsD),
-		    list(vecm_l1_LRtr_var, vecm_l1_LRtr_tsD),
-		    list(vecm_l3_LRtr_var, vecm_l3_LRtr_tsD))
+  l1_co = list(vecm_l1_co_var, vecm_l1_co_tsD), 
+  l3_co = list(vecm_l3_co_var, vecm_l3_co_tsD), 
+  l1_bo = list(vecm_l1_bo_var, vecm_l1_bo_tsD),
+  l3_bo = list(vecm_l3_bo_var, vecm_l3_bo_tsD),
+  l1_LRco = list(vecm_l1_LRco_var, vecm_l1_LRco_tsD),
+  l3_LRco = list(vecm_l3_LRco_var, vecm_l3_LRco_tsD),
+  l1_LRtr = list(vecm_l1_LRtr_var, vecm_l1_LRtr_tsD),
+  l3_LRtr = list(vecm_l3_LRtr_var, vecm_l3_LRtr_tsD))
 
 deftol <- .Machine$double.eps ^ 0.5
 lowtol <- 1.e-07
@@ -45,8 +60,8 @@ comp_teststat <- function(x, tol=deftol) all.equal(x[[1]]@teststat, rev(rank.tes
 comp_betas <- function(x, tol=deftol) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$beta, check.attributes=FALSE, tolerance=tol)
 comp_coefs <- function(x, tol=deftol) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE, tolerance=tol)
 comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attributes=FALSE)
-comp_IRF <- function(x) all.equal(irf(vec2var(x[[1]]), boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE)
-comp_IRF_rand <- function(x) all.equal(irf(vec2var(x[[1]]), runs=2, seed=1234)$irf, irf(x[[2]], runs=2, seed=1234)$irf, check.attributes=FALSE)
+comp_IRF <- function(x, ortho = TRUE) all.equal2(irf(vec2var(x[[1]]), boot=FALSE, ortho = ortho)$irf,
+                                                 irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE)
 comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
 comp_resid <- function(x, tol=deftol) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE, tolerance=tol)
 comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
@@ -70,19 +85,20 @@ roundAll.Equal <- function(x, round=8){
   x
 }
 
+models_noLR <-  all_models[-grep("LR", names(all_models))]
 
 ### Compare VECM methods:
-print(sapply(all_models, comp_teststat ))
-print(sapply(all_models, comp_betas, tol=lowtol))
+sapply(all_models, comp_teststat )
+sapply(all_models, comp_betas, tol=lowtol)
 roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
-print(sapply(all_models, comp_LL))
-print(sapply(all_models, comp_IRF))
-print(sapply(all_models, comp_IRF_rand))
-print(sapply(all_models, comp_FEVD))
-print(sapply(all_models, comp_resid, tol=lowtol)) # 5
-print(sapply(all_models, comp_fitted)) 
-roundAll.Equal(sapply(all_models, comp_predict)) # 5 and 6
-lapply(sapply(all_models, comp_predictOld),roundAll.Equal, round=6) # 5 and 6
+sapply(all_models, comp_LL)
+sapply(models_noLR, comp_IRF)
+sapply(models_noLR, comp_IRF, ortho = FALSE)
+sapply(all_models, comp_FEVD)
+sapply(all_models, comp_resid, tol=lowtol) # 5
+sapply(all_models, comp_fitted)
+sapply(all_models[-c(3, 4)], comp_predict)
+lapply(sapply(all_models[-c(3, 4)], comp_predictOld),roundAll.Equal, round=6) # 5 and 6
 sapply(all_models, comp_VECM_coefA, tolerance=1e-07)
 sapply(all_models, comp_VECM_coefB, tolerance=1e-07)
 sapply(all_models, comp_VECM_coefPI, tolerance=1e-07)
@@ -131,20 +147,17 @@ var_l3_no_var <- VAR(Canada, p=3, type="none")
 
 
 all_var_models <- list(
-		    list(var_l1_co_tsD, var_l1_co_var), 
-		    list(var_l1_tr_tsD, var_l1_tr_var), 
-		    list(var_l1_bo_tsD, var_l1_bo_var), 
-		    list(var_l1_no_tsD, var_l1_no_var), 
-		    list(var_l3_co_tsD, var_l3_co_var), 
-		    list(var_l3_tr_tsD, var_l3_tr_var), 
-		    list(var_l3_bo_tsD, var_l3_bo_var), 
-		    list(var_l3_no_tsD, var_l3_no_var))
+  l1_co = list(var_l1_co_tsD, var_l1_co_var), 
+  l1_tr= list(var_l1_tr_tsD, var_l1_tr_var), 
+  l1_bo= list(var_l1_bo_tsD, var_l1_bo_var), 
+  l1_no= list(var_l1_no_tsD, var_l1_no_var), 
+  l3_co= list(var_l3_co_tsD, var_l3_co_var), 
+  l3_tr= list(var_l3_tr_tsD, var_l3_tr_var), 
+  l3_bo= list(var_l3_bo_tsD, var_l3_bo_var), 
+  l3_no= list(var_l3_no_tsD, var_l3_no_var))
 
-all_var_models_noNoBo <- all_var_models <- list(
-		    list(var_l1_co_tsD, var_l1_co_var), 
-		    list(var_l1_tr_tsD, var_l1_tr_var), 
-		    list(var_l3_co_tsD, var_l3_co_var), 
-		    list(var_l3_tr_tsD, var_l3_tr_var))
+all_var_models_noNoBo <- all_var_models[-grep("bo|no", names(all_var_models))]
+
 
 ## test functions
 coef_to_vars <- function(x){
@@ -168,15 +181,17 @@ comp_var_logLik <- function(x, tol=deftol) all.equal(logLik(x[[1]]), as.numeric(
 comp_var_pred <- function(x) all.equal(predict(x[[1]]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 comp_var_predOld <- function(x) all.equal(sapply(tsDyn:::predictOld.VAR(x[[1]], n.ahead=5)$fcst, function(x) x[,"fcst"]), sapply(predict(x[[2]], n.ahead=5)$fcst, function(x) x[,"fcst"]),check.attributes=FALSE)
 comp_var_fevd <- function(x) all.equal(sapply(fevd(x[[1]]), head,2), sapply(fevd(x[[2]]), head,2), check.attributes=FALSE)
-comp_var_IRF <- function(x) isTRUE(all.equal(irf(x[[1]], boot=FALSE)$irf, irf(x[[2]], boot=FALSE)$irf, check.attributes=FALSE))
+comp_var_IRF <- function(x, ortho = FALSE) isTRUE(all.equal(irf(x[[1]], boot=FALSE, ortho = ortho)$irf, 
+                                                            irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE))
+comp_var_IRF_old <- function(x, ortho = FALSE) isTRUE(all.equal(tsDyn:::irf_old(x[[1]], boot=FALSE, ortho = ortho)$irf, 
+                                                                irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE))
 
-### Compare VECM methods:
+### Compare VAR methods:
 sapply(all_var_models, comp_var_coefs)
 sapply(all_var_models, comp_var_logLik, tol=lowlowtol)
 roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_pred),7)
 roundAll.Equal(sapply(all_var_models_noNoBo, comp_var_predOld),7)
-sapply(all_var_models_noNoBo, comp_var_IRF)
-
-
-mod_1_VAR <- all_var_models_noNoBo[[1]]
-all.equal(irf(mod_1_VAR[[1]], boot=FALSE)$irf, irf(mod_1_VAR[[2]], boot=FALSE)$irf, check.attributes=FALSE)
+sapply(all_var_models, comp_var_IRF)
+sapply(all_var_models, comp_var_IRF_old)
+sapply(all_var_models, comp_var_IRF, ortho = TRUE)
+sapply(all_var_models, comp_var_IRF_old, ortho = TRUE)
