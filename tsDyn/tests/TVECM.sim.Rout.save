@@ -24,7 +24,9 @@ Type 'q()' to quit R.
 > TVECM.boot.check <- tsDyn:::TVECM.boot.check
 > 
 > all.equal2 <-  function(target, current, ...) {
-+   iconv(all.equal(target, current, ...), "latin1", "ASCII", sub="")
++   out <- all.equal(target, current, ...)
++   if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
++   out
 + }
 > 
 > ################################################################
@@ -457,4 +459,4 @@ Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  2.907   0.170   3.183 
+  2.769   0.124   3.029 
