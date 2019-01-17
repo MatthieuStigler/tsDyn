@@ -5,6 +5,7 @@
 \alias{irf.setar}
 \alias{irf.ar}
 \alias{irf.VAR}
+\alias{irf.nlVar}
 \alias{irf.VECM}
 \alias{irf.TVAR}
 \alias{irf.TVECM}
@@ -63,8 +64,7 @@ coefficients are computed. The default value is false.}
 A list of class \sQuote{\code{varirf}} see  \code{\link[vars]{irf.varest}}
 }
 \description{
-Use the \code{fevd} function from package \pkg{vars} to compute the impulse
-response coefficients (IRF) of a VAR(p) (or transformed VECM to VAR(p)) for
+Compute the impulse response coefficients (IRF) of a VAR(p) (or transformed VECM to VAR(p)) for
 \code{n.ahead} steps.
 For TVECM and TVAR model, argument \code{regime} offers regime-specific IRF.
 }
