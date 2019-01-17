@@ -37,7 +37,9 @@ Loading required package: lmtest
 > data(Canada)
 > 
 > all.equal2 <-  function(target, current, ...) {
-+   iconv(all.equal(target, current, ...), "latin1", "ASCII", sub="")
++   out <- all.equal(target, current, ...)
++   if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
++   out
 + }
 > 
 > 
@@ -160,8 +162,8 @@ Loading required package: lmtest
 [3,] "Component rw: Mean relative difference: 0.1094004"  
 [4,] "Component U: Mean relative difference: 0.1094004"   
 > sapply(models_noLR, comp_IRF, ortho = FALSE)
- l1_co  l3_co  l1_bo  l3_bo 
-"TRUE" "TRUE" "TRUE" "TRUE" 
+l1_co l3_co l1_bo l3_bo 
+ TRUE  TRUE  TRUE  TRUE 
 > sapply(all_models, comp_FEVD)
   l1_co   l3_co   l1_bo   l3_bo l1_LRco l3_LRco l1_LRtr l3_LRtr 
    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
@@ -364,4 +366,4 @@ FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 > 
 > proc.time()
    user  system elapsed 
-  3.255   0.138   5.299 
+  3.129   0.140   3.462 

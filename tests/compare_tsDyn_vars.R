@@ -5,7 +5,9 @@ library(vars)
 data(Canada)
 
 all.equal2 <-  function(target, current, ...) {
-  iconv(all.equal(target, current, ...), "latin1", "ASCII", sub="")
+  out <- all.equal(target, current, ...)
+  if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
+  out
 }
 
 
