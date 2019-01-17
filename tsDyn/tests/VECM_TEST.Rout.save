@@ -3698,74 +3698,74 @@ There were 24 warnings (use warnings() to see them)
 > ## VECM boot
 > options(warn=-1)
 > sapply(vecm_all, function(x) try(tsDyn:::TVECM.boot.check(x), silent=TRUE))
-                                                                                              vecm_OLS_l1_co 
-                                                                                                      "TRUE" 
-                                                                                              vecm_OLS_l3_co 
-                                                                                                      "TRUE" 
-                                                                                    vecm_OLS_l3_co_betaGiven 
-                                                                                                      "TRUE" 
-                                                                                              vecm_OLS_l1_tr 
-                                                                                                      "TRUE" 
-                                                                                              vecm_OLS_l1_bo 
-                                                                                                      "TRUE" 
-                                                                                              vecm_OLS_l1_no 
-                                                                                                      "TRUE" 
-                                                                                         vecm_OLS_l1_coAsExo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
-                                                                                         vecm_OLS_l3_coAsExo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
-                                                                                            vecm_OLS_l1_LRco 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                            vecm_OLS_l1_LRtr 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                       vecm_OLS_l1_LRtr_noCo 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                            vecm_OLS_l1_LRbo 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                              vecm_OLS_l0_co 
-              "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle case with lag = 0\n" 
-                                                                                              vecm_OLS_l0_tr 
-              "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle case with lag = 0\n" 
-                                                                                               vecm_ML_l0_co 
-              "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle case with lag = 0\n" 
-                                                                                               vecm_ML_l0_tr 
-              "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle case with lag = 0\n" 
-                                                                                               vecm_ML_l0_bo 
-              "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle case with lag = 0\n" 
-                                                                                               vecm_ML_l0_no 
-              "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle case with lag = 0\n" 
-                                                                                             vecm_ML_l0_LRco 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                             vecm_ML_l0_LRtr 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                               vecm_ML_l1_co 
-                                                                                                      "TRUE" 
-                                                                                               vecm_ML_l3_co 
-                                                                                                      "TRUE" 
-                                                                                               vecm_ML_l1_tr 
-                                                                                                      "TRUE" 
-                                                                                               vecm_ML_l1_bo 
-                                                                                                      "TRUE" 
-                                                                                               vecm_ML_l1_no 
-                                                                                                      "TRUE" 
-                                                                                          vecm_ML_l1_coAsExo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
-                                                                                          vecm_ML_l3_coAsExo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
-                                                                                             vecm_ML_l1_LRco 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                          vecm_ML_l1_LRc_exo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
-                                                                                             vecm_ML_l1_LRtr 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                         vecm_ML_l1_LRtr_exo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
-                                                                                        vecm_ML_l1_LRtr_noCo 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                             vecm_ML_l1_LRbo 
-"Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle cases with LRinclude != 'none' \n" 
-                                                                                         vecm_ML_l1_LRbo_exo 
-                  "Error in TVECM.boot(object, boot.scheme = \"check\") : \n  Cannot handle exo variables\n" 
+                                                                                                   vecm_OLS_l1_co 
+                                                                                                           "TRUE" 
+                                                                                                   vecm_OLS_l3_co 
+                                                                                                           "TRUE" 
+                                                                                         vecm_OLS_l3_co_betaGiven 
+                                                                                                           "TRUE" 
+                                                                                                   vecm_OLS_l1_tr 
+                                                                                                           "TRUE" 
+                                                                                                   vecm_OLS_l1_bo 
+                                                                                                           "TRUE" 
+                                                                                                   vecm_OLS_l1_no 
+                                                                                                           "TRUE" 
+                                                                                              vecm_OLS_l1_coAsExo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
+                                                                                              vecm_OLS_l3_coAsExo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
+                                                                                                 vecm_OLS_l1_LRco 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                                 vecm_OLS_l1_LRtr 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                            vecm_OLS_l1_LRtr_noCo 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                                 vecm_OLS_l1_LRbo 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                                   vecm_OLS_l0_co 
+              "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle case with lag = 0\n" 
+                                                                                                   vecm_OLS_l0_tr 
+              "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle case with lag = 0\n" 
+                                                                                                    vecm_ML_l0_co 
+              "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle case with lag = 0\n" 
+                                                                                                    vecm_ML_l0_tr 
+              "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle case with lag = 0\n" 
+                                                                                                    vecm_ML_l0_bo 
+              "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle case with lag = 0\n" 
+                                                                                                    vecm_ML_l0_no 
+              "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle case with lag = 0\n" 
+                                                                                                  vecm_ML_l0_LRco 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                                  vecm_ML_l0_LRtr 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                                    vecm_ML_l1_co 
+                                                                                                           "TRUE" 
+                                                                                                    vecm_ML_l3_co 
+                                                                                                           "TRUE" 
+                                                                                                    vecm_ML_l1_tr 
+                                                                                                           "TRUE" 
+                                                                                                    vecm_ML_l1_bo 
+                                                                                                           "TRUE" 
+                                                                                                    vecm_ML_l1_no 
+                                                                                                           "TRUE" 
+                                                                                               vecm_ML_l1_coAsExo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
+                                                                                               vecm_ML_l3_coAsExo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
+                                                                                                  vecm_ML_l1_LRco 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                               vecm_ML_l1_LRc_exo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
+                                                                                                  vecm_ML_l1_LRtr 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                              vecm_ML_l1_LRtr_exo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
+                                                                                             vecm_ML_l1_LRtr_noCo 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                                  vecm_ML_l1_LRbo 
+"Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle cases with LRinclude != 'none' \n" 
+                                                                                              vecm_ML_l1_LRbo_exo 
+                  "Error in TVECM.boot(object, boot.scheme = \"check\", ...) : \n  Cannot handle exo variables\n" 
 > options(warn=0)
 > 
 > vecm_all_noExo_noLRinc <- vecm_all[-grep("LR|exo|Exo|l0", names(vecm_all))]
@@ -5308,4 +5308,4 @@ r=3 -4758.653 -4768.659 -4778.556
 > 
 > proc.time()
    user  system elapsed 
-  5.267   0.243   5.784 
+  4.244   0.132   4.366 

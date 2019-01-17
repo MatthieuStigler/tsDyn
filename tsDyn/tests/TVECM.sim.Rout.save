@@ -1,5 +1,5 @@
 
-R version 3.5.0 (2018-04-23) -- "Joy in Playing"
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
 Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -20,6 +20,9 @@ Type 'q()' to quit R.
 > library(tsDyn)
 > library(mnormt)
 > 
+> 
+> TVECM.boot.check <- tsDyn:::TVECM.boot.check
+> 
 > ################################################################
 > ######### From man file:
 > ################################################################
@@ -36,7 +39,7 @@ Type 'q()' to quit R.
 > vecm1<-TVECM.sim(B=rbind(c(-0.2, 0,0), c(0.2, 0,0)), nthresh=0, beta=1,n=100, lag=1,include="none", innov=innov)
 > ECT<-vecm1[,1]-vecm1[,2]
 > ECT[1:5]
-[1]  0.0000  0.0000 -0.3303  1.2900 -0.8117
+[1] -0.3303  1.2900 -0.8117  1.2389  0.5022
 > 
 > #add an intercept as in panel B
 > B2 <- rbind(c(-0.2, 0.1,0,0), c(0.2,0.4, 0,0))
@@ -50,11 +53,11 @@ Equ x1: -0.2   0.1     0        0        0
 Equ x2:  0.2   0.4     0        0        0
 > b[1:5,]
         [,1]   [,2]
-[1,]  0.0000 0.0000
-[2,]  0.0000 0.0000
-[3,] -0.4605 0.1698
-[4,]  1.3243 0.5143
-[5,]  1.3916 2.7913
+[1,] -0.4605 0.1698
+[2,]  1.3243 0.5143
+[3,]  1.3916 2.7913
+[4,]  2.2324 1.6463
+[5,]  1.5284 1.7179
 > all.equal(b, b_2)
 [1] TRUE
 > 
@@ -69,11 +72,11 @@ Equ x1: -0.2   0.1     0        0        0
 Equ x2:  0.2   0.4     0        0        0
 > b_beta_vec[1:5,]
         [,1]   [,2]
-[1,]  0.0000 0.0000
-[2,]  0.0000 0.0000
-[3,] -0.4605 0.1698
-[4,]  1.3243 0.5143
-[5,]  1.3916 2.7913
+[1,] -0.4605 0.1698
+[2,]  1.3243 0.5143
+[3,]  1.3916 2.7913
+[4,]  2.2324 1.6463
+[5,]  1.5284 1.7179
 > all.equal(b,b_beta_vec)
 [1] TRUE
 > all.equal(b_beta_vec, b_beta_vec_2)
@@ -86,11 +89,11 @@ Equ x1: -0.2   0.1     0        0        0
 Equ x2:  0.2   0.4     0        0        0
 > b_beta_mat[1:5,]
         [,1]   [,2]
-[1,]  0.0000 0.0000
-[2,]  0.0000 0.0000
-[3,] -0.4605 0.1698
-[4,]  1.3243 0.5143
-[5,]  1.3916 2.7913
+[1,] -0.4605 0.1698
+[2,]  1.3243 0.5143
+[3,]  1.3916 2.7913
+[4,]  2.2324 1.6463
+[5,]  1.5284 1.7179
 > all.equal(b,b_beta_mat)
 [1] TRUE
 > 
@@ -103,28 +106,28 @@ Equ x2:  0.2   0.4     0        0        0
 > data(zeroyld)
 > dat<-zeroyld
 > TVECMobject<-TVECM(dat, nthresh=1, lag=1, ngridBeta=20, th1=list(exact=-1.195), plot=FALSE)
-> tv_1_boot <-TVECM.sim(TVECMobject=TVECMobject,type="boot", seed=123, show.parMat=TRUE)
-                         ECT     Const Trend short.run t -1 long.run t -1
-Equation short.run 0.2025264 0.4857667     0      0.2252923   -0.09926611
-Equation long.run  0.9575983 1.5929831     0      0.8703592    0.02252604
-                           ECT        Const Trend short.run t -1 long.run t -1
-Equation short.run 0.001291099  0.004290751     0    -0.02328976    0.06741675
-Equation long.run  0.058816293 -0.007954949     0     0.16032265    0.14668443
+> tv_1_boot <-TVECM.boot(TVECMobject, seed=123, show.parMat=TRUE)
+          ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
+Equ x1: 0.2025264 0.4857667         0    0.2252923  -0.09926611 0.001291099
+Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
+           Const_upr Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1:  0.004290751         0  -0.02328976   0.06741675
+Equ x2: -0.007954949         0   0.16032265   0.14668443
 > head(tv_1_boot)
-      [,1]   [,2]
-[1,] 2.183  1.575
-[2,] 2.246  1.545
-[3,] 2.237  1.403
-[4,] 1.610  0.940
-[5,] 1.441  0.650
-[6,] 0.697 -0.067
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2374   1.4032
+[4,]    1.6103   0.9403
+[5,]    1.4411   0.6505
+[6,]    0.6970  -0.0672
 > 
 > ##Check the bootstrap
-> all.equal(TVECM.sim(TVECMobject=TVECMobject,type="check"), as.matrix(dat), check.attributes=FALSE)
+> TVECM.boot.check(TVECMobject)
 [1] TRUE
 > 
 > ## check correspondance bootstrap/simul:
-> tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", beta=TVECMobject$model.specific$beta,
+> tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),beta=TVECMobject$model.specific$beta,
 +                         Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123, innov=matrix(0,200,2))
           ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
 Equ x1: 0.2025264 0.4857667         0    0.2252923  -0.09926611 0.001291099
@@ -133,15 +136,15 @@ Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
 Equ x1:  0.004290751         0  -0.02328976   0.06741675
 Equ x2: -0.007954949         0   0.16032265   0.14668443
 > head(tv_1_boot)
-      [,1]   [,2]
-[1,] 2.183  1.575
-[2,] 2.246  1.545
-[3,] 2.237  1.403
-[4,] 1.610  0.940
-[5,] 1.441  0.650
-[6,] 0.697 -0.067
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2374   1.4032
+[4,]    1.6103   0.9403
+[5,]    1.4411   0.6505
+[6,]    0.6970  -0.0672
 > 
-> tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),type="simul", 
+> tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject), 
 +                      beta=TVECMobject$model.specific$beta,
 +                      Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
           ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
@@ -151,13 +154,13 @@ Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
 Equ x1:  0.004290751         0  -0.02328976   0.06741675
 Equ x2: -0.007954949         0   0.16032265   0.14668443
 > head(tv_1_boot)
-      [,1]   [,2]
-[1,] 2.183  1.575
-[2,] 2.246  1.545
-[3,] 2.237  1.403
-[4,] 1.610  0.940
-[5,] 1.441  0.650
-[6,] 0.697 -0.067
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2374   1.4032
+[4,]    1.6103   0.9403
+[5,]    1.4411   0.6505
+[6,]    0.6970  -0.0672
 > 
 > ##Bootstrap a TVAR with two threshold (three regimes)
 > tv_2_const <- TVECM(dat, lag=1, nthresh=2, plot=FALSE, trace=FALSE, th1=list(exact=-1.312),
@@ -174,110 +177,85 @@ Equ x2: -0.007954949         0   0.16032265   0.14668443
 > tv_2_const_l2 <- TVECM(dat, nthresh=2, lag=2, ngridBeta=5,  plot=FALSE, include="none",
 +                        th1=list(exact=-1.312),th2=list(exact=0.774), trace=FALSE)
 > 
-> TVECM.sim(TVECMobject=tv_2_const, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-                         ECT     Const Trend short.run t -1 long.run t -1
-Equation short.run 0.2343191 0.5627267     0      0.2133872   -0.13045497
-Equation long.run  1.1492230 1.9445867     0      0.7652367    0.02490849
-                           ECT        Const Trend short.run t -1 long.run t -1
-Equation short.run -0.01031875  0.007322243     0     0.09944158    0.06907443
-Equation long.run   0.01991474 -0.005735839     0     0.32699066    0.23687489
-                           ECT       Const Trend short.run t -1 long.run t -1
-Equation short.run -0.04920032  0.06691590     0    -0.11216037    0.04637838
-Equation long.run   0.10732160 -0.09079342     0     0.08524092   -0.02873180
-      [,1]  [,2]
-[1,] 2.183 1.575
-[2,] 2.246 1.545
-[3,] 2.256 1.665
-[4,] 2.289 1.701
-[5,] 2.151 1.413
-> TVECM.sim(TVECMobject=tv_2_none, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-                           ECT Const Trend short.run t -1 long.run t -1
-Equation short.run -0.03252245     0     0      0.3508268    -0.2229371
-Equation long.run   0.17029747     0     0      1.2574671    -0.3689984
-                           ECT Const Trend short.run t -1 long.run t -1
-Equation short.run -0.01855284     0     0     0.09248489    0.05361497
-Equation long.run  -0.02128513     0     0     0.25119037    0.19618437
-                           ECT Const Trend short.run t -1 long.run t -1
-Equation short.run 0.008401237     0     0    -0.18027015     0.1024449
-Equation long.run  0.061539636     0     0     0.01649033     0.1198955
-      [,1]  [,2]
-[1,] 2.183 1.575
-[2,] 2.246 1.545
-[3,] 2.229 1.599
-[4,] 2.254 1.610
-[5,] 2.199 1.570
-> TVECM.sim(TVECMobject=tv_2_trend, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-                         ECT Const       Trend short.run t -1 long.run t -1
-Equation short.run 0.3391893     0 0.002350986     0.07245793   -0.05503711
-Equation long.run  1.4764723     0 0.007927246     0.30567992    0.26850260
-                   Const          ECT         Trend short.run t -1 Const
-Equation short.run     0 -0.009627084 -1.272937e-05      0.0967326     0
-Equation long.run      0  0.019137028 -2.862608e-05      0.3246202     0
-                   long.run t -1          ECT         Trend short.run t -1
-Equation short.run    0.07017931 -0.004106742  1.678226e-05    -0.11558062
-Equation long.run     0.23703865  0.080441375 -1.830732e-04     0.08127482
-                   long.run t -1
-Equation short.run    0.04875773
-Equation long.run    -0.02692949
-      [,1]  [,2]
-[1,] 2.183 1.575
-[2,] 2.246 1.545
-[3,] 2.251 1.638
-[4,] 2.273 1.657
-[5,] 2.134 1.377
-Warning message:
-In TVECM.sim(TVECMobject = tv_2_trend, type = "boot", show.parMat = TRUE,  :
-  Accuracy of function (tested with arg type=check) is not good when arg include= trend  is given
-
-> TVECM.sim(TVECMobject=tv_2_both, type="boot", show.parMat=TRUE, seed=456)[1:5,]
-                         ECT      Const       Trend short.run t -1
-Equation short.run 0.3344445 -0.1764324 0.002892201     0.06269098
-Equation long.run  1.4605964 -0.2530547 0.008833043     0.30094440
-                   long.run t -1         ECT        Const         Trend
-Equation short.run   -0.04669461 -0.01913800 0.0329355255 -1.274667e-04
-Equation long.run     0.27609545  0.02432369 0.0003496974 -2.007436e-05
-                   short.run t -1 long.run t -1         ECT       Const
-Equation short.run     0.06886216    0.07908553 -0.05978909  0.09243691
-Equation long.run      0.29465882    0.24365050  0.12349362 -0.06383229
-                           Trend short.run t -1 long.run t -1
-Equation short.run -3.868788e-05    -0.11591998    0.04050465
-Equation long.run  -1.475473e-04     0.07572181   -0.02512837
-      [,1]  [,2]
-[1,] 2.183 1.575
-[2,] 2.246 1.545
-[3,] 2.265 1.629
-[4,] 2.303 1.670
-[5,] 2.167 1.409
-Warning message:
-In TVECM.sim(TVECMobject = tv_2_both, type = "boot", show.parMat = TRUE,  :
-  Accuracy of function (tested with arg type=check) is not good when arg include= both  is given
-
-> try(TVECM.sim(TVECMobject=tv_2_const_common, type="boot", show.parMat=TRUE, seed=456)[1:5,], silent=TRUE)
+> TVECM.boot(tv_2_const, show.parMat=TRUE, seed=456)[1:5,]
+          ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_mid
+Equ x1: 0.2343191 0.5627267         0    0.2133872  -0.13045497 -0.01031875
+Equ x2: 1.1492230 1.9445867         0    0.7652367   0.02490849  0.01991474
+           Const_mid Trend_mid L{x1}{1}_mid L{x2}{1}_mid     ECT_upr
+Equ x1:  0.007322243         0   0.09944158   0.06907443 -0.04920032
+Equ x2: -0.005735839         0   0.32699066   0.23687489  0.10732160
+          Const_upr Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1:  0.06691590         0  -0.11216037   0.04637838
+Equ x2: -0.09079342         0   0.08524092  -0.02873180
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2558   1.6649
+[4,]    2.2893   1.7014
+[5,]    2.1512   1.4125
+> TVECM.boot(tv_2_none, show.parMat=TRUE, seed=456)[1:5,]
+            ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_mid
+Equ x1: -0.03252245         0         0    0.3508268   -0.2229371 -0.01855284
+Equ x2:  0.17029747         0         0    1.2574671   -0.3689984 -0.02128513
+        Const_mid Trend_mid L{x1}{1}_mid L{x2}{1}_mid     ECT_upr Const_upr
+Equ x1:         0         0   0.09248489   0.05361497 0.008401237         0
+Equ x2:         0         0   0.25119037   0.19618437 0.061539636         0
+        Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1:         0  -0.18027015    0.1024449
+Equ x2:         0   0.01649033    0.1198955
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2287   1.5989
+[4,]    2.2544   1.6098
+[5,]    2.1987   1.5703
+> TVECM.boot(tv_2_trend,show.parMat=TRUE, seed=456)[1:5,]
+          ECT_low Const_low   Trend_low L{x1}{1}_low L{x2}{1}_low ECT_mid
+Equ x1: 0.3391893         0 0.002350986   0.07245793  -0.05503711       0
+Equ x2: 1.4764723         0 0.007927246   0.30567992   0.26850260       0
+           Const_mid     Trend_mid L{x1}{1}_mid L{x2}{1}_mid    ECT_upr
+Equ x1: -0.009627084 -1.272937e-05    0.0967326            0 0.07017931
+Equ x2:  0.019137028 -2.862608e-05    0.3246202            0 0.23703865
+           Const_upr     Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1: -0.004106742  1.678226e-05  -0.11558062   0.04875773
+Equ x2:  0.080441375 -1.830732e-04   0.08127482  -0.02692949
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2514   1.6383
+[4,]    2.2731   1.6570
+[5,]    2.1335   1.3775
+> TVECM.boot(tv_2_both, show.parMat=TRUE, seed=456)[1:5,]
+          ECT_low  Const_low   Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_mid
+Equ x1: 0.3344445 -0.1764324 0.002892201   0.06269098  -0.04669461 -0.01913800
+Equ x2: 1.4605964 -0.2530547 0.008833043   0.30094440   0.27609545  0.02432369
+           Const_mid     Trend_mid L{x1}{1}_mid L{x2}{1}_mid     ECT_upr
+Equ x1: 0.0329355255 -1.274667e-04   0.06886216   0.07908553 -0.05978909
+Equ x2: 0.0003496974 -2.007436e-05   0.29465882   0.24365050  0.12349362
+          Const_upr     Trend_upr L{x1}{1}_upr L{x2}{1}_upr
+Equ x1:  0.09243691 -3.868788e-05  -0.11591998   0.04050465
+Equ x2: -0.06383229 -1.475473e-04   0.07572181  -0.02512837
+     short.run long.run
+[1,]    2.1830   1.5750
+[2,]    2.2460   1.5450
+[3,]    2.2651   1.6294
+[4,]    2.3034   1.6700
+[5,]    2.1667   1.4095
+> try(TVECM.boot(tv_2_const_common, show.parMat=TRUE, seed=456)[1:5,], silent=TRUE)
 > 
-> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const)
+> TVECM.boot.check(tv_2_const)
 [1] TRUE
-> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_none)
+> TVECM.boot.check(tv_2_none)
 [1] TRUE
-> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_const_l2)
+> TVECM.boot.check(tv_2_const_l2)
 [1] TRUE
-> 
+> TVECM.boot.check(tv_2_both)
+[1] TRUE
 > 
 > ## does not work:
-> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_trend)
-[1] FALSE
-Warning message:
-In TVECM.sim(TVECMobject = TVECMobject, type = "check") :
-  Accuracy of function (tested with arg type=check) is not good when arg include= trend  is given
-
-> tsDyn:::check.TVECM.boot(TVECMobject=tv_2_both)
-[1] FALSE
-Warning message:
-In TVECM.sim(TVECMobject = TVECMobject, type = "check") :
-  Accuracy of function (tested with arg type=check) is not good when arg include= both  is given
-
-> 
-> 
-> 
+> TVECM.boot.check(tv_2_trend)
+[1] "Component “short.run”: Mean relative difference: 0.2180449"
+[2] "Component “long.run”: Mean relative difference: 0.191615"  
 > 
 > ###############
 > #### p>2
@@ -286,64 +264,60 @@ In TVECM.sim(TVECMobject = TVECMobject, type = "check") :
 > data(barry)
 > 
 > ve_r1_l1 <- VECM(barry, lag=1)
-> tsDyn:::check.VECM.boot(ve_r1_l1)
+> ve_r1_l3 <- VECM(barry, lag=3)
+> ve_r2_l3 <- VECM(barry, lag=3, estim="ML", r=2)
+> 
+> TVECM.boot.check(ve_r1_l1)
 [1] TRUE
+> TVECM.boot.check(ve_r1_l3)
+[1] TRUE
+> TVECM.boot.check(ve_r2_l3)
+[1] TRUE
+> 
 > VECM.boot(ve_r1_l1, show.parMat=TRUE, seed=234)[1:5,]
-                         ECT   Intercept Trend dolcan -1    cpiUSA -1
-Equation dolcan -0.002537673 0.002202355     0 0.1587853 -0.003002494
-Equation cpiUSA  0.055320874 0.135043876     0 0.5426890  0.483673616
-Equation cpiCAN  0.179057392 0.157670998     0 0.2897487  0.327296468
-                    cpiCAN -1
-Equation dolcan  0.0001286435
-Equation cpiUSA -0.0353661496
-Equation cpiCAN -0.0224027426
-       [,1]    [,2]    [,3]
+                 ECT       Const Trend  L{x1}{1}     L{x2}{1}      L{x3}{1}
+Equ x1: -0.002537673 0.002202355     0 0.1587853 -0.003002494  0.0001286435
+Equ x2:  0.055320874 0.135043876     0 0.5426890  0.483673616 -0.0353661496
+Equ x3:  0.179057392 0.157670998     0 0.2897487  0.327296468 -0.0224027426
+     dolcan  cpiUSA  cpiCAN
 [1,] 0.9993 27.9800 25.8600
 [2,] 0.9956 28.1700 26.0000
 [3,] 0.9837 28.4766 25.9924
 [4,] 1.0075 28.8608 25.3569
 [5,] 1.0154 28.9239 25.5003
-> 
-> ve_r1_l3 <- VECM(barry, lag=3)
-> tsDyn:::check.VECM.boot(ve_r1_l3)
-[1] TRUE
 > VECM.boot(ve_r1_l3, show.parMat=TRUE, seed=234)[1:5,]
-                         ECT   Intercept Trend dolcan -1    cpiUSA -1
-Equation dolcan -0.001338343 0.003662911     0 0.1611940 -0.002242126
-Equation cpiUSA  0.029339845 0.108353256     0 0.8711430  0.468684873
-Equation cpiCAN  0.133099298 0.100383436     0 0.6925224  0.272239507
-                    cpiCAN -1   dolcan -2    cpiUSA -2    cpiCAN -2  dolcan -3
-Equation dolcan  0.0003953115 -0.04139589  0.002012077 -0.006607018  0.0202477
-Equation cpiUSA -0.0510243367 -0.49404335 -0.023189036  0.071589503 -0.3943149
-Equation cpiCAN -0.0494533196 -0.13395315  0.009117886  0.164960151 -0.6081994
-                   cpiUSA -3     cpiCAN -3
-Equation dolcan -0.002153848 -0.0003941692
-Equation cpiUSA  0.007943649  0.0928680566
-Equation cpiCAN  0.022337674  0.1324489696
-       [,1]    [,2]    [,3]
+                 ECT       Const Trend  L{x1}{1}     L{x2}{1}      L{x3}{1}
+Equ x1: -0.001338343 0.003662911     0 0.1611940 -0.002242126  0.0003953115
+Equ x2:  0.029339845 0.108353256     0 0.8711430  0.468684873 -0.0510243367
+Equ x3:  0.133099298 0.100383436     0 0.6925224  0.272239507 -0.0494533196
+           L{x1}{2}     L{x2}{2}     L{x3}{2}   L{x1}{3}     L{x2}{3}
+Equ x1: -0.04139589  0.002012077 -0.006607018  0.0202477 -0.002153848
+Equ x2: -0.49404335 -0.023189036  0.071589503 -0.3943149  0.007943649
+Equ x3: -0.13395315  0.009117886  0.164960151 -0.6081994  0.022337674
+             L{x3}{3}
+Equ x1: -0.0003941692
+Equ x2:  0.0928680566
+Equ x3:  0.1324489696
+     dolcan  cpiUSA  cpiCAN
 [1,] 0.9993 27.9800 25.8600
 [2,] 0.9956 28.1700 26.0000
 [3,] 0.9967 28.4400 26.0700
 [4,] 1.0007 28.6300 26.3600
 [5,] 0.9916 28.9337 26.3204
-> 
-> ve_r2_l3 <- VECM(barry, lag=3, estim="ML", r=2)
-> tsDyn:::check.VECM.boot(ve_r2_l3)
-[1] TRUE
 > VECM.boot(ve_r2_l3, show.parMat=TRUE, seed=234)[1:5,]
-                       ECT1          ECT2  Intercept Trend dolcan -1
-Equation dolcan -0.02128737  0.0005968341 0.02324814     0 0.1622498
-Equation cpiUSA -0.05886126  0.0019115449 0.19169805     0 0.8619558
-Equation cpiCAN  0.13234280 -0.0025774055 0.10561308     0 0.6225139
-                   cpiUSA -1     cpiCAN -1   dolcan -2    cpiUSA -2
-Equation dolcan -0.003419996  0.0006640453 -0.03681695  0.001110734
-Equation cpiUSA  0.462197612 -0.0485913611 -0.48826864 -0.028412522
-Equation cpiCAN  0.266045773 -0.0476408945 -0.19364163  0.004214840
-                   cpiCAN -2   dolcan -3     cpiUSA -3     cpiCAN -3
-Equation dolcan -0.006387489  0.02526483 -0.0036154386 -0.0002821687
-Equation cpiUSA  0.073825879 -0.38942643 -0.0005587153  0.0944265013
-Equation cpiCAN  0.166485918 -0.68004445  0.0141090720  0.1337360507
-       [,1]    [,2]    [,3]
+                ECT           ECT      Const Trend  L{x1}{1}     L{x2}{1}
+Equ x1: -0.02128737  0.0005968341 0.02324814     0 0.1622498 -0.003419996
+Equ x2: -0.05886126  0.0019115449 0.19169805     0 0.8619558  0.462197612
+Equ x3:  0.13234280 -0.0025774055 0.10561308     0 0.6225139  0.266045773
+             L{x3}{1}    L{x1}{2}     L{x2}{2}     L{x3}{2}    L{x1}{3}
+Equ x1:  0.0006640453 -0.03681695  0.001110734 -0.006387489  0.02526483
+Equ x2: -0.0485913611 -0.48826864 -0.028412522  0.073825879 -0.38942643
+Equ x3: -0.0476408945 -0.19364163  0.004214840  0.166485918 -0.68004445
+             L{x2}{3}      L{x3}{3}
+Equ x1: -0.0036154386 -0.0002821687
+Equ x2: -0.0005587153  0.0944265013
+Equ x3:  0.0141090720  0.1337360507
+     dolcan  cpiUSA  cpiCAN
 [1,] 0.9993 27.9800 25.8600
 [2,] 0.9956 28.1700 26.0000
 [3,] 0.9967 28.4400 26.0700
@@ -354,7 +328,7 @@ Equation cpiCAN  0.166485918 -0.68004445  0.0141090720  0.1337360507
 > ######### Check error message when matrix badly specified:
 > ################################################################
 > 
-> B<-matrix(rnorm(14), byrow=TRUE,ncol=7)
+> B <- matrix(rnorm(14), byrow=TRUE,ncol=7)
 > 
 > ## 0 thresh
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="none"))
@@ -362,28 +336,28 @@ Matrix B badly specified: should have  3 columns, but has 7
        ECT L{x1}{1} L{x2}{1}
 Equ x1  NA       NA       NA
 Equ x2  NA       NA       NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="const"))
 Matrix B badly specified: should have  4 columns, but has 7 
        ECT const L{x1}{1} L{x2}{1}
 Equ x1  NA    NA       NA       NA
 Equ x2  NA    NA       NA       NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="both"))
 Matrix B badly specified: should have  5 columns, but has 7 
        ECT const trend L{x1}{1} L{x2}{1}
 Equ x1  NA    NA    NA       NA       NA
 Equ x2  NA    NA    NA       NA       NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=1,show.parMat=TRUE, include="trend"))
 Matrix B badly specified: should have  4 columns, but has 7 
        ECT trend L{x1}{1} L{x2}{1}
 Equ x1  NA    NA       NA       NA
 Equ x2  NA    NA       NA       NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 1, show.parMat = TRUE,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > 
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=2,show.parMat=TRUE, include="none"))
@@ -391,14 +365,14 @@ Matrix B badly specified: should have  5 columns, but has 7
        ECT L{x1}{1} L{x2}{1} L{x1}{2} L{x2}{2}
 Equ x1  NA       NA       NA       NA       NA
 Equ x2  NA       NA       NA       NA       NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 2, show.parMat = TRUE,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=0, n=100, lag=2,show.parMat=TRUE, include="const"))
 Matrix B badly specified: should have  6 columns, but has 7 
        ECT const L{x1}{1} L{x2}{1} L{x1}{2} L{x2}{2}
 Equ x1  NA    NA       NA       NA       NA       NA
 Equ x2  NA    NA       NA       NA       NA       NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 0, n = 100, lag = 2, show.parMat = TRUE,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > 
 > ## 1 thresh  
@@ -407,7 +381,7 @@ Matrix B badly specified: should have  6 columns, but has 7
        ECT_low L{x1}{1}_low L{x2}{1}_low ECT_upr L{x1}{1}_upr L{x2}{1}_upr
 Equ x1      NA           NA           NA      NA           NA           NA
 Equ x2      NA           NA           NA      NA           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="const"))
 Matrix B badly specified: should have  8 columns, but has 7 
@@ -417,7 +391,7 @@ Equ x2      NA        NA           NA           NA      NA        NA
        L{x1}{1}_upr L{x2}{1}_upr
 Equ x1           NA           NA
 Equ x2           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="both"))
 Matrix B badly specified: should have  10 columns, but has 7 
@@ -427,7 +401,7 @@ Equ x2      NA        NA        NA           NA           NA      NA        NA
        trend_upr L{x1}{1}_upr L{x2}{1}_upr
 Equ x1        NA           NA           NA
 Equ x2        NA           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=1,show.parMat=TRUE, include="trend"))
 Matrix B badly specified: should have  8 columns, but has 7 
@@ -437,7 +411,7 @@ Equ x2      NA        NA           NA           NA      NA        NA
        L{x1}{1}_upr L{x2}{1}_upr
 Equ x1           NA           NA
 Equ x2           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > 
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=1, Thresh=0, n=100, lag=2,show.parMat=TRUE, include="const"))
@@ -448,7 +422,7 @@ Equ x2      NA        NA           NA           NA           NA           NA
        ECT_upr const_upr L{x1}{1}_upr L{x2}{1}_upr L{x1}{2}_upr L{x2}{2}_upr
 Equ x1      NA        NA           NA           NA           NA           NA
 Equ x2      NA        NA           NA           NA           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 1, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > 
 > ## 2 thresh
@@ -460,7 +434,7 @@ Equ x2      NA           NA           NA      NA           NA           NA
        ECT_upr L{x1}{1}_upr L{x2}{1}_upr
 Equ x1      NA           NA           NA
 Equ x2      NA           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > try(a<-TVECM.sim(B=B, beta=1, nthresh=2, Thresh=0, n=100, lag=2,show.parMat=TRUE, include="const"))
 Matrix B badly specified: should have  18 columns, but has 7 
@@ -473,10 +447,10 @@ Equ x2      NA        NA           NA           NA           NA           NA
        ECT_upr const_upr L{x1}{1}_upr L{x2}{1}_upr L{x1}{2}_upr L{x2}{2}_upr
 Equ x1      NA        NA           NA           NA           NA           NA
 Equ x2      NA        NA           NA           NA           NA           NA
-Error in TVECM.sim(B = B, beta = 1, nthresh = 2, Thresh = 0, n = 100,  : 
+Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  : 
   
 > 
 > 
 > proc.time()
    user  system elapsed 
-  2.055   0.075   2.118 
+  2.058   0.055   2.100 
