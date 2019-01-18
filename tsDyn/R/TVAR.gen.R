@@ -3,9 +3,8 @@ TVAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both
                       starting=NULL, innov, 
                       trendStart=1,
                       show.parMat=FALSE, returnStarting=FALSE,
-                      round.dig=16,
-                      add.regime =FALSE,
-                      seed){
+                      round_digits=16,
+                      add.regime =FALSE){
   
   ###check correct arguments
   include<-match.arg(include)
@@ -44,7 +43,7 @@ TVAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both
     
   
   if(nthresh%in%c(1,2))
-    Thresh<-round(Thresh, round.dig)
+    Thresh<-round(Thresh, round_digits)
   
   ##### put coefficients vector in right form according to arg include (arg both need no modif)
   a<-NULL
@@ -88,23 +87,26 @@ TVAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both
   ## MAIN loop:
   if(nthresh==0){
     for(i in (p+1):(n+p)){
-      Yb[i,]<-rowSums(cbind(B[,1], B[,2]*trend[i], B[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
+      Yb[i,] <- rowSums(cbind(Bmat[,1], 
+                              Bmat[,2]*trend[i], 
+                              Bmat[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),
+                              resb[i,]))
     }
   } else if(nthresh==1){
     BDown <- Bmat[, seq_len(nparBmat)]
     BUp   <- Bmat[,-seq_len(nparBmat)]
     
     for(i in (p+1):(n+p)){
-      if(round(z2[i-thDelay], round.dig)<=Thresh) {
+      if(round(z2[i-thDelay], round_digits)<=Thresh) {
         Yb[i,]<-rowSums(cbind(BDown[,1], 
                               BDown[,2]*trend[i], 
                               BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),
                               resb[i,]))
-        Yb[i,]<-round(Yb[i,], round.dig)
+        Yb[i,]<-round(Yb[i,], round_digits)
         regime[i] <- 1
       } else {
         Yb[i,]<-rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
-        Yb[i,]<-round(Yb[i,], round.dig)
+        Yb[i,]<-round(Yb[i,], round_digits)
         regime[i] <- 2
       }
       z2[i]<-Yb[i,]%*%combin
@@ -115,10 +117,10 @@ TVAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both
     BUp <- Bmat[,seq_len(nparBmat)+2*nparBmat]
     
     for(i in (p+1):(n+p)){
-      if(round(z2[i-thDelay], round.dig)<=Thresh[1]) {
+      if(round(z2[i-thDelay], round_digits)<=Thresh[1]) {
         Yb[i,] <- rowSums(cbind(BDown[,1], BDown[,2]*trend[i], BDown[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
         regime[i] <- 1
-      } else if(round(z2[i-thDelay], round.dig)>Thresh[2]) {
+      } else if(round(z2[i-thDelay], round_digits)>Thresh[2]) {
         Yb[i,] <- rowSums(cbind(BUp[,1], BUp[,2]*trend[i], BUp[,-c(1,2)]%*%matrix(t(Yb[i-c(1:p),]), ncol=1),resb[i,]))
         regime[i] <- 3
       } else {
@@ -132,7 +134,7 @@ TVAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both
   ## return result
   if(show.parMat)
     print(Bmat)
-  res <- round(Yb, round.dig) 
+  res <- round(Yb, round_digits) 
   if(add.regime) res <- cbind(res, regime)
   if(!returnStarting) res <- res[-c(1:p),, drop=FALSE] 
   return(res)

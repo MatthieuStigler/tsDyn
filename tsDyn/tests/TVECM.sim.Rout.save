@@ -134,7 +134,7 @@ Equ x2: -0.007954949         0   0.16032265   0.14668443
 > 
 > ## check correspondance bootstrap/simul:
 > tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),beta=TVECMobject$model.specific$beta,
-+                         Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123, innov=matrix(0,200,2))
++                         Thresh=getTh(TVECMobject), show.parMat=TRUE, innov=matrix(0,200,2))
           ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
 Equ x1: 0.2025264 0.4857667         0    0.2252923  -0.09926611 0.001291099
 Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
@@ -152,7 +152,7 @@ Equ x2: -0.007954949         0   0.16032265   0.14668443
 > 
 > tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject), 
 +                      beta=TVECMobject$model.specific$beta,
-+                      Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
++                      Thresh=getTh(TVECMobject), show.parMat=TRUE)
           ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
 Equ x1: 0.2025264 0.4857667         0    0.2252923  -0.09926611 0.001291099
 Equ x2: 0.9575983 1.5929831         0    0.8703592   0.02252604 0.058816293
@@ -459,4 +459,4 @@ Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  2.769   0.124   3.029 
+  2.737   0.161   3.084 

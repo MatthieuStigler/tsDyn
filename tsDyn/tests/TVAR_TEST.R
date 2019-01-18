@@ -102,7 +102,7 @@ gr_args_boot <- subset(gr_args_ok_df, !commonInter)
 
 # sapply(gr_args_boot$models, function(x) head(TVAR.boot(x, seed=123)))
 
-boots_runs <- lapply(gr_args_boot$models, function(x) TVAR.boot(x, boot.scheme="check", round.dig=5))
+boots_runs <- lapply(gr_args_boot$models, function(x) TVAR.boot(x, boot.scheme="check", round_digits=5))
 boots_checks <- sapply(boots_runs, function(x) all.equal(as.matrix(zeroyld[1:100,]), x, check.attributes = FALSE))
 
 gr_args_boot$boots_checks <- boots_checks

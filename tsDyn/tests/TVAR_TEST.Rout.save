@@ -1,6 +1,6 @@
 
-R version 3.4.3 (2017-11-30) -- "Kite-Eating Tree"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -4310,7 +4310,7 @@ mod_56 mod_57 mod_58 mod_59 mod_60
 > 
 > # sapply(gr_args_boot$models, function(x) head(TVAR.boot(x, seed=123)))
 > 
-> boots_runs <- lapply(gr_args_boot$models, function(x) TVAR.boot(x, boot.scheme="check", round.dig=5))
+> boots_runs <- lapply(gr_args_boot$models, function(x) TVAR.boot(x, boot.scheme="check", round_digits=5))
 > boots_checks <- sapply(boots_runs, function(x) all.equal(as.matrix(zeroyld[1:100,]), x, check.attributes = FALSE))
 > 
 > gr_args_boot$boots_checks <- boots_checks
@@ -4371,4 +4371,4 @@ mod_56 mod_57 mod_58 mod_59 mod_60
 > 
 > proc.time()
    user  system elapsed 
-  7.385   0.268   7.643 
+  8.270   0.258   8.922 

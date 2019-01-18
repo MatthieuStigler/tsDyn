@@ -8,8 +8,13 @@ suppressMessages(library(tidyverse))
 path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
 if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
 
+path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
+if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+
 models_ar_setar <- readRDS(path_mod_uni) %>% 
   filter(model %in% c("ar", "setar"))
+
+models_multivariate <- readRDS(path_mod_multi)
 
 ############################
 ### Univariate
@@ -34,3 +39,10 @@ models_ar_setar %>%
                                   R = 20, seed = 123) %>% as_tibble)) %>% 
   unnest(girf) %>% 
   as.data.frame()
+
+
+############################
+### Multivariate
+############################
+
+

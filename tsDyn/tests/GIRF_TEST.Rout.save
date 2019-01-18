@@ -27,8 +27,13 @@ Type 'q()' to quit R.
 > path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
 > if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
 > 
+> path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
+> if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+> 
 > models_ar_setar <- readRDS(path_mod_uni) %>% 
 +   filter(model %in% c("ar", "setar"))
+> 
+> models_multivariate <- readRDS(path_mod_multi)
 > 
 > ############################
 > ### Univariate
@@ -232,6 +237,13 @@ Type 'q()' to quit R.
 71 16.348781 16.481652 -0.13287106
 72 15.347734 15.471993 -0.12425852
 > 
+> 
+> ############################
+> ### Multivariate
+> ############################
+> 
+> 
+> 
 > proc.time()
    user  system elapsed 
-  3.478   0.192   3.790 
+  3.636   0.149   3.921 
