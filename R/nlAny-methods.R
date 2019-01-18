@@ -92,6 +92,16 @@ get_nVar.nlar <- function (object, ...) 1L
 get_nVar.nlVar <- function (object, ...) as.integer(object$k)
 
 
+### new way
+get_series <- function(x) {
+  if(inherits(x ,"nlVar")) {
+    res <- colnames(x$model)[seq_len(x$k)]
+  } else {
+    res <- x$str$series
+  }
+  res
+}
+
 if(FALSE) {
   library(tidyverse)
   
@@ -118,7 +128,9 @@ if(FALSE) {
   
   sapply(models_all$object, getTh)
   sapply(models_all$object, get_lag)
-  checks <- models_all %>% 
+  sapply(models_all$object, get_series)
+
+    checks <- models_all %>% 
     mutate(lag_out = map_int(object, get_lag),
            nthresh_out = map(object, get_nthresh),
            nVar_out = map_int(object, get_nVar)) %>% 
