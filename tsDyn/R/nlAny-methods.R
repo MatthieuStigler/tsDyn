@@ -74,25 +74,25 @@ getTh.nlVar<-function(object,...){
 }
 
 
-############## Get lag
+######## Get lag  ########
 get_lag <- function (object, ...)  UseMethod("get_lag")
 get_lag.nlar <- function (object, ...) as.integer(object$str$m)
 get_lag.nlVar <- function (object, ...) as.integer(object$lag)
 
-############## Get nthresh
+######## Get nthresh  ########
 get_nthresh <- function (object, ...)  UseMethod("get_nthresh")
 get_nthresh.nlar <- function (object, ...) as.integer(object$model.specific$nthresh)
 get_nthresh.nlVar <- function (object, ...) as.integer(object$model.specific$nthresh)
 get_nthresh.lstar <- function (object, ...) 1L
 
 
-############## Get k
+######## Get nVar ########
 get_nVar <- function (object, ...)  UseMethod("get_nVar")
 get_nVar.nlar <- function (object, ...) 1L
 get_nVar.nlVar <- function (object, ...) as.integer(object$k)
 
 
-### new way
+######## get series ########
 get_series <- function(x) {
   if(inherits(x ,"nlVar")) {
     res <- colnames(x$model)[seq_len(x$k)]
@@ -102,8 +102,27 @@ get_series <- function(x) {
   res
 }
 
+######## get orig data ########
+get_data_orig <- function (object, as.df = FALSE, ...)  UseMethod("get_data_orig")
+
+get_data_orig.nlar <- function (object, as.df = FALSE, ...) {
+  res <- object$str$x
+  if(as.df) res <- as.data.frame(res)
+  res
+}
+get_data_orig.nlVar <- function (object, as.df = FALSE, ...) {
+  res <- object$model[, seq_len(get_nVar(object))]
+  if(as.df) res <- as.data.frame(res)
+  res
+}
+
+
+
+
+
 if(FALSE) {
   library(tidyverse)
+  library(tsDyn)
   
   ############################
   ### Load data
@@ -122,15 +141,22 @@ if(FALSE) {
   ### Test
   ############################
   
-  mod_1 <-  models_all$object[[1]]
-  get_nthresh(mod_1$model.specific
-              $object.specific$nthresh)
+  mod_uni_1 <-  models_all$object[[1]]
+  mod_multi_1 <-  models_multivariate$object[[1]]
   
+  get_data_orig(object=mod_uni_1, as.df = TRUE) %>%  head
+  get_data_orig(object=mod_multi_1, as.df = TRUE)%>%  head
+  
+  
+  
+  ## on all
   sapply(models_all$object, getTh)
   sapply(models_all$object, get_lag)
   sapply(models_all$object, get_series)
+  sapply(models_all$object, get_data_orig) %>% 
+    sapply(head,1)
 
-    checks <- models_all %>% 
+  checks <- models_all %>% 
     mutate(lag_out = map_int(object, get_lag),
            nthresh_out = map(object, get_nthresh),
            nVar_out = map_int(object, get_nVar)) %>% 
