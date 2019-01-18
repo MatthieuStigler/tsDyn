@@ -30,20 +30,21 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   include <- object$include
   B <- coef(object, hyperCoef = FALSE)
   nthresh <-  get_nthresh(object)
-  # if(nthresh >0)  
   Thresh <- getTh(object)
   N <- n.ahead + 1
   K <-  get_nVar(object)
+  series <-  get_series(object)
   
   ## model
   model <- switch(class(object)[[1]],
                   "ar" = "setar",
+                  "linear" = "setar",
                   "setar" = "setar",
                   "VAR" = "TVAR",
                   "TVAR" = "TVAR",
                   "VECM" = "TVECM",
                   "TVECM" = "TVECM",
-                  stop("Error"))
+                  stop("Error model not recognised!"))
   
   ## sample innov, if not provided
   if(is.null(innov)) {
@@ -66,9 +67,9 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   if(nrow(innov)!=N) stop("innov should be of same length as n.ahead + 1")
   
   ## shocks
-  innov_1 <- rbind(shock, 
+  innov_1 <- rbind(shock_M, 
                    innov[-1,, drop = FALSE])
-  if(shock_both) innov_1 <- innov + rbind(shock, matrix(0, nrow=n.ahead, ncol = K))
+  if(shock_both) innov_1 <- innov + rbind(shock_M, matrix(0, nrow=n.ahead, ncol = K))
   innov_2 <- innov
   
   ## steps 3 and 4 in Koop et al (1996)
@@ -87,16 +88,29 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   
 
   # assemble data
-  df <- data.frame(n.ahead = c(-lag:0, seq_len(n.ahead)),
-                   sim_1 = sim_1,
-                   sim_2 = sim_2)
+  n.aheads_all <- c(-lag:0, seq_len(n.ahead))
+  if(K>1) {
+    df <- data.frame(var = rep(series, each = nrow(sim_1)),
+                     n.ahead = n.aheads_all,
+                     sim_1 = unlist(sim_1),
+                     sim_2 = unlist(sim_2))
+    
+    rownames(df) <-  seq_len(nrow(df))
+  } else {
+    df <- data.frame(var = series,
+                     n.ahead = n.aheads_all,
+                     sim_1 = sim_1$res,
+                     sim_2 = sim_2$res)  
+  }
+  
+  
+  
   if(add.regime) {
     df <- df[, 1:4]  
     colnames(df) <-  c("n.ahead", "sim_1", "regime_1", "sim_2")
-  } else {
-    colnames(df) <-  c("n.ahead", "sim_1",  "sim_2")
   }
-  if(!returnStarting) df <- df[-seq_len(lag),]
+  
+  if(!returnStarting) df <- subset(df, n.ahead>=0)
   # df$diff <- df$sim_1 - df$sim_2
   df
 }
@@ -113,11 +127,11 @@ irf_1_shock_ave <- function(object, shock, hist, R=10, n.ahead=10, innov= NULL, 
                                   innov = innov, shock_both  =shock_both,
                                   returnStarting = returnStarting, add.regime = add.regime), simplify = FALSE)
   out_M <- do.call("rbind", out) 
-  out_M$repli = rep(seq_len(R), each = length(unique(out_M$n.ahead))) 
+  # out_M$repli = rep(seq_len(R), each = length(unique(out_M$n.ahead))) 
   
   ## step 5 in Koop et al:
   out_M_means <- aggregate(out_M[, grep("sim|regime", colnames(out_M))],
-                           list(n.ahead=  out_M$n.ahead), mean)
+                           list(n.ahead = out_M$n.ahead, var = out_M$var), mean)
   out_M_means
 }
 
@@ -135,38 +149,53 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
                         hist_li = NULL, shock_li = NULL, ...) {
 
   ##
-  lag <- object$str$m
-  x_orig <- object$str$x
-  N <-  length(x_orig)
-  resids <-  residuals(object, initVal = FALSE)
-  
-  ## construct list of hist and shocks
+  lag <- get_lag(object)
+  x_orig <- get_data_orig(object, as.df = TRUE)
+  N <-  nrow(x_orig)
+  resids <-  as.data.frame(residuals(object, initVal = FALSE))
+  n_used <- nrow(resids)
+  nVar <- get_nVar(object)
+
   
   ## construct hist_li if not provided
   sample_hist <-  function() {
     hist_M <- sample(lag:N, size = 1, replace = FALSE)
     (hist_M - lag+ 1) : hist_M
   }
+  nrow_length <- function(x) {
+    nr <- nrow(x)
+    if(is.null(nr)) nr <- length(x)
+    nr
+  }
+    
   if(is.null(hist_li)) {
     if(!is.null(seed)) set.seed(seed)
-    hist_li <- replicate(n.hist, sample_hist(), simplify = FALSE)  
+    hist_li <- replicate(n.hist, x_orig[sample_hist(),, drop = FALSE], simplify = FALSE)  
   } else {
-    if(!is.list(hist_li)) stop("hist_li should be a list of vectors")
-    if(unique(sapply(hist_li, length))!=lag) stop("each element of hist_li should have length lags")
+    if(!is.list(hist_li)) stop("hist_li should be a list of vectors/matrices")
+    if(unique(sapply(hist_li, nrow_length))!=lag) stop("each element of hist_li should have length lags")
   }
   
   ## construct shock_li if not provided
   if(is.null(shock_li)) {
     if(!is.null(seed)) set.seed(seed)
-    shock_li <- replicate(n.shock, sample(resids, size = 1), simplify = FALSE)
+    shock_li <- replicate(n.shock, resids[sample(seq_len(n_used), size = 1),, drop = FALSE], simplify = FALSE)
   } else {
     if(!is.list(shock_li)) stop("shock_li should be a list of vectors")
-    if(unique(sapply(shock_li, length))!= 1) stop("each element of shock_li should have length lags")
+    if(unique(sapply(shock_li, nrow_length))!= 1) stop("each element of shock_li should have length lags")
   }
+  
   
   ## combine each
   M <- expand.grid(hist =hist_li, shock =shock_li)
-  
+  n_cases <- nrow(M)
+  shock_M <- as.data.frame(do.call("rbind", M$shock))
+  colnames(shock_M) <- paste("shock_var", seq_len(nVar), sep = "")
+  hist_M <- as.data.frame(do.call("rbind", M$hist))
+  colnames(hist_M) <- paste("hist_l", seq_len(length(M$hist[[1]])), sep = "")
+  rep_info <- cbind(n_simu = seq_len(nrow(M)),
+                    hist_M, shock_M)
+    
   ## run irf_1_shock_ave for each combo
   sims <- lapply(1:nrow(M), function(x) irf_1_shock_ave(object = object, 
                                                 shock = M$shock[[x]], hist = M$hist[[x]],
@@ -176,18 +205,18 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   ## extend the data frame
   sims_df <- do.call("rbind", sims)
   n.ahead_here <- length(unique(head(sims_df$n.ahead, 2*(n.ahead*lag)))) # just in case was called with returnStarting
-  sims_df$n_rep <- rep(1:nrow(M), each = n.ahead_here)
-  sims_df$shock <-  rep(unlist(M$shock), each = n.ahead_here)
-  sims_df$last_hist <-  rep(sapply(M$hist, tail, 1), each = n.ahead_here)
+  sims_df$n_simu <- rep(seq_len(n_cases), each = n.ahead_here * nVar)
   sims_df$girf <- with(sims_df, sim_1 - sim_2)
+  sims_df2 <-  merge(rep_info, sims_df, by = "n_simu", sort = FALSE)
   
   ##
-  if("regime_1" %in% colnames(sims_df)) {
-    cols <- c("n_rep", "last_hist", "shock", "n.ahead", "sim_1", "sim_2", "regime_1", "girf")
-  } else {
-    cols <- c("n_rep", "last_hist", "shock", "n.ahead", "sim_1", "sim_2", "girf")
-  }
-  sims_df[, cols]
+  # if("regime_1" %in% colnames(sims_df)) {
+  #   cols <- c("n_rep", "last_hist", "shock", "n.ahead", "sim_1", "sim_2", "regime_1", "girf")
+  # } else {
+  #   cols <- c("n_rep", "last_hist", "shock", "n.ahead", "sim_1", "sim_2", "girf")
+  # }
+  # sims_df[, cols]
+  sims_df2
 }
 
 #' @rdname GIRF
@@ -198,6 +227,16 @@ GIRF.linear <- function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   GIRF.setar(object, n.ahead = n.ahead, seed = seed, n.hist=n.hist, n.shock=n.shock, R = R, 
                           hist_li = hist_li, shock_li = shock_li, ...)
 }
+
+#' @rdname GIRF
+#' @export
+GIRF.nlVar <- function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20, R = 10, 
+                        hist_li = NULL, shock_li = NULL, ...) {
+  
+  GIRF.setar(object, n.ahead = n.ahead, seed = seed, n.hist=n.hist, n.shock=n.shock, R = R, 
+             hist_li = hist_li, shock_li = shock_li, ...)
+}
+
 
 if(FALSE) {
   library(tsDyn)
