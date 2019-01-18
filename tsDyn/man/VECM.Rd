@@ -40,7 +40,7 @@ An object of class \code{VECM} (and higher classes \code{VAR} and
 (the latter only for models estimated with MLE)} 
 \item{Prediction:}{predict and \code{\link{predict_rolling}}} 
 \item{coef extraction:}{Extract cointegrating/adjustment coefficients, \code{\link{coefA}}, \code{\link{coefB}} \code{\link{coefPI}}} 
-\item{VAR/VECM methods:}{Impulse response function (\code{\link[=irf.nlVar]{irf}}) and forecast error variance
+\item{VAR/VECM methods:}{Impulse response function (\code{\link{irf.VECM}}) and forecast error variance
 decomposition (\code{\link[=fevd.nlVar]{fevd}})} 
 \item{LaTeX:}{toLatex} }
 }
