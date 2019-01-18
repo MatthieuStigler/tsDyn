@@ -4,6 +4,7 @@
 \alias{GIRF}
 \alias{GIRF.setar}
 \alias{GIRF.linear}
+\alias{GIRF.nlVar}
 \title{Generalized Impulse response Function (GIRF)}
 \usage{
 GIRF(object, n.ahead, seed = NULL, ...)
@@ -12,6 +13,9 @@ GIRF(object, n.ahead, seed = NULL, ...)
   n.shock = 20, R = 10, hist_li = NULL, shock_li = NULL, ...)
 
 \method{GIRF}{linear}(object, n.ahead = 10, seed = NULL, n.hist = 20,
+  n.shock = 20, R = 10, hist_li = NULL, shock_li = NULL, ...)
+
+\method{GIRF}{nlVar}(object, n.ahead = 10, seed = NULL, n.hist = 20,
   n.shock = 20, R = 10, hist_li = NULL, shock_li = NULL, ...)
 }
 \arguments{
