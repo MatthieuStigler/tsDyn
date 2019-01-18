@@ -26,36 +26,60 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   
 
   ## extract model infos
-  lag <- object$str$m
+  lag <- get_lag(object)
   include <- object$include
   B <- coef(object, hyperCoef = FALSE)
-  nthresh <-  object$model.specific$nthresh
-  if(nthresh >0)  Thresh <- getTh(object)
+  nthresh <-  get_nthresh(object)
+  # if(nthresh >0)  
+  Thresh <- getTh(object)
   N <- n.ahead + 1
+  K <-  get_nVar(object)
   
-  ## 
+  ## model
+  model <- switch(class(object)[[1]],
+                  "ar" = "setar",
+                  "setar" = "setar",
+                  "VAR" = "TVAR",
+                  "TVAR" = "TVAR",
+                  "VECM" = "TVECM",
+                  "TVECM" = "TVECM",
+                  stop("Error"))
+  
+  ## sample innov, if not provided
   if(is.null(innov)) {
-    res_obj <- residuals(object)[-seq_len(lag)]
+    res_obj <- as.matrix(residuals(object))
+    res_obj <- res_obj[-seq_len(lag),, drop = FALSE]
     if(!is.null(seed)) set.seed(seed)
-    innov <-  sample(res_obj, N, replace = FALSE)
+    index_samp <- sample(seq_len(nrow(res_obj)), N, replace = FALSE)
+    innov <-  res_obj <- res_obj[index_samp,, drop = FALSE]
   }
   
+  ## hist: as matrix
+  hist_M <- as.matrix(hist)
+  shock_M <- as.matrix(shock)
+  
   ## check args
-  if(length(hist)!= lag) stop("hist should be of same length as lag")
-  if(length(innov)!=N) stop("innov should be of same length as n.ahead + 1")
+  if(nrow(hist_M)!= lag) stop("hist should be of same nrow as lag")
+  if(ncol(hist_M)!= K) stop("hist should be of same ncol as number of variables")
+  if(nrow(shock_M)!= 1) stop("shock should have only one row")
+  if(ncol(shock_M)!= K) stop("shock should be of same ncol as number of variables")
+  if(nrow(innov)!=N) stop("innov should be of same length as n.ahead + 1")
   
   ## shocks
-  innov_1 <- c(shock, innov[-1])
-  if(shock_both) innov_1 <- innov + c(shock, rep(0, n.ahead))
+  innov_1 <- rbind(shock, 
+                   innov[-1,, drop = FALSE])
+  if(shock_both) innov_1 <- innov + rbind(shock, matrix(0, nrow=n.ahead, ncol = K))
   innov_2 <- innov
   
   ## steps 3 and 4 in Koop et al (1996)
-  sim_1 <- setar.gen(B = B, lag = lag, include= include,
+  sim_1 <- model.gen(model = model,
+                     B = B, lag = lag, include= include,
                      nthresh = nthresh, Thresh = Thresh,
                      starting = hist,
                      innov = innov_1, n = N,
                      returnStarting = TRUE, add.regime = add.regime)
-  sim_2 <- setar.gen(B = B, lag = lag, include= include,
+  sim_2 <- model.gen(model = model,
+                     B = B, lag = lag, include= include,
                      nthresh = nthresh, Thresh = Thresh,
                      starting = hist,
                      innov = innov_2, n = N,
@@ -69,6 +93,8 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   if(add.regime) {
     df <- df[, 1:4]  
     colnames(df) <-  c("n.ahead", "sim_1", "regime_1", "sim_2")
+  } else {
+    colnames(df) <-  c("n.ahead", "sim_1",  "sim_2")
   }
   if(!returnStarting) df <- df[-seq_len(lag),]
   # df$diff <- df$sim_1 - df$sim_2
