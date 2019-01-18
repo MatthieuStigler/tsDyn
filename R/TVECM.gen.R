@@ -118,13 +118,13 @@ VECM.gen <- function(B, beta, n=200, lag=1,
                       include = c("const", "trend","none", "both"), 
                       starting=NULL, innov,
                       returnStarting = FALSE, 
-                      show.parMat=FALSE, seed,
-                      ndig = 4){
+                      show.parMat=FALSE, 
+                      round_digits = 4){
   TVECM.gen(B=B, beta=beta, n=n, lag=lag, 
             include = include, 
             nthresh=0,
             starting=starting, innov = innov,
-            returnStarting = returnStarting, show.parMat=show.parMat, seed= seed, ndig = ndig)
+            returnStarting = returnStarting, show.parMat=show.parMat, round_digits = round_digits)
     
 }
   
@@ -133,8 +133,8 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
                       nthresh=1, Thresh, 
                       starting=NULL, innov,
                       returnStarting = FALSE, 
-                      show.parMat=FALSE, seed,
-                      ndig = 4){
+                      show.parMat=FALSE, 
+                      round_digits = 4){
   
 
   p <- lag
@@ -220,7 +220,7 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
     
     for(i in (p+2):(n + p + 1)){
       ECT <- Yb[i-1,, drop = FALSE] %*% t(tBETA)
-      if(round(ECT,ndig)<=Thresh){
+      if(round(ECT,round_digits)<=Thresh){
         B_here <-  BD
       }  else{
         B_here <-  BU
@@ -238,9 +238,9 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
     BU <- Bmat[,seq_len(nparBmat)+2*nparBmat]
     for(i in (p+2):(n + p + 1)){
       ECT <- Yb[i-1,, drop = FALSE] %*% t(tBETA)
-      if(round(ECT,ndig)<=Thresh[1]){ 
+      if(round(ECT,round_digits)<=Thresh[1]){ 
         B_here <-  BD
-      } else if(round(ECT,ndig)>Thresh[2]) {
+      } else if(round(ECT,round_digits)>Thresh[2]) {
         B_here <-  BU
       } else{
         B_here <-  BM
@@ -259,7 +259,7 @@ TVECM.gen <- function(B, beta, n=200, lag=1,
     colnames(Bmat)<- colnames_Matrix_system
     print(Bmat)
   }
-  # res <- round(Yb, ndig)
+  # res <- round(Yb, round_digits)
   if(!returnStarting) Yb <- Yb[-seq_len(p+1), ] 
   return(Yb)
 }

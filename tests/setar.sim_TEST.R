@@ -56,14 +56,14 @@ models_univariate %>%
 ### test boot
 ################
 
-setar.boot.check <-  function(object, n_digits = 10) {
-  mod_boot <- setar.boot(object, boot.scheme = "check", n_digits = n_digits, returnStarting = TRUE)  
+setar.boot.check <-  function(object, round_digits = 10) {
+  mod_boot <- setar.boot(object, boot.scheme = "check", round_digits = round_digits, returnStarting = TRUE)  
   orig_series <- as.numeric(object$str$x)
   all.equal(mod_boot, orig_series)
 }
 
-linear.boot.check <-  function(object, n_digits = 10) {
-  mod_boot <- linear.boot(object, boot.scheme = "check",n_digits = n_digits, returnStarting = TRUE)  
+linear.boot.check <-  function(object, round_digits = 10) {
+  mod_boot <- linear.boot(object, boot.scheme = "check",round_digits = round_digits, returnStarting = TRUE)  
   orig_series <- as.numeric(object$str$x)
   all.equal(mod_boot, orig_series)
 }
@@ -96,11 +96,11 @@ set_1th_l1_tr <-  setar(lynx, nthresh=1, m=1, include = "trend")
 
 
 setar.boot.check(set_1th_l1)
-setar.boot.check(set_1th_l1, n_digits = 2)
+setar.boot.check(set_1th_l1, round_digits = 2)
 setar.boot.check(set_1th_l2)
-setar.boot.check(set_1th_l2, n_digits = 5)
+setar.boot.check(set_1th_l2, round_digits = 5)
 setar.boot.check(set_1th_l1_tr)
-setar.boot.check(set_1th_l1_tr, n_digits = 1)
+setar.boot.check(set_1th_l1_tr, round_digits = 1)
 
 
 ## why difference?
@@ -113,7 +113,7 @@ if(FALSE) {
     first <- which(abs(x2$diff)>tol)[1]
     filter(x2, between(n_row, first -minus, first +minus))
   }
-  set_1th_l2_b <- setar.boot(setarObject = set_1th_l2, boot.scheme = "check", n_digits = 7)
+  set_1th_l2_b <- setar.boot(setarObject = set_1th_l2, boot.scheme = "check", round_digits = 7)
   
   df_comp <- tibble(orig = lynx, boot = set_1th_l2_b) %>% 
     mutate(n_row = 1:n(),
@@ -139,9 +139,9 @@ set_2th_l1_tr <-  setar(lynx, nthresh=2, m=1, include = "trend")
 
 setar.boot.check(set_2th_l1)
 setar.boot.check(set_2th_l2)
-setar.boot.check(set_2th_l2, n_digits = 1)
+setar.boot.check(set_2th_l2, round_digits = 1)
 setar.boot.check(set_2th_l1_tr)
-setar.boot.check(set_2th_l1_tr, n_digits = 1)
+setar.boot.check(set_2th_l1_tr, round_digits = 1)
 
 
 ################

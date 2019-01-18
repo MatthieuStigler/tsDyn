@@ -56,7 +56,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
                       nthresh=0, thDelay=0, Thresh, 
                       trendStart=1, 
                       starting=NULL,  innov, exo, 
-                      n_digits = 10,
+                      round_digits = 10,
                       returnStarting = FALSE,
                       add.regime =FALSE,
                       show.parMat = FALSE, ...){
@@ -127,7 +127,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
   } else if(nthresh==1){
     for(i in (lag+1):length(y)){
       # switch every time the coef matrix to use
-      if(round(z2[i-thDelay], n_digits) <= Thresh) {
+      if(round(z2[i-thDelay], round_digits) <= Thresh) {
         B_here <-  BDown
         regime[i] <- 1
       } else {
@@ -141,10 +141,10 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
   } else if(nthresh==2){
     for(i in (lag+1):length(y)){
       # switch every time the coef matrix to use
-      if(round(z2[i-thDelay],n_digits)<=Thresh[1]) {
+      if(round(z2[i-thDelay],round_digits)<=Thresh[1]) {
         B_here <-  BDown
         regime[i] <- 1
-      } else if(round(z2[i-thDelay], n_digits)>Thresh[2]) {
+      } else if(round(z2[i-thDelay], round_digits)>Thresh[2]) {
         B_here <-  BUp
         regime[i] <- 3
       } else{ 
@@ -157,7 +157,7 @@ setar.gen <- function(B, n=200, lag=1, include=c("const", 'trend', "none", "both
     }
   }
   
-  res <- round(y, n_digits)
+  res <- round(y, round_digits)
   if(!returnStarting) {
     res <- res[-seq_len(lag)] 
     regime <- regime[-seq_len(lag)] 

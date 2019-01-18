@@ -60,12 +60,12 @@ TVECM.boot.check(TVECMobject)
 
 ## check correspondance bootstrap/simul:
 tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),beta=TVECMobject$model.specific$beta,
-                        Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123, innov=matrix(0,200,2))
+                        Thresh=getTh(TVECMobject), show.parMat=TRUE, innov=matrix(0,200,2))
 head(tv_1_boot)
 
 tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject), 
                      beta=TVECMobject$model.specific$beta,
-                     Thresh=getTh(TVECMobject), show.parMat=TRUE, seed=123)
+                     Thresh=getTh(TVECMobject), show.parMat=TRUE)
 head(tv_1_boot)
 
 ##Bootstrap a TVAR with two threshold (three regimes)
