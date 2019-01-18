@@ -19,7 +19,7 @@ model.gen <- function(model = c("setar", "TVAR", "TVECM"),
     res <- setar.gen(B = B, n=n, lag=lag, include=include, 
                      nthresh=nthresh, Thresh=Thresh, 
                      thDelay=thDelay, ## SPECIFIC to: setar, TVAR
-                     starting=starting, innov = innov, 
+                     starting=as.numeric(starting), innov = innov, 
                      exo = exo, ## SPECIFIC
                      trendStart=trendStart, ## SPECIFIC to: setar, TVAR
                      round_digits = round_digits,
