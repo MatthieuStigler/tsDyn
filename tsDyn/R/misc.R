@@ -304,3 +304,14 @@ myInsertCol(X, 1, 2)
 myInsertCol(X, c(1,2,4,5), 1)
 myInsertCol(X, c(1,2,3,5,9), 1)
 }
+
+
+
+## functions for tests
+tsDCheck_rem_quo <-  function(x) gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", x)
+
+tsDCheck_all.equal <-  function(target, current, ...) {
+  out <- all.equal(target, current, ...)
+  if(!isTRUE(out)) out <- tsDCheck_rem_quo(out)
+  out
+}

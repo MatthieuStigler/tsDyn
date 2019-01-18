@@ -36,12 +36,7 @@ Loading required package: lmtest
 > 
 > data(Canada)
 > 
-> all.equal2 <-  function(target, current, ...) {
-+   out <- all.equal(target, current, ...)
-+   if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
-+   out
-+ }
-> 
+> options(useFancyQuotes=FALSE) # useful for all.equal comparison
 > 
 > #########################
 > ##### VECM #####
@@ -94,8 +89,8 @@ Loading required package: lmtest
 > comp_betas <- function(x, tol=deftol) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$beta, check.attributes=FALSE, tolerance=tol)
 > comp_coefs <- function(x, tol=deftol) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE, tolerance=tol)
 > comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attributes=FALSE)
-> comp_IRF <- function(x, ortho = TRUE) all.equal2(irf(vec2var(x[[1]]), boot=FALSE, ortho = ortho)$irf,
-+                                                  irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE)
+> comp_IRF <- function(x, ortho = TRUE) all.equal(irf(vec2var(x[[1]]), boot=FALSE, ortho = ortho)$irf,
++                                                 irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE)
 > comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
 > comp_resid <- function(x, tol=deftol) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE, tolerance=tol)
 > comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)
@@ -141,26 +136,26 @@ Loading required package: lmtest
   l1_co   l3_co   l1_bo   l3_bo l1_LRco l3_LRco l1_LRtr l3_LRtr 
    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
 > sapply(models_noLR, comp_IRF)
-     l1_co                                                 
-[1,] "Component e: Mean relative difference: 0.03872391"   
-[2,] "Component prod: Mean relative difference: 0.03872391"
-[3,] "Component rw: Mean relative difference: 0.03872391"  
-[4,] "Component U: Mean relative difference: 0.03872391"   
-     l3_co                                                
-[1,] "Component e: Mean relative difference: 0.1009638"   
-[2,] "Component prod: Mean relative difference: 0.1009638"
-[3,] "Component rw: Mean relative difference: 0.1009638"  
-[4,] "Component U: Mean relative difference: 0.1009638"   
-     l1_bo                                                 
-[1,] "Component e: Mean relative difference: 0.04562581"   
-[2,] "Component prod: Mean relative difference: 0.04562581"
-[3,] "Component rw: Mean relative difference: 0.04562581"  
-[4,] "Component U: Mean relative difference: 0.04562581"   
-     l3_bo                                                
-[1,] "Component e: Mean relative difference: 0.1094004"   
-[2,] "Component prod: Mean relative difference: 0.1094004"
-[3,] "Component rw: Mean relative difference: 0.1094004"  
-[4,] "Component U: Mean relative difference: 0.1094004"   
+     l1_co                                                     
+[1,] "Component \"e\": Mean relative difference: 0.03872391"   
+[2,] "Component \"prod\": Mean relative difference: 0.03872391"
+[3,] "Component \"rw\": Mean relative difference: 0.03872391"  
+[4,] "Component \"U\": Mean relative difference: 0.03872391"   
+     l3_co                                                    
+[1,] "Component \"e\": Mean relative difference: 0.1009638"   
+[2,] "Component \"prod\": Mean relative difference: 0.1009638"
+[3,] "Component \"rw\": Mean relative difference: 0.1009638"  
+[4,] "Component \"U\": Mean relative difference: 0.1009638"   
+     l1_bo                                                     
+[1,] "Component \"e\": Mean relative difference: 0.04562581"   
+[2,] "Component \"prod\": Mean relative difference: 0.04562581"
+[3,] "Component \"rw\": Mean relative difference: 0.04562581"  
+[4,] "Component \"U\": Mean relative difference: 0.04562581"   
+     l3_bo                                                    
+[1,] "Component \"e\": Mean relative difference: 0.1094004"   
+[2,] "Component \"prod\": Mean relative difference: 0.1094004"
+[3,] "Component \"rw\": Mean relative difference: 0.1094004"  
+[4,] "Component \"U\": Mean relative difference: 0.1094004"   
 > sapply(models_noLR, comp_IRF, ortho = FALSE)
 l1_co l3_co l1_bo l3_bo 
  TRUE  TRUE  TRUE  TRUE 
@@ -366,4 +361,4 @@ FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 > 
 > proc.time()
    user  system elapsed 
-  3.129   0.140   3.462 
+  3.129   0.088   3.308 
