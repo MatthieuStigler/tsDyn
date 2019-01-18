@@ -20,7 +20,25 @@ models_multivariate <- readRDS(path_mod_multi)
 ### Univariate
 ############################
 
-models_ar_setar
+
+mod_1_uni <- models_ar_setar$object[[1]]
+
+tsDyn:::irf_1_shock(mod_1_uni, 
+                    shock = 1,
+                    hist = 0,
+                    seed = 123)
+
+tsDyn:::irf_1_shock_ave(object = mod_1_uni, 
+                        shock = 1,
+                        hist = 0, 
+                        seed = 123)
+
+
+GIRF(object = mod_1_uni, 
+     hist_li = list(rep(1.6, 1)),
+     shock_li = list(0.01), 
+     R = 20, 
+     seed = 123) %>% head
 
 
 ## Simple, given shocks
@@ -45,4 +63,21 @@ models_ar_setar %>%
 ### Multivariate
 ############################
 
+mod_1_multi <- models_multivariate$object[[1]]
 
+tsDyn:::irf_1_shock(mod_1_multi, 
+                    shock = matrix(c(1, 0), nrow = 1),
+                    hist = matrix(c(0, 0), nrow = 1))
+
+tsDyn:::irf_1_shock_ave(mod_1_multi, 
+                        shock = matrix(c(1, 0), nrow = 1),
+                        hist = matrix(c(0, 0), nrow = 1),
+                        seed = 123)
+
+GIRF(object=mod_1_multi, 
+     shock_li = list(matrix(c(1, 0), nrow = 1),
+                     matrix(c(0, 1), nrow = 1)),
+     hist_li = list(matrix(c(0, 0), nrow = 1),
+                    matrix(c(0, 1), nrow = 1)),
+     seed = 123) %>% 
+  head
