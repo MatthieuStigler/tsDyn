@@ -97,13 +97,6 @@ irf_old <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumu
   irf(vec2var.tsDyn(x), impulse=impulse, response=response, n.ahead = n.ahead, ortho=ortho, cumulative=cumulative, boot=boot, ci=ci, runs=runs, seed=seed, ...)
 }
 
-### new way
-get_series <- function(x) {
-  if(inherits(x ,"nlVar")) {
-    res <- colnames(x$model)[seq_len(x$k)]
-  }
-  res
-}
 
 #' @importFrom stats df.residual
 
