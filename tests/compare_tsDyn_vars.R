@@ -4,12 +4,7 @@ library(vars)
 
 data(Canada)
 
-all.equal2 <-  function(target, current, ...) {
-  out <- all.equal(target, current, ...)
-  if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
-  out
-}
-
+options(useFancyQuotes=FALSE) # useful for all.equal comparison
 
 #########################
 ##### VECM #####
@@ -62,8 +57,8 @@ comp_teststat <- function(x, tol=deftol) all.equal(x[[1]]@teststat, rev(rank.tes
 comp_betas <- function(x, tol=deftol) all.equal(cajorls(x[[1]])$beta, x[[2]]$model.specific$beta, check.attributes=FALSE, tolerance=tol)
 comp_coefs <- function(x, tol=deftol) all.equal(coefficients(cajorls(x[[1]])$rlm), t(coefficients(x[[2]])), check.attributes=FALSE, tolerance=tol)
 comp_LL <- function(x) all.equal(as.numeric(logLik(vec2var(x[[1]]))), logLik(x[[2]]), check.attributes=FALSE)
-comp_IRF <- function(x, ortho = TRUE) all.equal2(irf(vec2var(x[[1]]), boot=FALSE, ortho = ortho)$irf,
-                                                 irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE)
+comp_IRF <- function(x, ortho = TRUE) all.equal(irf(vec2var(x[[1]]), boot=FALSE, ortho = ortho)$irf,
+                                                irf(x[[2]], boot=FALSE, ortho = ortho)$irf, check.attributes=FALSE)
 comp_FEVD <- function(x) all.equal(fevd(vec2var(x[[1]])), fevd(x[[2]]), check.attributes=FALSE)
 comp_resid <- function(x, tol=deftol) all.equal(residuals(vec2var(x[[1]])), residuals(x[[2]]), check.attributes=FALSE, tolerance=tol)
 comp_fitted <- function(x) all.equal(fitted(vec2var(x[[1]])), fitted(x[[2]], level="original"), check.attributes=FALSE)

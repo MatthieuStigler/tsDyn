@@ -3,12 +3,7 @@ library(mnormt)
 
 
 TVECM.boot.check <- tsDyn:::TVECM.boot.check
-
-all.equal2 <-  function(target, current, ...) {
-  out <- all.equal(target, current, ...)
-  if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
-  out
-}
+options(useFancyQuotes=FALSE) # useful for all.equal comparison
 
 ################################################################
 ######### From man file:
@@ -95,7 +90,7 @@ TVECM.boot.check(tv_2_const_l2)
 TVECM.boot.check(tv_2_both)
 
 ## does not work:
-iconv(TVECM.boot.check(tv_2_trend), "latin1", "ASCII", sub="")
+TVECM.boot.check(tv_2_trend)
 
 ###############
 #### p>2

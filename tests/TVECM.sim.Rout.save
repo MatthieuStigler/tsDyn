@@ -22,12 +22,7 @@ Type 'q()' to quit R.
 > 
 > 
 > TVECM.boot.check <- tsDyn:::TVECM.boot.check
-> 
-> all.equal2 <-  function(target, current, ...) {
-+   out <- all.equal(target, current, ...)
-+   if(!isTRUE(out)) out <- gsub("[[:punct:]]([[:alnum:]]+)[[:punct:]]:", "\\1:", out)
-+   out
-+ }
+> options(useFancyQuotes=FALSE) # useful for all.equal comparison
 > 
 > ################################################################
 > ######### From man file:
@@ -259,9 +254,9 @@ Equ x2: -0.06383229 -1.475473e-04   0.07572181  -0.02512837
 [1] TRUE
 > 
 > ## does not work:
-> iconv(TVECM.boot.check(tv_2_trend), "latin1", "ASCII", sub="")
-[1] "Component short.run: Mean relative difference: 0.2180451"
-[2] "Component long.run: Mean relative difference: 0.1916152" 
+> TVECM.boot.check(tv_2_trend)
+[1] "Component \"short.run\": Mean relative difference: 0.2180451"
+[2] "Component \"long.run\": Mean relative difference: 0.1916152" 
 > 
 > ###############
 > #### p>2
@@ -459,4 +454,4 @@ Error in TVECM.gen(B = B, n = n, lag = lag, include = include, beta = beta,  :
 > 
 > proc.time()
    user  system elapsed 
-  2.737   0.161   3.084 
+  2.871   0.136   3.067 
