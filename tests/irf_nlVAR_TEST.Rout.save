@@ -293,20 +293,38 @@ Type 'q()' to quit R.
 > ############################
 > 
 > models_VECM <- models_multivariate %>% 
-+   filter(model == "VECM")
++   filter(model == "VECM") %>% 
++   mutate(irf = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE)))
 > 
-> models_VECM
-# A tibble: 8 x 6
-    lag include model object     object_vars nthresh
-  <dbl> <chr>   <chr> <list>     <list>        <int>
-1     1 both    VECM  <S3: VECM> <NULL>           NA
-2     1 const   VECM  <S3: VECM> <S4: ca.jo>      NA
-3     1 none    VECM  <S3: VECM> <NULL>           NA
-4     1 trend   VECM  <S3: VECM> <NULL>           NA
-5     2 both    VECM  <S3: VECM> <NULL>           NA
-6     2 const   VECM  <S3: VECM> <S4: ca.jo>      NA
-7     2 none    VECM  <S3: VECM> <NULL>           NA
-8     2 trend   VECM  <S3: VECM> <NULL>           NA
+> 
+> ## show two first of first componment
+> models_VECM %>% 
++   mutate(irf = map(irf, ~ head(.$irf[[1]], 2) %>% 
++                      as_tibble)) %>% 
++   unnest(irf) %>% 
++   as.data.frame()
+   lag include model nthresh   dolcan    cpiUSA
+1    1    both  VECM      NA 1.000000 0.0000000
+2    1    both  VECM      NA 1.150497 0.5368465
+3    1   const  VECM      NA 1.000000 0.0000000
+4    1   const  VECM      NA 1.158429 0.5918901
+5    1    none  VECM      NA 1.000000 0.0000000
+6    1    none  VECM      NA 1.167443 1.1502466
+7    1   trend  VECM      NA 1.000000 0.0000000
+8    1   trend  VECM      NA 1.162446 0.7468192
+9    2    both  VECM      NA 1.000000 0.0000000
+10   2    both  VECM      NA 1.152608 0.6520061
+11   2   const  VECM      NA 1.000000 0.0000000
+12   2   const  VECM      NA 1.162481 0.7117269
+13   2    none  VECM      NA 1.000000 0.0000000
+14   2    none  VECM      NA 1.171534 1.1898042
+15   2   trend  VECM      NA 1.000000 0.0000000
+16   2   trend  VECM      NA 1.167209 0.8854858
+> 
+> 
+> ## plot 1
+> plot(models_VECM$irf[[1]])
+>   
 > 
 > 
 > ############################
@@ -315,30 +333,53 @@ Type 'q()' to quit R.
 > 
 > ## regime specific for TVAR
 > models_TVAR <- models_multivariate %>% 
-+   filter(model == "TVAR") 
-> 
-> models_TVAR %>% 
++   filter(model == "TVAR")  %>% 
 +   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
-# A tibble: 16 x 7
-     lag include model object     object_vars nthresh irf_L       
-   <dbl> <chr>   <chr> <list>     <list>        <int> <list>      
- 1     1 both    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
- 2     1 both    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
- 3     1 const   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
- 4     1 const   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
- 5     1 none    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
- 6     1 none    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
- 7     1 trend   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
- 8     1 trend   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
- 9     2 both    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
-10     2 both    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
-11     2 const   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
-12     2 const   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
-13     2 none    TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
-14     2 none    TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
-15     2 trend   TVAR  <S3: TVAR> <NULL>            1 <S3: varirf>
-16     2 trend   TVAR  <S3: TVAR> <NULL>            2 <S3: varirf>
+> 
+> ## show two first of first componment
+> models_TVAR %>% 
++   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
++                      as_tibble)) %>% 
++   unnest(irf) %>% 
++   as.data.frame()
+   lag include model nthresh    dolcan      cpiUSA
+1    1    both  TVAR       1 1.0000000  0.00000000
+2    1    both  TVAR       1 0.9822979  0.71811173
+3    1    both  TVAR       2 1.0000000  0.00000000
+4    1    both  TVAR       2 0.9822979  0.71811173
+5    1   const  TVAR       1 1.0000000  0.00000000
+6    1   const  TVAR       1 0.9939684  1.34157882
+7    1   const  TVAR       2 1.0000000  0.00000000
+8    1   const  TVAR       2 1.0310970  0.59375307
+9    1    none  TVAR       1 1.0000000  0.00000000
+10   1    none  TVAR       1 1.0018378  0.30564625
+11   1    none  TVAR       2 1.0000000  0.00000000
+12   1    none  TVAR       2 0.9994742  0.30631672
+13   1   trend  TVAR       1 1.0000000  0.00000000
+14   1   trend  TVAR       1 1.0038460  0.68548271
+15   1   trend  TVAR       2 1.0000000  0.00000000
+16   1   trend  TVAR       2 1.0280167  0.40856653
+17   2    both  TVAR       1 1.0000000  0.00000000
+18   2    both  TVAR       1 1.1164077 -0.05789139
+19   2    both  TVAR       2 1.0000000  0.00000000
+20   2    both  TVAR       2 1.1164077 -0.05789139
+21   2   const  TVAR       1 1.0000000  0.00000000
+22   2   const  TVAR       1 1.1438210  0.83541511
+23   2   const  TVAR       2 1.0000000  0.00000000
+24   2   const  TVAR       2 1.1438210  0.83541511
+25   2    none  TVAR       1 1.0000000  0.00000000
+26   2    none  TVAR       1 1.1452641  0.66249651
+27   2    none  TVAR       2 1.0000000  0.00000000
+28   2    none  TVAR       2 1.1963932 -0.03686374
+29   2   trend  TVAR       1 1.0000000  0.00000000
+30   2   trend  TVAR       1 1.1450492  0.70350616
+31   2   trend  TVAR       2 1.0000000  0.00000000
+32   2   trend  TVAR       2 1.1557695  1.05338082
+> 
+> 
+> ## plot 1
+> plot(models_TVAR$irf_L[[1]])
 > 
 > proc.time()
    user  system elapsed 
- 16.976   0.250  20.124 
+ 18.815   0.293  20.999 

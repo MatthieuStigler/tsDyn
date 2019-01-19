@@ -21,7 +21,7 @@ df_regs <-  tibble(model = c("linear", "setar", "setar"),
 models_irf <- models_univariate %>% 
   filter(!model %in% c("aar", "lstar" )) %>% 
   left_join(df_regs, by = "model") %>% 
-  mutate(irf = map2(object, regime,  ~suppressWarnings(irf(.x,  boot = TRUE, runs = 20, seed = 7, regime = .y))))
+  mutate(irf = map2(object, regime,  ~suppressWarnings(irf(.x,  boot = TRUE, runs = 5, seed = 7, regime = .y))))
 
 ## IRF
 df_irf <- map_df(models_irf$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
@@ -48,3 +48,9 @@ df_all %>%
   mutate(is_in = irf_irf >= irf_low & irf_irf <= irf_upp) %>% 
   count(model, regime, is_in)
 
+
+## try plot
+irf_1 <- irf(models_univariate$object[[1]])
+irf_10 <- irf(models_univariate$object[[10]])
+plot(irf_1)
+plot(irf_10)

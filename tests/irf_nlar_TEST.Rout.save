@@ -40,7 +40,7 @@ Type 'q()' to quit R.
 > models_irf <- models_univariate %>% 
 +   filter(!model %in% c("aar", "lstar" )) %>% 
 +   left_join(df_regs, by = "model") %>% 
-+   mutate(irf = map2(object, regime,  ~suppressWarnings(irf(.x,  boot = TRUE, runs = 20, seed = 7, regime = .y))))
++   mutate(irf = map2(object, regime,  ~suppressWarnings(irf(.x,  boot = TRUE, runs = 5, seed = 7, regime = .y))))
 > 
 > ## IRF
 > df_irf <- map_df(models_irf$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
@@ -62,133 +62,142 @@ Type 'q()' to quit R.
 +   filter(n.ahead %in% c( 1)) %>% 
 +   as.data.frame()
    lag include  model nthresh thDelay regime n.ahead    irf_irf     irf_low
-1    1    both linear      NA      NA    all       1  0.5290559  0.27258337
-2    1    both  setar       1       0      H       1  0.5274143 -0.77635643
-3    1    both  setar       1       0      L       1  0.8829112 -3.63646699
-4    1    both  setar       2       0      H       1  0.9351812 -0.11283196
-5    1    both  setar       2       0      L       1 -0.3576188 -1.27862555
-6    1   const linear      NA      NA    all       1  0.5859870  0.35210226
-7    1   const  setar       1       0      H       1  0.9098441  0.26180374
-8    1   const  setar       1       0      L       1  0.9441860 -0.62365610
-9    1   const  setar       2       0      H       1  1.0194805 -0.12134814
-10   1   const  setar       2       0      L       1  0.1925287 -1.07694842
-11   1    none linear      NA      NA    all       1  0.9836385  0.92779923
-12   1    none  setar       1       0      H       1  0.9280588  0.88306869
-13   1    none  setar       1       0      L       1  1.1985522  1.14306886
-14   1    none  setar       2       0      H       1  0.9192732  0.86077501
-15   1    none  setar       2       0      L       1  1.1681179  1.06241279
-16   1   trend linear      NA      NA    all       1  0.8954487  0.74545214
-17   1   trend  setar       1       0      H       1  0.8497728  0.75978700
-18   1   trend  setar       1       0      L       1  1.6838723  0.88060014
-19   1   trend  setar       2       0      H       1  0.9570671  0.83591659
-20   1   trend  setar       2       0      L       1  1.3321844  0.81264348
-21   2    both linear      NA      NA    all       1  0.6590824  0.43337015
-22   2    both  setar       1       0      H       1  0.6537916  0.30817106
-23   2    both  setar       1       0      L       1  1.4846455 -1.43574272
-24   2    both  setar       1       1      H       1  0.4741078  0.17069322
-25   2    both  setar       1       1      L       1  1.6654367  0.36832236
-26   2    both  setar       2       0      H       1  0.9510257  0.44011548
-27   2    both  setar       2       0      L       1 -0.5517492 -1.83152597
-28   2    both  setar       2       1      H       1  1.2907524  0.19620198
-29   2    both  setar       2       1      L       1  0.9565823  0.12363404
-30   2   const linear      NA      NA    all       1  0.7110028  0.47566207
-31   2   const  setar       1       0      H       1  1.0048340  0.55605408
-32   2   const  setar       1       0      L       1  1.1279944 -0.93516272
-33   2   const  setar       1       1      H       1  0.6184753  0.14779149
-34   2   const  setar       1       1      L       1  1.1306673  0.16543511
-35   2   const  setar       2       0      H       1  1.1646495  0.40870868
-36   2   const  setar       2       0      L       1  1.1158326 -1.18606753
-37   2   const  setar       2       1      H       1  1.2893372  0.02410641
-38   2   const  setar       2       1      L       1  0.7452092  0.50251372
-39   2    none linear      NA      NA    all       1  0.9529903  0.78853923
-40   2    none  setar       1       0      H       1  1.0732823  0.99151348
-41   2    none  setar       1       0      L       1  1.4153645  1.10586824
-42   2    none  setar       1       1      H       1  0.4066658  0.26328897
-43   2    none  setar       1       1      L       1  0.7648152  0.29948128
-44   2    none  setar       2       0      H       1  1.1511918  0.99393360
-45   2    none  setar       2       0      L       1  1.0540197  0.32152628
-46   2    none  setar       2       1      H       1  1.2343256 -0.23710068
-47   2    none  setar       2       1      L       1  0.7648152  0.51443389
-48   2   trend linear      NA      NA    all       1  0.8966971  0.73267950
-49   2   trend  setar       1       0      H       1  0.9799192  0.82445673
-50   2   trend  setar       1       0      L       1  2.2465299  0.35581468
-51   2   trend  setar       1       1      H       1  0.6318633  0.49445860
-52   2   trend  setar       1       1      L       1  0.7006092  0.32621022
-53   2   trend  setar       2       0      H       1  1.1084846  0.81387613
-54   2   trend  setar       2       0      L       1  0.5001720 -0.34657368
-55   2   trend  setar       2       1      H       1  0.7857352  0.33786175
-56   2   trend  setar       2       1      L       1  1.0595660  0.37173375
-     irf_upp
-1  0.6452152
-2  0.7251662
-3  0.8324092
-4  1.1098901
-5  1.2856313
-6  0.6985703
-7  1.3772807
-8  2.2337432
-9  1.5887968
-10 2.7127089
-11 1.0157467
-12 0.9691584
-13 1.3422659
-14 0.9614410
-15 1.2909785
-16 0.9292084
-17 0.9239605
-18 1.8542624
-19 1.1095669
-20 1.4934306
-21 0.8686705
-22 1.6470522
-23 1.7548941
-24 0.7692486
-25 1.8057677
-26 1.2134669
-27 0.3491577
-28 1.8096668
-29 1.4177880
-30 0.9092740
-31 1.5565639
-32 1.8054222
-33 0.9806451
-34 1.6061356
-35 1.5110207
-36 1.2183634
-37 1.6747164
-38 0.9569333
-39 1.1487227
-40 1.3834374
-41 2.0149448
-42 0.8898167
-43 0.9595796
-44 1.5933311
-45 2.0575715
-46 1.5037646
-47 1.1243362
-48 1.0397333
-49 1.1409939
-50 2.8052863
-51 0.9549621
-52 0.9205926
-53 1.3788878
-54 2.0670564
-55 1.3942545
-56 1.2820120
+1    1    both linear      NA      NA    all       1  0.5290559  0.32514649
+2    1    both  setar       1       0      H       1  0.5274143 -0.56431538
+3    1    both  setar       1       0      L       1  0.8829112 -3.26868782
+4    1    both  setar       2       0      H       1  0.9351812  0.46422329
+5    1    both  setar       2       0      L       1 -0.3576188 -1.20169711
+6    1   const linear      NA      NA    all       1  0.5859870  0.36222410
+7    1   const  setar       1       0      H       1  0.9098441  0.28958167
+8    1   const  setar       1       0      L       1  0.9441860  0.18415650
+9    1   const  setar       2       0      H       1  1.0194805 -0.08062493
+10   1   const  setar       2       0      L       1  0.1925287 -0.64324105
+11   1    none linear      NA      NA    all       1  0.9836385  0.92600189
+12   1    none  setar       1       0      H       1  0.9280588  0.88044811
+13   1    none  setar       1       0      L       1  1.1985522  1.14726951
+14   1    none  setar       2       0      H       1  0.9192732  0.83311859
+15   1    none  setar       2       0      L       1  1.1681179  1.00172708
+16   1   trend linear      NA      NA    all       1  0.8954487  0.75911211
+17   1   trend  setar       1       0      H       1  0.8497728  0.74070734
+18   1   trend  setar       1       0      L       1  1.6838723  1.67231070
+19   1   trend  setar       2       0      H       1  0.9570671  0.84998127
+20   1   trend  setar       2       0      L       1  1.3321844  0.83770597
+21   2    both linear      NA      NA    all       1  0.6590824  0.47230362
+22   2    both  setar       1       0      H       1  0.6537916  0.67736578
+23   2    both  setar       1       0      L       1  1.4846455 -0.35720867
+24   2    both  setar       1       1      H       1  0.4741078  0.27229144
+25   2    both  setar       1       1      L       1  1.6654367  0.59603772
+26   2    both  setar       2       0      H       1  0.9510257  0.39290774
+27   2    both  setar       2       0      L       1 -0.5517492 -1.59280493
+28   2    both  setar       2       1      H       1  1.2907524  0.98713749
+29   2    both  setar       2       1      L       1  0.9565823  0.92230441
+30   2   const linear      NA      NA    all       1  0.7110028  0.51285805
+31   2   const  setar       1       0      H       1  1.0048340  0.69289708
+32   2   const  setar       1       0      L       1  1.1279944  0.27166667
+33   2   const  setar       1       1      H       1  0.6184753  0.26912811
+34   2   const  setar       1       1      L       1  1.1306673  0.78025129
+35   2   const  setar       2       0      H       1  1.1646495  0.84210748
+36   2   const  setar       2       0      L       1  1.1158326  0.02828286
+37   2   const  setar       2       1      H       1  1.2893372  0.31279069
+38   2   const  setar       2       1      L       1  0.7452092  0.56980957
+39   2    none linear      NA      NA    all       1  0.9529903  0.81916380
+40   2    none  setar       1       0      H       1  1.0732823  1.03423204
+41   2    none  setar       1       0      L       1  1.4153645  1.16331054
+42   2    none  setar       1       1      H       1  0.4066658  0.34187630
+43   2    none  setar       1       1      L       1  0.7648152  0.13539014
+44   2    none  setar       2       0      H       1  1.1511918  1.02898598
+45   2    none  setar       2       0      L       1  1.0540197  0.09497119
+46   2    none  setar       2       1      H       1  1.2343256  0.89547321
+47   2    none  setar       2       1      L       1  0.7648152  0.58177511
+48   2   trend linear      NA      NA    all       1  0.8966971  0.79147279
+49   2   trend  setar       1       0      H       1  0.9799192  1.05457106
+50   2   trend  setar       1       0      L       1  2.2465299  1.04736293
+51   2   trend  setar       1       1      H       1  0.6318633  0.63706037
+52   2   trend  setar       1       1      L       1  0.7006092  0.46014838
+53   2   trend  setar       2       0      H       1  1.1084846  0.83764009
+54   2   trend  setar       2       0      L       1  0.5001720  0.49725567
+55   2   trend  setar       2       1      H       1  0.7857352  0.24939003
+56   2   trend  setar       2       1      L       1  1.0595660  0.69214213
+      irf_upp
+1   0.6195147
+2   0.5663047
+3  -0.2937537
+4   1.0577115
+5  -0.6974202
+6   0.7136597
+7   1.2655181
+8   2.0934095
+9   1.1109982
+10  2.3237284
+11  0.9865249
+12  0.9403934
+13  1.2467582
+14  0.9140192
+15  1.2201801
+16  0.8997656
+17  0.8703499
+18  1.8746765
+19  1.0586774
+20  1.4001492
+21  0.8369548
+22  0.9050912
+23  1.6456195
+24  0.5573693
+25  1.8079368
+26  1.1748471
+27 -0.3966017
+28  2.0053106
+29  1.2802681
+30  0.8769139
+31  1.1635143
+32  1.6836598
+33  0.9137788
+34  1.5364564
+35  1.3141665
+36  1.1311213
+37  1.7966887
+38  0.8823909
+39  1.0115073
+40  1.2714636
+41  1.8554379
+42  0.8157076
+43  0.9017888
+44  1.3143976
+45  1.2204155
+46  1.7849146
+47  1.1263525
+48  0.9605828
+49  1.1337700
+50  2.9989709
+51  0.9423192
+52  0.7943283
+53  1.2283931
+54  1.2052317
+55  1.4319349
+56  1.2729626
 > 
 > 
 > df_all %>% 
 +   mutate(is_in = irf_irf >= irf_low & irf_irf <= irf_upp) %>% 
 +   count(model, regime, is_in)
-# A tibble: 4 x 4
+# A tibble: 6 x 4
   model  regime is_in     n
   <chr>  <chr>  <lgl> <int>
-1 linear all    TRUE     40
-2 setar  H      TRUE    120
-3 setar  L      FALSE     5
-4 setar  L      TRUE    115
+1 linear all    FALSE     2
+2 linear all    TRUE     38
+3 setar  H      FALSE    10
+4 setar  H      TRUE    110
+5 setar  L      FALSE     9
+6 setar  L      TRUE    111
 > 
+> 
+> ## try plot
+> irf_1 <- irf(models_univariate$object[[1]])
+> irf_10 <- irf(models_univariate$object[[10]])
+There were 50 or more warnings (use warnings() to see the first 50)
+> plot(irf_1)
+> plot(irf_10)
 > 
 > proc.time()
    user  system elapsed 
- 26.280   0.216  26.998 
+ 13.335   0.247  14.460 
