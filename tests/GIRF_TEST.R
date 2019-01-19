@@ -12,6 +12,7 @@ irf_1_shock_ave <- tsDyn:::irf_1_shock_ave
 add.regime = FALSE
 shock_both = TRUE
 n.hist =  5
+n.ahead =  10
 n.shock = 20
 
 ############################
@@ -40,7 +41,7 @@ mod_1_ar <- models_ar_setar %>%
   filter(model == "linear") %>% {.$object[[1]]}
 
 
-mod_1_uni_1_shock <- irf_1_shock(mod_1_uni, 
+mod_1_uni_1_shock <- irf_1_shock(object=mod_1_uni, 
                                  shock = 1,
                                  hist = 0,
                                  seed = 123)
@@ -70,8 +71,8 @@ head(mod_1_uni_1_girf)
 plot_GIRF_line_low(mod_1_uni_1_girf, n_simu  = 1:4)
 
 mod_1_uni_1_girf_big <- GIRF(object = mod_1_uni, 
-                             n.hist = 50,
-                             R = 10, 
+                             n.hist = 5,
+                             R = 2, 
                              seed = 123)
 
 plot(x=mod_1_uni_1_girf_big, plot_type = "density")
@@ -79,18 +80,16 @@ plot(x=mod_1_uni_1_girf_big, plot_type = "line", n_simu = 1:50, add_legend =FALS
 
 ## Simple, given shocks
 models_ar_setar %>% 
-  head(2) %>% 
   mutate(girf = map2(object, lag, ~GIRF(object=.x, n.ahead = 3,
                                         hist_li = list(rep(1.6, .y)),
-                                        shock_li = list(0.01), R = 20, seed = 123) %>% as_tibble)) %>% 
+                                        shock_li = list(0.01), R = 2, seed = 123) %>% as_tibble)) %>% 
   unnest(girf) %>% 
   as.data.frame()
 
 ## Simple, random
 models_ar_setar %>% 
-  head(2) %>% 
   mutate(girf = map(object, ~GIRF(object=., n.ahead = 3, n.hist = 3, n.shock = 3,
-                                  R = 10, seed = 123) %>% as_tibble)) %>% 
+                                  R = 2, seed = 123) %>% as_tibble)) %>% 
   unnest(girf) %>% 
   as.data.frame()
 
@@ -105,6 +104,9 @@ mod_TVAR <- models_multivariate %>%
 mod_VAR <- models_multivariate %>% 
   filter(model == "VAR"& lag ==2) %>% {.$object[[1]]}
 
+mod_VECM <- models_multivariate %>% 
+  filter(model == "VECM" & lag ==2) %>% {.$object[[1]]}
+
 mod_TVAR_1_shock <- irf_1_shock(object = mod_TVAR, 
                                    shock = matrix(c(1, 0), nrow = 1),
                                    hist = matrix(c(0, 0, 0, 0), nrow = 2),
@@ -112,6 +114,9 @@ mod_TVAR_1_shock <- irf_1_shock(object = mod_TVAR,
 
 mod_VAR_1_shock <- irf_1_shock(object = mod_VAR, shock = matrix(c(1, 0), nrow = 1),
                                hist = matrix(c(0, 0, 0, 0), nrow = 2), seed = 123)
+
+mod_VECM_1_shock <- irf_1_shock(object = mod_VECM, shock = matrix(c(1, 0), nrow = 1),
+                                hist = matrix(rep(0, 6), nrow = 3), seed = 123)
 
 
 plot_GIRF_line_low(x=mod_VAR_1_shock)
@@ -136,7 +141,7 @@ TVAR_GIRF <- GIRF(object=mod_TVAR,
                   R = 2,
                   seed = 123) 
 
-gi_out <- GIRF(object=mod_TVAR, seed = 123, n.hist = 60, R = 2) 
+gi_out <- GIRF(object=mod_TVAR, seed = 123, n.hist = 40, R = 2) 
 plot(density(residuals(mod_TVAR)[, 1]))
 head(gi_out)
 plot(x=gi_out, var = "dolcan")
@@ -144,9 +149,9 @@ plot(x=gi_out, var = "cpiUSA")
 
 ## Simple, random
 models_multivariate %>% 
-  head(2) %>% 
+  # head(2) %>% 
   mutate(girf = map(object, ~GIRF(object=., n.ahead = 3, n.hist = 3, n.shock = 3,
-                                  R = 20, seed = 123) %>% as_tibble)) %>% 
+                                  R = 2, seed = 123) %>% head(2))) %>% 
   unnest(girf) %>% 
   as.data.frame()
 
