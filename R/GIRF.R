@@ -18,24 +18,26 @@
 #' To cope with this, Koop et al (1996) introduced the Generalized Impulse response Function (GIRF):
 #' \deqn{IRF(h,\delta,\omega_{t-1})=E[y_{t+h}|\epsilon_{t}=\delta,\epsilon_{t+h}=0,\omega_{t-1}]-E[y_{t+h}|\epsilon_{t}=0,\epsilon_{t+h}=0,\omega_{t-1}]}
 #' 
-#' It is the difference in two conditional expectations, one containing the shock of interest, the second one averaging it out. The averaging-out is done
-#' by comparing against random innovations (unlike against innovation 0 as in IRF), The parameter \code{R} corresponds to the number of times this is done. 
+#' It is the difference between two conditional expectations, one containing the shock of interest, the second one averaging it out. The averaging-out is done
+#' by comparing against random innovations (unlike the IRF, that compare against innovation 0), 
+#' The parameter \code{R} corresponds to the number of times this is done. 
 #' 
 #' The GIRF as defined here depends on the particular shock, as well as history. 
 #' Koop et al (1996) suggest to draw multiple combinations of histories and innovations. This is done with arguments \code{n.hist} and \code{n.shock} 
 #' (or, alternatively, provide one of, or both, \code{hist_li} and \code{hist_li} as list of histories and shocks).
-#' The output is a data-frame containing the two average paths for each combinations of shcoks and histories. 
+#' 
+#' The output is a data-frame containing the two average paths for each combinations of shocks and histories. 
 #'@return A data-frame, with:
-#'#'\describe{ 
+#'\describe{ 
 #'\item{n_simu:}{Id for the simulation (total number is n.hist times n.shock)} 
-#'\item{hist, shock}{History anbd shock used in the nth simulation}
+#'\item{hist, shock}{History and shock used in the nth simulation}
 #'\item{n.ahead:}{The forecasting horizon. Note the shocks happens at time 0}
-#'\item{var:}{The variable (on which the shock happens, corresponds hence to the \code{response} argument in \code{irf}}
-#'\item{sim_1, sim_2}{The simulation with the specifric shock, and without it}
+#'\item{var:}{The variable (on which the shock happens, corresponds hence to the \code{response} argument in \code{irf})}
+#'\item{sim_1, sim_2}{The average (over R times) simulation with the specific shock (sim_1) or with ranodm shocks (sim_2). }
 #'\item{girf}{The difference between sim_1 and sim_2}
 #'}
 #'@author Matthieu Stigler
-#'@seealso \code{\link{irf.nlVar}} for the IRF, for linear models, or incase of non-linear models, for each regime. 
+#'@seealso \code{\link{irf.nlVar}} for the IRF, for linear models, or in case of non-linear models, for each regime. 
 #'@examples 
 #'
 #'## simulate a SETAR for the example. Higher regime more persistent (AR coef 0.5 instead of 0.2)
@@ -48,6 +50,12 @@
 #'
 #'## GIRF
 #'girf_out <- GIRF(set_estim)
+#'
+#'## the GIRF shows a very fast convergence (the shock at n.ahead = 4 is already very close to 0)
+#'plot(girf_out, n.ahead = 1:4)
+#'## investigate a few specific GIRFS:
+#'plot(girf_out, plot_type = "line", n_simu  = 1:5)
+
 #'@export
 GIRF <-  function(object, n.ahead, seed = NULL, ...) UseMethod("GIRF")
 
@@ -179,8 +187,10 @@ irf_1_shock_ave <- function(object, shock, hist, R=10, n.ahead=10, innov= NULL, 
 #' @param n.hist The number of past histories to consider. Should be high, ideally size of data (minus lags). 
 #' @param n.shock The number of actual shocks to consider
 #' @param R the number of draws to use for the n.ahead innovations
-#' @param hist_li optional, a list of histories (each of same length as lags in the model)
-#' @param shock_li optional, a list of innovations
+#' @param hist_li optional, a list of histories (each of same length as lags in the model). 
+#' If not provided, \code{n.hist} histories will be randomly drawn for the original series. 
+#' @param shock_li optional, a list of innovations. 
+#' If not provided, \code{n.shock} shocks will be randomly drawn from the estimated residuals.  
 #' @references Koop, G, Pesaran, M. H. & Potter, S. M. (1996) Impulse response analysis in nonlinear multivariate models. Journal of Econometrics, 74, 119-147  
 #' @export
 ## GIRF uses irf_1_shock_ave for a large number of draws of shock and histories
