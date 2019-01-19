@@ -57,8 +57,8 @@ plot_GIRF_line <- function(x, n_simu = 1:5, var = unique(x$var)[1],
 }
 
 ## lower level function for unexported irf_1_shock
-plot_GIRF_line_any <- function(x, n_simu = 1:2,...) {
-  if(!"girf" %in% colnames(x)) x$girf <-  x$sim_2 - x$sim_1
+plot_GIRF_line_low <- function(x, n_simu = 1:2,...) {
+  if(!"girf" %in% colnames(x)) x$girf <-  x$sim_1 - x$sim_2
   if(!"n_simu" %in% colnames(x)) {
     x$n_simu <-  1
     n_simu <-  1
@@ -66,7 +66,7 @@ plot_GIRF_line_any <- function(x, n_simu = 1:2,...) {
   if(!"var" %in% colnames(x)) {
     x$var <-  "x"
   }
-  plot_GIRF_line(x, n_simu = n_simu) 
+  plot_GIRF_line(x, n_simu = n_simu, ...) 
 }  
 
 
