@@ -3,7 +3,7 @@
 #'@param x output of girf
 #'@param n_simu line plot: which simulation to plot?
 #'@param var plot: which variable to plot?
-#'@param plot_type density for each \code{n.ahead}, or line, for multipe \code{n_simu}?
+#'@param plot_type plot: density (for each \code{n.ahead}), or line (for multipe \code{n_simu})?
 #' @rdname GIRF
 #' @export
 plot.GIRF_df <- function(x, plot_type = c("density", "line"),
