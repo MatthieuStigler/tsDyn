@@ -69,6 +69,7 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
 
   ## extract model infos
   lag <- get_lag(object)
+  n_start <- ifelse(inherits(object, c("VECM", "TVECM")), lag + 1, lag)
   include <- object$include
   B <- coef(object, hyperCoef = FALSE)
   nthresh <-  get_nthresh(object)
@@ -76,6 +77,7 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   N <- n.ahead + 1
   K <-  get_nVar(object)
   series <-  get_series(object)
+  beta <- object$model.specific$coint
   
   ## model
   model <- switch(class(object)[[1]],
@@ -106,7 +108,7 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   shock_M <- as.matrix(shock)
   
   ## check args
-  if(nrow(hist_M)!= lag) stop("hist should be of same nrow as lag")
+  if(nrow(hist_M)!= n_start) stop("hist should be of same nrow as lag (+1 if VECM)")
   if(ncol(hist_M)!= K) stop("hist should be of same ncol as number of variables")
   if(nrow(shock_M)!= 1) stop("shock should have only one row")
   if(ncol(shock_M)!= K) stop("shock should be of same ncol as number of variables")
@@ -122,19 +124,21 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
   sim_1 <- model.gen(model = model,
                      B = B, lag = lag, include= include,
                      nthresh = nthresh, Thresh = Thresh,
-                     starting = hist,
+                     beta = beta,
+                     starting = hist_M,
                      innov = innov_1, n = N,
                      returnStarting = TRUE, add.regime = add.regime)
   sim_2 <- model.gen(model = model,
                      B = B, lag = lag, include= include,
                      nthresh = nthresh, Thresh = Thresh,
-                     starting = hist,
+                     beta = beta,
+                     starting = hist_M,
                      innov = innov_2, n = N,
                      returnStarting = TRUE, add.regime = add.regime)
   
 
   # assemble data
-  n.aheads_all <- c(-lag:0, seq_len(n.ahead))
+  n.aheads_all <- c(-n_start:0, seq_len(n.ahead))
   if(K>1) {
     df <- data.frame(var = rep(series, each = nrow(sim_1)),
                      n.ahead = n.aheads_all,
@@ -199,6 +203,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
 
   ##
   lag <- get_lag(object)
+  n_start <- ifelse(inherits(object, c("VECM", "TVECM")), lag + 1, lag) ## VECM requires one more start value as in diff
   x_orig <- get_data_orig(object, as.df = TRUE)
   N <-  nrow(x_orig)
   resids <-  as.data.frame(residuals(object, initVal = FALSE))
@@ -208,8 +213,8 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   
   ## construct hist_li if not provided
   sample_hist <-  function() {
-    hist_M <- sample(lag:N, size = 1, replace = FALSE)
-    (hist_M - lag+ 1) : hist_M
+    hist_M <- sample(n_start:N, size = 1, replace = FALSE)
+    (hist_M - n_start+ 1) : hist_M
   }
   nrow_length <- function(x) {
     nr <- nrow(x)
@@ -222,7 +227,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
     hist_li <- replicate(n.hist, x_orig[sample_hist(),, drop = FALSE], simplify = FALSE)  
   } else {
     if(!is.list(hist_li)) stop("hist_li should be a list of vectors/matrices")
-    if(unique(sapply(hist_li, nrow_length))!=lag) stop("each element of hist_li should have length lags")
+    if(unique(sapply(hist_li, nrow_length))!=n_start) stop("each element of hist_li should have length lags (+1 if VECM)")
   }
   
   ## construct shock_li if not provided
@@ -240,14 +245,14 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   shock_M <- as.data.frame(do.call("rbind", M$shock))
   colnames(shock_M) <- paste("shock_var", seq_len(nVar), sep = "")
   hist_M <- as.data.frame(do.call("rbind", lapply(M$hist, function(x) c(as.matrix(x)))))
-  colnames(hist_M) <- paste("hist_x", rep(seq_len(nVar), each = lag),
-                            "_l", rep(seq_len(lag), times = nVar), sep = "")
+  colnames(hist_M) <- paste("hist_x", rep(seq_len(nVar), each = n_start),
+                            "_l", rep(seq_len(n_start), times = nVar), sep = "")
   rep_info <- cbind(n_simu = seq_len(nrow(M)),
                     hist_M, shock_M)
     
   ## run irf_1_shock_ave for each combo
-  sims <- lapply(1:nrow(M), function(x) irf_1_shock_ave(object = object, 
-                                                shock = M$shock[[x]], hist = M$hist[[x]],
+  sims <- lapply(1:nrow(M), function(i) irf_1_shock_ave(object = object, 
+                                                shock = M$shock[[i]], hist = M$hist[[i]],
                                                 n.ahead = n.ahead, 
                                                 R = R, seed = seed, ...))
   
