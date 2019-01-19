@@ -62,6 +62,9 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
                      ortho = TRUE, 
                      ...) {
   regime <-  match.arg(regime)
+  series <- get_series(x)
+  if(length(series)==1) series <- "x" ## weird bug: plot.irf works only if is called x...
+    
   irf_orig <- irf_1(x=x , n.ahead = n.ahead, cumulative = cumulative, regime = regime, ortho = ortho)
   if(runs ==0) boot <-  FALSE
   
@@ -101,18 +104,16 @@ irf_any <-  function(x, n.ahead = 10, cumulative = FALSE,
   ## results
   res <- list()
   res$irf <- irf_orig
-  res$model <-  "varest"
+  res$Lower <-  if(boot) li_df_to_M(q_low_li) else NULL 
+  res$Upper <-  if(boot) li_df_to_M(q_high_li) else NULL 
+  res$response <- series
+  res$impulse <- series
+  res$ortho <-  ortho
+  res$cumulative <- cumulative
   res$runs <- runs
   res$ci <- ci
-  if(boot) {
-    res$Lower <-  li_df_to_M(q_low_li) #matrix(quants[, 1], dimnames = list(NULL, "x"))
-    res$Upper <-  li_df_to_M(q_high_li) #matrix(quants[, 2], dimnames = list(NULL, "x"))
-  }
-  res$response <- "x"
-  res$ortho <-  FALSE
-  res$impulse <- "x"
   res$boot <- boot
-  res$cumulative <- cumulative
+  res$model <-  "varest"
   
   class(res) <- "varirf"
   res

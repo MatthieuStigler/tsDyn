@@ -89,9 +89,21 @@ comp %>%
 ############################
 
 models_VECM <- models_multivariate %>% 
-  filter(model == "VECM")
+  filter(model == "VECM") %>% 
+  mutate(irf = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE)))
 
-models_VECM
+
+## show two first of first componment
+models_VECM %>% 
+  mutate(irf = map(irf, ~ head(.$irf[[1]], 2) %>% 
+                     as_tibble)) %>% 
+  unnest(irf) %>% 
+  as.data.frame()
+
+
+## plot 1
+plot(models_VECM$irf[[1]])
+  
 
 
 ############################
@@ -100,7 +112,16 @@ models_VECM
 
 ## regime specific for TVAR
 models_TVAR <- models_multivariate %>% 
-  filter(model == "TVAR") 
-
-models_TVAR %>% 
+  filter(model == "TVAR")  %>% 
   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
+
+## show two first of first componment
+models_TVAR %>% 
+  mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
+                     as_tibble)) %>% 
+  unnest(irf) %>% 
+  as.data.frame()
+
+
+## plot 1
+plot(models_TVAR$irf_L[[1]])
