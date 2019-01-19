@@ -10,11 +10,45 @@
 #' 
 #' Generates a GIRF for multiple innovations and histories
 #' 
-#' @param object An object of class \code{\link{linear}} or \code{\link{setar}}
+#' @param object An object of class \code{\link{linear}}, \code{\link{setar}} or \code{nlVar} (\code{\link{TVAR}}, \code{\link{TVECM}})
 #' @param n.ahead The numher of steps ahead to compute
 #' @param seed optional, the seed for the random numbers
-#' @param \ldots Further argumetns passed to specific methods. 
-#' @export
+#' @param \ldots Further arguments passed to specific methods. 
+#' @details In a nonlinear model, the Impulse response Function (IRF) is not time-, scale- and sign-invariant as in linear models. 
+#' To cope with this, Koop et al (1996) introduced the Generalized Impulse response Function (GIRF):
+#' \deqn{IRF(h,\delta,\omega_{t-1})=E[y_{t+h}|\epsilon_{t}=\delta,\epsilon_{t+h}=0,\omega_{t-1}]-E[y_{t+h}|\epsilon_{t}=0,\epsilon_{t+h}=0,\omega_{t-1}]}
+#' 
+#' It is the difference in two conditional expectations, one containing the shock of interest, the second one averaging it out. The averaging-out is done
+#' by comparing against random innovations (unlike against innovation 0 as in IRF), The parameter \code{R} corresponds to the number of times this is done. 
+#' 
+#' The GIRF as defined here depends on the particular shock, as well as history. 
+#' Koop et al (1996) suggest to draw multiple combinations of histories and innovations. This is done with arguments \code{n.hist} and \code{n.shock} 
+#' (or, alternatively, provide one of, or both, \code{hist_li} and \code{hist_li} as list of histories and shocks).
+#' The output is a data-frame containing the two average paths for each combinations of shcoks and histories. 
+#'@return A data-frame, with:
+#'#'\describe{ 
+#'\item{n_simu:}{Id for the simulation (total number is n.hist times n.shock)} 
+#'\item{hist, shock}{History anbd shock used in the nth simulation}
+#'\item{n.ahead:}{The forecasting horizon. Note the shocks happens at time 0}
+#'\item{var:}{The variable (on which the shock happens, corresponds hence to the \code{response} argument in \code{irf}}
+#'\item{sim_1, sim_2}{The simulation with the specifric shock, and without it}
+#'\item{girf}{The difference between sim_1 and sim_2}
+#'}
+#'@author Matthieu Stigler
+#'@seealso \code{\link{irf.nlVar}} for the IRF, for linear models, or incase of non-linear models, for each regime. 
+#'@examples 
+#'
+#'## simulate a SETAR for the example. Higher regime more persistent (AR coef 0.5 instead of 0.2)
+#'set <- setar.sim(B = c(0.5, 0.2, 0.5, 0.5), lag = 1, Thresh = 0.5, n = 500)
+#'set_estim <- setar(set, m = 1)
+#'
+#'## regime-specific IRF:
+#'plot(irf(set_estim, regime = "L", boot = FALSE))
+#'plot(irf(set_estim, regime = "H", boot = FALSE))
+#'
+#'## GIRF
+#'girf_out <- GIRF(set_estim)
+#'@export
 GIRF <-  function(object, n.ahead, seed = NULL, ...) UseMethod("GIRF")
 
 ### This function generates, for a given shock and hist, parallel IRF paths, once  with shock, once without. 
@@ -45,6 +79,10 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
                   "VECM" = "TVECM",
                   "TVECM" = "TVECM",
                   stop("Error model not recognised!"))
+  
+  if(class(object)[[1]] %in% c("TVAR", "TVECM")) {
+    B <-  do.call("cbind", B)
+  }
   
   ## sample innov, if not provided
   if(is.null(innov)) {
@@ -138,11 +176,12 @@ irf_1_shock_ave <- function(object, shock, hist, R=10, n.ahead=10, innov= NULL, 
 
 
 #' @rdname GIRF
-#' @param n.hist The number of past histories ot consider
-#' @param n.shock The number of actual shocks ot consider
+#' @param n.hist The number of past histories to consider. Should be high, ideally size of data (minus lags). 
+#' @param n.shock The number of actual shocks to consider
 #' @param R the number of draws to use for the n.ahead innovations
 #' @param hist_li optional, a list of histories (each of same length as lags in the model)
 #' @param shock_li optional, a list of innovations
+#' @references Koop, G, Pesaran, M. H. & Potter, S. M. (1996) Impulse response analysis in nonlinear multivariate models. Journal of Econometrics, 74, 119-147  
 #' @export
 ## GIRF uses irf_1_shock_ave for a large number of draws of shock and histories
 GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20, R = 10, 
@@ -185,14 +224,14 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
     if(unique(sapply(shock_li, nrow_length))!= 1) stop("each element of shock_li should have length lags")
   }
   
-  
   ## combine each
   M <- expand.grid(hist =hist_li, shock =shock_li)
   n_cases <- nrow(M)
   shock_M <- as.data.frame(do.call("rbind", M$shock))
   colnames(shock_M) <- paste("shock_var", seq_len(nVar), sep = "")
-  hist_M <- as.data.frame(do.call("rbind", M$hist))
-  colnames(hist_M) <- paste("hist_l", seq_len(length(M$hist[[1]])), sep = "")
+  hist_M <- as.data.frame(do.call("rbind", lapply(M$hist, function(x) c(as.matrix(x)))))
+  colnames(hist_M) <- paste("hist_x", rep(seq_len(nVar), each = lag),
+                            "_l", rep(seq_len(lag), times = nVar), sep = "")
   rep_info <- cbind(n_simu = seq_len(nrow(M)),
                     hist_M, shock_M)
     
@@ -216,6 +255,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   #   cols <- c("n_rep", "last_hist", "shock", "n.ahead", "sim_1", "sim_2", "girf")
   # }
   # sims_df[, cols]
+  class(sims_df2) <- c("GIRF_df", "data.frame")
   sims_df2
 }
 
