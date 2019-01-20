@@ -17,6 +17,7 @@ mod_boot <- function(x) {
                 "VAR" = VAR.boot(x),
                 "VECM" = VECM.boot(x),
                 "TVAR" = TVAR.boot(x),
+                "TVECM" = TVECM.boot(x),
                 stop("ERROR, not implemented"))
   x_b
 }
