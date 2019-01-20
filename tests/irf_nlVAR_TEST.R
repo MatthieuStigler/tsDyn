@@ -110,13 +110,21 @@ plot(models_VECM$irf[[1]])
 ### TVAR
 ############################
 
-## regime specific for TVAR
+
 models_TVAR <- models_multivariate %>% 
-  filter(model == "TVAR")  %>% 
+  filter(model == "TVAR")
+
+## test 1
+tvar_1 <- models_TVAR$object[[1]]
+
+irf(tvar_1, runs = 2, seed = 123)
+
+## regime specific for TVAR
+models_TVAR_irf <- models_TVAR  %>% 
   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
 
 ## show two first of first componment
-models_TVAR %>% 
+models_TVAR_irf %>% 
   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
                      as_tibble)) %>% 
   unnest(irf) %>% 
@@ -124,4 +132,32 @@ models_TVAR %>%
 
 
 ## plot 1
-plot(models_TVAR$irf_L[[1]])
+plot(models_TVAR_irf$irf_L[[1]])
+
+############################
+### TVECM
+############################
+
+models_TVECM <- models_multivariate %>% 
+  filter(model == "TVECM")
+
+## test 1
+tvecm_1 <- models_TVECM$object[[1]]
+tsDyn:::irf_1(x=tvecm_1 , n.ahead = 10, cumulative = FALSE, regime = "L", ortho = TRUE)
+tsDyn:::irf_1(x=tvecm_1 , n.ahead = 10, cumulative = FALSE, regime = "L", ortho = FALSE)
+irf(x=tvecm_1, runs = 2, seed = 123)
+
+## regime specific for TVECM
+models_TVECM_irf <- models_TVECM   %>% 
+  mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
+
+## show two first of first componment
+models_TVECM_irf %>% 
+  mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
+                     as_tibble)) %>% 
+  unnest(irf) %>% 
+  as.data.frame()
+
+
+## plot 1
+plot(models_TVECM_irf$irf_L[[1]])
