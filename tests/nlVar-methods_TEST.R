@@ -29,6 +29,17 @@ sapply(mods, tsDyn:::coefVec.nlVar)
 sapply(mods_nonLIn, coef, regime = "L")
 sapply(mods_nonLIn, coef, regime = "H")
 
+## utilities: get_lag, get_nVar, df.residual
+sapply(mods, tsDyn:::get_series)
+models_multivariate %>% 
+  mutate(lag_out = map_int(object, tsDyn:::get_lag.nlVar),
+         nVar_out = map_int(object, tsDyn:::get_nVar.nlVar),
+         df_out = map(object, df.residual)) %>% 
+  select(-starts_with("object")) %>% 
+  as.data.frame()
+
+
+
 
 uni_stats <- models_multivariate %>% 
   mutate_at("object", funs(deviance = map_dbl(., deviance),

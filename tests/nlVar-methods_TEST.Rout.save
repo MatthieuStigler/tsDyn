@@ -4734,6 +4734,84 @@ Equation dolcan -0.01007585
 Equation cpiUSA  0.24673984
 
 > 
+> ## utilities: get_lag, get_nVar, df.residual
+> sapply(mods, tsDyn:::get_series)
+     [,1]     [,2]     [,3]     [,4]     [,5]     [,6]     [,7]     [,8]    
+[1,] "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan"
+[2,] "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA"
+     [,9]     [,10]    [,11]    [,12]    [,13]    [,14]    [,15]    [,16]   
+[1,] "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan"
+[2,] "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA"
+     [,17]    [,18]    [,19]    [,20]    [,21]    [,22]    [,23]    [,24]   
+[1,] "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan"
+[2,] "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA"
+     [,25]    [,26]    [,27]    [,28]    [,29]    [,30]    [,31]    [,32]   
+[1,] "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan"
+[2,] "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA"
+     [,33]    [,34]    [,35]    [,36]    [,37]    [,38]    [,39]    [,40]   
+[1,] "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan"
+[2,] "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA"
+     [,41]    [,42]    [,43]    [,44]    [,45]    [,46]    [,47]    [,48]   
+[1,] "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan" "dolcan"
+[2,] "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA" "cpiUSA"
+> models_multivariate %>% 
++   mutate(lag_out = map_int(object, tsDyn:::get_lag.nlVar),
++          nVar_out = map_int(object, tsDyn:::get_nVar.nlVar),
++          df_out = map(object, df.residual)) %>% 
++   select(-starts_with("object")) %>% 
++   as.data.frame()
+   lag include model nthresh lag_out nVar_out df_out
+1    1    both   VAR      NA       1        2    319
+2    1   const   VAR      NA       1        2    320
+3    1    none   VAR      NA       1        2    321
+4    1   trend   VAR      NA       1        2    320
+5    2    both   VAR      NA       2        2    316
+6    2   const   VAR      NA       2        2    317
+7    2    none   VAR      NA       2        2    318
+8    2   trend   VAR      NA       2        2    317
+9    1    both  VECM      NA       1        2    317
+10   1   const  VECM      NA       1        2    318
+11   1    none  VECM      NA       1        2    319
+12   1   trend  VECM      NA       1        2    318
+13   2    both  VECM      NA       2        2    314
+14   2   const  VECM      NA       2        2    315
+15   2    none  VECM      NA       2        2    316
+16   2   trend  VECM      NA       2        2    315
+17   1    both  TVAR       1       1        2    315
+18   1    both  TVAR       2       1        2    311
+19   1   const  TVAR       1       1        2    317
+20   1   const  TVAR       2       1        2    314
+21   1    none  TVAR       1       1        2    319
+22   1    none  TVAR       2       1        2    317
+23   1   trend  TVAR       1       1        2    317
+24   1   trend  TVAR       2       1        2    314
+25   2    both  TVAR       1       2        2    310
+26   2    both  TVAR       2       2        2    304
+27   2   const  TVAR       1       2        2    312
+28   2   const  TVAR       2       2        2    307
+29   2    none  TVAR       1       2        2    314
+30   2    none  TVAR       2       2        2    310
+31   2   trend  TVAR       1       2        2    312
+32   2   trend  TVAR       2       2        2    307
+33   1    both TVECM       1       1        2    317
+34   1    both TVECM       2       1        2    317
+35   1   const TVECM       1       1        2    318
+36   1   const TVECM       2       1        2    318
+37   1    none TVECM       1       1        2    319
+38   1    none TVECM       2       1        2    319
+39   1   trend TVECM       1       1        2    318
+40   1   trend TVECM       2       1        2    318
+41   2    both TVECM       1       2        2    314
+42   2    both TVECM       2       2        2    314
+43   2   const TVECM       1       2        2    315
+44   2   const TVECM       2       2        2    315
+45   2    none TVECM       1       2        2    316
+46   2    none TVECM       2       2        2    316
+47   2   trend TVECM       1       2        2    315
+48   2   trend TVECM       2       2        2    315
+> 
+> 
+> 
 > 
 > uni_stats <- models_multivariate %>% 
 +   mutate_at("object", funs(deviance = map_dbl(., deviance),
@@ -9546,4 +9624,4 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 > 
 > proc.time()
    user  system elapsed 
- 21.796   0.226  22.812 
+ 22.898   0.301  26.680 
