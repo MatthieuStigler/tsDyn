@@ -31,7 +31,8 @@ plot_GIRF_dens <- function(x, n.ahead = c(1, 5, 10), var = unique(x$var)[1],
   colnames(df_w) <- gsub("girf\\.", "n.ahead: ", colnames(df_w))
   
   dens <- apply(df_w[, -c(1, 2), drop = FALSE], 2, density)
-  plot(NA, xlim=range(sapply(dens, "[", "x")), ylim=range(sapply(dens, "[", "y")), ylab = "GIRF")
+  plot(NA, xlim=range(sapply(dens, "[", "x")), ylim=range(sapply(dens, "[", "y")), 
+       ylab = "GIRF", xlab = "Density", ...)
   invisible <- mapply(lines, dens, col=1:length(dens))
   
   if(add_legend) legend("topright", legend=names(dens), fill=1:length(dens))
@@ -50,7 +51,7 @@ plot_GIRF_line <- function(x, n_simu = 1:5, var = unique(x$var)[1],
   
   
   plot(NA, xlim= range(df$n.ahead), 
-       ylim=range(df$girf), ylab = "GIRF")
+       ylim=range(df$girf), ylab = "GIRF", xlab = "n.ahead", ...)
   invisible <- lapply(1:ncol(df_w2), function(x) lines(x = df_w$n.ahead, y = df_w2[,x], col =x))
   if(add_legend) legend("topright", legend=colnames(df_w2), fill=1:nrow(df_w2))
   
