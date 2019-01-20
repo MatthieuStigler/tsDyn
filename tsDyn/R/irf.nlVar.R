@@ -72,6 +72,7 @@ irf.TVAR <-  function(x, impulse = NULL, response = NULL, n.ahead = 10,
                       ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95, 
                       runs = 100, seed = NULL, 
                       regime = c("L", "M", "H"), ...) {
+  regime <- match.arg(regime)
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, boot = boot, ci = ci, runs = runs,
           regime = regime, seed = seed, ortho = ortho, ...) 
 }
@@ -82,6 +83,7 @@ irf.TVECM <-  function(x, impulse = NULL, response = NULL, n.ahead = 10,
                        ortho = TRUE, cumulative = FALSE, boot = TRUE, ci = 0.95, 
                        runs = 100, seed = NULL, 
                        regime = c("L", "M", "H"), ...) {
+  regime <- match.arg(regime)
   irf_any(x=x, n.ahead = n.ahead, cumulative = cumulative, boot = boot, ci = ci, runs = runs,
           regime = regime, seed = seed, ortho = ortho, ...) 
 }
