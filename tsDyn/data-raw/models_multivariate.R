@@ -38,7 +38,7 @@ models_VECM_vars <- grid_simple %>%
 models_VECM <- models_VECM_tsD %>% 
   left_join(models_VECM_vars, by = c("lag", "include", "model"))
 
-## TVAR, TVEC<
+## TVAR, TVECM
 grid_tvar <- crossing(lag  =c(1, 2), 
                        include = c("const", "trend", "none", "both"),
                        nthresh = 1:2)
@@ -70,7 +70,7 @@ models_multivariate <- bind_rows(models_VAR,
 path <- system.file("inst/testdata", package = "tsDyn")
 if(path== "") path <- system.file("testdata", package = "tsDyn")
 path <-  "~/Dropbox/Documents/tsDyn/tsDyn/inst/testdata"
-saveRDS(models_multivariate, file= paste(path, "models_multivariate.rds", sep = "/"))
+saveRDS(models_multivariate, file= paste(path, "models_multivariate.rds", sep = "/"), compress = "xz")
 
 ## this gives path: system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
 path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
