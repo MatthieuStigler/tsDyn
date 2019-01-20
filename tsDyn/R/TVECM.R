@@ -704,6 +704,7 @@ TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=
   
   z<-list(coefficients=Blist, residuals=resbest, model=YnaX, coeffmat=Bbest,
           nobs_regimes=nobs, k=k, t=t,T=T, nparB=allpar, 
+          df.residual = t- npar,
           fitted.values=fitted, lag=lag, include=include,model.specific=specific,
           inputArgs = inputArgs)
   
