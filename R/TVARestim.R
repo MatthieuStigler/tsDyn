@@ -612,16 +612,17 @@ nga <- length(usedThVar)
 }
 
 #Plot for the grid search
-plot3<-function(th,nthresh, allTh){
+plot3 <- function(th,nthresh, allTh, type = "p"){
     allDelay<-unique(allTh[,1])
     col <- rep(allDelay,length.out=nrow(allTh))+1
-    if(nthresh==1)
+    if(nthresh==1) {
       posBestTh<-which(allTh[,2]==th)
-    else{
-      posBestTh1<-which(allTh[,2]==th[1])
-      posBestTh2<-which(allTh[,2]==th[2])
-      posBestTh<-c(posBestTh1,posBestTh2)}
-    plot(allTh[,2], allTh[,3], col=col,xlab="Threshold Value",ylab="SSR")
+    } else {
+      posBestTh1 <- which(allTh[, 2] == th[1])
+      posBestTh2 <- which(allTh[, 2] == th[2])
+      posBestTh <- c(posBestTh1, posBestTh2)
+    }
+    plot(allTh[,2], allTh[,3], col=col,xlab="Threshold Value",ylab="SSR", type = type)
     title("Results of the grid search")
     points(th,allTh[posBestTh,3], col=c(2:(nthresh+1)), cex=2)
     leg<-c(paste("Threshold Delay", allDelay),(paste("th", 1:nthresh)))
