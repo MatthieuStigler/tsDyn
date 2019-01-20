@@ -502,27 +502,28 @@ print.selectSETAR<-function(x,...){
 }
 
 
+## #'@rdname selectSETAR
+## #'@param type plot: type of type of plot desired, see \code{\link[graphics]{plot.default}}
 #' @export
-plot.selectSETAR<-function(x,...){
+plot.selectSETAR <- function(x, type = "p", ...){
   if(x$criterion!="SSR")
     stop("Currently only implemented for criterion SSR")
-  plot3(th=x$th,nthresh=x$nthresh,allTh= x$allTh)
-#  plot3a(th=x$th,nthresh=x$nthresh,allTh= x$allTh, bestDelay=x$bests[1])
+  plot3(th=x$th, nthresh=x$nthresh, allTh= x$allTh, type = type)
 }
 
 ###Try it
 if(FALSE) { #usage example
-library(tsDyn)
-environment(selectSETAR)<-environment(selectNNET)
-#Transformation like in Hansen 1999
-sun<-(sqrt(sunspot.year+1)-1)*2		
-
-###Full grid search with OLS
-selectSETAR(sun, m=3, criterion="SSR", d=1, thDelay=0:2,model="TAR", trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
-
-selectSETAR(sun, m=3, criterion="AIC", d=1, thDelay=0:2,model="TAR", trim=0.25, max.iter=10, plot=FALSE, nthresh=1)
-selectSETAR(sun, m=3, th=list(ngrid=2),criterion="SSR", d=1, thDelay=0:2, trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
-selectSETAR(sun, m=3, th=MakeThSpec(ngrid=2),criterion="SSR", d=1, thDelay=0:2, trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
-###restricted search with AIC or AIC pooled around the max selected by OLS
-selectSETAR(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)
+  library(tsDyn)
+  environment(selectSETAR)<-environment(selectNNET)
+  #Transformation like in Hansen 1999
+  sun<-(sqrt(sunspot.year+1)-1)*2		
+  
+  ###Full grid search with OLS
+  selectSETAR(sun, m=3, criterion="SSR", d=1, thDelay=0:2,model="TAR", trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
+  
+  selectSETAR(sun, m=3, criterion="AIC", d=1, thDelay=0:2,model="TAR", trim=0.25, max.iter=10, plot=FALSE, nthresh=1)
+  selectSETAR(sun, m=3, th=list(ngrid=2),criterion="SSR", d=1, thDelay=0:2, trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
+  selectSETAR(sun, m=3, th=MakeThSpec(ngrid=2),criterion="SSR", d=1, thDelay=0:2, trim=0.15, max.iter=10, plot=FALSE, nthresh=2)
+  ###restricted search with AIC or AIC pooled around the max selected by OLS
+  selectSETAR(sun, m=2, criterion="AIC", d=1, thDelay=0:1, around=7.444575)
 }
