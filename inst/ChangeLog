@@ -1,5 +1,6 @@
 Version 0.9-50: Matthieu Stigler (20/5/2018)
- -new: ar_mean, to compute the long-term mean of an AR process
+ -new function: ECT_plot(), showing the (T)VECM response to ECT deviations
+ -newfunction: ar_mean(), to compute the long-term mean of an AR process
  -MAJOR: tsDyn now depends on R 2.13, not 2.10 (i.e. at least 2011 version, not 2010)
 
 Version 0.9-48: Matthieu Stigler (20/5/2018)
