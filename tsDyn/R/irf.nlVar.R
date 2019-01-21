@@ -128,6 +128,17 @@ irf_1.TVAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,
   
 }
 
+irf_1.TVECM <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,  
+                        regime = c("L", "M", "H"), ...) {
+  regime <-  match.arg(regime)
+  irf_1.nlVar(x, n.ahead = n.ahead, 
+              cumulative = cumulative, 
+              regime = regime, 
+              ortho = ortho, ...)
+  
+}
+
+
 irf_1.nlVar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("all", "L", "M", "H"), ortho =FALSE,  ...) {
   regime <-  match.arg(regime)
   series <- get_series(x)
