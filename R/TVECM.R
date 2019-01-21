@@ -693,6 +693,7 @@ TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=
   specific$timeAttributes <- attributes(data[, 1])
   specific$LRinclude <- "none"
   specific$r <- 1
+  specific$ect <- ECT_best
   # specific$commonInter<-commonInter
   
   ## input arguments to return
