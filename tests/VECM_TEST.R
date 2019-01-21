@@ -279,4 +279,6 @@ pred_l3_vecm_1_12_nd_ref5 <- predict(mod_var_l3_vecm_sub_ref5, n.ahead=2, newdat
 pred_l3_vecm_nd_ref5 <- rbind(pred_l3_vecm_0_12_nd_ref5, pred_l3_vecm_1_12_nd_ref5)
 all.equal(pred_l3_vecm_nd_ref5[c(2,4),], as.M(pred_l3_vecm_roll_12_ref$pred[16:17,1:3]), check.attributes=FALSE) ## check refited2 ahead
 
-
+## ECT_plot
+out <- lapply(vecm_all, plot_ECT)
+sapply(out, head, 1)
