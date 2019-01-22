@@ -224,7 +224,9 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
     
   if(is.null(hist_li)) {
     if(!is.null(seed)) set.seed(seed)
-    hist_li <- replicate(n.hist, x_orig[sample_hist(),, drop = FALSE], simplify = FALSE)  
+    hist_li <- replicate(n.hist, x_orig[sample_hist(),, drop = FALSE], simplify = FALSE)
+    samples_hist <- sample(n_start:N, size = n.hist, replace = FALSE)
+    hist_li <- lapply(samples_hist, function(i) x_orig[(i - n_start+ 1) : i,, drop = FALSE])
   } else {
     if(!is.list(hist_li)) stop("hist_li should be a list of vectors/matrices")
     if(unique(sapply(hist_li, nrow_length))!=n_start) stop("each element of hist_li should have length lags (+1 if VECM)")
@@ -233,7 +235,9 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
   ## construct shock_li if not provided
   if(is.null(shock_li)) {
     if(!is.null(seed)) set.seed(seed)
-    shock_li <- replicate(n.shock, resids[sample(seq_len(n_used), size = 1),, drop = FALSE], simplify = FALSE)
+    samples_shock <- sample(seq_len(n_used), size = n.shock, replace = FALSE)
+    shock_li <- lapply(samples_shock, function(i) resids[i,, drop = FALSE])
+    # shock_li <- replicate(n.shock, resids[sample(seq_len(n_used), size = 1),, drop = FALSE], simplify = FALSE)
   } else {
     if(!is.list(shock_li)) stop("shock_li should be a list of vectors")
     if(unique(sapply(shock_li, nrow_length))!= 1) stop("each element of shock_li should have length lags")
@@ -404,7 +408,7 @@ if(FALSE) {
     scale_x_continuous(breaks = seq(0, 10, by = 2))
   
   ### SETAR
-  set_girf_full <- GIRF(object=set_l2_const, R = 5, add.regime = TRUE,
+  set_girf_full <- GIRF(object=set_l2_const, R = 5, add.regime = FALSE,
                         returnStarting = TRUE) %>%  as_tibble
   set_girf_1series <- filter(set_girf_full, n_rep ==1) %>% 
     mutate(reg_recalc = regime(set_l2_const, serie = sim_1))
