@@ -24,7 +24,8 @@ This plot shows how variables in a (T)VECM respond to deviations from the long-t
 \examples{
 data(zeroyld)
 vec_l1 <- VECM(zeroyldMeta[, c("long.run", "short.run")], lag =1)
-tvec_l1 <- TVECM(zeroyldMeta[, c("long.run", "short.run")], lag =1, plot  = FALSE, trace = FALSE, th1 = list(exact = -1.263))
+tvec_l1 <- TVECM(zeroyldMeta[, c("long.run", "short.run")], lag =1, 
+                plot  = FALSE, trace = FALSE, th1 = list(exact = -1.263))
 
 plot_ECT(vec_l1)
 plot_ECT(tvec_l1, legend.location = "bottomright")
