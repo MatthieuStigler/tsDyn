@@ -263,7 +263,7 @@ if(FALSE){
   
   ## vars
   library(vars)
-  data(Canada)
+  # data(Canada)
   irf.ca.jo <- function(x, r=1, ...) irf(vec2var(x, r = r), ...)
   
   var_vars_l1 <- VAR(Canada, p = 1, type = "const")
