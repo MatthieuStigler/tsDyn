@@ -3,7 +3,7 @@
 \name{TVAR}
 \alias{TVAR}
 \alias{OlsTVAR}
-\title{Multivariate Threshold Autoregressive model}
+\title{Multivariate Threshold Vector Autoregressive model}
 \usage{
 TVAR(data, lag, include = c("const", "trend", "none", "both"),
   model = c("TAR", "MTAR"), commonInter = FALSE, nthresh = 1,
@@ -35,7 +35,7 @@ not t+1 as in univariate cases.}
 variable. Either a single value (indicating which variable to take) or a
 combination}
 
-\item{thVar}{external transition variable}
+\item{thVar}{Optional. External transition variable.}
 
 \item{trim}{trimming parameter indicating the minimal percentage of
 observations in each regime}
@@ -63,7 +63,8 @@ applied to each regime or not.}
 An object of class TVAR, with standard methods.
 }
 \description{
-Estimate a multivariate Threshold VAR
+Estimate a multivariate Threshold VAR (TVAR), either using lags as transition variable (default),
+or specifying an external variable.
 }
 \details{
 For fixed \code{th} and threshold variable, the model is linear, so

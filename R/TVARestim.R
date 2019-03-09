@@ -1,6 +1,7 @@
-#'Multivariate Threshold Autoregressive model
+#'Multivariate Threshold Vector Autoregressive model
 #'
-#'Estimate a multivariate Threshold VAR
+#'Estimate a multivariate Threshold VAR (TVAR), either using lags as transition variable (default),
+#'or specifying an external variable. 
 #'
 #'For fixed \code{th} and threshold variable, the model is linear, so
 #'estimation can be done directly by CLS (Conditional Least Squares). The
@@ -35,7 +36,7 @@
 #'@param mTh combination of variables with same lag order for the transition
 #'variable. Either a single value (indicating which variable to take) or a
 #'combination
-#'@param thVar external transition variable
+#'@param thVar Optional. External transition variable. 
 #'@param trim trimming parameter indicating the minimal percentage of
 #'observations in each regime
 #'@param ngrid number of elements of the grid, especially for \code{nthresh=3}
