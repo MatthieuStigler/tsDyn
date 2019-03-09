@@ -224,7 +224,7 @@ GIRF.setar <-  function(object, n.ahead = 10, seed = NULL, n.hist=20, n.shock=20
     
   if(is.null(hist_li)) {
     if(!is.null(seed)) set.seed(seed)
-    hist_li <- replicate(n.hist, x_orig[sample_hist(),, drop = FALSE], simplify = FALSE)
+    # hist_li <- replicate(n.hist, x_orig[sample_hist(),, drop = FALSE], simplify = FALSE)
     samples_hist <- sample(n_start:N, size = n.hist, replace = FALSE)
     hist_li <- lapply(samples_hist, function(i) x_orig[(i - n_start+ 1) : i,, drop = FALSE])
   } else {
