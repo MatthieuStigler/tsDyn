@@ -1,5 +1,4 @@
 ^data-raw$
-<<<<<<< HEAD
 ^man-roxygen$
 ^.*\.Rproj$
 ^\.Rproj\.user$
