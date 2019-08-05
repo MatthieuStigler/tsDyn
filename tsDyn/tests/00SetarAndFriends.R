@@ -1,5 +1,5 @@
 library(tsDyn)
-suppressWarnings(RNGversion("3.5.3"))
+library(tidyverse)
 
 ###SETAR
 
@@ -56,6 +56,18 @@ selectSETAR(lynx, m=2, d=1, th=MakeThSpec(int=c(957, 1824), ngrid="Half"), commo
 
 
 ## setar.sim
-set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check", returnStarting = TRUE))
+set_all_boot <- lapply(set_all, function(x) setar.boot(x, boot.scheme = "check", returnStarting = TRUE, round_digits=10))
 set_all_boot_check <-  sapply(set_all_boot, function(x) all.equal(x, as.numeric(lynx)))
-set_all_boot_check
+
+vals_df <- bind_cols(set_all_boot) %>%  
+  mutate(n_row = 1:n()) %>% 
+  gather(model, value, -n_row) %>% 
+  mutate(original = rep(as.numeric(lynx), length(set_all_boot)),
+         diff = value-original) 
+
+vals_df %>% 
+  filter(value!=original) %>% 
+  group_by(model) %>%
+  mutate(rmse = sqrt(mean(value-original)^2)) %>% 
+  filter(n_row ==min(n_row)) %>% 
+  dplyr::select(-rmse)
