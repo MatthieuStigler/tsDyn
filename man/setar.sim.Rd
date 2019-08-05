@@ -27,7 +27,7 @@ linear.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
 
 \item{seed}{Bootstrap: seed used in the resampling}
 
-\item{\dots}{additional arguments for the unexported \code{rand.gen}.}
+\item{\dots}{additional arguments for the unexported \code{setar.gen}.}
 
 \item{linearObject}{Bootstrap: the \code{\link{linear}} object to resample data from.}
 

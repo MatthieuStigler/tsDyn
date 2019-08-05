@@ -22,7 +22,7 @@
 #'@param setarObject Bootstrap: the \code{\link{setar}} object to resample data from.
 #'@param boot.scheme Bootstrap: which resampling scheme to use for the residuals. See \code{\link{resample_vec}}. 
 #'@param seed Bootstrap: seed used in the resampling
-#'@param \dots additional arguments for the unexported \code{rand.gen}.  
+#'@param \dots additional arguments for the unexported \code{setar.gen}.  
 #'@return a list with the simulated/bootstraped data and the parameter matrix
 #'used.
 #'@author Matthieu Stigler
