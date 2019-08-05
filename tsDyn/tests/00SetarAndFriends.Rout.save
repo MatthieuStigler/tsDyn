@@ -1538,7 +1538,7 @@ Results of the grid search for 1 threshold
 +   mutate(n_row = 1:n()) %>% 
 +   gather(model, value, -n_row) %>% 
 +   mutate(original = rep(as.numeric(lynx), length(set_all_boot)),
-+          diff = value-original) 
++          diff = abs(value-original) < 1e-010)
 > 
 > vals_df %>% 
 +   filter(value!=original) %>% 
@@ -1548,16 +1548,16 @@ Results of the grid search for 1 threshold
 +   dplyr::select(-rmse)
 # A tibble: 7 x 5
 # Groups:   model [7]
-  n_row model value original       diff
-  <int> <chr> <dbl>    <dbl>      <dbl>
-1    15 set0   409.      409  10.00e-11
-2    14 set2   279.      279  10.00e-11
-3    15 set3   409.      409  10.00e-11
-4    21 set4   151.      151  10.00e-11
-5    14 set5   279.      279 -10.00e-11
-6    13 set6   184.      184  10.00e-11
-7    14 set7   279.      279  10.00e-11
+  n_row model value original diff 
+  <int> <chr> <dbl>    <dbl> <lgl>
+1    15 set0   409.      409 TRUE 
+2    14 set2   279.      279 TRUE 
+3    15 set3   409.      409 TRUE 
+4    21 set4   151.      151 TRUE 
+5    14 set5   279.      279 TRUE 
+6    13 set6   184.      184 TRUE 
+7    14 set7   279.      279 TRUE 
 > 
 > proc.time()
    user  system elapsed 
-  3.533   0.251   3.927 
+  3.551   0.251   4.057 
