@@ -1,6 +1,6 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -18,7 +18,29 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
+Registered S3 method overwritten by 'xts':
+  method     from
+  as.zoo.xts zoo 
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
+Registered S3 methods overwritten by 'forecast':
+  method             from    
+  fitted.fracdiff    fracdiff
+  residuals.fracdiff fracdiff
 > suppressMessages(library(tidyverse))
+> suppressWarnings(RNGversion("3.5.3"))
+> 
+> roundAll.Equal <- function(x, round=8){
++   isFALSE <- x!="TRUE"
++   xFalse <- x[isFALSE]
++   # extract the number (i.e remove all the rest)
++   xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
++             "", xFalse)
++   xf2<- round(as.numeric(xf),round)
++   x[isFALSE] <- paste("Mean relative difference: ", xf2, sep="")
++   x
++ }
 > 
 > ############################
 > ### Load data
@@ -270,16 +292,16 @@ Warning message:
 Possible unit root in the low  regime. Roots are: 0.633 
 > 
 > 
-> setar.boot.check(set_1th_l1)
-[1] "Mean relative difference: 0.987262"
+> roundAll.Equal(setar.boot.check(set_1th_l1), 2)
+[1] "Mean relative difference: 0.99"
 > setar.boot.check(set_1th_l1, round_digits = 2)
 [1] TRUE
-> setar.boot.check(set_1th_l2)
-[1] "Mean relative difference: 0.1405485"
-> setar.boot.check(set_1th_l2, round_digits = 5)
-[1] "Mean relative difference: 0.2019088"
-> setar.boot.check(set_1th_l1_tr)
-[1] "Mean relative difference: 9.138646e-07"
+> roundAll.Equal(setar.boot.check(set_1th_l2), 2)
+[1] "Mean relative difference: 0.14"
+> roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
+[1] "Mean relative difference: 0.2"
+> isTRUE(setar.boot.check(set_1th_l1_tr))
+[1] FALSE
 > setar.boot.check(set_1th_l1_tr, round_digits = 1)
 [1] TRUE
 > 
@@ -366,4 +388,4 @@ Possible unit root in the low  regime. Roots are: 0.633
 > 
 > proc.time()
    user  system elapsed 
-  3.838   0.215   4.223 
+  3.648   0.275   4.359 
