@@ -2,7 +2,6 @@ library(tsDyn)
 library(mnormt)
 suppressWarnings(RNGversion("3.5.3"))
 
-
 TVECM.boot.check <- tsDyn:::TVECM.boot.check
 options(useFancyQuotes=FALSE) # useful for all.equal comparison
 

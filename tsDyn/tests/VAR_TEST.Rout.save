@@ -1,7 +1,6 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,7 +18,17 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
-> 
+Registered S3 method overwritten by 'xts':
+  method     from
+  as.zoo.xts zoo 
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
+Registered S3 methods overwritten by 'forecast':
+  method             from    
+  fitted.fracdiff    fracdiff
+  residuals.fracdiff fracdiff
+> suppressWarnings(RNGversion("3.5.3"))
 > 
 > data(zeroyld)
 > data(barry)
@@ -6287,8 +6296,8 @@ $var_l3_tr
 
 > 
 > all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
-[1] "Component \"var_l1_tr\": Mean relative difference: 0.01818794"
-[2] "Component \"var_l3_tr\": Mean relative difference: 0.01021486"
+[1] "Component “var_l1_tr”: Mean relative difference: 0.01818794"
+[2] "Component “var_l3_tr”: Mean relative difference: 0.01021486"
 > 
 > lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 $var_l1_co
@@ -6612,5 +6621,5 @@ $var_l3_no
 > 
 > 
 > proc.time()
-utilisateur     système      écoulé 
-      3.040       0.288       3.321 
+   user  system elapsed 
+  3.481   0.237   4.316 

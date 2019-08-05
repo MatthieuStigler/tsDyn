@@ -84,15 +84,17 @@ models_ar_setar %>%
   mutate(girf = map2(object, lag, ~GIRF(object=.x, n.ahead = 3,
                                         hist_li = list(rep(1.6, .y)),
                                         shock_li = list(0.01), R = 2, seed = 123) %>% as_tibble)) %>% 
+  select(-object) %>% 
   unnest(girf) %>% 
-  as.data.frame()
+  as_tibble()
 
 ## Simple, random
 models_ar_setar %>% 
   mutate(girf = map(object, ~GIRF(object=., n.ahead = 3, n.hist = 3, n.shock = 3,
                                   R = 2, seed = 123) %>% as_tibble)) %>% 
+  select(-object) %>% 
   unnest(girf) %>% 
-  as.data.frame()
+  as_tibble()
 
 
 ############################
@@ -153,6 +155,7 @@ models_multivariate %>%
   # head(2) %>% 
   mutate(girf = map(object, ~GIRF(object=., n.ahead = 3, n.hist = 3, n.shock = 3,
                                   R = 2, seed = 123) %>% head(2))) %>% 
+  select(-object) %>% 
   unnest(girf) %>% 
-  as.data.frame()
+  as_tibble()
 
