@@ -53,7 +53,7 @@ models_VAR <- models_multivariate %>%
 models_IRF_any <- models_multivariate %>% 
   filter(model == "VAR") %>% 
   mutate(ortho = list(tibble(ortho =c(TRUE, FALSE)))) %>% 
-  unnest(ortho) %>% 
+  {suppressWarnings(unnest(., ortho, .preserve = "object"))} %>% 
   mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 2, seed = 7, ortho = .y)),
          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))

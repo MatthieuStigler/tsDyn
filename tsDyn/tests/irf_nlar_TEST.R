@@ -36,12 +36,12 @@ df_all <- models_irf %>%
   gather(irf_stat, value, irf_irf, irf_low, irf_upp) %>% 
   mutate(value = map(value, ~tibble(x=.) %>% 
                           mutate(n.ahead = 0:4))) %>% 
+  select(-object) %>% 
   unnest(value) %>% 
   spread(irf_stat, x)
 
 df_all %>% 
   filter(n.ahead %in% c( 1)) %>% 
-  select(-object) %>% 
   as_tibble()
 
 
