@@ -65,9 +65,11 @@ vals_df <- bind_cols(set_all_boot) %>%
   mutate(original = rep(as.numeric(lynx), length(set_all_boot)),
          diff = abs(value-original) < 1e-010)
 
-vals_df %>% 
-  filter(value!=original) %>% 
-  group_by(model) %>%
-  mutate(rmse = sqrt(mean(value-original)^2)) %>% 
-  filter(n_row ==min(n_row)) %>% 
-  dplyr::select(-rmse)
+if(FALSE) {
+  vals_df %>% 
+    filter(value!=original) %>% 
+    group_by(model) %>%
+    mutate(rmse = sqrt(mean(value-original)^2)) %>% 
+    filter(n_row ==min(n_row)) %>% 
+    dplyr::select(-rmse)
+}
