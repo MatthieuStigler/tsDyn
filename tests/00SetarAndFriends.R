@@ -63,7 +63,7 @@ vals_df <- bind_cols(set_all_boot) %>%
   mutate(n_row = 1:n()) %>% 
   gather(model, value, -n_row) %>% 
   mutate(original = rep(as.numeric(lynx), length(set_all_boot)),
-         diff = value-original) 
+         diff = abs(value-original) < 1e-010)
 
 vals_df %>% 
   filter(value!=original) %>% 
