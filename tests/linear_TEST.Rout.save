@@ -116,11 +116,6 @@ $both_l_3
 > all_lin_pred <- lapply(all_lin_const, predict, n.ahead = 5)
 > 
 > ar_1_Mean_pred <- predict(ar_1_Mean, n.ahead = 5)$pred
-Warning message:
-In object$var.pred * vars :
-  Recycling array of length 1 in array-vector arithmetic is deprecated.
-  Use c() or as.vector() instead.
-
 > 
 > all.equal(ar_1_Mean_pred, all_lin_pred[["const_l_1"]], check.attributes = TRUE)
 [1] TRUE
