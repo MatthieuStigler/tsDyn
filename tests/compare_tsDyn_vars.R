@@ -1,7 +1,5 @@
-
 library(tsDyn)
 library(vars)
-suppressWarnings(RNGversion("3.5.3"))
 
 data(Canada)
 
@@ -93,7 +91,7 @@ sapply(all_models, comp_LL)
 sapply(models_noLR, comp_IRF)
 sapply(models_noLR, comp_IRF, ortho = FALSE)
 sapply(all_models, comp_FEVD)
-sapply(all_models, comp_resid, tol=lowtol) # 5
+sapply(all_models, comp_resid, tol=lowlowtol) # 5
 sapply(all_models, comp_fitted)
 sapply(all_models[-c(3, 4)], comp_predict)
 lapply(sapply(all_models[-c(3, 4)], comp_predictOld),roundAll.Equal, round=6) # 5 and 6
