@@ -43,10 +43,10 @@ models_multivariate %>%
 
 
 uni_stats <- models_multivariate %>% 
-  mutate_at("object", funs(deviance = map_dbl(., deviance),
-                           AIC = map_dbl(., AIC),
-                           BIC = map_dbl(., BIC),
-                           logLik = map_dbl(., logLik))) %>% 
+  mutate_at("object", list(deviance = ~map_dbl(., deviance),
+                           AIC = ~map_dbl(., AIC),
+                           BIC = ~map_dbl(., BIC),
+                           logLik = ~map_dbl(., logLik))) %>% 
   select(-starts_with("object"))
 
 as.data.frame(uni_stats)
