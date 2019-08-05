@@ -41,8 +41,8 @@ lapply(mod_notrend_noaar, ar_mean)
 sapply(mod, getTh)
 
 
-##
-suppressMessages(suppressWarnings(sapply(mod_no_aar, function(x) isTRUE(tsDyn:::mod_refit_check(x)))))
+## Output of mod_no_aar[-44] is platform/machien specific...
+suppressMessages(suppressWarnings(sapply(mod_no_aar[-44], tsDyn:::mod_refit_check)))
 
 
 ### Pred Roll, acc_stat:
