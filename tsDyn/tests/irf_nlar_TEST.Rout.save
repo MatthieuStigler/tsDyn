@@ -1,6 +1,6 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -18,8 +18,18 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
+Registered S3 method overwritten by 'xts':
+  method     from
+  as.zoo.xts zoo 
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
+Registered S3 methods overwritten by 'forecast':
+  method             from    
+  fitted.fracdiff    fracdiff
+  residuals.fracdiff fracdiff
 > suppressMessages(library(tidyverse))
-> 
+> suppressWarnings(RNGversion("3.5.3"))
 > 
 > ############################
 > ### Load data
@@ -60,121 +70,22 @@ Type 'q()' to quit R.
 > 
 > df_all %>% 
 +   filter(n.ahead %in% c( 1)) %>% 
-+   as.data.frame()
-   lag include  model nthresh thDelay regime n.ahead    irf_irf     irf_low
-1    1    both linear      NA      NA    all       1  0.5290559  0.32514649
-2    1    both  setar       1       0      H       1  0.5274143 -0.56431538
-3    1    both  setar       1       0      L       1  0.8829112 -3.26868782
-4    1    both  setar       2       0      H       1  0.9351812  0.46422329
-5    1    both  setar       2       0      L       1 -0.3576188 -1.20169711
-6    1   const linear      NA      NA    all       1  0.5859870  0.36222410
-7    1   const  setar       1       0      H       1  0.9098441  0.28958167
-8    1   const  setar       1       0      L       1  0.9441860  0.18415650
-9    1   const  setar       2       0      H       1  1.0194805 -0.08062493
-10   1   const  setar       2       0      L       1  0.1925287 -0.64324105
-11   1    none linear      NA      NA    all       1  0.9836385  0.92600189
-12   1    none  setar       1       0      H       1  0.9280588  0.88044811
-13   1    none  setar       1       0      L       1  1.1985522  1.14726951
-14   1    none  setar       2       0      H       1  0.9192732  0.83311859
-15   1    none  setar       2       0      L       1  1.1681179  1.00172708
-16   1   trend linear      NA      NA    all       1  0.8954487  0.75911211
-17   1   trend  setar       1       0      H       1  0.8497728  0.74070734
-18   1   trend  setar       1       0      L       1  1.6838723  1.67231070
-19   1   trend  setar       2       0      H       1  0.9570671  0.84998127
-20   1   trend  setar       2       0      L       1  1.3321844  0.83770597
-21   2    both linear      NA      NA    all       1  0.6590824  0.47230362
-22   2    both  setar       1       0      H       1  0.6537916  0.67736578
-23   2    both  setar       1       0      L       1  1.4846455 -0.35720867
-24   2    both  setar       1       1      H       1  0.4741078  0.27229144
-25   2    both  setar       1       1      L       1  1.6654367  0.59603772
-26   2    both  setar       2       0      H       1  0.9510257  0.39290774
-27   2    both  setar       2       0      L       1 -0.5517492 -1.59280493
-28   2    both  setar       2       1      H       1  1.2907524  0.98713749
-29   2    both  setar       2       1      L       1  0.9565823  0.92230441
-30   2   const linear      NA      NA    all       1  0.7110028  0.51285805
-31   2   const  setar       1       0      H       1  1.0048340  0.69289708
-32   2   const  setar       1       0      L       1  1.1279944  0.27166667
-33   2   const  setar       1       1      H       1  0.6184753  0.26912811
-34   2   const  setar       1       1      L       1  1.1306673  0.78025129
-35   2   const  setar       2       0      H       1  1.1646495  0.84210748
-36   2   const  setar       2       0      L       1  1.1158326  0.02828286
-37   2   const  setar       2       1      H       1  1.2893372  0.31279069
-38   2   const  setar       2       1      L       1  0.7452092  0.56980957
-39   2    none linear      NA      NA    all       1  0.9529903  0.81916380
-40   2    none  setar       1       0      H       1  1.0732823  1.03423204
-41   2    none  setar       1       0      L       1  1.4153645  1.16331054
-42   2    none  setar       1       1      H       1  0.4066658  0.34187630
-43   2    none  setar       1       1      L       1  0.7648152  0.13539014
-44   2    none  setar       2       0      H       1  1.1511918  1.02898598
-45   2    none  setar       2       0      L       1  1.0540197  0.09497119
-46   2    none  setar       2       1      H       1  1.2343256  0.89547321
-47   2    none  setar       2       1      L       1  0.7648152  0.58177511
-48   2   trend linear      NA      NA    all       1  0.8966971  0.79147279
-49   2   trend  setar       1       0      H       1  0.9799192  1.05457106
-50   2   trend  setar       1       0      L       1  2.2465299  1.04736293
-51   2   trend  setar       1       1      H       1  0.6318633  0.63706037
-52   2   trend  setar       1       1      L       1  0.7006092  0.46014838
-53   2   trend  setar       2       0      H       1  1.1084846  0.83764009
-54   2   trend  setar       2       0      L       1  0.5001720  0.49725567
-55   2   trend  setar       2       1      H       1  0.7857352  0.24939003
-56   2   trend  setar       2       1      L       1  1.0595660  0.69214213
-      irf_upp
-1   0.6195147
-2   0.5663047
-3  -0.2937537
-4   1.0577115
-5  -0.6974202
-6   0.7136597
-7   1.2655181
-8   2.0934095
-9   1.1109982
-10  2.3237284
-11  0.9865249
-12  0.9403934
-13  1.2467582
-14  0.9140192
-15  1.2201801
-16  0.8997656
-17  0.8703499
-18  1.8746765
-19  1.0586774
-20  1.4001492
-21  0.8369548
-22  0.9050912
-23  1.6456195
-24  0.5573693
-25  1.8079368
-26  1.1748471
-27 -0.3966017
-28  2.0053106
-29  1.2802681
-30  0.8769139
-31  1.1635143
-32  1.6836598
-33  0.9137788
-34  1.5364564
-35  1.3141665
-36  1.1311213
-37  1.7966887
-38  0.8823909
-39  1.0115073
-40  1.2714636
-41  1.8554379
-42  0.8157076
-43  0.9017888
-44  1.3143976
-45  1.2204155
-46  1.7849146
-47  1.1263525
-48  0.9605828
-49  1.1337700
-50  2.9989709
-51  0.9423192
-52  0.7943283
-53  1.2283931
-54  1.2052317
-55  1.4319349
-56  1.2729626
++   select(-object) %>% 
++   as_tibble()
+# A tibble: 56 x 10
+     lag include model  nthresh thDelay regime n.ahead irf_irf irf_low irf_upp
+   <dbl> <chr>   <chr>    <int>   <int> <chr>    <int>   <dbl>   <dbl>   <dbl>
+ 1     1 both    linear      NA      NA all          1   0.529  0.325    0.620
+ 2     1 both    setar        1       0 H            1   0.527 -0.564    0.566
+ 3     1 both    setar        1       0 L            1   0.883 -3.27    -0.294
+ 4     1 both    setar        2       0 H            1   0.935  0.464    1.06 
+ 5     1 both    setar        2       0 L            1  -0.358 -1.20    -0.697
+ 6     1 const   linear      NA      NA all          1   0.586  0.362    0.714
+ 7     1 const   setar        1       0 H            1   0.910  0.290    1.27 
+ 8     1 const   setar        1       0 L            1   0.944  0.184    2.09 
+ 9     1 const   setar        2       0 H            1   1.02  -0.0806   1.11 
+10     1 const   setar        2       0 L            1   0.193 -0.643    2.32 
+# … with 46 more rows
 > 
 > 
 > df_all %>% 
@@ -200,4 +111,4 @@ There were 50 or more warnings (use warnings() to see the first 50)
 > 
 > proc.time()
    user  system elapsed 
- 13.335   0.247  14.460 
+ 14.350   0.267  14.988 

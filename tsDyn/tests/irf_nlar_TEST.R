@@ -41,7 +41,8 @@ df_all <- models_irf %>%
 
 df_all %>% 
   filter(n.ahead %in% c( 1)) %>% 
-  as.data.frame()
+  select(-object) %>% 
+  as_tibble()
 
 
 df_all %>% 
