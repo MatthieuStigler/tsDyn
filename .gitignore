@@ -1,0 +1,17 @@
+*~
+*tsDyn.Rcheck
+*.R~
+*.o
+*.so
+#.gitignore
+Divers_tsDyn
+tsDyn_*.tar.gz
+devtools_tsDyn.R
+wiki
+TODO.txt
+TODO.Rmd
+orthographe.txt
+tsDyn/src/symbols*
+tsDyn_roxy
+NAMESPACE_roxy
+.Rproj.user
