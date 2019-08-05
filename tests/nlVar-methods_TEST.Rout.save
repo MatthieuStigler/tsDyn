@@ -1,6 +1,6 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -29,7 +29,6 @@ Registered S3 methods overwritten by 'forecast':
   fitted.fracdiff    fracdiff
   residuals.fracdiff fracdiff
 > suppressMessages(library(tidyverse))
-> suppressWarnings(RNGversion("3.5.3"))
 > 
 > ############################
 > ### Load data
@@ -4825,10 +4824,10 @@ Equation cpiUSA  0.24673984
 > 
 > 
 > uni_stats <- models_multivariate %>% 
-+   mutate_at("object", funs(deviance = map_dbl(., deviance),
-+                            AIC = map_dbl(., AIC),
-+                            BIC = map_dbl(., BIC),
-+                            logLik = map_dbl(., logLik))) %>% 
++   mutate_at("object", list(deviance = ~map_dbl(., deviance),
++                            AIC = ~map_dbl(., AIC),
++                            BIC = ~map_dbl(., BIC),
++                            logLik = ~map_dbl(., logLik))) %>% 
 +   select(-starts_with("object"))
 > 
 > as.data.frame(uni_stats)
@@ -9635,4 +9634,4 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 > 
 > proc.time()
    user  system elapsed 
- 22.898   0.301  26.680 
+ 20.029   0.352  20.714 
