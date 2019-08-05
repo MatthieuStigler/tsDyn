@@ -53,7 +53,7 @@ models_VAR <- models_multivariate %>%
 models_IRF_any <- models_multivariate %>% 
   filter(model == "VAR") %>% 
   mutate(ortho = list(tibble(ortho =c(TRUE, FALSE)))) %>% 
-  unnest(ortho, .preserve = c("object", "object_vars")) %>% 
+  unnest(ortho) %>% 
   mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 2, seed = 7, ortho = .y)),
          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))
@@ -98,6 +98,7 @@ models_VECM <- models_multivariate %>%
 models_VECM %>% 
   mutate(irf = map(irf, ~ head(.$irf[[1]], 2) %>% 
                      as_tibble)) %>% 
+  select(-object, -object_vars) %>% 
   unnest(irf) %>% 
   as.data.frame()
 
@@ -128,6 +129,7 @@ models_TVAR_irf <- models_TVAR  %>%
 models_TVAR_irf %>% 
   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
                      as_tibble)) %>% 
+  select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
   as.data.frame()
 
@@ -156,6 +158,7 @@ models_TVECM_irf <- models_TVECM   %>%
 models_TVECM_irf %>% 
   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
                      as_tibble)) %>% 
+  select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
   as.data.frame()
 
