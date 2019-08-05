@@ -1,6 +1,6 @@
 library(tsDyn)
 suppressMessages(library(tidyverse))
-
+suppressWarnings(RNGversion("3.5.3"))
 
 ############################
 ### Load data

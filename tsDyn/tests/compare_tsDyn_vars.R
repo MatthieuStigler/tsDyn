@@ -1,6 +1,7 @@
 
 library(tsDyn)
 library(vars)
+suppressWarnings(RNGversion("3.5.3"))
 
 data(Canada)
 

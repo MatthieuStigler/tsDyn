@@ -1,6 +1,7 @@
 
 library(tsDyn)
 suppressMessages(library(tidyverse))
+suppressWarnings(RNGversion("3.5.3"))
 
 
 plot_GIRF_line_low <-  tsDyn:::plot_GIRF_line_low
