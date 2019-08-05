@@ -1,6 +1,6 @@
 
-R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -18,7 +18,18 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
+Registered S3 method overwritten by 'xts':
+  method     from
+  as.zoo.xts zoo 
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
+Registered S3 methods overwritten by 'forecast':
+  method             from    
+  fitted.fracdiff    fracdiff
+  residuals.fracdiff fracdiff
 > suppressMessages(library(tidyverse))
+> suppressWarnings(RNGversion("3.5.3"))
 > 
 > ############################
 > ### Load data
@@ -30,18 +41,18 @@ Type 'q()' to quit R.
 > 
 > models_multivariate
 # A tibble: 48 x 6
-     lag include model object     object_vars  nthresh
-   <dbl> <chr>   <chr> <list>     <list>         <int>
- 1     1 both    VAR   <S3: VAR>  <S3: varest>      NA
- 2     1 const   VAR   <S3: VAR>  <S3: varest>      NA
- 3     1 none    VAR   <S3: VAR>  <S3: varest>      NA
- 4     1 trend   VAR   <S3: VAR>  <S3: varest>      NA
- 5     2 both    VAR   <S3: VAR>  <S3: varest>      NA
- 6     2 const   VAR   <S3: VAR>  <S3: varest>      NA
- 7     2 none    VAR   <S3: VAR>  <S3: varest>      NA
- 8     2 trend   VAR   <S3: VAR>  <S3: varest>      NA
- 9     1 both    VECM  <S3: VECM> <NULL>            NA
-10     1 const   VECM  <S3: VECM> <S4: ca.jo>       NA
+     lag include model object object_vars nthresh
+   <dbl> <chr>   <chr> <list> <list>        <int>
+ 1     1 both    VAR   <VAR>  <varest>         NA
+ 2     1 const   VAR   <VAR>  <varest>         NA
+ 3     1 none    VAR   <VAR>  <varest>         NA
+ 4     1 trend   VAR   <VAR>  <varest>         NA
+ 5     2 both    VAR   <VAR>  <varest>         NA
+ 6     2 const   VAR   <VAR>  <varest>         NA
+ 7     2 none    VAR   <VAR>  <varest>         NA
+ 8     2 trend   VAR   <VAR>  <varest>         NA
+ 9     1 both    VECM  <VECM> <NULL>           NA
+10     1 const   VECM  <VECM> <ca.jo>          NA
 # … with 38 more rows
 > 
 > ############################
@@ -166,31 +177,31 @@ Type 'q()' to quit R.
 > models_IRF_any <- models_multivariate %>% 
 +   filter(model == "VAR") %>% 
 +   mutate(ortho = list(tibble(ortho =c(TRUE, FALSE)))) %>% 
-+   unnest(ortho, .preserve = c("object", "object_vars")) %>% 
++   unnest(ortho) %>% 
 +   mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 2, seed = 7, ortho = .y)),
 +          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
 +          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))
 > 
 > models_IRF_any
 # A tibble: 16 x 10
-     lag include model nthresh object  object_vars ortho irf   irf_vars irf_vec2
-   <dbl> <chr>   <chr>   <int> <list>  <list>      <lgl> <lis> <list>   <list>  
- 1     1 both    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
- 2     1 both    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
- 3     1 const   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
- 4     1 const   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
- 5     1 none    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
- 6     1 none    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
- 7     1 trend   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
- 8     1 trend   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
- 9     2 both    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
-10     2 both    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
-11     2 const   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
-12     2 const   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
-13     2 none    VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
-14     2 none    VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
-15     2 trend   VAR        NA <S3: V… <S3: vares… TRUE  <S3:… <S3: va… <S3: va…
-16     2 trend   VAR        NA <S3: V… <S3: vares… FALSE <S3:… <S3: va… <S3: va…
+     lag include model object object_vars nthresh ortho irf    irf_vars irf_vec2
+   <dbl> <chr>   <chr> <list> <list>        <int> <lgl> <list> <list>   <list>  
+ 1     1 both    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+ 2     1 both    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+ 3     1 const   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+ 4     1 const   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+ 5     1 none    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+ 6     1 none    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+ 7     1 trend   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+ 8     1 trend   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+ 9     2 both    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+10     2 both    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+11     2 const   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+12     2 const   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+13     2 none    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+14     2 none    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+15     2 trend   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
+16     2 trend   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
 > 
 > ## show head of irf any
 > map_df(models_IRF_any$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
@@ -301,6 +312,7 @@ Type 'q()' to quit R.
 > models_VECM %>% 
 +   mutate(irf = map(irf, ~ head(.$irf[[1]], 2) %>% 
 +                      as_tibble)) %>% 
++   select(-object, -object_vars) %>% 
 +   unnest(irf) %>% 
 +   as.data.frame()
    lag include model nthresh   dolcan    cpiUSA
@@ -438,6 +450,7 @@ $dolcan
 > models_TVAR_irf %>% 
 +   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
 +                      as_tibble)) %>% 
++   select(-object, -object_vars, -irf_L ) %>% 
 +   unnest(irf) %>% 
 +   as.data.frame()
    lag include model nthresh    dolcan      cpiUSA
@@ -636,6 +649,7 @@ There were 14 warnings (use warnings() to see them)
 > models_TVECM_irf %>% 
 +   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
 +                      as_tibble)) %>% 
++   select(-object, -object_vars, -irf_L ) %>% 
 +   unnest(irf) %>% 
 +   as.data.frame()
    lag include model nthresh   dolcan     cpiUSA
@@ -678,4 +692,4 @@ There were 14 warnings (use warnings() to see them)
 > 
 > proc.time()
    user  system elapsed 
- 46.826   0.272  48.473 
+ 42.152   0.302  43.044 
