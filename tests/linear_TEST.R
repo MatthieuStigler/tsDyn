@@ -1,4 +1,5 @@
 library(tsDyn)
+suppressWarnings(RNGversion("3.5.3"))
 
 ### linear
 grid <-  expand.grid(include = c( "const", "trend","none", "both"),

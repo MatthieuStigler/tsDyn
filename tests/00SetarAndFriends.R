@@ -1,4 +1,5 @@
 library(tsDyn)
+suppressWarnings(RNGversion("3.5.3"))
 
 ###SETAR
 
