@@ -2,6 +2,17 @@ library(tsDyn)
 suppressMessages(library(tidyverse))
 suppressWarnings(RNGversion("3.5.3"))
 
+roundAll.Equal <- function(x, round=8){
+  isFALSE <- x!="TRUE"
+  xFalse <- x[isFALSE]
+  # extract the number (i.e remove all the rest)
+  xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
+            "", xFalse)
+  xf2<- round(as.numeric(xf),round)
+  x[isFALSE] <- paste("Mean relative difference: ", xf2, sep="")
+  x
+}
+
 ############################
 ### Load data
 ############################
@@ -96,11 +107,11 @@ set_1th_l2 <-  setar(lynx, nthresh=1, m=2)
 set_1th_l1_tr <-  setar(lynx, nthresh=1, m=1, include = "trend")
 
 
-setar.boot.check(set_1th_l1)
+roundAll.Equal(setar.boot.check(set_1th_l1), 2)
 setar.boot.check(set_1th_l1, round_digits = 2)
-setar.boot.check(set_1th_l2)
-setar.boot.check(set_1th_l2, round_digits = 5)
-setar.boot.check(set_1th_l1_tr)
+roundAll.Equal(setar.boot.check(set_1th_l2), 2)
+roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
+isTRUE(setar.boot.check(set_1th_l1_tr))
 setar.boot.check(set_1th_l1_tr, round_digits = 1)
 
 
