@@ -65,12 +65,12 @@ Registered S3 methods overwritten by 'forecast':
 +   gather(irf_stat, value, irf_irf, irf_low, irf_upp) %>% 
 +   mutate(value = map(value, ~tibble(x=.) %>% 
 +                           mutate(n.ahead = 0:4))) %>% 
++   select(-object) %>% 
 +   unnest(value) %>% 
 +   spread(irf_stat, x)
 > 
 > df_all %>% 
 +   filter(n.ahead %in% c( 1)) %>% 
-+   select(-object) %>% 
 +   as_tibble()
 # A tibble: 56 x 10
      lag include model  nthresh thDelay regime n.ahead irf_irf irf_low irf_upp
@@ -111,4 +111,4 @@ There were 50 or more warnings (use warnings() to see the first 50)
 > 
 > proc.time()
    user  system elapsed 
- 14.350   0.267  14.988 
+ 12.155   0.252  13.022 
