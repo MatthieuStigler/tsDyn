@@ -350,12 +350,12 @@ Possible unit root in the low  regime. Roots are: 0.633
 [1] TRUE
 > setar.boot.check(set_2th_l2)
 [1] "Mean relative difference: 1"
-> setar.boot.check(set_2th_l2, round_digits = 1)
-[1] "Mean relative difference: 0.5431945"
-> setar.boot.check(set_2th_l1_tr)
-[1] "Mean relative difference: 1"
-> setar.boot.check(set_2th_l1_tr, round_digits = 1)
-[1] "Mean relative difference: 0.0001531941"
+> isTRUE(setar.boot.check(set_2th_l2, round_digits = 1))
+[1] FALSE
+> isTRUE(setar.boot.check(set_2th_l1_tr))
+[1] FALSE
+> roundAll.Equal(setar.boot.check(set_2th_l1_tr, round_digits = 1),3)
+[1] "Mean relative difference: 0"
 > 
 > 
 > ################
@@ -388,4 +388,4 @@ Possible unit root in the low  regime. Roots are: 0.633
 > 
 > proc.time()
    user  system elapsed 
-  3.648   0.275   4.359 
+  3.745   0.255   4.493 
