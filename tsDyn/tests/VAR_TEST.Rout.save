@@ -29,6 +29,7 @@ Registered S3 methods overwritten by 'forecast':
   fitted.fracdiff    fracdiff
   residuals.fracdiff fracdiff
 > suppressWarnings(RNGversion("3.5.3"))
+> options(useFancyQuotes=FALSE) # useful for all.equal comparison
 > 
 > data(zeroyld)
 > data(barry)
@@ -6296,8 +6297,8 @@ $var_l3_tr
 
 > 
 > all.equal(lapply(var_all_pred, predict, n.ahead=2), lapply(var_all_pred, function(x) sapply(tsDyn:::predictOld.VAR(x, n.ahead=2)$fcst, function(y) y[,"fcst"])), check.attributes=FALSE)
-[1] "Component “var_l1_tr”: Mean relative difference: 0.01818794"
-[2] "Component “var_l3_tr”: Mean relative difference: 0.01021486"
+[1] "Component \"var_l1_tr\": Mean relative difference: 0.01818794"
+[2] "Component \"var_l3_tr\": Mean relative difference: 0.01021486"
 > 
 > lapply(var_all_level , function(x) predict_rolling(x,nroll=2)$pred)
 $var_l1_co
@@ -6622,4 +6623,4 @@ $var_l3_no
 > 
 > proc.time()
    user  system elapsed 
-  3.481   0.237   4.316 
+  3.436   0.254   3.928 

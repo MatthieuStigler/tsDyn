@@ -1,5 +1,6 @@
 library(tsDyn)
 suppressWarnings(RNGversion("3.5.3"))
+options(useFancyQuotes=FALSE) # useful for all.equal comparison
 
 data(zeroyld)
 data(barry)
