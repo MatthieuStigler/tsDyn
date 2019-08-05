@@ -1,5 +1,5 @@
 library(tsDyn)
-library(tidyverse)
+suppressMessages(library(tidyverse))
 
 ###SETAR
 
