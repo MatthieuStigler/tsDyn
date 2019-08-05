@@ -1,5 +1,6 @@
 library(tsDyn)
 suppressMessages(library(tidyverse))
+suppressWarnings(RNGversion("3.5.3"))
 
 data(IIPUs)
 
@@ -24,12 +25,12 @@ res <- grid %>%
 
 ### show F tests ###
 res %>% 
-  mutate(Ftests = map(dat, ~as_tibble(.$Ftests %>%  t))) %>% 
+  mutate(Ftests = map(dat, ~enframe(.$Ftests))) %>% 
   select(-dat) %>% 
   unnest(Ftests)
 
 res %>% 
-  mutate(Ftests = map(dat, ~as_tibble(.$SSRs %>%  t))) %>% 
+  mutate(Ftests = map(dat, ~enframe(.$SSRs))) %>% 
   select(-dat) %>% 
   unnest(Ftests)
 
