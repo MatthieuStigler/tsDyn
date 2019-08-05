@@ -1149,7 +1149,7 @@ NULL
 > 
 > 
 > ##
-> suppressMessages(suppressWarnings(sapply(mod_no_aar, tsDyn:::mod_refit_check)))
+> suppressMessages(suppressWarnings(sapply(mod_no_aar, function(x) isTRUE(tsDyn:::mod_refit_check(x)))))
  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
@@ -1263,4 +1263,4 @@ $aar
 > 
 > proc.time()
    user  system elapsed 
- 13.918   0.250  15.165 
+ 13.960   0.207  14.667 

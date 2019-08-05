@@ -42,7 +42,7 @@ sapply(mod, getTh)
 
 
 ##
-suppressMessages(suppressWarnings(sapply(mod_no_aar, tsDyn:::mod_refit_check)))
+suppressMessages(suppressWarnings(sapply(mod_no_aar, function(x) isTRUE(tsDyn:::mod_refit_check(x)))))
 
 
 ### Pred Roll, acc_stat:
