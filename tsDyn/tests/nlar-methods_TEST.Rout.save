@@ -1148,11 +1148,11 @@ NULL
 
 > 
 > 
-> ##
-> suppressMessages(suppressWarnings(sapply(mod_no_aar, function(x) isTRUE(tsDyn:::mod_refit_check(x)))))
+> ## Output of mod_no_aar[-44] is platform/machien specific...
+> suppressMessages(suppressWarnings(sapply(mod_no_aar[-44], tsDyn:::mod_refit_check)))
  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 > 
 > 
 > ### Pred Roll, acc_stat:
@@ -1263,4 +1263,4 @@ $aar
 > 
 > proc.time()
    user  system elapsed 
- 13.960   0.207  14.667 
+ 13.270   0.291  14.266 
