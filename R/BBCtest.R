@@ -19,6 +19,7 @@
 #'-The version of test used (either Wald, LM or LR).
 #'@author Matthieu Stigler
 #'@seealso \code{\link{setarTest}} for a test with stationarity as a null.
+#' @references Bec, Ben Salem and Carrasco (2004) Tests for Unit-Root versus Threshold Specification With an Application to the Purchasing Power Parity Relationship, Journal of Business and Economic Statistics; 22:4
 #'@export
 #'@examples
 #'
