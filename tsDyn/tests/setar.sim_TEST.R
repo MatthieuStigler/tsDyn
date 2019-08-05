@@ -151,9 +151,9 @@ set_2th_l1_tr <-  setar(lynx, nthresh=2, m=1, include = "trend")
 
 setar.boot.check(set_2th_l1)
 setar.boot.check(set_2th_l2)
-setar.boot.check(set_2th_l2, round_digits = 1)
-setar.boot.check(set_2th_l1_tr)
-setar.boot.check(set_2th_l1_tr, round_digits = 1)
+isTRUE(setar.boot.check(set_2th_l2, round_digits = 1))
+isTRUE(setar.boot.check(set_2th_l1_tr))
+roundAll.Equal(setar.boot.check(set_2th_l1_tr, round_digits = 1),3)
 
 
 ################
