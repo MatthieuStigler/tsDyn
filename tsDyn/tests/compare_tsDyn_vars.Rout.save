@@ -18,16 +18,6 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
-Registered S3 method overwritten by 'xts':
-  method     from
-  as.zoo.xts zoo 
-Registered S3 method overwritten by 'quantmod':
-  method            from
-  as.zoo.data.frame zoo 
-Registered S3 methods overwritten by 'forecast':
-  method             from    
-  fitted.fracdiff    fracdiff
-  residuals.fracdiff fracdiff
 > library(vars)
 Loading required package: MASS
 Loading required package: strucchange

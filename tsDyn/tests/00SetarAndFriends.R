@@ -1,4 +1,4 @@
-library(tsDyn)
+  library(tsDyn)
 suppressMessages(library(tidyverse))
 
 ###SETAR
@@ -71,5 +71,5 @@ if(FALSE) {
     group_by(model) %>%
     mutate(rmse = sqrt(mean(value-original)^2)) %>% 
     filter(n_row ==min(n_row)) %>% 
-    dplyr::select(-rmse)
+    select(-rmse)
 }
