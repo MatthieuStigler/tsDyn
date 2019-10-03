@@ -208,7 +208,7 @@ summary.rank.select <- function(object,...){
   cat("\nBest number of lags:\n")
   AIC_minlag<-apply(object$AICs, 1, which.min)
   BIC_minlag<-apply(object$BICs, 1, which.min)
-  HQ_minlag<-apply(object$BICs, 1, which.min)
+  HQ_minlag<-apply(object$HQs, 1, which.min)
 
   mat <- rbind(AIC_minlag, BIC_minlag,HQ_minlag)
   dimnames(mat) <- list(c("AIC", "BIC", "HQ"), paste("r", if(nrow(object$BICs)==1) 0 else 0:(nrow(object$BICs)-1), sep="="))
