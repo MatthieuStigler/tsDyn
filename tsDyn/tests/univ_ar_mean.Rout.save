@@ -61,32 +61,31 @@ Type 'q()' to quit R.
 +   mutate(ar_mean = map(ar_mean, ~as_tibble(t(.)))) %>% 
 +   unnest(ar_mean) %>% 
 +   select(-object) %>% 
-+   print(n = Inf)
-# A tibble: 22 x 9
-     lag include model  nthresh thDelay ar_mean ar_mean_H ar_mean_L ar_mean_M
-   <dbl> <chr>   <chr>    <int>   <int>   <dbl>     <dbl>     <dbl>     <dbl>
- 1     1 const   linear      NA      NA    2.42    NA        NA         NA   
- 2     1 none    linear      NA      NA    0       NA        NA         NA   
- 3     2 const   linear      NA      NA    2.40    NA        NA         NA   
- 4     2 none    linear      NA      NA    0       NA        NA         NA   
- 5     1 const   setar        1       0   NA        0.559     8.47      NA   
- 6     1 const   setar        2       0   NA       14.8       2.12       2.26
- 7     1 none    setar        1       0    0       NA        NA         NA   
- 8     1 none    setar        2       0    0       NA        NA         NA   
- 9     2 const   setar        1       0   NA        1.44      4.65      NA   
-10     2 const   setar        1       1   NA        2.42      1.70      NA   
-11     2 const   setar        2       0   NA       -0.567     0.316      2.50
-12     2 const   setar        2       1   NA        2.45      2.57       1.97
-13     2 none    setar        1       0    0       NA        NA         NA   
-14     2 none    setar        1       1    0       NA        NA         NA   
-15     2 none    setar        2       0    0       NA        NA         NA   
-16     2 none    setar        2       1    0       NA        NA         NA   
-17     1 const   lstar       NA       0   NA       -0.416     8.40      NA   
-18     1 none    lstar       NA       0    0       NA        NA         NA   
-19     2 const   lstar       NA       0   NA       -0.441     4.66      NA   
-20     2 const   lstar       NA       1   NA        1.67      1.56      NA   
-21     2 none    lstar       NA       0    0       NA        NA         NA   
-22     2 none    lstar       NA       1    0       NA        NA         NA   
++   as.data.frame() %>% 
++   print(digits=3)
+   lag include  model nthresh thDelay ar_mean ar_mean_H ar_mean_L ar_mean_M
+1    1   const linear      NA      NA    2.42        NA        NA        NA
+2    1    none linear      NA      NA    0.00        NA        NA        NA
+3    2   const linear      NA      NA    2.40        NA        NA        NA
+4    2    none linear      NA      NA    0.00        NA        NA        NA
+5    1   const  setar       1       0      NA     0.559     8.475        NA
+6    1   const  setar       2       0      NA    14.776     2.123      2.26
+7    1    none  setar       1       0    0.00        NA        NA        NA
+8    1    none  setar       2       0    0.00        NA        NA        NA
+9    2   const  setar       1       0      NA     1.444     4.648        NA
+10   2   const  setar       1       1      NA     2.421     1.703        NA
+11   2   const  setar       2       0      NA    -0.567     0.316      2.50
+12   2   const  setar       2       1      NA     2.453     2.572      1.97
+13   2    none  setar       1       0    0.00        NA        NA        NA
+14   2    none  setar       1       1    0.00        NA        NA        NA
+15   2    none  setar       2       0    0.00        NA        NA        NA
+16   2    none  setar       2       1    0.00        NA        NA        NA
+17   1   const  lstar      NA       0      NA    -0.416     8.402        NA
+18   1    none  lstar      NA       0    0.00        NA        NA        NA
+19   2   const  lstar      NA       0      NA    -0.441     4.657        NA
+20   2   const  lstar      NA       1      NA     1.670     1.555        NA
+21   2    none  lstar      NA       0    0.00        NA        NA        NA
+22   2    none  lstar      NA       1    0.00        NA        NA        NA
 > 
 > 
 > proc.time()
