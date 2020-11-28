@@ -19,9 +19,6 @@ Type 'q()' to quit R.
 
 > 
 > library(tsDyn)
-Registered S3 method overwritten by 'quantmod':
-  method            from
-  as.zoo.data.frame zoo 
 > suppressMessages(library(tidyverse))
 > suppressWarnings(RNGversion("3.5.3"))
 > 
@@ -261,24 +258,34 @@ Registered S3 method overwritten by 'quantmod':
 +                                   R = 2, seed = 123) %>% head(2))) %>% 
 +   select(-object) %>% 
 +   unnest(girf) %>% 
-+   as_tibble()
-# A tibble: 96 x 19
-     lag include model object_vars nthresh n_simu hist_x1_l1 hist_x2_l1
-   <dbl> <chr>   <chr> <list>        <int>  <int>      <dbl>      <dbl>
- 1     1 both    VAR   <varest>         NA      1       1.17       55.6
- 2     1 both    VAR   <varest>         NA      1       1.17       55.6
- 3     1 const   VAR   <varest>         NA      1       1.17       55.6
- 4     1 const   VAR   <varest>         NA      1       1.17       55.6
- 5     1 none    VAR   <varest>         NA      1       1.17       55.6
- 6     1 none    VAR   <varest>         NA      1       1.17       55.6
- 7     1 trend   VAR   <varest>         NA      1       1.17       55.6
- 8     1 trend   VAR   <varest>         NA      1       1.17       55.6
- 9     2 both    VAR   <varest>         NA      1       1.16       55.1
-10     2 both    VAR   <varest>         NA      1       1.16       55.1
-# … with 86 more rows, and 11 more variables: shock_var1 <dbl>,
-#   shock_var2 <dbl>, n.ahead <int>, var <chr>, sim_1 <dbl>, sim_2 <dbl>,
-#   girf <dbl>, hist_x1_l2 <dbl>, hist_x2_l2 <dbl>, hist_x1_l3 <dbl>,
-#   hist_x2_l3 <dbl>
++   select(-object_vars) %>% 
++   as.data.frame() %>% 
++   slice(10:20) %>% 
++   print(digits=3)
+   lag include model nthresh n_simu hist_x1_l1 hist_x2_l1 shock_var1 shock_var2
+1    2    both   VAR      NA      1       1.16       55.1     0.0162      0.129
+2    2   const   VAR      NA      1       1.16       55.1     0.0164      0.127
+3    2   const   VAR      NA      1       1.16       55.1     0.0164      0.127
+4    2    none   VAR      NA      1       1.16       55.1     0.0161      0.122
+5    2    none   VAR      NA      1       1.16       55.1     0.0161      0.122
+6    2   trend   VAR      NA      1       1.16       55.1     0.0156      0.116
+7    2   trend   VAR      NA      1       1.16       55.1     0.0156      0.116
+8    1    both  VECM      NA      1       1.16       55.1     0.0161      0.124
+9    1    both  VECM      NA      1       1.16       55.1     0.0161      0.124
+10   1   const  VECM      NA      1       1.16       55.1     0.0163      0.126
+11   1   const  VECM      NA      1       1.16       55.1     0.0163      0.126
+   n.ahead    var sim_1 sim_2  girf hist_x1_l2 hist_x2_l2 hist_x1_l3 hist_x2_l3
+1        1 cpiUSA  56.4  56.2 0.197       1.17       55.6         NA         NA
+2        0 cpiUSA  56.2  56.0 0.127       1.17       55.6         NA         NA
+3        1 cpiUSA  56.5  56.3 0.193       1.17       55.6         NA         NA
+4        0 cpiUSA  56.2  56.0 0.122       1.17       55.6         NA         NA
+5        1 cpiUSA  56.5  56.3 0.193       1.17       55.6         NA         NA
+6        0 cpiUSA  56.3  56.2 0.116       1.17       55.6         NA         NA
+7        1 cpiUSA  56.7  56.6 0.180       1.17       55.6         NA         NA
+8        0 cpiUSA  56.2  56.1 0.124       1.17       55.6         NA         NA
+9        1 cpiUSA  56.6  56.4 0.189       1.17       55.6         NA         NA
+10       0 cpiUSA  56.2  56.0 0.126       1.17       55.6         NA         NA
+11       1 cpiUSA  56.5  56.3 0.193       1.17       55.6         NA         NA
 > 
 > 
 > proc.time()
