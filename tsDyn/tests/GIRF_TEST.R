@@ -162,5 +162,8 @@ models_multivariate %>%
                                   R = 2, seed = 123) %>% head(2))) %>% 
   select(-object) %>% 
   unnest(girf) %>% 
-  as_tibble()
+  select(-object_vars) %>% 
+  as.data.frame() %>% 
+  slice(10:20) %>% 
+  print(digits=3)
 

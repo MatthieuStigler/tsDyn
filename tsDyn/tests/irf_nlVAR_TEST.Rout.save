@@ -29,21 +29,24 @@ Type 'q()' to quit R.
 > 
 > models_multivariate <- readRDS(path_mod_multi)
 > 
-> models_multivariate
-# A tibble: 48 x 6
-     lag include model object object_vars nthresh
-   <dbl> <chr>   <chr> <list> <list>        <int>
- 1     1 both    VAR   <VAR>  <varest>         NA
- 2     1 const   VAR   <VAR>  <varest>         NA
- 3     1 none    VAR   <VAR>  <varest>         NA
- 4     1 trend   VAR   <VAR>  <varest>         NA
- 5     2 both    VAR   <VAR>  <varest>         NA
- 6     2 const   VAR   <VAR>  <varest>         NA
- 7     2 none    VAR   <VAR>  <varest>         NA
- 8     2 trend   VAR   <VAR>  <varest>         NA
- 9     1 both    VECM  <VECM> <NULL>           NA
-10     1 const   VECM  <VECM> <ca.jo>          NA
-# … with 38 more rows
+> models_multivariate %>% 
++   mutate(across(where(is.list), class)) %>% 
++   as.data.frame() %>% 
++   head(12)
+   lag include model object object_vars nthresh
+1    1    both   VAR   list        list      NA
+2    1   const   VAR   list        list      NA
+3    1    none   VAR   list        list      NA
+4    1   trend   VAR   list        list      NA
+5    2    both   VAR   list        list      NA
+6    2   const   VAR   list        list      NA
+7    2    none   VAR   list        list      NA
+8    2   trend   VAR   list        list      NA
+9    1    both  VECM   list        list      NA
+10   1   const  VECM   list        list      NA
+11   1    none  VECM   list        list      NA
+12   1   trend  VECM   list        list      NA
+> 
 > 
 > ############################
 > ### VAR
@@ -144,17 +147,15 @@ Type 'q()' to quit R.
 > 
 > models_IRF_1$irf %>% 
 +   bind_rows() %>% 
-+   as_tibble() %>% 
-+   head()
-# A tibble: 6 x 3
++   head() %>% 
++   print(digits=3)
   dolcan cpiUSA impulse
-   <dbl>  <dbl> <chr>  
-1  1      0     dolcan 
-2  0.987 -0.140 dolcan 
-3  0.974 -0.278 dolcan 
-4  0.962 -0.414 dolcan 
-5  0.949 -0.549 dolcan 
-6  0.937 -0.683 dolcan 
+1  1.000  0.000  dolcan
+2  0.987 -0.140  dolcan
+3  0.974 -0.278  dolcan
+4  0.962 -0.414  dolcan
+5  0.949 -0.549  dolcan
+6  0.937 -0.683  dolcan
 > 
 > ### irf_any
 > # irf.NULL <- function(x) NULL
@@ -172,45 +173,43 @@ Type 'q()' to quit R.
 +          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
 +          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))
 > 
-> models_IRF_any
-# A tibble: 16 x 10
-     lag include model object object_vars nthresh ortho irf    irf_vars irf_vec2
-   <dbl> <chr>   <chr> <list> <list>        <int> <lgl> <list> <list>   <list>  
- 1     1 both    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
- 2     1 both    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
- 3     1 const   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
- 4     1 const   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
- 5     1 none    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
- 6     1 none    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
- 7     1 trend   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
- 8     1 trend   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
- 9     2 both    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
-10     2 both    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
-11     2 const   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
-12     2 const   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
-13     2 none    VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
-14     2 none    VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
-15     2 trend   VAR   <VAR>  <varest>         NA TRUE  <vari… <varirf> <varirf>
-16     2 trend   VAR   <VAR>  <varest>         NA FALSE <vari… <varirf> <varirf>
+> models_IRF_any %>% 
++   mutate(across(where(is.list), class)) %>% 
++   as.data.frame()
+   lag include model object object_vars nthresh ortho  irf irf_vars irf_vec2
+1    1    both   VAR   list        list      NA  TRUE list     list     list
+2    1    both   VAR   list        list      NA FALSE list     list     list
+3    1   const   VAR   list        list      NA  TRUE list     list     list
+4    1   const   VAR   list        list      NA FALSE list     list     list
+5    1    none   VAR   list        list      NA  TRUE list     list     list
+6    1    none   VAR   list        list      NA FALSE list     list     list
+7    1   trend   VAR   list        list      NA  TRUE list     list     list
+8    1   trend   VAR   list        list      NA FALSE list     list     list
+9    2    both   VAR   list        list      NA  TRUE list     list     list
+10   2    both   VAR   list        list      NA FALSE list     list     list
+11   2   const   VAR   list        list      NA  TRUE list     list     list
+12   2   const   VAR   list        list      NA FALSE list     list     list
+13   2    none   VAR   list        list      NA  TRUE list     list     list
+14   2    none   VAR   list        list      NA FALSE list     list     list
+15   2   trend   VAR   list        list      NA  TRUE list     list     list
+16   2   trend   VAR   list        list      NA FALSE list     list     list
 > 
 > ## show head of irf any
 > map_df(models_IRF_any$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
 +   as.data.frame() %>% 
-+   as_tibble()
-# A tibble: 32 x 2
-   dolcan     cpiUSA
-    <dbl>      <dbl>
- 1 0.0130 -0.00801  
- 2 0.0128 -0.00984  
- 3 1       0        
- 4 0.987  -0.140    
- 5 0.0129 -0.00791  
- 6 0.0128 -0.00974  
- 7 1       0        
- 8 0.987  -0.141    
- 9 0.0130 -0.00439  
-10 0.0130 -0.0000390
-# … with 22 more rows
++   head(10)%>% 
++   print(digits=3) 
+   dolcan    cpiUSA
+1  0.0130 -0.008008
+2  0.0128 -0.009835
+3  1.0000  0.000000
+4  0.9871 -0.139549
+5  0.0129 -0.007913
+6  0.0128 -0.009736
+7  1.0000  0.000000
+8  0.9871 -0.141092
+9  0.0130 -0.004389
+10 0.0130 -0.000039
 > 
 > 
 > ## compare with vars
@@ -262,32 +261,47 @@ Type 'q()' to quit R.
 +          is_same = map_lgl(comp_irf_tsD_vars, ~isTRUE(.)),
 +          comp_irf_tsDOld_vars = map2(irf_vec2, irf_vars,  ~all.equal(.x$irf, .y$irf)),
 +          is_same_tssDvec2 = map_lgl(comp_irf_tsDOld_vars, ~isTRUE(.)),
-+          comp_irf_tsDOld_tsDNew = map2(irf, irf_vec2,  ~all.equal(.x$irf, .y$irf)),
++          comp_irf_tsDOld_tsDNew = map2_lgl(irf, irf_vec2,  ~all.equal(.x$irf, .y$irf)),
 +          is_same_tsD_2ver = map_lgl(comp_irf_tsDOld_tsDNew, ~isTRUE(.))) %>% 
 +   select(-starts_with("irf"), -starts_with("comp_irf"), comp_irf_tsDOld_tsDNew)
 > 
 > comp %>% 
-+   select(-starts_with("object"))
-# A tibble: 16 x 9
-     lag include model nthresh ortho is_same is_same_tssDvec2 is_same_tsD_2ver
-   <dbl> <chr>   <chr>   <int> <lgl> <lgl>   <lgl>            <lgl>           
- 1     1 both    VAR        NA TRUE  TRUE    TRUE             TRUE            
- 2     1 both    VAR        NA FALSE TRUE    TRUE             TRUE            
- 3     1 const   VAR        NA TRUE  TRUE    TRUE             TRUE            
- 4     1 const   VAR        NA FALSE TRUE    TRUE             TRUE            
- 5     1 none    VAR        NA TRUE  TRUE    TRUE             TRUE            
- 6     1 none    VAR        NA FALSE TRUE    TRUE             TRUE            
- 7     1 trend   VAR        NA TRUE  FALSE   FALSE            TRUE            
- 8     1 trend   VAR        NA FALSE FALSE   FALSE            TRUE            
- 9     2 both    VAR        NA TRUE  TRUE    TRUE             TRUE            
-10     2 both    VAR        NA FALSE TRUE    TRUE             TRUE            
-11     2 const   VAR        NA TRUE  TRUE    TRUE             TRUE            
-12     2 const   VAR        NA FALSE TRUE    TRUE             TRUE            
-13     2 none    VAR        NA TRUE  TRUE    TRUE             TRUE            
-14     2 none    VAR        NA FALSE TRUE    TRUE             TRUE            
-15     2 trend   VAR        NA TRUE  FALSE   FALSE            TRUE            
-16     2 trend   VAR        NA FALSE FALSE   FALSE            TRUE            
-# … with 1 more variable: comp_irf_tsDOld_tsDNew <list>
++   select(-starts_with("object")) %>% 
++   as.data.frame()
+   lag include model nthresh ortho is_same is_same_tssDvec2 is_same_tsD_2ver
+1    1    both   VAR      NA  TRUE    TRUE             TRUE             TRUE
+2    1    both   VAR      NA FALSE    TRUE             TRUE             TRUE
+3    1   const   VAR      NA  TRUE    TRUE             TRUE             TRUE
+4    1   const   VAR      NA FALSE    TRUE             TRUE             TRUE
+5    1    none   VAR      NA  TRUE    TRUE             TRUE             TRUE
+6    1    none   VAR      NA FALSE    TRUE             TRUE             TRUE
+7    1   trend   VAR      NA  TRUE   FALSE            FALSE             TRUE
+8    1   trend   VAR      NA FALSE   FALSE            FALSE             TRUE
+9    2    both   VAR      NA  TRUE    TRUE             TRUE             TRUE
+10   2    both   VAR      NA FALSE    TRUE             TRUE             TRUE
+11   2   const   VAR      NA  TRUE    TRUE             TRUE             TRUE
+12   2   const   VAR      NA FALSE    TRUE             TRUE             TRUE
+13   2    none   VAR      NA  TRUE    TRUE             TRUE             TRUE
+14   2    none   VAR      NA FALSE    TRUE             TRUE             TRUE
+15   2   trend   VAR      NA  TRUE   FALSE            FALSE             TRUE
+16   2   trend   VAR      NA FALSE   FALSE            FALSE             TRUE
+   comp_irf_tsDOld_tsDNew
+1                    TRUE
+2                    TRUE
+3                    TRUE
+4                    TRUE
+5                    TRUE
+6                    TRUE
+7                    TRUE
+8                    TRUE
+9                    TRUE
+10                   TRUE
+11                   TRUE
+12                   TRUE
+13                   TRUE
+14                   TRUE
+15                   TRUE
+16                   TRUE
 > 
 > ############################
 > ### VECM
@@ -633,7 +647,7 @@ $dolcan
 > ## regime specific for TVECM
 > models_TVECM_irf <- models_TVECM   %>% 
 +   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
-There were 14 warnings (use warnings() to see them)
+There were 28 warnings (use warnings() to see them)
 > 
 > ## show two first of first componment
 > models_TVECM_irf %>% 
