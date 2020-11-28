@@ -30,13 +30,17 @@ models_univariate %>%
   mutate(boot = map(object, ~ tibble(n = 1:3, boot =head(setar.boot(., seed = 123), 3)))) %>% 
   select(-object) %>% 
   unnest(boot)  %>% 
-  spread(include, boot)
+  spread(include, boot) %>% 
+  as.data.frame() %>% 
+  print(digits=3)
 
 models_univariate %>% 
   mutate(boot = map(object, ~ tibble(n = 1:3, boot =head(setar.boot(., seed = 123, returnStarting = TRUE), 3)))) %>% 
   select(-object) %>% 
   unnest(boot)  %>% 
-  spread(include, boot)
+  spread(include, boot)%>% 
+  as.data.frame() %>% 
+  print(digits=3)
 
 ## add regime
 models_univariate %>% 
@@ -49,7 +53,8 @@ models_univariate %>%
   gather(stat, value, res, regime) %>% 
   unite(stat_n, stat, n) %>% 
   spread(stat_n, value) %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  print(digits=3)
 
 ## add regime and starting
 models_univariate %>% 
@@ -62,7 +67,8 @@ models_univariate %>%
   gather(stat, value, res, regime) %>% 
   unite(stat_n, stat, n) %>% 
   spread(stat_n, value) %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  print(digits=3)
 
 ################
 ### test boot

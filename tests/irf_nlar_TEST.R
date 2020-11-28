@@ -42,12 +42,15 @@ df_all <- models_irf %>%
 
 df_all %>% 
   filter(n.ahead %in% c( 1)) %>% 
-  as_tibble()
+  as.data.frame() %>% 
+  print(digits=3)
 
 
 df_all %>% 
   mutate(is_in = irf_irf >= irf_low & irf_irf <= irf_upp) %>% 
-  count(model, regime, is_in)
+  count(model, regime, is_in) %>% 
+  as.data.frame() %>% 
+  print(digits=3)
 
 
 ## try plot
