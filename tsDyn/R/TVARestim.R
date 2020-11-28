@@ -437,7 +437,7 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   Blist <- nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar)
   
   ## name the coefMat:
-  BnamesVec <- if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
+  BnamesVec <- if(inherits(Blist, "list")) c(sapply(Blist, colnames)) else colnames(Blist)
   colnames(Bbest) <- BnamesVec
   
   ##number of obs in each regime
@@ -451,7 +451,7 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   naX <- rbind(matrix(NA, ncol=ncol(tZbest), nrow=p), tZbest)
   YnaX <- cbind(data, naX)
   BlistMod <- nameB(mat=Bbest, commonInter=commonInter, Bnames=Bnames, nthresh=nthresh, npar=npar,sameName=FALSE )
-  BnamesVecMod <- if(class(BlistMod)=="list") c(sapply(BlistMod, colnames)) else colnames(BlistMod)
+  BnamesVecMod <- if(inherits(BlistMod, "list")) c(sapply(BlistMod, colnames)) else colnames(BlistMod)
   colnames(YnaX) <- c(colnames(data),BnamesVecMod)
   
   ###elements to return
