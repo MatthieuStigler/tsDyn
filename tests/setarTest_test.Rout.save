@@ -40,27 +40,7 @@ Type 'q()' to quit R.
 +                                thDelay = ..3,
 +                                test = ..4,
 +                                nboot = 2)))
-Warning messages:
-1: 
-With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
- 
-2: Possible unit root in the high  regime. Roots are: 0.981 11.6058 
-3: 
-With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
- 
-4: Possible unit root in the high  regime. Roots are: 0.9871 13.2387 
-5: 
-With the threshold you gave (-3.19877483971203) there is a regime with less than trim=15% observations (10.18%, 89.82%, )
- 
-6: 
-With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
- 
-7: 
-With the threshold you gave (-3.19877483971203) there is a regime with less than trim=15% observations (10.18%, 89.82%, )
- 
-8: 
-With the threshold you gave (-2.72533309207574) there is a regime with less than trim=15% observations (10.64%, 89.36%, )
- 
+There were 16 warnings (use warnings() to see them)
 > 
 > 
 > ### show F tests ###
