@@ -86,7 +86,9 @@ models_ar_setar %>%
                                         shock_li = list(0.01), R = 2, seed = 123) %>% as_tibble)) %>% 
   select(-object) %>% 
   unnest(girf) %>% 
-  as_tibble()
+  as.data.frame() %>% 
+  head(10) %>% 
+  print(digits=3)
 
 ## Simple, random
 models_ar_setar %>% 
@@ -94,7 +96,10 @@ models_ar_setar %>%
                                   R = 2, seed = 123) %>% as_tibble)) %>% 
   select(-object) %>% 
   unnest(girf) %>% 
-  as_tibble()
+  as.data.frame() %>% 
+  head(10) %>% 
+  print(digits=3)
+
 
 
 ############################

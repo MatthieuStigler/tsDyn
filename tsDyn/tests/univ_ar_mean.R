@@ -42,5 +42,6 @@ models_ar_mean %>%
   mutate(ar_mean = map(ar_mean, ~as_tibble(t(.)))) %>% 
   unnest(ar_mean) %>% 
   select(-object) %>% 
-  print(n = Inf)
+  as.data.frame() %>% 
+  print(digits=3)
 
