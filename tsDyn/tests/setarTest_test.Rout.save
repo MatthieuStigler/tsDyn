@@ -47,40 +47,40 @@ There were 16 warnings (use warnings() to see them)
 > res %>% 
 +   mutate(Ftests = map(dat, ~enframe(.$Ftests))) %>% 
 +   select(-dat) %>% 
-+   unnest(Ftests)
-# A tibble: 72 x 6
-   include   lag thDelay test  name  value
-   <chr>   <int>   <int> <chr> <chr> <dbl>
- 1 both        1       0 1vs   1vs2   5.16
- 2 both        1       0 1vs   1vs3  10.2 
- 3 both        1       0 1vs   2vs3   5.01
- 4 both        1       0 2vs3  1vs2   5.16
- 5 both        1       0 2vs3  1vs3  10.2 
- 6 both        1       0 2vs3  2vs3   5.01
- 7 both        2       0 1vs   1vs2  15.0 
- 8 both        2       0 1vs   1vs3  28.8 
- 9 both        2       0 1vs   2vs3  13.4 
-10 both        2       0 2vs3  1vs2  15.0 
-# … with 62 more rows
++   unnest(Ftests)%>% 
++   as.data.frame() %>% 
++   head(10) %>% 
++   print(digits=3) 
+   include lag thDelay test name value
+1     both   1       0  1vs 1vs2  5.16
+2     both   1       0  1vs 1vs3 10.22
+3     both   1       0  1vs 2vs3  5.01
+4     both   1       0 2vs3 1vs2  5.16
+5     both   1       0 2vs3 1vs3 10.22
+6     both   1       0 2vs3 2vs3  5.01
+7     both   2       0  1vs 1vs2 14.99
+8     both   2       0  1vs 1vs3 28.83
+9     both   2       0  1vs 2vs3 13.40
+10    both   2       0 2vs3 1vs2 14.99
 > 
 > res %>% 
 +   mutate(Ftests = map(dat, ~enframe(.$SSRs))) %>% 
 +   select(-dat) %>% 
-+   unnest(Ftests)
-# A tibble: 72 x 6
-   include   lag thDelay test   name value
-   <chr>   <int>   <int> <chr> <int> <dbl>
- 1 both        1       0 1vs       1  606.
- 2 both        1       0 1vs       2  599.
- 3 both        1       0 1vs       3  593.
- 4 both        1       0 2vs3      1  606.
- 5 both        1       0 2vs3      2  599.
- 6 both        1       0 2vs3      3  593.
- 7 both        2       0 1vs       1  533.
- 8 both        2       0 1vs       2  516.
- 9 both        2       0 1vs       3  501.
-10 both        2       0 2vs3      1  533.
-# … with 62 more rows
++   unnest(Ftests)%>% 
++   as.data.frame() %>% 
++   head(10) %>% 
++   print(digits=3) 
+   include lag thDelay test name value
+1     both   1       0  1vs    1   606
+2     both   1       0  1vs    2   599
+3     both   1       0  1vs    3   593
+4     both   1       0 2vs3    1   606
+5     both   1       0 2vs3    2   599
+6     both   1       0 2vs3    3   593
+7     both   2       0  1vs    1   533
+8     both   2       0  1vs    2   516
+9     both   2       0  1vs    3   501
+10    both   2       0 2vs3    1   533
 > 
 > 
 > proc.time()

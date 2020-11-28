@@ -27,10 +27,16 @@ res <- grid %>%
 res %>% 
   mutate(Ftests = map(dat, ~enframe(.$Ftests))) %>% 
   select(-dat) %>% 
-  unnest(Ftests)
+  unnest(Ftests)%>% 
+  as.data.frame() %>% 
+  head(10) %>% 
+  print(digits=3) 
 
 res %>% 
   mutate(Ftests = map(dat, ~enframe(.$SSRs))) %>% 
   select(-dat) %>% 
-  unnest(Ftests)
+  unnest(Ftests)%>% 
+  as.data.frame() %>% 
+  head(10) %>% 
+  print(digits=3) 
 
