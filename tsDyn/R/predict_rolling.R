@@ -76,6 +76,7 @@ predict_rolling_1step.nlVar <- function(object, nroll=10, n.ahead=1, refit.every
 ## infos on model
   model <- attr(object, "model")
   k <- object$k
+  hasExo <- object$exogen
   origSerie <- object$model[,1:k]
   lag <- object$lag
   include <- object$include
