@@ -659,7 +659,7 @@ TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=
   
   #partitionning the matrix following the regimes, and naming it
   Blist<-nameB(Bbest,commonInter=ifelse(model=="All",FALSE,TRUE), Bnames=Bcolnames,nthresh=nthresh,npar=npar, model="TVECM", TVECMmodel=model)
-  BnamesVec<-if(class(Blist)=="list") c(sapply(Blist, colnames)) else colnames(Blist)
+  BnamesVec<-if(inherits(Blist, "list")) c(sapply(Blist, colnames)) else colnames(Blist)
   colnames(Bbest)<-BnamesVec
   
   ###Y and regressors matrix (returned in $model)
@@ -667,7 +667,7 @@ TVECM<-function(data,lag=1,nthresh=1, trim=0.05, ngridBeta=50, ngridTh=50, plot=
   YnaX<-cbind(data, naX)
   
   BlistMod<-nameB(Bbest,commonInter=ifelse(model=="All",FALSE,TRUE), Bnames=Bcolnames,nthresh=nthresh,npar=npar, model="TVECM", TVECMmodel=model,sameName=FALSE )
-  BnamesVecMod<-if(class(BlistMod)=="list") c(sapply(BlistMod, colnames)) else colnames(BlistMod)
+  BnamesVecMod<-if(inherits(BlistMod, "list")) c(sapply(BlistMod, colnames)) else colnames(BlistMod)
   colnames(YnaX)<-c(colnames(data),BnamesVecMod)
   
   ###Number of observations in each regime
