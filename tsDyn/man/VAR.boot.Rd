@@ -5,13 +5,25 @@
 \alias{VAR.boot}
 \title{Simulate or bootstrap a VAR model}
 \usage{
-VAR.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
-  "both"), starting = NULL, innov = rmnorm(n, varcov = varcov),
-  varcov = diag(1, nrow(B)), show.parMat = FALSE,
-  returnStarting = FALSE, ...)
+VAR.sim(
+  B,
+  n = 200,
+  lag = 1,
+  include = c("const", "trend", "none", "both"),
+  starting = NULL,
+  innov = rmnorm(n, varcov = varcov),
+  varcov = diag(1, nrow(B)),
+  show.parMat = FALSE,
+  returnStarting = FALSE,
+  ...
+)
 
-VAR.boot(VARobject, boot.scheme = c("resample", "wild1", "wild2",
-  "check"), seed, ...)
+VAR.boot(
+  VARobject,
+  boot.scheme = c("resample", "wild1", "wild2", "check"),
+  seed,
+  ...
+)
 }
 \arguments{
 \item{B}{Matrix of coefficients.}

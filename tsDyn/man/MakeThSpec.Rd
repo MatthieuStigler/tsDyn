@@ -5,8 +5,13 @@
 \alias{makeThSpec}
 \title{Specification of the threshold search}
 \usage{
-MakeThSpec(ngrid = c("All", "Half", "Third", "Quarter"), exact = NULL,
-  int = c("from", "to"), around = "val", ...)
+MakeThSpec(
+  ngrid = c("All", "Half", "Third", "Quarter"),
+  exact = NULL,
+  int = c("from", "to"),
+  around = "val",
+  ...
+)
 }
 \arguments{
 \item{ngrid}{The number of values to search for}

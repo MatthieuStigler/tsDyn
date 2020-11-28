@@ -4,8 +4,14 @@
 \alias{BBCTest}
 \title{Test of unit root against SETAR alternative}
 \usage{
-BBCTest(x, m, series, testStat = c("LR", "Wald", "LM"), trim = 0.1,
-  grid = c("minPerc", "minObs"))
+BBCTest(
+  x,
+  m,
+  series,
+  testStat = c("LR", "Wald", "LM"),
+  trim = 0.1,
+  grid = c("minPerc", "minObs")
+)
 }
 \arguments{
 \item{x}{time series}
