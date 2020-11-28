@@ -4,8 +4,16 @@
 \alias{TVECM.SeoTest}
 \title{No cointegration vs threshold cointegration test}
 \usage{
-TVECM.SeoTest(data, lag, beta, trim = 0.1, nboot, plot = FALSE,
-  hpc = c("none", "foreach"), check = FALSE)
+TVECM.SeoTest(
+  data,
+  lag,
+  beta,
+  trim = 0.1,
+  nboot,
+  plot = FALSE,
+  hpc = c("none", "foreach"),
+  check = FALSE
+)
 }
 \arguments{
 \item{data}{time series}

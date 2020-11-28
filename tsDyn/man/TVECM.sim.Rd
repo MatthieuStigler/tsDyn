@@ -7,20 +7,47 @@
 \alias{TVECM.boot}
 \title{Simulation and bootstrap a VECM or bivariate TVECM}
 \usage{
-TVECM.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
-  "both"), beta, nthresh = 1, Thresh, starting = NULL,
-  innov = rmnorm(n, varcov = diag(1, nrow(B))), show.parMat = FALSE,
-  returnStarting = FALSE, ...)
+TVECM.sim(
+  B,
+  n = 200,
+  lag = 1,
+  include = c("const", "trend", "none", "both"),
+  beta,
+  nthresh = 1,
+  Thresh,
+  starting = NULL,
+  innov = rmnorm(n, varcov = diag(1, nrow(B))),
+  show.parMat = FALSE,
+  returnStarting = FALSE,
+  ...
+)
 
-VECM.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
-  "both"), beta, starting = NULL, innov = rmnorm(n, varcov = diag(1,
-  nrow(B))), show.parMat = FALSE, returnStarting = FALSE, ...)
+VECM.sim(
+  B,
+  n = 200,
+  lag = 1,
+  include = c("const", "trend", "none", "both"),
+  beta,
+  starting = NULL,
+  innov = rmnorm(n, varcov = diag(1, nrow(B))),
+  show.parMat = FALSE,
+  returnStarting = FALSE,
+  ...
+)
 
-VECM.boot(object, boot.scheme = c("resample", "resample_block", "wild1",
-  "wild2", "check"), seed = NULL, ...)
+VECM.boot(
+  object,
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+  seed = NULL,
+  ...
+)
 
-TVECM.boot(object, boot.scheme = c("resample", "resample_block", "wild1",
-  "wild2", "check"), seed = NULL, ...)
+TVECM.boot(
+  object,
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{B}{Simulation: Matrix of coefficients to simulate}

@@ -4,7 +4,9 @@
 \name{setarTest_IIPUs_results}
 \alias{setarTest_IIPUs_results}
 \title{Results from the setarTest, applied on Hansen (1999) data}
-\format{A list containign output from two tests}
+\format{
+A list containign output from two tests
+}
 \usage{
 setarTest_IIPUs_results
 }

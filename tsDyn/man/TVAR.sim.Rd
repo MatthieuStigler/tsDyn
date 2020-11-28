@@ -5,13 +5,29 @@
 \alias{TVAR.boot}
 \title{Simulation of a multivariate Threshold Autoregressive model (TVAR)}
 \usage{
-TVAR.sim(B, Thresh, nthresh = 1, n = 200, lag = 1,
-  include = c("const", "trend", "none", "both"), thDelay = 1,
-  mTh = 1, starting = NULL, innov = rmnorm(n, varcov = varcov),
-  varcov = diag(1, nrow(B)), show.parMat = FALSE, ...)
+TVAR.sim(
+  B,
+  Thresh,
+  nthresh = 1,
+  n = 200,
+  lag = 1,
+  include = c("const", "trend", "none", "both"),
+  thDelay = 1,
+  mTh = 1,
+  starting = NULL,
+  innov = rmnorm(n, varcov = varcov),
+  varcov = diag(1, nrow(B)),
+  show.parMat = FALSE,
+  ...
+)
 
-TVAR.boot(TVARobject, innov, seed, boot.scheme = c("resample", "wild1",
-  "wild2", "check"), ...)
+TVAR.boot(
+  TVARobject,
+  innov,
+  seed,
+  boot.scheme = c("resample", "wild1", "wild2", "check"),
+  ...
+)
 }
 \arguments{
 \item{B}{Matrix of coefficients to simulate}

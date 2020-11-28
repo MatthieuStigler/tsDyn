@@ -8,8 +8,7 @@
 \usage{
 regime(object, initVal = TRUE, timeAttr = TRUE, series = NULL, ...)
 
-\method{regime}{lstar}(object, initVal = TRUE, timeAttr = TRUE, series,
-  discretize = TRUE, ...)
+\method{regime}{lstar}(object, initVal = TRUE, timeAttr = TRUE, series, discretize = TRUE, ...)
 }
 \arguments{
 \item{object}{object of class \code{setar} or \code{nlVar}}

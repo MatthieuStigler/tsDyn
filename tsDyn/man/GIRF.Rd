@@ -10,18 +10,50 @@
 \usage{
 GIRF(object, n.ahead, seed = NULL, ...)
 
-\method{GIRF}{setar}(object, n.ahead = 10, seed = NULL, n.hist = 20,
-  n.shock = 20, R = 10, hist_li = NULL, shock_li = NULL, ...)
+\method{GIRF}{setar}(
+  object,
+  n.ahead = 10,
+  seed = NULL,
+  n.hist = 20,
+  n.shock = 20,
+  R = 10,
+  hist_li = NULL,
+  shock_li = NULL,
+  ...
+)
 
-\method{GIRF}{linear}(object, n.ahead = 10, seed = NULL, n.hist = 20,
-  n.shock = 20, R = 10, hist_li = NULL, shock_li = NULL, ...)
+\method{GIRF}{linear}(
+  object,
+  n.ahead = 10,
+  seed = NULL,
+  n.hist = 20,
+  n.shock = 20,
+  R = 10,
+  hist_li = NULL,
+  shock_li = NULL,
+  ...
+)
 
-\method{GIRF}{nlVar}(object, n.ahead = 10, seed = NULL, n.hist = 20,
-  n.shock = 20, R = 10, hist_li = NULL, shock_li = NULL, ...)
+\method{GIRF}{nlVar}(
+  object,
+  n.ahead = 10,
+  seed = NULL,
+  n.hist = 20,
+  n.shock = 20,
+  R = 10,
+  hist_li = NULL,
+  shock_li = NULL,
+  ...
+)
 
-\method{plot}{GIRF_df}(x, plot_type = c("density", "line"),
-  n.ahead = c(1, 5, 10), var = unique(x$var)[1], n_simu = c(1, 2),
-  ...)
+\method{plot}{GIRF_df}(
+  x,
+  plot_type = c("density", "line"),
+  n.ahead = c(1, 5, 10),
+  var = unique(x$var)[1],
+  n_simu = c(1, 2),
+  ...
+)
 }
 \arguments{
 \item{object}{An object of class \code{\link{linear}}, \code{\link{setar}} or \code{nlVar} (\code{\link{TVAR}}, \code{\link{TVECM}})}

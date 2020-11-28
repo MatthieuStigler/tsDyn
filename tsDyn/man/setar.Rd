@@ -49,7 +49,6 @@ setar(x, m, d=1, steps=d, series, mL, mM, mH, thDelay=0, mTh, thVar, th, trace=F
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}
 \item{restriction}{Restriction on the threshold. \code{OuterSymAll} will take a symmetric threshold and symmetric coefficients for outer regimes. OuterSymTh currently unavailable}
 \item{nested}{Whether is this a nested call? (useful for correcting final model df)}
-\item{...}{further arguments to be passed to \code{nlar}}
 }
 \details{
 Self Exciting Threshold AutoRegressive model.

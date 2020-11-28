@@ -4,10 +4,18 @@
 \alias{lineVar}
 \title{Multivariate linear models: VAR and VECM}
 \usage{
-lineVar(data, lag, r = 1, include = c("const", "trend", "none",
-  "both"), model = c("VAR", "VECM"), I = c("level", "diff", "ADF"),
-  beta = NULL, estim = c("2OLS", "ML"), LRinclude = c("none",
-  "const", "trend", "both"), exogen = NULL)
+lineVar(
+  data,
+  lag,
+  r = 1,
+  include = c("const", "trend", "none", "both"),
+  model = c("VAR", "VECM"),
+  I = c("level", "diff", "ADF"),
+  beta = NULL,
+  estim = c("2OLS", "ML"),
+  LRinclude = c("none", "const", "trend", "both"),
+  exogen = NULL
+)
 }
 \arguments{
 \item{data}{multivariate time series (first row being first=oldest value)}
@@ -51,7 +59,7 @@ in the VECM estimation: \describe{
 \item{Presentation}{Results are printed in a different ways, using a matrix form}
 \item{lateX export}{The matrix of coefficients can be exported to latex, 
        with or without standard-values and significance stars}
-}
+} 
 
 Two estimators are available: the Engle-Granger two-steps
 approach (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS,
