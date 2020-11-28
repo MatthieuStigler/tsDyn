@@ -239,15 +239,16 @@ myformat<-function(x,digits, toLatex=FALSE){
   r[littlex]<-format(x[littlex],digits=min(digits,2), scientific=TRUE)
   if(toLatex)
     r<-gsub("(e.*)","slashtext{\\1}",r)
-  if(class(x)=="numeric")
+  if(inherits(x, "numeric")) {
     return(noquote(r))
-  if(class(x)=="matrix")
+  } else if(inherits(x, "matrix")) {
     return(matrix(noquote(r), ncol=ncol(x), nrow=nrow(x)))
+  }
 }
 
 ###Assign to class list is class matrix
 asListIfMat<-function(x){
-  if(class(x)=="matrix")
+  if(inherits(x, "matrix"))
     return(list(x))
   else
     return(x)

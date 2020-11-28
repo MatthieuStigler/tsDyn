@@ -179,7 +179,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     n_exo <- NROW(exogen)
     if(n_exo!=t){
       if(n_exo!=T)  warning("exogen is of size ", n_exo, "while full/end-sample size is of size", T,"/", nrow(Z), "series shortened")
-      exogen <- myTail(exogen, t, addrownums=FALSE)
+      exogen <- myTail(exogen, t, keepnums=FALSE)# changed form addrownums
     }
     Z <- if(lag==0 & include=="none") exogen else cbind(Z, exogen)
   }
