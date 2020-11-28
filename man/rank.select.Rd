@@ -7,9 +7,15 @@
 \alias{as.data.frame.rank.select}
 \title{Selection of the cointegrating rank with Information criterion.}
 \usage{
-rank.select(data, lag.max = 10, r.max = ncol(data) - 1,
-  include = c("const", "trend", "none", "both"), fitMeasure = c("SSR",
-  "LL"), sameSample = TRUE, returnModels = FALSE)
+rank.select(
+  data,
+  lag.max = 10,
+  r.max = ncol(data) - 1,
+  include = c("const", "trend", "none", "both"),
+  fitMeasure = c("SSR", "LL"),
+  sameSample = TRUE,
+  returnModels = FALSE
+)
 
 \method{print}{rank.select}(x, ...)
 

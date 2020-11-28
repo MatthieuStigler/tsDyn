@@ -4,9 +4,16 @@
 \alias{VECM}
 \title{Estimation of Vector error correction model (VECM)}
 \usage{
-VECM(data, lag, r = 1, include = c("const", "trend", "none", "both"),
-  beta = NULL, estim = c("2OLS", "ML"), LRinclude = c("none",
-  "const", "trend", "both"), exogen = NULL)
+VECM(
+  data,
+  lag,
+  r = 1,
+  include = c("const", "trend", "none", "both"),
+  beta = NULL,
+  estim = c("2OLS", "ML"),
+  LRinclude = c("none", "const", "trend", "both"),
+  exogen = NULL
+)
 }
 \arguments{
 \item{data}{multivariate time series (first row being first=oldest value)}
@@ -81,7 +88,7 @@ with the first value to 1, and the next values showing the opposite sign in the 
 In case the vector has \eqn{K-1} values, this is what \code{lineVar} is doing, setting \eqn{(1, - \beta)}. 
 Note finally one should provide values for all
 the coefficients (eventually except for special case of r=1 and k-1), if you want to provide only part of the 
-parameters, and let the others be estimated, look at the functions in package urca.
+parameters, and let the others be estimated, look at the functions in package urca. 
 
 The eigenvector matrix \eqn{\beta} is normalised using the Phillips triangular representation, 
 see Hamilton (1994, p. 576) and Juselius (2006, p. 216), see \code{\link{coefA}} for more details.

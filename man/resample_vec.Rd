@@ -4,8 +4,12 @@
 \alias{resample_vec}
 \title{Resampling schemes}
 \usage{
-resample_vec(x, boot.scheme = c("resample", "resample_block", "wild1",
-  "wild2", "check"), seed = NULL, block.size = 2)
+resample_vec(
+  x,
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+  seed = NULL,
+  block.size = 2
+)
 }
 \arguments{
 \item{x}{A numeric vector}

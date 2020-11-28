@@ -4,8 +4,12 @@
 \alias{autotriples}
 \title{Trivariate time series plots}
 \usage{
-autotriples(x, lags = 1:2, h, type = c("levels", "persp", "image",
-  "lines", "points"))
+autotriples(
+  x,
+  lags = 1:2,
+  h,
+  type = c("levels", "persp", "image", "lines", "points")
+)
 }
 \arguments{
 \item{x}{time series}

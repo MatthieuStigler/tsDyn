@@ -5,10 +5,17 @@
 \alias{setartest}
 \title{Test of linearity against threshold (SETAR)}
 \usage{
-setarTest(x, m, thDelay = 0, trim = 0.1, include = c("const",
-  "trend", "none", "both"), nboot = 10, test = c("1vs", "2vs3"),
-  hpc = c("none", "foreach"), boot.scheme = c("resample",
-  "resample_block", "wild1", "wild2", "check"))
+setarTest(
+  x,
+  m,
+  thDelay = 0,
+  trim = 0.1,
+  include = c("const", "trend", "none", "both"),
+  nboot = 10,
+  test = c("1vs", "2vs3"),
+  hpc = c("none", "foreach"),
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check")
+)
 }
 \arguments{
 \item{x}{time series}

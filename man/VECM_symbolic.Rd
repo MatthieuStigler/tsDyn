@@ -4,8 +4,13 @@
 \alias{VECM_symbolic}
 \title{Virtua VECM model}
 \usage{
-VECM_symbolic(alpha, beta, lags, inc, include = c("none", "const",
-  "trend", "both"))
+VECM_symbolic(
+  alpha,
+  beta,
+  lags,
+  inc,
+  include = c("none", "const", "trend", "both")
+)
 }
 \arguments{
 \item{alpha}{Matrix of alpha speed adjustment coefficients.}

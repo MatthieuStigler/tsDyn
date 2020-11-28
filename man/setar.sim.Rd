@@ -7,18 +7,41 @@
 \alias{linear.sim}
 \title{Simulation and bootstrap of Threshold Autoregressive model (SETAR)}
 \usage{
-setar.boot(setarObject, boot.scheme = c("resample", "resample_block",
-  "wild1", "wild2", "check"), seed = NULL, ...)
+setar.boot(
+  setarObject,
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+  seed = NULL,
+  ...
+)
 
-linear.boot(linearObject, boot.scheme = c("resample", "resample_block",
-  "wild1", "wild2", "check"), seed = NULL, ...)
+linear.boot(
+  linearObject,
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+  seed = NULL,
+  ...
+)
 
-setar.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
-  "both"), nthresh = 1, Thresh, starting = NULL, innov = rnorm(n),
-  ...)
+setar.sim(
+  B,
+  n = 200,
+  lag = 1,
+  include = c("const", "trend", "none", "both"),
+  nthresh = 1,
+  Thresh,
+  starting = NULL,
+  innov = rnorm(n),
+  ...
+)
 
-linear.sim(B, n = 200, lag = 1, include = c("const", "trend", "none",
-  "both"), starting = NULL, innov = rnorm(n), ...)
+linear.sim(
+  B,
+  n = 200,
+  lag = 1,
+  include = c("const", "trend", "none", "both"),
+  starting = NULL,
+  innov = rnorm(n),
+  ...
+)
 }
 \arguments{
 \item{setarObject}{Bootstrap: the \code{\link{setar}} object to resample data from.}

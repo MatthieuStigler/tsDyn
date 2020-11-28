@@ -4,8 +4,12 @@
 \alias{autopairs}
 \title{Bivariate time series plots}
 \usage{
-autopairs(x, lag = 1, h, type = c("levels", "persp", "image", "lines",
-  "points", "regression"))
+autopairs(
+  x,
+  lag = 1,
+  h,
+  type = c("levels", "persp", "image", "lines", "points", "regression")
+)
 }
 \arguments{
 \item{x}{time series}

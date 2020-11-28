@@ -7,8 +7,13 @@
 \usage{
 delta(x, m, d = 1, eps)
 
-delta.test(x, m = 2:3, d = 1, eps = seq(0.5 * sd(x), 2 * sd(x),
-  length = 4), B = 49)
+delta.test(
+  x,
+  m = 2:3,
+  d = 1,
+  eps = seq(0.5 * sd(x), 2 * sd(x), length = 4),
+  B = 49
+)
 }
 \arguments{
 \item{x}{time series}

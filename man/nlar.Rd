@@ -4,8 +4,16 @@
 \alias{nlar}
 \title{Non-linear time series model, base class definition}
 \usage{
-nlar(str, coefficients, fitted.values, residuals, k, model,
-  model.specific = NULL, ...)
+nlar(
+  str,
+  coefficients,
+  fitted.values,
+  residuals,
+  k,
+  model,
+  model.specific = NULL,
+  ...
+)
 }
 \arguments{
 \item{str}{a \code{nlar.struct} object, i.e. the result of a call to
