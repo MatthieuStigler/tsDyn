@@ -3,8 +3,11 @@
 devtools::check_rhub(interactive = FALSE)
 devtools::check_win_devel()
 devtools::check_win_release()
+devtools::check_win_oldrelease()
 
 devtools::spell_check(use_wordlist = TRUE)
+
+cat(devtools::spell_check(use_wordlist = TRUE)$word, sep = "\n")
 
 #
 # usethis::use_cran_comments(open = FALSE)
