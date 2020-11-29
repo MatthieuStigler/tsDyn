@@ -14,7 +14,7 @@ data(m.unrate)
 }
 \source{
   \url{
-    http://faculty.chicagobooth.edu/ruey.tsay/teaching/fts2
+    https://faculty.chicagobooth.edu/ruey.tsay/teaching/fts2
   }
 }
 \references{
