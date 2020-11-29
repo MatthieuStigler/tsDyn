@@ -49,7 +49,7 @@
 #'plot(irf(set_estim, regime = "H", boot = FALSE))
 #'
 #'## GIRF
-#'girf_out <- GIRF(set_estim)
+#'girf_out <- GIRF(set_estim, n.hist = 10, n.shock = 10) # smaller number for example only
 #'
 #'## the GIRF shows a very fast convergence (the shock at n.ahead = 4 is already very close to 0)
 #'plot(girf_out, n.ahead = 1:4)
