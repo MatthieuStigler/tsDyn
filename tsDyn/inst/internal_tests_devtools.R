@@ -16,7 +16,12 @@ cat(devtools::spell_check(use_wordlist = TRUE)$word, sep = "\n")
 
 ## reverse dependency? not working well as of Nov 2020
 # usethis::use_revdep()
-# revdepcheck::revdep_check(num_workers = 4)
+# revdepcheck::revdep_check(num_workers = 1)
+
+# Error in if (worker$process$get_exit_status()) { : 
+#     argument is not interpretable as logical
+#   In addition: Warning message:
+#     call dbDisconnect() when finished working with a connection 
 
 ## Release
 devtools::release_checks()
