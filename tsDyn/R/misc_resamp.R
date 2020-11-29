@@ -6,7 +6,7 @@
 #' @param seed the seed used, see \code{\link{set.seed}}
 #' @param block.size for the \code{resample_block} scheme, the size of the blocks.
 #'  
-#' @details This function offers various bootrsap/resampling schemes:
+#' @details This function offers various bootstrap/resampling schemes:
 #' \describe{
 #'   \item{resample}{Resampling with replacement}
 #'   \item{resample_block}{Resampling contiguous observations (blocks) with replacement. Use argument \code{block.size}}

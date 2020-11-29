@@ -14,7 +14,7 @@
 #'\eqn{ \hat \Sigma_{i}} is the estimated covariance matrix of the model with i
 #'regimes (and so i-1 thresholds).
 #'
-#'Three test are avalaible. The both first can be seen as linearity test,
+#'Three test are available. The both first can be seen as linearity test,
 #'whereas the third can be seen as a specification test: once the 1vs2 or/and
 #'1vs3 rejected the linearity and henceforth accepted the presence of a
 #'threshold, is a model with one or two thresholds preferable?
@@ -25,8 +25,8 @@
 #'
 #'Test \bold{2vs3}: 1 threshold TAR versus 2 threshold2 TAR
 #'
-#'The both first are computed together and avalaible with test="1vs". The third
-#'test is avalaible with test="2vs3".
+#'The both first are computed together and available with test="1vs". The third
+#'test is available with test="2vs3".
 #'
 #'The homoskedastik bootstrap distribution is based on resampling the residuals
 #'from H0 model, estimating the threshold parameter and then computing the
@@ -67,7 +67,7 @@
 #'@seealso \code{\link{setarTest}} for the univariate version.
 #'\code{\link{OlsTVAR}} for estimation of the model.
 #'@references Hansen (1999) Testing for linearity, Journal of Economic Surveys,
-#'Volume 13, Number 5, December 1999 , pp. 551-576(26) avalaible at:
+#'Volume 13, Number 5, December 1999 , pp. 551-576(26) available at:
 #'\url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 #'
 #'Lo and Zivot (2001) "Threshold Cointegration and Nonlinear Adjustment to the

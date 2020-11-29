@@ -61,7 +61,7 @@ When the model is estimated with 2OLS, the LL is computed as: \deqn{ LL =
 \log|\Sigma| }
 
 Where \eqn{\Sigma} is the variance matrix of residuals from the the VECM
-model. There is hence no correspondance between the LL from the VECM computed
+model. There is hence no correspondence between the LL from the VECM computed
 with 2OLS or ML.
 }
 \examples{

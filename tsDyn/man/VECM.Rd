@@ -68,8 +68,8 @@ latex, with or without standard-values and significance stars}
 argument allowing to compute rolling forecasts.} }
 
 Two estimators are available: the Engle-Granger two step approach
-(\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministics
-regressors (or external variables if LRinclude is of class numeric) can be
+(\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministic
+regressors (or external variables if \code{LRinclude} is of class numeric) can be
 added for the estimation of the cointegrating value and for the ECT. This is
 only working when the beta value is not pre-specified.
 
@@ -137,7 +137,7 @@ Juselius (2006) The Cointegrated VAR model, Oxford University Press
 to extract the relevant parameter matrices. 
 
 \code{\link{lineVar}} \code{\link{TVAR}} and \code{\link{TVECM}} for
-the correspoding threshold models. \code{\link{linear}} for the univariate AR
+the corresponding threshold models. \code{\link{linear}} for the univariate AR
 model.
 }
 \author{

@@ -14,7 +14,7 @@ data(m.unrate)
 }
 \source{
   \url{
-    https://faculty.chicagobooth.edu/ruey.tsay/teaching/fts2
+    https://faculty.chicagobooth.edu/ruey-s-tsay/research/analysis-of-financial-time-series-2nd-edition
   }
 }
 \references{

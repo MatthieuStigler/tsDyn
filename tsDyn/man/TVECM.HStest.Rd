@@ -34,7 +34,7 @@ Available methods are \code{print()}, \code{summary()} and \code{plot()}.
 With the argument \code{hpc}, the burdensome bootstrap replication can be run on parallel cores, thus alleviating the time of computation. The user needs simply to choose a package (among doMC, doMPI, doSNOW or doRedis) and register the backend. See the vignette for more details. 
 }
 
-\value{A list cointaining diverse values:
+\value{A list containing diverse values:
 \item{stat}{The sup-LM statistic.}
 \item{values}{The whole LM values.}
 \item{PvalBoot}{The bootstrap p-value}

@@ -66,7 +66,7 @@ See \code{\link{setar}} for their description.}
 \item{innov}{Simulation: time series of innovations/residuals.}
 }
 \value{
-a list with the simulated/bootstraped data and the parameter matrix
+a list with the simulated/bootstrapped data and the parameter matrix
 used.
 }
 \description{

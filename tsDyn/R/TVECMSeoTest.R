@@ -25,7 +25,7 @@
 #'\code{\link{TVECM.HStest}}
 #'@param check Possibility to check the function by no sampling: the test value
 #'should be the same as in the original data
-#'@return A list cointaining diverse informations:
+#'@return A list containing diverse informations:
 #'
 #'Estimated threshold parameters and usual slope parameters.
 #'

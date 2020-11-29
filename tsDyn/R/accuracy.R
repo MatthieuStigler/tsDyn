@@ -6,7 +6,7 @@
 
 #'Forecasting accuracy measures.
 #'
-#'Compute forecasting accuracies. This is very similar ot the
+#'Compute forecasting accuracies. This is very similar to the
 #'\code{\link[forecast]{accuracy}} method form \pkg{forecast}.
 #'
 #'The function works either for a simple data.frame or for objects
@@ -75,7 +75,7 @@ accuracy_stat.pred_roll <- function(object, w, ...) {
     colnames(means)[1] <- "var"
     res_withmeans <- rbind(res_raw, means)
 
-  ## add horizont column:
+  ## add horizon column:
     res_withmeans[,"n.ahead"] <- rep(c(n.aheads,"all"), each=if(nvar==1) 1 else nvar+1)
     res <- res_withmeans
     res <- res[order(res$var, numerize(res$n.ahead)),]

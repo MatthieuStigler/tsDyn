@@ -37,7 +37,7 @@ series of updated forecasts.
 \details{
 This function allows to check the out-of sample forecasting accuracy by
 estimating the model on a sub-sample of the original, then making
-\code{nroll} forcasts of horizont \code{n.ahead}, each time by updating the
+\code{nroll} forecasts of horizon \code{n.ahead}, each time by updating the
 sample. In other words, with a given model estimated on 100 observations, the
 function will estimate it on say 90 first obs (\code{nroll=10}), generate a
 say 1 step-ahead \code{n.ahead=1} from obs 90, then using true value 91,

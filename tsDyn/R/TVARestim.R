@@ -27,7 +27,7 @@
 #'@param model Whether the transition variable is taken in levels (TAR) or
 #'difference (MTAR)
 #'@param commonInter Whether the deterministic regressors are regime specific
-#'(commonInter=FALSE) or not.
+#'(\code{commonInter}=FALSE) or not.
 #'@param nthresh Number of thresholds
 #'@param thDelay 'time delay' for the threshold variable (as multiple of
 #'embedding time delay d) PLEASE NOTE that the notation is currently different
@@ -105,7 +105,7 @@ TVAR <- function(data, lag, include = c( "const", "trend","none", "both"), model
   else if(include=="both")
     Z<-cbind(rep(1,t),seq_len(t), Z)
   if(commonInter & include!="const")
-    stop("commonInter argument only avalaible with include = const")
+    stop("commonInter argument only available with include = const")
   npar <- ncol(Z)			#Number of parameters
   
   

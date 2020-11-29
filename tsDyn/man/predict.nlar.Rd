@@ -46,7 +46,7 @@ containing the prediction (pred) and the forecast standard errors
 (\code{se}).
 }
 \description{
-Forecating a non-linear model object of general class \sQuote{\code{nlar}},
+Forecasting a non-linear model object of general class \sQuote{\code{nlar}},
 including \sQuote{\code{setar}} and \sQuote{\code{star}}.
 }
 \details{
@@ -57,7 +57,7 @@ resampling methods, averaging \code{n.boot} times over future residuals, are
 available:
 
 \describe{ \item{naive}{No residuals} \item{MC}{Monte-Carlo method, where
-residuals are taken from a normal distribution, with sd. equal to the
+residuals are taken from a normal distribution, with a standard deviation equal to the
 residuals sd. } \item{bootstrap}{Residuals are resampled from the empirical
 residuals from the model.} \item{block-bootstrap}{Same as bootstrap, but
 residuals are resampled in block, with size \code{block.size}} }

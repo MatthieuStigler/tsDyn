@@ -12,7 +12,7 @@
 #' where \eqn{S_{i}} is the SSR of the model with i regimes (and so i-1
 #' thresholds).
 #' 
-#' Three test are avalaible. The both first can be seen as linearity test,
+#' Three test are available. The both first can be seen as linearity test,
 #' whereas the third can be seen as a specification test: once the 1vs2 or/and
 #' 1vs3 rejected the linearity and henceforth accepted the presence of a
 #' threshold, is a model with one or two thresholds preferable?
@@ -23,8 +23,8 @@
 #' 
 #' Test \bold{2vs3}: 1 threshold TAR versus 2 thresholds TAR
 #' 
-#' The two first tests are computed together and avalaible with test="1vs". The
-#' third test is avalaible with test="2vs3".
+#' The two first tests are computed together and available with test="1vs". The
+#' third test is available with test="2vs3".
 #' 
 #' The homoskedastic bootstrap distribution is based on resampling the
 #' residuals from H0 model (ar for test 1vs, and setar(1) for test 2vs3),
@@ -34,7 +34,7 @@
 #' @aliases setarTest setartest
 #' @param x time series
 #' @param m,thDelay lag and 'time delay' for the threshold variable
-#' @param test whether ot test AR against SETAR, or SETAR(1 reg) against SETAR(2 reg)
+#' @param test whether to test AR against SETAR, or SETAR(1 reg) against SETAR(2 reg)
 #' @template param_include
 #' @param nboot number of bootstrap replications
 #' @param trim trimming parameter indicating the minimal percentage of
@@ -53,14 +53,14 @@
 #' \item{CriticalValBoot}{The critical values for the test selected}
 #' \item{Ftestboot}{All the F-test computed} \item{firstBests, secBests}{The
 #' thresholds for the original series, obtained from search for 1 thresh
-#' (firstBests) and conditional search for 2 thresh (secBests)}
+#' (\code{firstBests}) and conditional search for 2 thresh (secBests)}
 #' \item{nboot,m}{The number of bootstrap replications (\code{nboot}), the
 #' lags used (\code{m})}
 #' @author Matthieu Stigler
 #' @seealso \code{\link{TVAR.LRtest}} for the multivariate version.
 #' \code{\link{SETAR}} for estimation of the model.
 #' @references Hansen (1999) Testing for linearity, Journal of Economic
-#' Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26) avalaible at:
+#' Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26) available at:
 #' \url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 #' @keywords ts
 #' @examples
