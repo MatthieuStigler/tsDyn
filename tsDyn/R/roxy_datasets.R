@@ -90,7 +90,7 @@
 #' 
 #' @name setarTest_IIPUs_results
 #' @docType data
-#' @format A list containign output from two tests
+#' @format A list containing output from two tests
 #' @keywords datasets
 #' @seealso Example in \code{\link{IIPUs}}
 #' @examples

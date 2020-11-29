@@ -1,4 +1,4 @@
-#'Virtua VECM model
+#'Virtual VECM model
 #'
 #'Pedagogical tool to create a symbolic VECM model, i.e. just for
 #'representation purpose.
@@ -6,8 +6,8 @@
 #'
 #'@param alpha Matrix of alpha speed adjustment coefficients.
 #'@param beta Matrix of alpha, cointegrating coefficients.
-#'@param lags Matrix containg the lags coefficients.
-#'@param inc Matrix containg the include (see following arg) coefficients.
+#'@param lags Matrix containing the lags coefficients.
+#'@param inc Matrix containing the include (see following arg.) coefficients.
 #'@param include Character indicating the type of deterministic term included,
 #'if any.
 #'@return An object of class \sQuote{VECM}, without however any data.

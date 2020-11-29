@@ -24,7 +24,7 @@ as.matrix.ts <- function(x, ...)  {
 #'= TRUE} will show the matrix of parameters together with their values and
 #'names.
 #'
-#'The argument \code{beta} is the contegrating value on the right side of the
+#'The argument \code{beta} is the cointegrating value on the right side of the
 #'long-run relationship, and hence the function use the vector (1,-beta). The
 #'\code{innov} argument specifies the innovations. It should be given as a
 #'matrix of dim nxk, (here \var{n} does not include the starting values!), by
@@ -61,7 +61,7 @@ as.matrix.ts <- function(x, ...)  {
 #'@template param_returnStarting
 #'@param seed Bootstrap: seed used in the resampling
 #'@param \dots additional arguments for the unexported \code{TVECM.gen}.  
-#'@return A matrix with the simulated/bootstraped series.
+#'@return A matrix with the simulated/bootstrapped series.
 #'@author Matthieu Stigler
 #'@seealso \code{\link{VECM}} or \code{\link{TVECM}} to estimate the VECM or TVECM.  
 #'Similar \code{\link{TVAR.sim}} and \code{\link{TVAR.boot}} for \code{\link{TVAR}}, 

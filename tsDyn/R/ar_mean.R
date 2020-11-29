@@ -2,9 +2,9 @@
 #' Long-term mean of an AR(p) process
 #' 
 #' Computes the long term mean of an AR process
-#' @param object an objetc of class \code{\link{linear}}, \code{\link{setar}} or \code{\link{lstar}}
-#' @param \ldots unused argment
-#' @details The function computes the long-term meanof an AR(p) process, or of the correspondg sub-regimes in 
+#' @param object an object of class \code{\link{linear}}, \code{\link{setar}} or \code{\link{lstar}}
+#' @param \ldots unused argument
+#' @details The function computes the long-term mean of an AR(p) process, or of the corresponding sub-regimes in 
 #' SETAR or LSTAR model. 
 #' There are three possible cases:
 #' \describe{

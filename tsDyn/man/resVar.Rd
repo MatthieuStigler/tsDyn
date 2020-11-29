@@ -1,7 +1,7 @@
 \name{resVar}
 \alias{resVar}
 \title{Residual variance}
-\description{Extracts the global and regime-dependant variance of the residuals
+\description{Extracts the global and regime-dependent variance of the residuals
 }
 \usage{
 resVar(x, adj=c("OLS", "ML"))

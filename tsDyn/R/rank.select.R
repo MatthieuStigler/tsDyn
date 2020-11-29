@@ -11,7 +11,7 @@
 #'@param data multivariate time series.
 #'@param lag.max Maximum number of lags to investigate.
 #'@param r.max Maximum rank to investigate.
-#'@param include Type of deterministic regressors to innclude. See
+#'@param include Type of deterministic regressors to include. See
 #'\code{\link{VECM}} or \code{\link{lineVar}}.
 #'@param fitMeasure Whether the AIC/BIC should be based on the full likelihood,
 #'or just the SSR. See explanations in \code{\link{logLik.VECM}}.

@@ -24,7 +24,7 @@ resample_vec(
 Bootstrap a vector according to multiple resampling schemes: resampling, block resampling, Wild bootstrap.
 }
 \details{
-This function offers various bootrsap/resampling schemes:
+This function offers various bootstrap/resampling schemes:
 \describe{
   \item{resample}{Resampling with replacement}
   \item{resample_block}{Resampling contiguous observations (blocks) with replacement. Use argument \code{block.size}}

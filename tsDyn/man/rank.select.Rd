@@ -30,7 +30,7 @@ rank.select(
 
 \item{r.max}{Maximum rank to investigate.}
 
-\item{include}{Type of deterministic regressors to innclude. See
+\item{include}{Type of deterministic regressors to include. See
 \code{\link{VECM}} or \code{\link{lineVar}}.}
 
 \item{fitMeasure}{Whether the AIC/BIC should be based on the full likelihood,

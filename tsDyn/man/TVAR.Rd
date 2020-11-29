@@ -37,7 +37,7 @@ TVAR(
 difference (MTAR)}
 
 \item{commonInter}{Whether the deterministic regressors are regime specific
-(commonInter=FALSE) or not.}
+(\code{commonInter}=FALSE) or not.}
 
 \item{nthresh}{Number of thresholds}
 

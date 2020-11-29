@@ -23,7 +23,7 @@
 #'@param boot.scheme Bootstrap: which resampling scheme to use for the residuals. See \code{\link{resample_vec}}. 
 #'@param seed Bootstrap: seed used in the resampling
 #'@param \dots additional arguments for the unexported \code{setar.gen}.  
-#'@return a list with the simulated/bootstraped data and the parameter matrix
+#'@return a list with the simulated/bootstrapped data and the parameter matrix
 #'used.
 #'@author Matthieu Stigler
 #'@seealso \code{\link{SETAR}} to estimate a SETAR, \code{\link{arima.sim}} to

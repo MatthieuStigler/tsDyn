@@ -37,7 +37,7 @@
 #'\log|\Sigma| }
 #'
 #'Where \eqn{\Sigma} is the variance matrix of residuals from the the VECM
-#'model. There is hence no correspondance between the LL from the VECM computed
+#'model. There is hence no correspondence between the LL from the VECM computed
 #'with 2OLS or ML.
 #'
 #'

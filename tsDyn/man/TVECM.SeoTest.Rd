@@ -36,7 +36,7 @@ observations in each regime}
 should be the same as in the original data}
 }
 \value{
-A list cointaining diverse informations:
+A list containing diverse informations:
 
 Estimated threshold parameters and usual slope parameters.
 

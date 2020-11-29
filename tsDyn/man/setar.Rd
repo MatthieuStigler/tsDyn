@@ -74,7 +74,7 @@ For fixed \code{th} and threshold variable, the model is linear, so
 (Conditional Least Squares).
 Standard errors for phi1 and phi2 coefficients provided by the
 \code{summary} method for this model are taken from the linear
-regression theory, and are to be considered asymptoticals.
+regression theory, and are to be considered asymptotical.
 }
 \seealso{
 \code{\link{plot.setar}} for details on plots produced for this model from the \code{plot} generic.

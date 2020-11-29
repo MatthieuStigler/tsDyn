@@ -1,6 +1,6 @@
 #' Predict method for objects of class \sQuote{\code{VAR}}, \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
 #' 
-#' Forecating the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
+#' Forecasting the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
 #' 
 #' @aliases  predict.VAR predict.VECM
 #' @param object An object of class  \sQuote{\code{VAR}}, \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}

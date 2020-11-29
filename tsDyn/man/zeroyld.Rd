@@ -16,8 +16,9 @@ Hansen, B. and Seo, B. (2002), Testing for two-regime threshold cointegration in
 
 The data can be downloaded from: \url{http://www.ssc.wisc.edu/~bhansen/progs/joe_02r.zip}.
 
-The authors themselves took the data from the wepage of Huston McCulloch:
-\url{https://www.econ.ohio-state.edu/jhm/ts/mcckwon/mccull.htm}
+The authors themselves took the data from the webpage of Huston McCulloch:
+\url{https://www.asc.ohio-state.edu/mcculloch.2/ts/mcckwon/mccull.htm}
+% old: \url{https://www.econ.ohio-state.edu/jhm/ts/mcckwon/mccull.htm}
 }
 
 \format{

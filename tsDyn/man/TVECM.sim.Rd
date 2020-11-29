@@ -77,7 +77,7 @@ or linear \code{\link{VECM}}}
 \item{seed}{Bootstrap: seed used in the resampling}
 }
 \value{
-A matrix with the simulated/bootstraped series.
+A matrix with the simulated/bootstrapped series.
 }
 \description{
 Estimate or bootstraps a multivariate Threshold VAR
@@ -96,7 +96,7 @@ TVECM. To be sure that once is using it correctly, setting \code{show.parMat
 = TRUE} will show the matrix of parameters together with their values and
 names.
 
-The argument \code{beta} is the contegrating value on the right side of the
+The argument \code{beta} is the cointegrating value on the right side of the
 long-run relationship, and hence the function use the vector (1,-beta). The
 \code{innov} argument specifies the innovations. It should be given as a
 matrix of dim nxk, (here \var{n} does not include the starting values!), by

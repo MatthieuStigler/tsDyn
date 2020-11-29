@@ -58,7 +58,7 @@ GIRF(object, n.ahead, seed = NULL, ...)
 \arguments{
 \item{object}{An object of class \code{\link{linear}}, \code{\link{setar}} or \code{nlVar} (\code{\link{TVAR}}, \code{\link{TVECM}})}
 
-\item{n.ahead}{The numher of steps ahead to compute}
+\item{n.ahead}{The number of steps ahead to compute}
 
 \item{seed}{optional, the seed for the random numbers}
 
@@ -91,7 +91,7 @@ A data-frame, with:
 \item{hist, shock}{History and shock used in the nth simulation}
 \item{n.ahead:}{The forecasting horizon. Note the shocks happens at time 0}
 \item{var:}{The variable (on which the shock happens, corresponds hence to the \code{response} argument in \code{irf})}
-\item{sim_1, sim_2}{The average (over R times) simulation with the specific shock (sim_1) or with ranodm shocks (sim_2). }
+\item{sim_1, sim_2}{The average (over R times) simulation with the specific shock (sim_1) or with random shocks (sim_2). }
 \item{girf}{The difference between sim_1 and sim_2}
 }
 }

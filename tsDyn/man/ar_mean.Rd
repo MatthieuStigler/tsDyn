@@ -16,15 +16,15 @@ ar_mean(object, ...)
 \method{ar_mean}{lstar}(object, ...)
 }
 \arguments{
-\item{object}{an objetc of class \code{\link{linear}}, \code{\link{setar}} or \code{\link{lstar}}}
+\item{object}{an object of class \code{\link{linear}}, \code{\link{setar}} or \code{\link{lstar}}}
 
-\item{\ldots}{unused argment}
+\item{\ldots}{unused argument}
 }
 \description{
 Computes the long term mean of an AR process
 }
 \details{
-The function computes the long-term meanof an AR(p) process, or of the correspondg sub-regimes in 
+The function computes the long-term mean of an AR(p) process, or of the corresponding sub-regimes in 
 SETAR or LSTAR model. 
 There are three possible cases:
 \describe{

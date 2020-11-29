@@ -28,7 +28,7 @@ into the \sQuote{all} category}
 A data-frame containing the forecasting accuracy measures.
 }
 \description{
-Compute forecasting accuracies. This is very similar ot the
+Compute forecasting accuracies. This is very similar to the
 \code{\link[forecast]{accuracy}} method form \pkg{forecast}.
 }
 \details{
