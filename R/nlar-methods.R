@@ -138,7 +138,7 @@ getNUsed.nlar <- function(obj, ...)
 
 #'Non-linear time series model, base class definition
 #'
-#'Generic non-linear autogregressive model class constructor.
+#'Generic non-linear autoregressive model class constructor.
 #'
 #'Constructor for the generic \code{nlar} model class. On a fitted object you
 #'can call some generic methods. For a list of them, see

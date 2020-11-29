@@ -33,11 +33,11 @@ star(x, m=2, noRegimes, d = 1, steps = d, series, rob = FALSE,
 }
 \details{
 The function star implements the iterative building strategy described
-in [1] to identify and estimate Smooth Transition AutoRegressive
+in [1] to identify and estimate Smooth Transition Autoregressive
 models.
 
 [1] T. Terasvirta, "Specification, estimation and evaluation of smooth
-transition autoregresive models", J. Am. Stat. Assoc. 89 (1994):
+transition autoregressive models", J. Am. Stat. Assoc. 89 (1994):
 208-218. 
 }
 \seealso{\code{\link{addRegime}}}

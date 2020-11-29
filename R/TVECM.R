@@ -47,7 +47,7 @@
 #'observations in each regime
 #'@param ngridBeta number of elements to search for the cointegrating value
 #'@param ngridTh number of elements to search for the threshold value
-#'@param plot Whether the grid with the SSR of each threshold should be ploted.
+#'@param plot Whether the grid with the SSR of each threshold should be plotted.
 #'@param th1 different possibilities to pre-specify an exact value, an interval
 #'or a central point for the search of the threshold (or first threshold if
 #'nthresh=2)
@@ -55,7 +55,7 @@
 #'point for the search of the second threshold (used only if nthresh=2)
 #'@param beta different possibilities to pre-specify an exact value, an
 #'interval or a central point for the search of the cointegrating value
-#'@param restr Currently not avalaible
+#'@param restr Currently not available
 #'@param common Whether the regime-specific dynamics are only for the ECT or
 #'for the ECT and the lags
 #'@param include Type of deterministic regressors to include

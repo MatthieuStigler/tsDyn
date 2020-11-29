@@ -26,7 +26,7 @@ Each exported function has a corresponding man page (some man pages are in commo
 \seealso{
 \code{\link{availableModels}} for listing all currently available NLAR models
 
-\code{\link{autopairs}},\code{\link{autotriples}},\code{\link{autotriples.rgl}} for graphical explorative functions
+\code{\link{autopairs}},\code{\link{autotriples}},\code{\link{autotriples.rgl}} for graphical exploratory functions
 
 \code{\link{llar}}, \code{\link{delta}}, \code{\link{delta.lin}} for nonlinearity checking tools
 }

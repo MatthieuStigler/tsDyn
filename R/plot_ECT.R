@@ -3,7 +3,7 @@
 #' This plot shows how variables in a (T)VECM respond to deviations from the long-term equilibrium
 #' 
 #' @param x object of class \code{\link{VECM}} or \code{\link{TVECM}}
-#'@param add.legend logical. Whetehr to add a legend?
+#'@param add.legend logical. Whether to add a legend?
 #'@param legend.location character. Location of the legend, see \code{\link[graphics]{legend}}
 #'@param \ldots arguments passed to the initial \code{plot} call, see \code{\link[graphics]{plot}}
 #'@examples

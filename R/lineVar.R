@@ -139,7 +139,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
   Y <- y[(p+1):T,] #
   X <- embed(y, p+1)[, -seq_len(k)]	#Lags matrix
 
-  #Set up of dependant and independant variables matrices
+  #Set up of dependent and independent variables matrices
   if(notAllLags)
     X<-X[,sort(rep((Lags*k-k+1), k))+0:(k-1)]
 
@@ -408,8 +408,8 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #' argument allowing to compute rolling forecasts.} }
 #'
 #' Two estimators are available: the Engle-Granger two step approach
-#' (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministics
-#' regressors (or external variables if LRinclude is of class numeric) can be
+#' (\code{2OLS}) or the Johansen (\code{ML}). For the 2OLS, deterministic
+#' regressors (or external variables if \code{LRinclude} is of class numeric) can be
 #' added for the estimation of the cointegrating value and for the ECT. This is
 #' only working when the beta value is not pre-specified.
 #'
@@ -470,7 +470,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 #'to extract the relevant parameter matrices. 
 #'
 #'\code{\link{lineVar}} \code{\link{TVAR}} and \code{\link{TVECM}} for
-#'the correspoding threshold models. \code{\link{linear}} for the univariate AR
+#'the corresponding threshold models. \code{\link{linear}} for the univariate AR
 #'model.
 #'@keywords ts
 #'@export

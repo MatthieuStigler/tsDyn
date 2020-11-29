@@ -24,7 +24,7 @@ Default to TRUE.}
 \item{\dots}{additional arguments to \code{regime}}
 
 \item{discretize}{logical (default TRUE) whether the series are discretized to {1,2}, 
-or whether regimeprobabilities are returned.}
+or whether regime probabilities are returned.}
 }
 \value{
 Time series of same attributes as input to setar.

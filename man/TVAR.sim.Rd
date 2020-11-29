@@ -76,7 +76,7 @@ understand how to give right input}
 \item{boot.scheme}{The bootstrap scheme.}
 }
 \value{
-A matrix with the simulated/bootstraped series.
+A matrix with the simulated/bootstrapped series.
 }
 \description{
 Simulate a multivariate Threshold VAR (TVAR)

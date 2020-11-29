@@ -122,7 +122,7 @@ testRegime <- function(object, ...)
 #    regime should be considered.
 #
 # object: a STAR model already built with at least 2 regimes.
-# G: the gradient matrix obtained by using computeGradient()
+# G: the gradient matrix obtained by using \code{computeGradient()}
 # rob: boolean indicating if robust tests should be used or not.
 # sig: significance level of the tests
 # 

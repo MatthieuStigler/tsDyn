@@ -29,7 +29,7 @@ An object of class \code{nlar}. \link{nlar-methods} for a list of
 available methods.
 }
 \description{
-Generic non-linear autogregressive model class constructor.
+Generic non-linear autoregressive model class constructor.
 }
 \details{
 Constructor for the generic \code{nlar} model class. On a fitted object you

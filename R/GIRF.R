@@ -11,7 +11,7 @@
 #' Generates a GIRF for multiple innovations and histories
 #' 
 #' @param object An object of class \code{\link{linear}}, \code{\link{setar}} or \code{nlVar} (\code{\link{TVAR}}, \code{\link{TVECM}})
-#' @param n.ahead The numher of steps ahead to compute
+#' @param n.ahead The number of steps ahead to compute
 #' @param seed optional, the seed for the random numbers
 #' @param \ldots Further arguments passed to specific methods. 
 #' @details In a nonlinear model, the Impulse response Function (IRF) is not time-, scale- and sign-invariant as in linear models. 
@@ -33,7 +33,7 @@
 #'\item{hist, shock}{History and shock used in the nth simulation}
 #'\item{n.ahead:}{The forecasting horizon. Note the shocks happens at time 0}
 #'\item{var:}{The variable (on which the shock happens, corresponds hence to the \code{response} argument in \code{irf})}
-#'\item{sim_1, sim_2}{The average (over R times) simulation with the specific shock (sim_1) or with ranodm shocks (sim_2). }
+#'\item{sim_1, sim_2}{The average (over R times) simulation with the specific shock (sim_1) or with random shocks (sim_2). }
 #'\item{girf}{The difference between sim_1 and sim_2}
 #'}
 #'@author Matthieu Stigler

@@ -31,7 +31,7 @@ Only for \sQuote{\code{VAR}}/\sQuote{\code{VECM}}, not for \sQuote{\code{TVAR}}.
 A matrix of predicted values.
 }
 \description{
-Forecating the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
+Forecasting the \strong{level} of a series estimated by  \sQuote{\code{VAR}} / \sQuote{\code{VECM}} or \sQuote{\code{TVAR}}
 }
 \details{
 The forecasts are obtained recursively, and are for the levels of the series.  

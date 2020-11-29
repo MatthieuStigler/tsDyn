@@ -38,7 +38,7 @@ observations in each regime}
 
 \item{ngridTh}{number of elements to search for the threshold value}
 
-\item{plot}{Whether the grid with the SSR of each threshold should be ploted.}
+\item{plot}{Whether the grid with the SSR of each threshold should be plotted.}
 
 \item{th1}{different possibilities to pre-specify an exact value, an interval
 or a central point for the search of the threshold (or first threshold if
@@ -50,7 +50,7 @@ point for the search of the second threshold (used only if nthresh=2)}
 \item{beta}{different possibilities to pre-specify an exact value, an
 interval or a central point for the search of the cointegrating value}
 
-\item{restr}{Currently not avalaible}
+\item{restr}{Currently not available}
 
 \item{common}{Whether the regime-specific dynamics are only for the ECT or
 for the ECT and the lags}

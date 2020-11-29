@@ -9,7 +9,7 @@ plot_ECT(x, add.legend = TRUE, legend.location = "topright", ...)
 \arguments{
 \item{x}{object of class \code{\link{VECM}} or \code{\link{TVECM}}}
 
-\item{add.legend}{logical. Whetehr to add a legend?}
+\item{add.legend}{logical. Whether to add a legend?}
 
 \item{legend.location}{character. Location of the legend, see \code{\link[graphics]{legend}}}
 

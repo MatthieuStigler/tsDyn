@@ -197,7 +197,7 @@ TVAR.gen <- function(B, n=200, lag=1, include = c("const", "trend","none", "both
 #'understand how to give right input
 #'@param \dots Further arguments passed to the underlying (un-exported)
 #'\code{TVAR.gen} function
-#'@return A matrix with the simulated/bootstraped series.
+#'@return A matrix with the simulated/bootstrapped series.
 #'@author Matthieu Stigler
 #'@seealso \code{\link{TVAR}} to estimate the TVAR.  Similar \code{\link{TVECM.sim}} and \code{\link{TVECM.boot}} for \code{\link{TVECM}}, 
 #'\code{\link{VAR.sim}} and \code{\link{VAR.boot}} for VAR models estimated with \code{\link{lineVar}}. 

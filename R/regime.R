@@ -86,7 +86,7 @@ regime.nlVar <- function(object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...
 
 #' @rdname regime
 #' @param discretize logical (default TRUE) whether the series are discretized to {1,2}, 
-#' or whether regimeprobabilities are returned. 
+#' or whether regime probabilities are returned. 
 #' @export
 regime.lstar <- function(object, initVal=TRUE, timeAttr=TRUE, series, discretize=TRUE, ...){
   

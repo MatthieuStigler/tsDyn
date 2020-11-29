@@ -127,7 +127,7 @@ Equ x2: -0.007954949         0   0.16032265   0.14668443
 > TVECM.boot.check(TVECMobject)
 [1] TRUE
 > 
-> ## check correspondance bootstrap/simul:
+> ## check correspondence bootstrap/simul:
 > tv_1_sim <-TVECM.sim(B=tsDyn:::coefMat.nlVar(TVECMobject),beta=TVECMobject$model.specific$beta,
 +                         Thresh=getTh(TVECMobject), show.parMat=TRUE, innov=matrix(0,200,2))
           ECT_low Const_low Trend_low L{x1}{1}_low L{x2}{1}_low     ECT_upr
