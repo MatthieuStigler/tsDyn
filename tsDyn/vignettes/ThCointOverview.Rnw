@@ -290,7 +290,7 @@ residuals follow a multivariate SETAR process with p >1 lags, the
 lags in the TVECM do also have regime-specific components.
 
 Several other model specifications have been used in the literature.
-Gonzalo and Pittarakis\citeyearpar{GonzaloPitarakis2006a} and Krischnakumar
+Gonzalo and Pittarakis\citeyearpar{GonzaloPitarakis2006a} and Krishnakumar
 and Netto (2009) use as transition variable not the deviations itself,
 but an external variable (that is, a TAR model, as we will see later).
 This has important implications as the stationarity conditions are
@@ -371,7 +371,7 @@ as it then corresponds to the delay of the error-correction term.
 Note that some authors don't take as transition variable the deviations
 from equilibrium but rather an external variable%
 \footnote{Or the differences of a single variable included in the process, as
-in Krischnakumar and Netto (2009).%
+in Krishnakumar and Netto (2009).%
 }, i.e. they use a TAR model. 
 
 The theoretically unlimited number of regimes is usually restricted
