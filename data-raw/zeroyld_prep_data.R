@@ -90,12 +90,26 @@ zeroyldFull <-  dat_c %>%
 sapply(zeroyldFull, class)
 
 #############################
+## simpler version: zeroyld
+#############################
 
+zeroyld <- zeroyldMeta %>% 
+  select(short.run, long.run)
+
+head(zeroyld)
+
+## old version
+#    short.run long.run
+# 1     2.183    1.575
+# 2     2.246    1.545
+
+#############################
 ## export
 #############################
 
 
 use_data(zeroyldMeta, overwrite = TRUE)
+use_data(zeroyld, overwrite = TRUE)
 # write.csv(dat_fin_more, "/home/matifou/Dropbox/Documents/tsDyn/tsDyn/data/zeroyldMeta.csv")
 # write.csv2(zeroyldMeta, "data/zeroyldMeta.csv",
 #            row.names = FALSE)
