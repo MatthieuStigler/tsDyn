@@ -29,6 +29,7 @@
 #'    \code{ca.jo.test} (from \code{\link[urca]{blrtest}} etc...). Care should be taken 
 #'    however, since the normalization might override the restrictions imposed. 
 #' @return A matrix containing the coefficients 
+#' @references Johansen, Soren, (1995), Likelihood-Based Inference in Cointegrated Vector Autoregressive Models, Oxford University Press
 #' @export
 #' @examples
 #' data(barry)
