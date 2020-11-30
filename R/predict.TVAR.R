@@ -20,7 +20,7 @@ predict.TVAR <- function(object, newdata, n.ahead=5,
   
   if(!missing(newdata)) {
     if(!inherits(newdata, c("data.frame", "matrix","zoo", "ts"))) stop("Arg 'newdata' should be of class data.frame, matrix, zoo or ts")
-    if(nrow(newdata)!=lag) stop("Please provide newdata with nrow=lag")
+    if(nrow(newdata)!=lag) stop(paste0("Please provide newdata with nrow=lag=", lag))
     starting <-  newdata 
   }
   
