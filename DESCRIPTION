@@ -4,7 +4,8 @@ Title: Nonlinear Time Series Models with Regime Switching
 Version: 0.9-48.999
 Date: 2018-05-20
 Authors@R: c(person("Antonio Fabio", "Di Narzo", role = "aut"),
-             person("Jose Luis", "Aznarte", role = "ctb"),
+             person("Jose Luis", "Aznarte", role = "ctb",
+                    comment =c(ORCID="0000-0002-1636-244X")),
              person("Matthieu", "Stigler", role = c("aut","cre"), email="Matthieu.Stigler@gmail.com",
                     comment =c(ORCID="0000-0002-6802-4290")))
 Depends: R (>= 2.13)
