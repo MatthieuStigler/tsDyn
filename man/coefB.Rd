@@ -93,6 +93,9 @@ if(require(urca)){
  all.equal(coefB(vecm_r2), coefB(vecm_ur, r=2), check.attributes=FALSE)
 }
 }
+\references{
+Johansen, Soren, (1995), Likelihood-Based Inference in Cointegrated Vector Autoregressive Models, Oxford University Press
+}
 \author{
 Matthieu Stigler
 }
