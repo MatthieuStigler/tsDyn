@@ -128,7 +128,7 @@ if(FALSE) {
 
 
 ###### Characteristic roots
-root_oneReg <- function(coef, regime=c("L", "M", "H", "."), lags, dowarn = TRUE){
+root_oneReg <- function(coef, regime=c("L", "M", "H", "."), lags, warn_root = TRUE){
   regime <- match.arg(regime)
   
   ## get reelvant coefs
@@ -144,7 +144,7 @@ root_oneReg <- function(coef, regime=c("L", "M", "H", "."), lags, dowarn = TRUE)
   root <- polyroot(charPol)
   root_mod <- Mod(root)
   
-  if(any(root_mod<=1) & dowarn){
+  if(any(root_mod<=1) & warn_root){
     regimeName <- switch(regime, "L"="low", "M"="medium", "H"="high", "."="")
     message <- paste("Possible unit root in the", regimeName, " regime. Roots are:", paste(round(root_mod,4), collapse=" "))
     warning(message, call.=FALSE)
@@ -193,7 +193,7 @@ charac_root.nlar <- function(object, ...) {
   if(inherits(object, c("lstar", "star"))) lags <- list(1:object$str$m, 1:object$str$m)
   
   res_li  <- mapply(root_oneReg, regime = as.list(reg), lags = lags, 
-                    MoreArgs = list(coef = coef(object), dowarn = FALSE),
+                    MoreArgs = list(coef = coef(object), warn_root = FALSE),
                     SIMPLIFY = FALSE)
   res_li2 <- lapply(res_li, function(x) data.frame(root = 1:length(x[[1]]), value = x$root_mod))
   res_df <- Reduce(function(x, y) merge(x, y, by = "root", all = TRUE), res_li2)
