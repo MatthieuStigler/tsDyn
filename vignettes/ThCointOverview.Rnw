@@ -7,6 +7,7 @@
 \usepackage[authoryear]{natbib}
 \usepackage{SweaveCustom}
 \usepackage{xcolor}
+\usepackage{fullpage}
 \usepackage{url}
 \usepackage[unicode=true, pdfusetitle, backref=false,colorlinks=true, pdfborder={0 0 0}]{hyperref}
 
@@ -34,6 +35,7 @@
 \usepackage{babel}
 
 \begin{document}
+
 \begin{Scode}{results=hide, echo=FALSE}
 require(tsDyn)
 options(prompt=" ", encoding="LATIN-9")
@@ -42,13 +44,20 @@ options(prompt=" ", encoding="LATIN-9")
 
 
 \author{Matthieu Stigler\\
-\date{January 10, 2010}
+\date{January 10, 2010 (Revision 6: Nov 2020)}
 \textsf{\small Matthieu.Stigler at gmail.com}}
 
 \maketitle
+
 \begin{center}
-(Revision 5: April 2013)
+\color{blue}{For an updated version, with emphasis on the Generalized Impulse Function (GIRF), see:\\
+Stigler (2020) \emph{tsDyn: Threshold cointegration: overview and implementation in R}\\
+Handbook of Statistics, 42:229-264, Elsevier,
+\href{https://doi-org.stanford.idm.oclc.org/10.1016/bs.host.2019.01.008}{\color{blue}{www}}
+}
 \par\end{center}
+
+
 \begin{abstract}
 Purpose of this paper is twofold. It is first to offer a rough overview
 on the field of threshold cointegration, from the seminal paper of
@@ -168,7 +177,7 @@ vectors are known, estimation of multiple cointegration relationship
 is trivial as the estimation is simply OLS regression for the VECM
 and testing can be done using classical Wald tests (Horvath and Watson
 \citeyear{HorvathWatson1995}). When these vectors are unknown, the
-reduced-rank approach adopted by Johansen (1998, 1995) is able to
+reduced-rank approach adopted by Johansen (1998, 1995)\citet{Johansen1988,Johansen1995}  is able to
 estimate the potential cointegrating vectors and to test for their
 significance, allowing to determine the number of cointegration relationships.
 This is available in R with the \code{ca.jo()} function from package \pkg{vars}
