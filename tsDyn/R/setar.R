@@ -24,7 +24,34 @@
 #	mH: autoregressive order above the threshold ('High')
 #	nested: is this a nested call? (useful for correcting final model df)
 #	trace: should infos be printed?
-setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"), model=c("TAR", "MTAR"), ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,trim=0.15, type=c("level", "diff", "ADF"), restriction=c("none","OuterSymAll","OuterSymTh") ){
+setar <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,
+                  include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"),
+                  model=c("TAR", "MTAR"),
+                  ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,
+                  trim=0.15,
+                  type=c("level", "diff", "ADF"),
+                  restriction=c("none","OuterSymAll","OuterSymTh")
+                  # warn_min_obs=TRUE,
+                  # warn_root=TRUE
+                  ){
+  
+  args <- as.list(match.call())
+  args[[1]] <- NULL
+  args_all <- append(args, list(warn_min_obs=TRUE,
+                                warn_root=TRUE))
+  do.call(setar_low, args_all, envir = parent.frame())
+}
+  
+
+setar_low <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVar, th, trace=FALSE, nested=FALSE,
+                  include = c("const", "trend","none", "both"), common=c("none", "include","lags", "both"),
+                  model=c("TAR", "MTAR"),
+                  ML=seq_len(mL),MM=seq_len(mM), MH=seq_len(mH), nthresh=1,
+                  trim=0.15,
+                  type=c("level", "diff", "ADF"),
+                  restriction=c("none","OuterSymAll","OuterSymTh"),
+                  warn_min_obs=FALSE,
+                  warn_root=FALSE){
 # 1: preliminaries
 # 2:  Build the regressors matrix and Y vector
 # 3: Set-up of transition variable
@@ -244,7 +271,7 @@ z<-as.matrix(z)
   regime <- c(rep(NA,length(x)-length(reg)), reg)
     
   nobs<-na.omit(c(mean(isL),mean(isM),mean(isH)))	#N of obs in each regime
-  if(min(nobs)<trim-0.01){
+  if(min(nobs)<trim-0.01 & warn_min_obs){
     warning("\nWith the threshold you gave (", th, ") there is a regime with less than trim=",100*trim,"% observations (",paste(round(100*nobs,2), "%, ", sep=""), ")\n", call.=FALSE)
   }
   if(min(nobs)==0)
@@ -318,10 +345,10 @@ z<-as.matrix(z)
 
 ###check for unit roots
   if(type=="level"){
-    isRootH <- root_oneReg(res$coefficients, regime = "H", lags = MH)
-    isRootL <- root_oneReg(res$coefficients, regime = "L", lags = ML)
+    isRootH <- root_oneReg(res$coefficients, regime = "H", lags = MH, warn_root = warn_root)
+    isRootL <- root_oneReg(res$coefficients, regime = "L", lags = ML, warn_root = warn_root)
     if(nthresh==2)
-      isRootM <- root_oneReg(res$coefficients, regime = "M", lags = MM)
+      isRootM <- root_oneReg(res$coefficients, regime = "M", lags = MM, warn_root = warn_root)
   }
 
 ### SETAR 7: return the infos

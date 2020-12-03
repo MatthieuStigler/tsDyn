@@ -40,7 +40,6 @@ Type 'q()' to quit R.
 +                                thDelay = ..3,
 +                                test = ..4,
 +                                nboot = 2)))
-There were 16 warnings (use warnings() to see them)
 > 
 > 
 > ### show F tests ###
