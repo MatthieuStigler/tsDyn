@@ -46,7 +46,7 @@ and rank \eqn{r}:
   \describe{
    \item{A}{Adjustment coefficients, of dim \eqn{K \times r}}
    \item{B}{Cointegrating coefficients, of dim \eqn{K \times r}}
-   \item{Pi}{Matrix \eqn{\Pi=A\dot B^{'}}, of dim \eqn{K \times K}}
+   \item{Pi}{Matrix \eqn{\Pi=A B^{'}}, of dim \eqn{K \times K}}
    }
    Coefficients are extracted from a VECM in package \code{tsDyn}, or from a VECM 
    obtained in package \code{urca} from \code{\link[urca]{ca.jo}} or \code{\link[urca]{cajorls}}. 
@@ -58,8 +58,8 @@ and rank \eqn{r}:
    The normalization is the Phillips triangular representation,  as suggested by Johansen (1995, p. 72), 
    standardising  the first \eqn{r\times r} coefficients to \eqn{I_r}:
    \describe{
-     \item{B}{\eqn{B_{norm}=B (c^{'}B)^{-1}} with \eqn{c=(I_r,0_{p-r,r})^{'}}}
-     \item{A}{\eqn{A_{norm}=B^{'}c}}
+     \item{B}{\eqn{B_{norm}=B (c^{'}B)^{-1}} with \eqn{c=(I_r,0_{K-r,r})^{'}}}
+     \item{A}{\eqn{A_{norm}=AB^{'}c}}
    }
    Finally, note that the function also apply to objects obtained from tests of class 
    \code{ca.jo.test} (from \code{\link[urca]{blrtest}} etc...). Care should be taken 
