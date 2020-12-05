@@ -762,6 +762,636 @@ Frequency = 1
  [9] 2.418100 2.417870
 
 > 
+> lapply(mod_const_only, predict, n.ahead=3, type="MC", seed=1234)
+[[1]]
+[[1]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.699227 2.632057 2.535147
+
+[[1]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.699227 2.699227
+50 1.882137 3.577706
+51 1.566999 3.602226
+
+
+[[2]]
+[[2]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.624885 2.500711 2.417268
+
+[[2]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.624885 2.624885
+50 1.768907 3.423516
+51 1.412091 3.509741
+
+
+[[3]]
+[[3]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.688936 2.544397 2.427185
+
+[[3]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.688936 2.688936
+50 1.838803 3.434150
+51 1.382525 3.468059
+
+
+[[4]]
+[[4]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 1.886000 2.521998 2.098536
+
+[[4]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 1.886000 1.886000
+50 1.810734 3.418901
+51 1.222540 2.872624
+
+
+[[5]]
+[[5]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.623663 2.410565 2.283101
+
+[[5]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.623663 2.623663
+50 1.721783 3.279117
+51 1.220608 3.302889
+
+
+[[6]]
+[[6]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.619786 2.509727 2.435836
+
+[[6]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.619786 2.619786
+50 1.819935 3.379552
+51 1.530686 3.426148
+
+
+[[7]]
+[[7]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.759622 2.703551 2.624925
+
+[[7]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.759622 2.759622
+50 2.014577 3.572345
+51 1.619070 3.688199
+
+
+[[8]]
+[[8]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.512616 2.543906 2.238271
+
+[[8]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.512616 2.512616
+50 1.873270 3.389578
+51 1.515958 3.016589
+
+
+[[9]]
+[[9]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.688648 2.543461 2.448394
+
+[[9]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.688648 2.688648
+50 1.837628 3.433514
+51 1.379960 3.467149
+
+
+[[10]]
+[[10]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.623340 2.409516 2.309587
+
+[[10]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.623340 2.623340
+50 1.720467 3.278405
+51 1.247822 3.301740
+
+
+[[11]]
+[[11]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.631237 2.510906 2.431900
+
+[[11]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.631237 2.631237
+50 1.844508 3.351233
+51 1.525315 3.421465
+
+
+> lapply(mod_const_only, predict, n.ahead=3, type="bootstrap", seed=1234)
+[[1]]
+[[1]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.699227 2.582197 2.491020
+
+[[1]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.699227 2.699227
+50 1.975343 3.739643
+51 1.717334 3.615281
+
+
+[[2]]
+[[2]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.624885 2.465465 2.340347
+
+[[2]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.624885 2.624885
+50 1.893373 3.670861
+51 1.455743 3.610034
+
+
+[[3]]
+[[3]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.688936 2.483265 2.432078
+
+[[3]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.688936 2.688936
+50 1.918761 3.484796
+51 1.475615 3.475700
+
+
+[[4]]
+[[4]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 1.886000 2.472542 2.119201
+
+[[4]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 1.886000 1.886000
+50 1.870672 3.570736
+51 1.351098 3.080134
+
+
+[[5]]
+[[5]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.623663 2.381322 2.227751
+
+[[5]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.623663 2.623663
+50 1.759541 3.444184
+51 1.195565 3.304635
+
+
+[[6]]
+[[6]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.619786 2.471301 2.375166
+
+[[6]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.619786 2.619786
+50 1.883685 3.632222
+51 1.565057 3.500204
+
+
+[[7]]
+[[7]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.759622 2.680781 2.552442
+
+[[7]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.759622 2.759622
+50 1.992117 3.773470
+51 1.627136 3.732379
+
+
+[[8]]
+[[8]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.512616 2.531013 2.213672
+
+[[8]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.512616 2.512616
+50 1.921616 3.558615
+51 1.630914 3.270256
+
+
+[[9]]
+[[9]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.688648 2.482492 2.447136
+
+[[9]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.688648 2.688648
+50 1.917765 3.484768
+51 1.518187 3.477827
+
+
+[[10]]
+[[10]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.623340 2.380427 2.235120
+
+[[10]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.623340 2.623340
+50 1.758617 3.442734
+51 1.196882 3.304137
+
+
+[[11]]
+[[11]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.631237 2.473523 2.341821
+
+[[11]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.631237 2.631237
+50 1.909633 3.669851
+51 1.553871 3.525138
+
+
+> lapply(mod_const_only, predict, n.ahead=3, type="block-bootstrap", seed=1234)
+[[1]]
+[[1]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.699227 2.643203 2.651336
+
+[[1]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.699227 2.699227
+50 1.851139 3.726936
+51 1.808777 3.746130
+
+
+[[2]]
+[[2]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.624885 2.490311 2.254758
+
+[[2]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.624885 2.624885
+50 1.913685 3.706673
+51 1.489050 3.412472
+
+
+[[3]]
+[[3]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.688936 2.541781 2.534744
+
+[[3]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.688936 2.688936
+50 1.541087 3.524343
+51 1.521310 3.495101
+
+
+[[4]]
+[[4]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 1.886000 2.549788 2.190231
+
+[[4]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 1.886000 1.886000
+50 1.624120 3.612913
+51 1.351974 3.335432
+
+
+[[5]]
+[[5]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.623663 2.379794 2.191166
+
+[[5]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.623663 2.623663
+50 1.745137 3.417631
+51 1.418244 3.085196
+
+
+[[6]]
+[[6]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.619786 2.497780 2.287442
+
+[[6]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.619786 2.619786
+50 1.973205 3.671035
+51 1.741850 3.140380
+
+
+[[7]]
+[[7]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.759622 2.703508 2.463683
+
+[[7]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.759622 2.759622
+50 1.992117 3.907056
+51 1.514316 3.638794
+
+
+[[8]]
+[[8]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.512616 2.602617 2.054608
+
+[[8]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.512616 2.512616
+50 1.921616 3.539660
+51 1.561994 2.872041
+
+
+[[9]]
+[[9]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.688648 2.541385 2.596026
+
+[[9]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.688648 2.688648
+50 1.542061 3.523408
+51 1.805157 3.494865
+
+
+[[10]]
+[[10]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.623340 2.378904 2.189639
+
+[[10]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.623340 2.623340
+50 1.744270 3.417798
+51 1.418685 3.087398
+
+
+[[11]]
+[[11]]$pred
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+[1] 2.631237 2.457292 2.322464
+
+[[11]]$se
+Time Series:
+Start = 49 
+End = 51 
+Frequency = 1 
+       2.5%    97.5%
+49 2.631237 2.631237
+50 1.922385 3.705454
+51 1.723155 3.101810
+
+
 > 
 > ## charac root
 > lapply(mod_notrend_noaar, charac_root)
