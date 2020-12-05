@@ -14,6 +14,7 @@
   ci = 0.95,
   block.size = 3,
   boot1Zero = TRUE,
+  seed = NULL,
   ...
 )
 }
@@ -36,6 +37,8 @@ bootstrap).}
 
 \item{boot1Zero}{Whether the first innovation for MC/bootstrap should be set
 to zero.}
+
+\item{seed}{optional, the seed for the random generation.}
 
 \item{\dots}{Further arguments passed to the internal \sQuote{\code{oneStep}} function. 
 Mainly argument \sQuote{\code{thVar}} if an external threshold variable was provided}

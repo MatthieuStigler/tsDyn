@@ -15,6 +15,7 @@
 #' @param block.size The block size when the block-bootstrap is used.
 #' @param boot1Zero Whether the first innovation for MC/bootstrap should be set
 #' to zero.
+#' @param seed optional, the seed for the random generation.
 #' @param \dots Further arguments passed to the internal \sQuote{\code{oneStep}} function. 
 #' Mainly argument \sQuote{\code{thVar}} if an external threshold variable was provided
 #' 
@@ -80,7 +81,8 @@
 
 #' @export
 #### Predict nlar
-predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"), nboot=100, ci=0.95, block.size=3, boot1Zero=TRUE,...)
+predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "bootstrap", "block-bootstrap"),
+                         nboot=100, ci=0.95, block.size=3, boot1Zero=TRUE, seed = NULL, ...)
 {
 
   type <- match.arg(type)
@@ -121,6 +123,7 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
     return(res)
   }
 
+  if(!is.null(seed)) set.seed(seed)
   res <- replicate(nboot, pred_fun(res=res))
   res_means <- rowMeans(res, na.rm=TRUE)
   pred <- res_means[n.used + 1:n.ahead]
