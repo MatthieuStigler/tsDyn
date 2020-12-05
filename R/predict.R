@@ -131,10 +131,13 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
 ## Compute SE if MC/boot
   if(type!="naive"){
     ci_half <- (1-ci)/2
-    SE <- t(apply(res[n.used + 1:n.ahead, ,drop=FALSE], 1 , quantile, prob=sort(c(ci_half, 1-ci_half)), na.rm=TRUE))
+    SE <- t(apply(res[n.used + 1:n.ahead, ,drop=FALSE], 1 , sd, na.rm=TRUE))
+    CI <- t(apply(res[n.used + 1:n.ahead, ,drop=FALSE], 1 , quantile, prob=sort(c(ci_half, 1-ci_half)), na.rm=TRUE))
     if(is.ts(newdata)){
       SE <- ts(SE, start = tsp(newdata)[2] + deltat(newdata),
-	      frequency=frequency(newdata))
+               frequency=frequency(newdata))
+      CI <- ts(CI, start = tsp(newdata)[2] + deltat(newdata),
+               frequency=frequency(newdata))
     }
   }
 
@@ -144,7 +147,7 @@ predict.nlar <- function(object, newdata, n.ahead=1, type=c("naive", "MC", "boot
   if(type=="naive"){
     result <- pred
   } else {
-    result <- list(pred=pred, se=SE)
+    result <- list(pred=pred, se=SE, ci=CI)
   }
 
   return(result)
