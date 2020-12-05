@@ -32,6 +32,9 @@ sapply(mod, function(x) head(residuals(x, initVal = FALSE)))
 
 lapply(mod_const_only, predict, n.ahead=10)
 
+lapply(mod_const_only, predict, n.ahead=3, type="MC", seed=1234)
+lapply(mod_const_only, predict, n.ahead=3, type="bootstrap", seed=1234)
+lapply(mod_const_only, predict, n.ahead=3, type="block-bootstrap", seed=1234)
 
 ## charac root
 lapply(mod_notrend_noaar, charac_root)
