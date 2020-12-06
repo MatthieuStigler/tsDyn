@@ -117,7 +117,7 @@ roundAll.Equal(setar.boot.check(set_1th_l1), 2)
 setar.boot.check(set_1th_l1, round_digits = 2)
 roundAll.Equal(setar.boot.check(set_1th_l2), 1)
 roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
-isTRUE(setar.boot.check(set_1th_l1_tr, tol=0.000001))
+setar.boot.check(set_1th_l1_tr, tol=0.00001)
 setar.boot.check(set_1th_l1_tr, round_digits = 1)
 
 
@@ -157,7 +157,7 @@ set_2th_l1_tr <-  setar(lynx, nthresh=2, m=1, include = "trend")
 
 
 setar.boot.check(set_2th_l1)
-roundAll.Equal(setar.boot.check(set_2th_l2, round_digits = 1),1)
+setar.boot.check(set_2th_l2, round_digits = 2, tol=0.6)
 isTRUE(setar.boot.check(set_2th_l2, round_digits = 1))
 isTRUE(setar.boot.check(set_2th_l1_tr))
 setar.boot.check(set_2th_l1_tr, round_digits = 2, tol=0.0001)
