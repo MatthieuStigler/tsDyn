@@ -160,7 +160,7 @@ irf(x=tvecm_1, runs = 2, seed = 123)
 
 ## regime specific for TVECM
 models_TVECM_irf <- models_TVECM   %>% 
-  mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
+  mutate(irf_L = map(object, ~suppressWarnings(irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L"))))
 
 ## show two first of first componment
 models_TVECM_irf %>% 
