@@ -74,10 +74,10 @@ models_univariate %>%
 ### test boot
 ################
 
-setar.boot.check <-  function(object, round_digits = 10) {
+setar.boot.check <-  function(object, round_digits = 10, ...) {
   mod_boot <- setar.boot(object, boot.scheme = "check", round_digits = round_digits, returnStarting = TRUE)  
   orig_series <- as.numeric(object$str$x)
-  all.equal(mod_boot, orig_series)
+  all.equal(mod_boot, orig_series, ...)
 }
 
 linear.boot.check <-  function(object, round_digits = 10) {
@@ -115,10 +115,11 @@ set_1th_l1_tr <-  setar(lynx, nthresh=1, m=1, include = "trend")
 
 roundAll.Equal(setar.boot.check(set_1th_l1), 2)
 setar.boot.check(set_1th_l1, round_digits = 2)
-roundAll.Equal(setar.boot.check(set_1th_l2), 2)
+roundAll.Equal(setar.boot.check(set_1th_l2), 1)
 roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
-isTRUE(setar.boot.check(set_1th_l1_tr))
+isTRUE(setar.boot.check(set_1th_l1_tr, tol=0.000001))
 setar.boot.check(set_1th_l1_tr, round_digits = 1)
+
 
 
 ## why difference?
@@ -156,11 +157,10 @@ set_2th_l1_tr <-  setar(lynx, nthresh=2, m=1, include = "trend")
 
 
 setar.boot.check(set_2th_l1)
-setar.boot.check(set_2th_l2)
+roundAll.Equal(setar.boot.check(set_2th_l2, round_digits = 1),1)
 isTRUE(setar.boot.check(set_2th_l2, round_digits = 1))
 isTRUE(setar.boot.check(set_2th_l1_tr))
-roundAll.Equal(setar.boot.check(set_2th_l1_tr, round_digits = 1),3)
-
+setar.boot.check(set_2th_l1_tr, round_digits = 2, tol=0.0001)
 
 ################
 ### tets sim

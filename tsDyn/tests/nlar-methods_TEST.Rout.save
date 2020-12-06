@@ -2077,9 +2077,8 @@ Possible unit root in the high  regime. Roots are: 1 1
 [12,] 3.093844 3.167923 3.189365 3.178690
 [13,] 3.237219 3.345161 3.365831 3.318405
 [14,] 3.393691 3.540102 3.509327 3.445134
-> sapply(pred_rolls_1, accuracy_stat)
+> sapply(pred_rolls_1, accuracy_stat)[-1,] ## removing first line as gave 'factor' under R<4
      linear     setar      lstar      aar       
-var  "x"        "x_small"  "x_small"  "x"       
 ME   0.05258699 0.02826967 0.03157037 0.03953898
 RMSE 0.1328027  0.06883358 0.07072864 0.09035348
 MAE  0.1148975  0.0477577  0.05207567 0.067775  

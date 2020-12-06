@@ -67,7 +67,7 @@ mod_small[["aar"]] <- aar(x_small, m=2)
 
 pred_rolls_1 <- lapply(mod_small, predict_rolling, n.ahead=1, newdata=x[101:114])
 sapply(pred_rolls_1, function(x) x$pred[[1]])
-sapply(pred_rolls_1, accuracy_stat)
+sapply(pred_rolls_1, accuracy_stat)[-1,] ## removing first line as gave 'factor' under R<4
 
 
 pred_rolls_12 <- lapply(mod_small, predict_rolling, n.ahead=1:2, newdata=x[101:114])
