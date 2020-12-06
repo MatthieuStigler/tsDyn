@@ -61,18 +61,29 @@ Warning message:
 In lineVar(data, lag, r = r, include = include, model = "VECM",  :
   Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
 > vecm_ML_l0_LRco <-VECM(barry, lag=0, LRinclude="const", estim="ML")
-Warning message:
-In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+Warning messages:
+1: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
   Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
+2: In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > vecm_ML_l0_LRtr <-VECM(barry, lag=0, LRinclude="trend", estim="ML")
 Warning message:
 In lineVar(data, lag, r = r, include = include, model = "VECM",  :
   Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...
 > 
 > vecm_OLS_l1_LRco <-VECM(barry, lag=1, LRinclude="const")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > vecm_OLS_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend")
 > vecm_OLS_l1_LRtr_noCo <-VECM(barry, lag=1, LRinclude="trend", include="none")
 > vecm_OLS_l1_LRbo <-VECM(barry, lag=1, LRinclude="both")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > 
 > vecm_ML_l1_co <-VECM(barry, lag=1, estim="ML")
 > vecm_ML_l3_co <-VECM(barry, lag=3, include="const", estim="ML")
@@ -86,12 +97,28 @@ In lineVar(data, lag, r = r, include = include, model = "VECM",  :
 > set.seed(1234)
 > exoVar <- rnorm(n=nrow(barry))
 > vecm_ML_l1_LRco <-VECM(barry, lag=1, LRinclude="const", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > vecm_ML_l1_LRc_exo <-VECM(barry, lag=1, LRinclude="const", estim="ML", exogen=exoVar)
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > vecm_ML_l1_LRtr <-VECM(barry, lag=1, LRinclude="trend", estim="ML")
 > vecm_ML_l1_LRtr_exo <-VECM(barry, lag=1, LRinclude="trend", estim="ML", exogen=exoVar)
 > vecm_ML_l1_LRtr_noCo <-VECM(barry, lag=1, LRinclude="trend", include="none", estim="ML")
 > vecm_ML_l1_LRbo <-VECM(barry, lag=1, LRinclude="both", estim="ML")
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > vecm_ML_l1_LRbo_exo <-VECM(barry, lag=1, LRinclude="both", estim="ML", exogen=exoVar)
+Warning message:
+In lineVar(data, lag, r = r, include = include, model = "VECM",  :
+  When `LRinclude` is either 'const' or 'both', `include` can only be `none`.
+  Setting include='none'.
 > 
 > vecm_all <- list(
 + 		vecm_OLS_l1_co=vecm_OLS_l1_co,
