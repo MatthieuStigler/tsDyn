@@ -122,7 +122,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     warning("Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...")
   }
   if(LRinclude%in%c("const", "both") & include !="none")  {
-    warning("When `LRinclude` is either 'const' or 'both', `include` can only be `none`")
+    warning("When `LRinclude` is either 'const' or 'both', `include` can only be `none`.\n  Setting include='none'.")
     include <- "none"
   }
 

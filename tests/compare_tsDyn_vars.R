@@ -26,10 +26,10 @@ vecm_l3_bo_var <- ca.jo(Canada, K=4, ecdet="none", spec="transitory", dumvar = t
 
 
 ### restricted cons
-vecm_l1_LRco_tsD <-VECM(Canada, lag=1, LRinclude="const", estim="ML")
+vecm_l1_LRco_tsD <-VECM(Canada, lag=1, LRinclude="const", estim="ML", include="none")
 vecm_l1_LRco_var <- ca.jo(Canada, K=2, ecdet="const", spec="transitory")
 
-vecm_l3_LRco_tsD <-VECM(Canada, lag=3, LRinclude="const", estim="ML")
+vecm_l3_LRco_tsD <-VECM(Canada, lag=3, LRinclude="const", estim="ML", include="none")
 vecm_l3_LRco_var <- ca.jo(Canada, K=4, ecdet="const", spec="transitory")
 
 ### restricted trend
