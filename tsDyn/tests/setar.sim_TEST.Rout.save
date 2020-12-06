@@ -292,8 +292,6 @@ Possible unit root in the low  regime. Roots are: 0.633
 [1] "Mean relative difference: 0.1"
 > roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
 [1] "Mean relative difference: 0.2"
-> setar.boot.check(set_1th_l1_tr, tol=0.00001)
-[1] TRUE
 > setar.boot.check(set_1th_l1_tr, round_digits = 1)
 [1] TRUE
 > 
