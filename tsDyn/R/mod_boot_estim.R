@@ -97,7 +97,7 @@ mod_refit.TVECM <-  function(x, data) {
 
 ####### mod_refit_check #######
 
-mod_refit_check <- function(object, check_call = FALSE) {
+mod_refit_check <- function(object, check_call = FALSE, keep_optim=FALSE) {
   is_uni <-  inherits(object, "nlar")
   if(is_uni) {
     dat <-  object$str$x
@@ -109,6 +109,13 @@ mod_refit_check <- function(object, check_call = FALSE) {
   if(!check_call) {
     object$inputArgs$call <- NULL
     mod_new$inputArgs$call <- NULL
+  }
+  if(!keep_optim){
+    if("model.specific" %in% names(object) &&"counts" %in% names(object$model.specific)){
+      mod_new$model.specific$counts <- NULL
+      object$model.specific$counts <- NULL
+    }
+    
   }
   
   all.equal(object, mod_new)
