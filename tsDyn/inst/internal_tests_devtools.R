@@ -1,6 +1,9 @@
 
 ## Online Checks
-devtools::check_rhub(interactive = FALSE)
+# _R_CHECK_FORCE_SUGGESTS_
+devtools::check_rhub(interactive = FALSE,
+                     env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false", ## rgl not working on Ubuntu Linux 16.04 LTS, R-release, GCC
+                                  `_R_CHECK_CRAN_INCOMING_USE_ASPELL_` = "true"))
 devtools::check_win_devel()
 devtools::check_win_release()
 devtools::check_win_oldrelease()
