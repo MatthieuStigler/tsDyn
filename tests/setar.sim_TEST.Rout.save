@@ -231,10 +231,10 @@ Type 'q()' to quit R.
 > ### test boot
 > ################
 > 
-> setar.boot.check <-  function(object, round_digits = 10) {
+> setar.boot.check <-  function(object, round_digits = 10, ...) {
 +   mod_boot <- setar.boot(object, boot.scheme = "check", round_digits = round_digits, returnStarting = TRUE)  
 +   orig_series <- as.numeric(object$str$x)
-+   all.equal(mod_boot, orig_series)
++   all.equal(mod_boot, orig_series, ...)
 + }
 > 
 > linear.boot.check <-  function(object, round_digits = 10) {
@@ -288,14 +288,15 @@ Possible unit root in the low  regime. Roots are: 0.633
 [1] "Mean relative difference: 0.99"
 > setar.boot.check(set_1th_l1, round_digits = 2)
 [1] TRUE
-> roundAll.Equal(setar.boot.check(set_1th_l2), 2)
-[1] "Mean relative difference: 0.14"
+> roundAll.Equal(setar.boot.check(set_1th_l2), 1)
+[1] "Mean relative difference: 0.1"
 > roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
 [1] "Mean relative difference: 0.2"
-> isTRUE(setar.boot.check(set_1th_l1_tr))
-[1] FALSE
+> isTRUE(setar.boot.check(set_1th_l1_tr, tol=0.000001))
+[1] TRUE
 > setar.boot.check(set_1th_l1_tr, round_digits = 1)
 [1] TRUE
+> 
 > 
 > 
 > ## why difference?
@@ -340,15 +341,14 @@ Possible unit root in the low  regime. Roots are: 0.633
 > 
 > setar.boot.check(set_2th_l1)
 [1] TRUE
-> setar.boot.check(set_2th_l2)
-[1] "Mean relative difference: 1"
+> roundAll.Equal(setar.boot.check(set_2th_l2, round_digits = 1),1)
+[1] "Mean relative difference: 0.5"
 > isTRUE(setar.boot.check(set_2th_l2, round_digits = 1))
 [1] FALSE
 > isTRUE(setar.boot.check(set_2th_l1_tr))
 [1] FALSE
-> roundAll.Equal(setar.boot.check(set_2th_l1_tr, round_digits = 1),3)
-[1] "Mean relative difference: 0"
-> 
+> setar.boot.check(set_2th_l1_tr, round_digits = 2, tol=0.0001)
+[1] TRUE
 > 
 > ################
 > ### tets sim
