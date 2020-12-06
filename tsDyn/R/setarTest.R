@@ -133,7 +133,7 @@ setarTest <- function(x, m, thDelay = 0, trim=0.1,
   
   ## estimate H0 model (for later bootstrap)
   null_model <- switch(test, 
-                       "1vs" = linear(x=x, m=m, include= include),
+                       "1vs" = linear(x=x, m=m, include= include, warn_root=FALSE),
                        "2vs3"=  setar_low(x=x, m=m, include= include, 
                                           nthresh=1, thDelay = thDelay, th =SSR_orig[,"th_1"], warn_min_obs = FALSE))
   

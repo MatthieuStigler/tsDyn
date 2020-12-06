@@ -19,7 +19,8 @@
 
 #linear model fitter (via OLS)
 #str: call to nlar.struct
-linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none", "both"), type=c("level", "diff", "ADF")) {
+linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none", "both"), type=c("level", "diff", "ADF"),
+                   warn_root=TRUE) {
   
 	str <- nlar.struct(x=x, m=m, d=d, steps=steps, series=series)
 	type <- match.arg(type)
@@ -59,7 +60,7 @@ linear <- function(x, m, d=1, steps=d, series,include = c("const", "trend","none
 	res$type <-  type
 	
 	#check if unit root lie outside unit circle
-	if(type=="level")
+	if(type=="level" & warn_root)
 	  is <- root_oneReg(coef(res), regime = ".", lags = seq_len(m))
 	
 	res <- extend(nlar(str,
