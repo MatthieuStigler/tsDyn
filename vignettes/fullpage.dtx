@@ -1,0 +1,387 @@
+% \iffalse      THIS IS A META-COMMENT
+%<*dtx>
+\ProvidesFile
+%========================================================================
+                              {FULLPAGE.DTX}
+%========================================================================
+%</dtx>
+%% Copyright 1994-1999 Patrick W Daly
+%% Max-Planck-Institut f\"ur Aeronomie
+%% Max-Planck-Str. 2
+%% D-37191 Katlenburg-Lindau
+%% Germany
+%% E-mail: daly@linmpi.mpg.de
+% 
+% This program can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt; either
+% version 1 of the License, or any later version.
+%
+% This is a contributed file to the LaTeX2e system.
+% -------------------------------------------------
+%         This is a LaTeX package to set all margins to 1in or 1.5cm
+% Installation:
+%    LaTeX this file: creates docstrip installation file fullpage.ins
+%                         AND the (LaTeX2e) documentation
+%    (La)TeX fullpage.ins: creates package files fullpage.sty, and optionally
+%                          doc driver fullpage.drv
+%    (fullpage.ins may be edited as needed)
+% Docstrip options available:
+%        package - to produce a (LaTeX2e) package .sty file 
+%        driver  - to produce a driver file to print the documentation
+%--------------------------------------------------------------------------
+%  *** Identify the package file:-
+%<package>\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+%<package>\ProvidesPackage{fullpage}
+%
+%  *** Identify the driver file:-
+%<driver>\NeedsTeXFormat{LaTeX2e}
+%<driver>\ProvidesFile{fullpage.drv}
+%
+%  *** The DATE, VERSION, and other INFO
+%\fi
+%\ProvidesFile{fullpage}
+         [1999/02/23 1.1 (PWD)]
+% \changes{1.0}{1994 Feb 15}{Initial version}
+% \changes{1.0a}{1994 Jun 15}{Documentation as per \LaTeXe: driver at start}
+% \changes{1.0b}{1997 Apr 29}{Conform to new \texttt{docstrip}}
+% \changes{1.1}{1999 Feb 23}{Update copyright notice}
+%
+% \CheckSum{74}
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+%
+%\iffalse
+%<*install>
+%^^A =============================================
+%^^A    Here is the docstrip installation file
+%^^A    It is written on first LaTeX run if it 
+%^^A    does not already exist
+%^^A =============================================
+\begin{filecontents*}{fullpage.ins}
+% File: fullpage.ins
+% Copyright 1999 Patrick W. Daly
+%
+% This file can be redistributed and/or modified under the terms
+% of the LaTeX Project Public License Distributed from CTAN
+% archives in directory macros/latex/base/lppl.txt; either
+% version 1 of the License, or any later version.
+% 
+% It is an installation file for extracting package and driver
+% files from the original source file. Simply process it under
+% TeX or LaTeX. 
+
+\input docstrip
+
+\preamble
+=============================================
+IMPORTANT NOTICE:
+
+This program can be redistributed and/or modified under the terms
+of the LaTeX Project Public License Distributed from CTAN
+archives in directory macros/latex/base/lppl.txt; either
+version 1 of the License, or any later version.
+
+This is a generated file.
+It may not be distributed without the original source file \inFileName.
+
+Full documentation can be obtained by LaTeXing that original file.
+Only a few abbreviated comments remain here to describe the usage.
+=============================================
+\endpreamble
+\postamble
+
+<<<<< End of generated file <<<<<<
+\endpostamble
+
+\declarepreamble\driver
+============================================
+This is the driver file to produce the LaTeX documentation 
+from the original source file \inFileName.
+
+Make changes to it as needed. (Never change the file \inFileName!)
+============================================
+\endpreamble
+
+\declarepostamble\driverq
+
+End of documentation driver file.
+\endpostamble
+
+\keepsilent
+\askforoverwritefalse
+
+\generate{\file{fullpage.sty}{\from{fullpage.dtx}{package}}
+          \file{fullpage.drv}{\usepreamble\driver\usepostamble\driverq
+                           \from{fullpage.dtx}{driver}}
+         }
+
+\obeyspaces
+\Msg{*******************************************}%
+\Msg{* For documentation, process fullpage.dtx *}%
+\Msg{*    or the driver file      fullpage.drv *}%
+\Msg{*******************************************}
+
+\endbatchfile
+\end{filecontents*}
+%</install>
+%<*driver>
+\documentclass{ltxdoc}
+%<driver>%\documentclass[twoside]{ltxdoc}
+%<driver>%\documentclass[a4paper]{ltxdoc}
+%<driver>%\documentclass[twoside,a4paper]{ltxdoc}
+\raggedbottom
+
+ %** To include the detailed explanation of the coding, comment out
+ %**   the next line
+\OnlyDescription
+
+ %** To produce a command index: add the following line for one run,
+ %**   then run  makeindex -s gind.ist natbib
+ %**   and reprocess, with or without this line (much faster without)
+%<driver>% \EnableCrossrefs\CodelineIndex 
+
+ %** To produce a change history: add the following line for one run,
+ %**   then run  makeindex -s gglo.ist -o natbib.gls natbib.glo
+ %**   and reprocess, with or without this line (faster without)
+%<driver>% \RecordChanges 
+
+\DisableCrossrefs %May stay; zapped by \EnableCrossrefs
+\CodelineNumbered %May stay
+
+\begin{document}
+   \DocInput{fullpage.dtx}
+\end{document}
+%</driver>
+%\fi
+%
+% \DoNotIndex{\begin,\CodelineIndex,\CodelineNumbered,\def,\DisableCrossrefs}
+% \DoNotIndex{\DocInput,\documentclass,\EnableCrossrefs,\end,\GetFileInfo}
+% \DoNotIndex{\NeedsTeXFormat,\OnlyDescription,\RecordChanges,\usepackage}
+% \DoNotIndex{\ProvidesClass,\ProvidesPackage,\ProvidesFile,\RequirePackage}
+% \DoNotIndex{\LoadClass,\PassOptionsToClass,\PassOptionsToPackage}
+% \DoNotIndex{\DeclareOption,\CurrentOption,\ProcessOptions,\ExecuteOptions}
+% \DoNotIndex{\AtEndOfClass,\AtEndOfPackage,\AtBeginDocument,\AtEndDocument}
+% \DoNotIndex{\InputIfFileExists,\IfFileExists,\ClassError,\PackageError}
+% \DoNotIndex{\ClassWarning,\PackageWarning,\ClassWarningNoLine}
+% \DoNotIndex{\PackageWarningNoLine,\ClassInfo,\PackageInfo,\MessageBreak}
+% \DoNotIndex{\space,\protect,\DeclareRobustCommand,\CheckCommand}
+% \DoNotIndex{\newcommand,\renewcommand,\providecommand\newenvironment}
+% \DoNotIndex{\renewenvironment,\newif,\newlength,\newcounter,\setlength}
+% \DoNotIndex{\setcounter,\if,\ifx,\ifcase,\ifnum,\texttt,\textbf,\textrm}
+% \DoNotIndex{\textsl,\textsc,\textup,\textit,\textmd,\textsf,\emph}
+% \DoNotIndex{\ttfamily,\rmfamily,\sffamily,\mdseries,\bfseries,\upshape}
+% \DoNotIndex{\slshape,\scshape,\itshape,\em,\LaTeX,\LaTeXe}
+% \DoNotIndex{\addtolength,\pagestyle,\paperheight,\paperwidth}
+% \DoNotIndex{\filename,\fileversion,\filedate,\let,\fi}
+%
+% \setcounter{IndexColumns}{2}
+% \setlength{\IndexMin}{10cm}
+% \setcounter{StandardModuleDepth}{1}
+%
+% \GetFileInfo{fullpage}
+%
+% \title{\bfseries A Package to Set Margins to Full Page}
+%    
+% \author{Patrick W. Daly}
+%         
+% \date{This paper describes package \texttt{\filename}\\
+%       version \fileversion{} from \filedate\\[1ex]
+%     \textsl{It is part of the \texttt{preprint} collection of packages}\\
+%  }
+% 
+% \maketitle
+%
+% \pagestyle{myheadings}
+% \markboth{P. W. Daly}{SETTING PAGE MARGINS FOR FULL PAGE}
+%
+%^^A In order to keep all marginal notes on the one (left) side:
+%^^A (otherwise they switch sides disasterously with twoside option)
+% \makeatletter \@mparswitchfalse \makeatother 
+%
+%\begin{small}\begin{center}\bfseries Summary\end{center}
+% The stripped version of this file contains the following brief description:
+%\iffalse
+%<*package>
+%\fi
+% \begin{verbatim}
+ % Sets all 4 margins to be either 1 inch or 1.5 cm, and specifies
+ %  the page style
+ % Call as    \usepackage[options]{fullpage}
+ % Options  =   in   (default) for 1 inch
+ %              cm             for 1.5 cm
+ %              plain (default) sets \pagestyle{plain}
+ %              empty           sets \pagestyle{empty}
+ %              headings        sets \pagestyle{headings}
+ %              myheadings      sets \pagestyle{myheadings}
+% \end{verbatim}
+%\iffalse
+ %-----------------------------------------------------------
+%</package>
+%\fi
+%\end{small}
+% 
+% \section{Purpose}
+% This package is called \texttt{\filename}, and it sets the text height
+% and width and the margins such that the page is almost full. It only
+% leaves a uniform margin on all four sides. 
+% 
+% To do this, it needs to know how big the full page is, whether US letter
+% size ($8\frac{1}{2} \times 11''$) or A4 ($21 \times 29.7$~cm), or some
+% other size. This is given in the parameters |\paperwidth| and
+% |\papersize| that are set by the appropriate option in the
+% |\documentclass| command.
+% 
+% The package must also know which page style is being employed. This is
+% because it must leave space for possible headers and footers, if they are
+% present. If not, it may use that space for text.
+% 
+% \section{Invoking the Package}
+% The package is called after the |\documentclass| command as e.g.,
+% \begin{quote}
+% |\documentclass[a4paper,landscape]{article}|\\
+% |\usepackage[|\emph{options}|]{|\texttt{\filename}|}|
+% \end{quote}
+% where possible options for \texttt{\filename} are
+% \begin{quote}\begin{description}
+% \item[\tt in] (default) sets the margins to one inch;
+% \item[\tt cm] sets the margins to 1.5~cm (one centimeter is really too
+%               little);
+% \item[\tt plain] (default) selects the \texttt{plain} page style, i.e.,
+%               with no headers but only a footer;
+% \item[\tt empty] for neither headers nor footers;
+% \item[\tt headings] for both header and footers;
+% \item[\tt myheadings] also for both headers and footers.
+% \end{description}\end{quote}
+% For the last 4 options, the corresponding |\pagestyle| declaration is
+% executed, so that it is not necessary to give it again. 
+% 
+% \StopEventually{\PrintIndex\PrintChanges}
+% 
+% \section{Options with \texttt{docstrip}}
+% The source \texttt{.dtx} file is meant to be processed with
+% \texttt{docstrip}, for which a number of options are available:
+% \begin{description}
+% \item[\tt package] to produce a \texttt{.sty} package file with most
+%     comments removed;
+% \item[\tt driver] to produce a driver \texttt{.drv} file that will print
+%     out the documentation under \LaTeXe. The documentation cannot be
+%     printed under \LaTeX~2.09.
+% \end{description}
+% The source file \texttt{\filename.dtx} is itself a driver file and can
+% be processed directly by \LaTeXe.
+% 
+% \section{The Coding}
+% This section presents and explains the actual coding of the macros.
+% It is nested between |%<*package>| and |%</package>|, which
+% are indicators to \texttt{docstrip} that this coding belongs to the package 
+% file.
+%
+% \begin{macro}{\FP@margin}
+% Define the options with help of the length |\FP@margin|. The options |in|
+% and |cm| select the actual margin size.
+%    \begin{macrocode}
+%<*package>
+\newlength{\FP@margin}
+\DeclareOption{in}{\setlength{\FP@margin}{1in}}
+\DeclareOption{cm}{\setlength{\FP@margin}{1.5cm}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ifFP@plain}
+% \begin{macro}{\ifFP@empty}
+% The remaining options determine the page style, and need two flags to
+% keep track of whether headers and footers are present.
+%    \begin{macrocode}
+\newif\ifFP@plain
+\newif\ifFP@empty
+\DeclareOption{plain}{\FP@plaintrue \FP@emptyfalse
+                      \pagestyle{plain}}
+\DeclareOption{empty}{\FP@plaintrue \FP@emptytrue
+                      \pagestyle{empty}}
+\DeclareOption{headings}{\FP@plainfalse \FP@emptyfalse
+                         \pagestyle{headings}}
+\DeclareOption{myheadings}{\FP@plainfalse \FP@emptyfalse
+                           \pagestyle{myheadings}}
+%    \end{macrocode}
+% \end{macro}\end{macro}
+% 
+% Invoke the default options and then process the requested ones. Use the
+% starred version of |\ProcessOptions| so that the options are executed
+% in the order they were specified (not defined). Thus if someone gives
+% conflicting options (like |in| and |cm|) then the last one in the list
+% counts.
+%    \begin{macrocode}
+\ExecuteOptions{in,plain}
+\ProcessOptions*
+%    \end{macrocode}
+% 
+% \begin{macro}{\headheight}
+% \begin{macro}{\headsep}
+% If there are to be no headers (for options |empty| and |plain|, which both
+% set |\ifFP@plain| to be \meta{true}), zero the appropriate parameters.
+%    \begin{macrocode}
+\ifFP@plain
+   \setlength{\headheight}{0pt}
+   \setlength{\headsep}{0pt}
+\fi
+%    \end{macrocode}
+% \end{macro}\end{macro}
+% 
+% \begin{macro}{\footskip}
+% If there are to be not footers, zero the |\footskip| parameter. This
+% occurs only for page style |empty|, for although the two |headings|
+% styles do not include a footer, they are often used in conjunction with a
+% |\thispagestyle{plain}| command for the first page of a document.
+%    \begin{macrocode}
+\ifFP@empty
+   \setlength{\footskip}{0pt}
+\fi
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\textwidth}
+% \begin{macro}{\oddsidemargin}
+% \begin{macro}{\evensidemargin}
+% Calculate the width of the text from |\paperwidth| and set the left and
+% right margins. Recall that \TeX{} automatically leaves a margin of $1''$.
+%    \begin{macrocode}
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-2\FP@margin}
+\setlength{\oddsidemargin}{\FP@margin}
+\addtolength{\oddsidemargin}{-1in}
+\setlength{\evensidemargin}{\oddsidemargin}
+%    \end{macrocode}
+% \end{macro}\end{macro}\end{macro}
+% 
+% \begin{macro}{\textheight}
+% \begin{macro}{\topmargin}
+% Calculate the height of the text from |\paperwidth|, by removing the
+% margins, headers, and footers. Set the top margin, recalling that \TeX{}
+% automatically leaves $1''$.
+%    \begin{macrocode}
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-\headheight}
+\addtolength{\textheight}{-\headsep}
+\addtolength{\textheight}{-\footskip}
+\addtolength{\textheight}{-2\FP@margin}
+\setlength{\topmargin}{\FP@margin}
+\addtolength{\topmargin}{-1in}
+%</package>
+%    \end{macrocode}
+% \end{macro}\end{macro}
+%
+% \Finale
