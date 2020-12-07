@@ -10,16 +10,16 @@
 |collate  |en_US.UTF-8                  |
 |ctype    |en_US.UTF-8                  |
 |tz       |America/Los_Angeles          |
-|date     |2020-11-29                   |
+|date     |2020-12-06                   |
 
 # Dependencies
 
-|package       |old    |new        |Δ  |
-|:-------------|:------|:----------|:--|
-|tsDyn         |10-1.2 |10.1.3     |*  |
-|colorspace    |NA     |2.0-0      |*  |
-|RcppArmadillo |NA     |0.10.1.2.0 |*  |
-|rstudioapi    |NA     |0.13       |*  |
+|package |old    |new     |Δ  |
+|:-------|:------|:-------|:--|
+|tsDyn   |10-1.2 |11.0.0  |*  |
+|isoband |NA     |0.2.3   |*  |
+|ps      |NA     |1.5.0   |*  |
+|tseries |NA     |0.10-48 |*  |
 
 # Revdeps
 
