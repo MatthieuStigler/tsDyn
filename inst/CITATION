@@ -17,6 +17,6 @@ citEntry(entry="Manual",
              person("Matthieu", "Stigler", role=c("aut", "ctb", "cre"))),
              	year = 2009,
 	note = "R package version 0.7",
-        url  = "https://cran.r-project.org/package=tsDyn/vignettes/tsDyn.pdf",
+        #url  = "https://cran.r-project.org/package=tsDyn/vignettes/tsDyn.pdf",
 	textVersion = "Antonio, Fabio Di Narzo, Jose Luis Aznarte and Matthieu Stigler (2009). tsDyn: Time series analysis based on dynamical systems theory")
 
