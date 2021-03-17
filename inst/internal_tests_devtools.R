@@ -4,7 +4,12 @@
 
 ## Online Checks
 # _R_CHECK_FORCE_SUGGESTS_
+rhub:::default_cran_check_platforms(devtools:::as.package(".")$path)
+rhub::platforms()
+my_platf <- c("macos-highsierra-release-cran", "fedora-clang-devel",
+              "linux-x86_64-rocker-gcc-san")
 devtools::check_rhub(interactive = FALSE,
+                     platforms = my_platf,
                      env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false", ## rgl not working on Ubuntu Linux 16.04 LTS, R-release, GCC
                                   `_R_CHECK_CRAN_INCOMING_USE_ASPELL_` = "true"))
 devtools::check_win_devel()
