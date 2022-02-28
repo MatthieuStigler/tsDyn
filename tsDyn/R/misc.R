@@ -232,7 +232,7 @@ percent<-function(x,digits=3,by100=FALSE){
   paste(a*round(x,digits),"%",sep="")
 }
 
-myformat<-function(x,digits, toLatex=FALSE){
+myformat <- function(x,digits, toLatex=FALSE){
   r<-x
   littlex<-abs(x)<10^-(digits)
   r[!littlex]<-formatC(x[!littlex],digits=digits, format="f")
