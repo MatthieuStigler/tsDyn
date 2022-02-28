@@ -54,6 +54,7 @@
 #' TVECM.SeoTest(zeroyld,lag=2, beta=1, trim=0.1,nboot=100, plot=FALSE,check=FALSE)
 #' }
 #'
+#'@export
 TVECM.SeoTest<-function(data,lag, beta, trim=0.1,nboot, plot=FALSE, hpc=c("none", "foreach"), check=FALSE) {
 
 hpc<-match.arg(hpc)
