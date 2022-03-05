@@ -1,6 +1,6 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.1.2 (2021-11-01) -- "Bird Hippie"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -288,10 +288,10 @@ Possible unit root in the low  regime. Roots are: 0.633
 [1] "Mean relative difference: 0.99"
 > setar.boot.check(set_1th_l1, round_digits = 2)
 [1] TRUE
-> roundAll.Equal(setar.boot.check(set_1th_l2), 1)
-[1] "Mean relative difference: 0.1"
-> roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 1)
-[1] "Mean relative difference: 0.2"
+> roundAll.Equal(setar.boot.check(set_1th_l2), 0)
+[1] "Mean relative difference: 0"
+> roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 0)
+[1] "Mean relative difference: 0"
 > setar.boot.check(set_1th_l1_tr, round_digits = 1)
 [1] TRUE
 > 
