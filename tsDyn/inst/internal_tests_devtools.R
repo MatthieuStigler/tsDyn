@@ -2,6 +2,10 @@
 # usethis::use_news_md()
 # usethis::use_cran_comments(open = FALSE)
 
+## URL checks:
+url_check(".")
+# curlGetHeaders("https://faculty.chicagobooth.edu/ruey-s-tsay/research/analysis-of-financial-time-series-2nd-edition")
+
 ## Online Checks
 # _R_CHECK_FORCE_SUGGESTS_
 rhub:::default_cran_check_platforms(devtools:::as.package(".")$path)
