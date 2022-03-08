@@ -90,7 +90,7 @@ irf_1_shock <-  function(object, shock, hist, n.ahead=10, innov= NULL, shock_bot
                   "TVECM" = "TVECM",
                   stop("Error model not recognised!"))
   
-  if(class(object)[[1]] %in% c("TVAR", "TVECM")) {
+  if(inherits(object,  c("TVAR", "TVECM"))) {
     B <-  do.call("cbind", B)
   }
   
