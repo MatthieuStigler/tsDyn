@@ -6,6 +6,14 @@
 url_check(".")
 # curlGetHeaders("https://faculty.chicagobooth.edu/ruey-s-tsay/research/analysis-of-financial-time-series-2nd-edition")
 
+
+##
+devtools::check(manual = TRUE,
+                remote = TRUE,
+                incoming = TRUE)
+
+
+
 ## Online Checks
 # _R_CHECK_FORCE_SUGGESTS_
 rhub:::default_cran_check_platforms(devtools:::as.package(".")$path)
