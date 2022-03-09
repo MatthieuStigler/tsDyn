@@ -1,5 +1,6 @@
 ## tsDyn 11-0.2
- * By  Matthieu Stigler (2022-03-08).
+ * By  Matthieu Stigler (2022-03-09).
+ * Add argument `seed` in `setarTest`
  * Minor fix in using class()== ... instead of inherits (x, ...)
  * Minor fix of URL: remove URL markup as created errors. 
  * Now use only NEWS, no changelog

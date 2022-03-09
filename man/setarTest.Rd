@@ -14,7 +14,8 @@ setarTest(
   nboot = 10,
   test = c("1vs", "2vs3"),
   hpc = c("none", "foreach"),
-  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check")
+  boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+  seed = NULL
 )
 }
 \arguments{
@@ -31,10 +32,12 @@ observations in each regime}
 
 \item{test}{whether to test AR against SETAR, or SETAR(1 reg) against SETAR(2 reg)}
 
-\item{hpc}{Possibility to run the bootstrap on parallel core. See details in
-\code{\link{TVECM.HStest}}}
+\item{hpc}{Possibility to run the bootstrap on parallel core. See details in}
 
 \item{boot.scheme}{Type of resampling scheme to use for the residuals. See \code{\link{resample_vec}}.}
+
+\item{seed}{Seed used in the bootstrap resampling
+\code{\link{TVECM.HStest}}}
 }
 \value{
 A object of class "Hansen99Test" containing:
