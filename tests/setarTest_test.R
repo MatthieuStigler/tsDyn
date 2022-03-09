@@ -15,12 +15,13 @@ grid <-  crossing(include = c( "const", "trend","none", "both"),
 ### run ###
 res <- grid %>% 
   mutate(dat = pmap(list(include, lag, thDelay, test),
-                    ~setarTest(IIPUs, 
+                    ~setarTest(IIPUs[1:100], 
                                include= ..1,
                                m = ..2,
                                thDelay = ..3,
                                test = ..4,
-                               nboot = 2)))
+                               nboot = 2,
+                               seed = 4323)))
 
 
 ### show F tests ###

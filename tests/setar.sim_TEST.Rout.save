@@ -22,13 +22,13 @@ Type 'q()' to quit R.
 > suppressWarnings(RNGversion("3.5.3"))
 > 
 > roundAll.Equal <- function(x, round=8){
-+   isFALSE <- x!="TRUE"
++   isFALSE <- !isTRUE(x)
 +   xFalse <- x[isFALSE]
 +   # extract the number (i.e remove all the rest)
 +   xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
 +             "", xFalse)
 +   xf2<- round(as.numeric(xf),round)
-+   x[isFALSE] <- paste("Mean relative difference: ", xf2, sep="")
++   x[isFALSE] <- paste("Mean relative difference at tol ", round, ": ", xf2, sep="")
 +   x
 + }
 > 
@@ -285,13 +285,13 @@ Possible unit root in the low  regime. Roots are: 0.633
 > 
 > 
 > roundAll.Equal(setar.boot.check(set_1th_l1), 2)
-[1] "Mean relative difference: 0.99"
+[1] "Mean relative difference at tol 2: 0.99"
 > setar.boot.check(set_1th_l1, round_digits = 2)
 [1] TRUE
 > roundAll.Equal(setar.boot.check(set_1th_l2), 0)
-[1] "Mean relative difference: 0"
+[1] "Mean relative difference at tol 0: 0"
 > roundAll.Equal(setar.boot.check(set_1th_l2, round_digits = 5), 0)
-[1] "Mean relative difference: 0"
+[1] "Mean relative difference at tol 0: 0"
 > setar.boot.check(set_1th_l1_tr, round_digits = 1)
 [1] TRUE
 > 
@@ -378,4 +378,4 @@ Possible unit root in the low  regime. Roots are: 0.633
 > 
 > proc.time()
    user  system elapsed 
-  3.745   0.255   4.493 
+  2.525   0.115   2.669 
