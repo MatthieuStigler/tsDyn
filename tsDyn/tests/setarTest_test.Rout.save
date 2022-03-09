@@ -34,12 +34,13 @@ Type 'q()' to quit R.
 > ### run ###
 > res <- grid %>% 
 +   mutate(dat = pmap(list(include, lag, thDelay, test),
-+                     ~setarTest(IIPUs, 
++                     ~setarTest(IIPUs[1:100], 
 +                                include= ..1,
 +                                m = ..2,
 +                                thDelay = ..3,
 +                                test = ..4,
-+                                nboot = 2)))
++                                nboot = 2,
++                                seed = 4323)))
 > 
 > 
 > ### show F tests ###
@@ -51,16 +52,16 @@ Type 'q()' to quit R.
 +   head(10) %>% 
 +   print(digits=3) 
    include lag thDelay test name value
-1     both   1       0  1vs 1vs2  5.16
-2     both   1       0  1vs 1vs3 10.22
-3     both   1       0  1vs 2vs3  5.01
-4     both   1       0 2vs3 1vs2  5.16
-5     both   1       0 2vs3 1vs3 10.22
-6     both   1       0 2vs3 2vs3  5.01
-7     both   2       0  1vs 1vs2 14.99
-8     both   2       0  1vs 1vs3 28.83
-9     both   2       0  1vs 2vs3 13.40
-10    both   2       0 2vs3 1vs2 14.99
+1     both   1       0  1vs 1vs2  8.22
+2     both   1       0  1vs 1vs3 16.70
+3     both   1       0  1vs 2vs3  7.82
+4     both   1       0 2vs3 1vs2  8.22
+5     both   1       0 2vs3 1vs3 16.70
+6     both   1       0 2vs3 2vs3  7.82
+7     both   2       0  1vs 1vs2 10.86
+8     both   2       0  1vs 1vs3 26.08
+9     both   2       0  1vs 2vs3 13.70
+10    both   2       0 2vs3 1vs2 10.86
 > 
 > res %>% 
 +   mutate(Ftests = map(dat, ~enframe(.$SSRs))) %>% 
@@ -70,16 +71,16 @@ Type 'q()' to quit R.
 +   head(10) %>% 
 +   print(digits=3) 
    include lag thDelay test name value
-1     both   1       0  1vs    1   606
-2     both   1       0  1vs    2   599
-3     both   1       0  1vs    3   593
-4     both   1       0 2vs3    1   606
-5     both   1       0 2vs3    2   599
-6     both   1       0 2vs3    3   593
-7     both   2       0  1vs    1   533
-8     both   2       0  1vs    2   516
-9     both   2       0  1vs    3   501
-10    both   2       0 2vs3    1   533
+1     both   1       0  1vs    1 113.9
+2     both   1       0  1vs    2 105.2
+3     both   1       0  1vs    3  97.5
+4     both   1       0 2vs3    1 113.9
+5     both   1       0 2vs3    2 105.2
+6     both   1       0 2vs3    3  97.5
+7     both   2       0  1vs    1 109.6
+8     both   2       0  1vs    2  98.6
+9     both   2       0  1vs    3  86.5
+10    both   2       0 2vs3    1 109.6
 > 
 > 
 > proc.time()

@@ -57,20 +57,31 @@ models_VAR <- models_multivariate %>%
 models_IRF_any <- models_multivariate %>% 
   filter(model == "VAR") %>% 
   mutate(ortho = list(tibble(ortho =c(TRUE, FALSE)))) %>% 
-  {suppressWarnings(unnest(., ortho, .preserve = "object"))} %>% 
-  mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 2, seed = 7, ortho = .y)),
-         irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
-         irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))
+  unnest(., ortho) %>% 
+  mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 1, seed = 7, ortho = .y)),
+         irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 1, seed = 7, ortho = .y)),
+         irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 1, seed = 7, ortho = .y)))
 
 models_IRF_any %>% 
   mutate(across(where(is.list), class)) %>% 
   as.data.frame()
 
+## showquick summary
+irf_extract_here <- function(x) {
+  head(x$irf[[1]], 2) %>% 
+    as.data.frame() %>% 
+    mutate(type = "irf") %>% 
+    rbind(head(x$Upper[[1]], 2) %>% 
+            as.data.frame() %>% 
+            mutate(type = "Upper_CI")) %>% 
+    relocate(type)
+}
+
 ## show head of irf any
-map_df(models_IRF_any$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
+map_dfr(models_IRF_any$irf, irf_extract_here) %>% 
   as.data.frame() %>% 
   head(10)%>% 
-  print(digits=3) 
+  mutate(across(where(is.numeric), round, 6))
 
 
 ## compare with vars
@@ -99,16 +110,15 @@ comp %>%
 
 models_VECM <- models_multivariate %>% 
   filter(model == "VECM") %>% 
-  mutate(irf = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE)))
-
+  mutate(irf = map(object, ~irf_any(.,  boot = TRUE, runs = 1, seed = 7, ortho = FALSE)))
 
 ## show two first of first componment
 models_VECM %>% 
-  mutate(irf = map(irf, ~ head(.$irf[[1]], 2) %>% 
-                     as_tibble)) %>% 
+  mutate(irf = map(irf, irf_extract_here)) %>% 
   select(-object, -object_vars) %>% 
   unnest(irf) %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  mutate(across(where(is.numeric), round, 6))
 
 
 ## plot 1
@@ -131,15 +141,15 @@ irf(tvar_1, runs = 2, seed = 123)
 
 ## regime specific for TVAR
 models_TVAR_irf <- models_TVAR  %>% 
-  mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
+  mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 1, seed = 7, ortho = FALSE, regime = "L")))
 
 ## show two first of first componment
 models_TVAR_irf %>% 
-  mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
-                     as_tibble)) %>% 
+  mutate(irf = map(irf_L, irf_extract_here)) %>%
   select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  mutate(across(where(is.numeric), round, 6))
 
 
 ## plot 1
@@ -160,15 +170,15 @@ irf(x=tvecm_1, runs = 2, seed = 123)
 
 ## regime specific for TVECM
 models_TVECM_irf <- models_TVECM   %>% 
-  mutate(irf_L = map(object, ~suppressWarnings(irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L"))))
+  mutate(irf_L = map(object, ~suppressWarnings(irf_any(.,  boot = TRUE, runs = 1, seed = 7, ortho = FALSE, regime = "L"))))
 
 ## show two first of first componment
 models_TVECM_irf %>% 
-  mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
-                     as_tibble)) %>% 
+  mutate(irf = map(irf_L, irf_extract_here)) %>% 
   select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
-  as.data.frame()
+  as.data.frame() %>% 
+  mutate(across(where(is.numeric), round, 6))
 
 
 ## plot 1

@@ -3,13 +3,13 @@ suppressMessages(library(tidyverse))
 suppressWarnings(RNGversion("3.5.3"))
 
 roundAll.Equal <- function(x, round=8){
-  isFALSE <- x!="TRUE"
+  isFALSE <- !isTRUE(x)
   xFalse <- x[isFALSE]
   # extract the number (i.e remove all the rest)
   xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
             "", xFalse)
   xf2<- round(as.numeric(xf),round)
-  x[isFALSE] <- paste("Mean relative difference: ", xf2, sep="")
+  x[isFALSE] <- paste("Mean relative difference at tol ", round, ": ", xf2, sep="")
   x
 }
 
