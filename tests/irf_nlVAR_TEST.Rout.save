@@ -209,7 +209,7 @@ Type 'q()' to quit R.
 > map_dfr(models_IRF_any$irf, irf_extract_here) %>% 
 +   as.data.frame() %>% 
 +   head(10)%>% 
-+   mutate(across(where(is.numeric), round, 6))
++   mutate(across(where(is.numeric), ~round(., 6)))
        type   dolcan    cpiUSA
 1       irf 0.012960 -0.008008
 2       irf 0.012792 -0.009835
@@ -328,7 +328,7 @@ Type 'q()' to quit R.
 +   select(-object, -object_vars) %>% 
 +   unnest(irf) %>% 
 +   as.data.frame() %>% 
-+   mutate(across(where(is.numeric), round, 6))
++   mutate(across(where(is.numeric), ~round(., 6)))
    lag include model nthresh     type    dolcan   cpiUSA
 1    1    both  VECM      NA      irf  1.000000 0.000000
 2    1    both  VECM      NA      irf  1.150497 0.536847
@@ -482,7 +482,7 @@ $dolcan
 +   select(-object, -object_vars, -irf_L ) %>% 
 +   unnest(irf) %>% 
 +   as.data.frame() %>% 
-+   mutate(across(where(is.numeric), round, 6))
++   mutate(across(where(is.numeric), ~round(., 6)))
    lag include model nthresh     type    dolcan    cpiUSA
 1    1    both  TVAR       1      irf  1.000000  0.000000
 2    1    both  TVAR       1      irf  0.982298  0.718112
@@ -712,7 +712,7 @@ $dolcan
 +   select(-object, -object_vars, -irf_L ) %>% 
 +   unnest(irf) %>% 
 +   as.data.frame() %>% 
-+   mutate(across(where(is.numeric), round, 6))
++   mutate(across(where(is.numeric), ~round(., 6)))
    lag include model nthresh     type    dolcan   cpiUSA
 1    1    both TVECM       1      irf  1.000000 0.000000
 2    1    both TVECM       1      irf  1.115865 0.635864
