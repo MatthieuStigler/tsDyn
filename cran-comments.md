@@ -9,8 +9,6 @@
 
 0 errors | 0 warnings | 0 note
 
-Some Windows versions trigger a note about a URL, which is a false positive. 
-
 ## Downstream dependencies
 
 I checked downstream dependencies with `revdepcheck::revdep_check` and all passed the test.
