@@ -186,35 +186,36 @@ setar_low <- function(x, m, d=1, steps=d, series, mL,mM,mH, thDelay=0, mTh, thVa
     if(max(thDelay)>=m) 
       stop(paste("thDelay too high: should be < m (=",m,")"))
     if(model=="TAR"){
-      if(type =="level")
-	z <- getXX(str)[,SeqmaxTh]
-      else
-	z<-getXX(str)[-1,SeqmaxTh]
+      if(type =="level") {
+        z <- getXX(str)[,SeqmaxTh]
+      } else {
+        z<-getXX(str)[-1,SeqmaxTh]
+      }
       #z2<-embedd(x, lags=c((0:(m-1))*(-d), steps) )[,1:m,drop=FALSE] equivalent if d=steps=1
       #z4<-embed(x,m+1)[,-1]
-    }
-    else{
+    } else if(model=="MTAR"){
+      
       if(max(thDelay)==m-1){
-	if(type =="level"){
-	  z<-getdXX(str)[, SeqmaxTh]
-	  xx<-xx[-1,, drop=FALSE]
-	  yy<-yy[-1]
-	  str$xx<-xx
-	  str$yy<-yy
-	}
-	else 
-	  z<-getdXX(str)[, SeqmaxTh]
-      }
-      else{
-	if(type =="level")
-	  z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
-	else
-	  z<-getdXX(str)[,SeqmaxTh]
+        ## z is in diff
+        z<-getdXX(str)[, SeqmaxTh]
+        # if rest in level, need to shorten the data!
+        if(type =="level"){
+          xx<-xx[-1,, drop=FALSE]
+          yy<-yy[-1]
+          str$xx<-xx
+          str$yy<-yy
+        } 
+      } else {
+        if(type =="level") {
+          z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
+        } else {
+          z<-getdXX(str)[,SeqmaxTh]
+        }
       }
     }
   } 
 
-z<-as.matrix(z)
+  z <- as.matrix(z)
 
 ###includes const, trend (identical to selectSETAR)
   if(include=="none" && any(c(ML,MM,MH)==0))
