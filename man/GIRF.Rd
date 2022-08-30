@@ -100,14 +100,14 @@ Generates a GIRF for multiple innovations and histories
 }
 \details{
 In a nonlinear model, the Impulse response Function (IRF) is not time-, scale- and sign-invariant as in linear models. 
-To cope with this, Koop et al (1996) introduced the Generalized Impulse response Function (GIRF):
-\deqn{IRF(h,\delta,\omega_{t-1})=E[y_{t+h}|\epsilon_{t}=\delta,\epsilon_{t+h}=0,\omega_{t-1}]-E[y_{t+h}|\epsilon_{t}=0,\epsilon_{t+h}=0,\omega_{t-1}]}
+To address this, Koop et al (1996) introduced the Generalized Impulse response Function (GIRF):
+\deqn{GIRF(h,\delta,\omega_{t-1})=E[y_{t+h}|\epsilon_{t}=\delta,\epsilon_{t+h}=0,\omega_{t-1}]-E[y_{t+h}|\epsilon_{t}=0,\epsilon_{t+h}=0,\omega_{t-1}]}
 
 It is the difference between two conditional expectations, one containing the shock of interest, the second one averaging it out. The averaging-out is done
-by comparing against random innovations (unlike the IRF, that compare against innovation 0), 
+by comparing against random innovations (unlike the IRF, which compares against innovation 0), 
 The parameter \code{R} corresponds to the number of times this is done. 
 
-The GIRF as defined here depends on the particular shock, as well as history. 
+The GIRF as defined here depends on the particular shock, as well as on the history. 
 Koop et al (1996) suggest to draw multiple combinations of histories and innovations. This is done with arguments \code{n.hist} and \code{n.shock} 
 (or, alternatively, provide one of, or both, \code{hist_li} and \code{hist_li} as list of histories and shocks).
 

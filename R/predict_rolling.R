@@ -1,6 +1,6 @@
 #'Rolling forecasts
 #'
-#'Forecasts a VAR or VECM by discarding a part of the sample, and generating a
+#'Forecasts a VAR or VECM by discarding a part of the sample, and recursively generating a
 #'series of updated forecasts.
 #'
 #'This function allows to check the out-of sample forecasting accuracy by
@@ -8,10 +8,10 @@
 #'\code{nroll} forecasts of horizon \code{n.ahead}, each time by updating the
 #'sample. In other words, with a given model estimated on 100 observations, the
 #'function will estimate it on say 90 first obs (\code{nroll=10}), generate a
-#'say 1 step-ahead \code{n.ahead=1} from obs 90, then using true value 91,
-#'92,... till full sample.
+#'say 1 step-ahead (\code{n.ahead=1}) from obs 90, then using true value 91 for 
+#' to predict value at 92, etc, till the full sample is used.  
 #'
-#'Unlike usual \command{predict()} methods, specifiying \code{n.ahead=2} will
+#'Unlike with usual \command{predict()} methods, specifiying \code{n.ahead=2} will
 #'not generate a 1 step-ahead and a 2 step-ahead forecasts, but only
 #'\code{nroll} 2 step-ahead forecasts.
 #'
@@ -29,8 +29,8 @@
 #'@param n.ahead An integer specifying the number of forecast steps.
 #'@param refit.every Determines every how many periods the model is
 #'re-estimated.
-#'@param newdata In case the model given is already estimated on the
-#'sub-sample, the out of sample data can be provided. Note it should contain
+#'@param newdata In case the given model is already estimated on the
+#'sub-sample, the out-of-sample data can be provided with this argument. Note it should contain
 #'observations to predict the first values, that are also contained in the
 #'in-sample.
 #'@param \dots Currently not used.
