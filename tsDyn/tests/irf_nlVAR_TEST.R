@@ -81,7 +81,7 @@ irf_extract_here <- function(x) {
 map_dfr(models_IRF_any$irf, irf_extract_here) %>% 
   as.data.frame() %>% 
   head(10)%>% 
-  mutate(across(where(is.numeric), round, 6))
+  mutate(across(where(is.numeric), ~round(., 6)))
 
 
 ## compare with vars
@@ -118,7 +118,7 @@ models_VECM %>%
   select(-object, -object_vars) %>% 
   unnest(irf) %>% 
   as.data.frame() %>% 
-  mutate(across(where(is.numeric), round, 6))
+  mutate(across(where(is.numeric), ~round(., 6)))
 
 
 ## plot 1
@@ -149,7 +149,7 @@ models_TVAR_irf %>%
   select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
   as.data.frame() %>% 
-  mutate(across(where(is.numeric), round, 6))
+  mutate(across(where(is.numeric), ~round(., 6)))
 
 
 ## plot 1
@@ -178,7 +178,7 @@ models_TVECM_irf %>%
   select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
   as.data.frame() %>% 
-  mutate(across(where(is.numeric), round, 6))
+  mutate(across(where(is.numeric), ~round(., 6)))
 
 
 ## plot 1
