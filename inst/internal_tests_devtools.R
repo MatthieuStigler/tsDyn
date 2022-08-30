@@ -49,3 +49,4 @@ cat(devtools::spell_check(use_wordlist = TRUE)$word, sep = "\n")
 ## Release
 devtools::release_checks()
 devtools::release()
+# direct: devtools::submit_cran()
