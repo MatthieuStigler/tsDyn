@@ -27,10 +27,10 @@
 autotriples.rgl <- function(x, lags=1:2, type=c("lines","points")) {
 	type <- match.arg(type)
 	X <- embedd(x, lags=c(-lags,0))
-	rgl::rgl.clear()
+	rgl::clear3d()
 	if(type=="lines")
-	  rgl::rgl.linestrips(X[,1],X[,2],X[,3])
+	  rgl::lines3d(X[,1],X[,2],X[,3])
 	else if (type=="points")
-	  rgl::rgl.points(X[,1],X[,2],X[,3])
+	  rgl::points3d(X[,1],X[,2],X[,3])
         invisible(NULL)
 }
