@@ -196,11 +196,11 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     if(is.null(beta) ){
 
     ## build LRplus: deterministic/exogeneous regressor in coint
-      if(class(LRinclude)=="character"){
+      if(is.character(LRinclude)){
         LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
         LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
         LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
-      } else if(class(LRinclude)%in%c("matrix", "numeric")) {
+      } else if(inherits(LRinclude, c("matrix", "numeric"))) {
         LRplus<-LRinclude
       } else{
         stop("Argument LRinclude badly given")
