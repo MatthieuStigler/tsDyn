@@ -13,9 +13,7 @@ data(m.unrate)
       zoo object 
 }
 \source{
-  \url{
-    https://faculty.chicagobooth.edu/ruey-s-tsay/research/analysis-of-financial-time-series-2nd-edition
-  }
+  \samp{https://faculty.chicagobooth.edu/ruey-s-tsay/research/analysis-of-financial-time-series-2nd-edition}
 }
 \references{
   Ruey Tsay (2005) Analysis of Financial Time Series, 2nd ed. (Wiley,

@@ -20,7 +20,9 @@ df_regs <-  tibble(model = c("linear", "setar", "setar"),
                        regime = c("all", "L", "H"))
 models_irf <- models_univariate %>% 
   filter(!model %in% c("aar", "lstar" )) %>% 
-  left_join(df_regs, by = "model") %>% 
+  merge(df_regs, by = "model") %>% 
+  as_tibble() %>% 
+  relocate(model, .after = include) %>% 
   mutate(irf = map2(object, regime,  ~suppressWarnings(irf(.x,  boot = TRUE, runs = 5, seed = 7, regime = .y))))
 
 ## IRF
