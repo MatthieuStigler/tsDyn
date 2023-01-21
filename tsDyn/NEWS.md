@@ -1,3 +1,7 @@
+## tsDyn 11-0.3
+ * By  Matthieu Stigler (2023-01-21).
+ * Minor fix, integrate pull request  #47 "Replace rgl.* functions with *3d" by @dmurdoch
+
 ## tsDyn 11-0.2
  * By  Matthieu Stigler (2022-03-09).
  * Add argument `seed` in `setarTest`
