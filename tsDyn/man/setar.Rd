@@ -43,7 +43,7 @@ setar(x, m, d=1, steps=d, series, mL, mM, mH, thDelay=0, mTh, thVar, th, trace=F
 \item{include}{Type of deterministic regressors to include}
 \item{common}{Indicates which elements are common to all regimes: no, only the \code{include} variables, the lags or both}
 \item{ML,MM,MH}{vector of lags for  order for \sQuote{low} (ML) \sQuote{middle} (MM, only useful if nthresh=2) and \sQuote{high} (MH)regime. Max must be <=m}
-\item{model}{Currently not implemented}
+\item{model}{Whether the threshold variable is taken in levels (TAR) or differences (MTAR)}
 \item{nthresh}{Number of threshold of the model}
 \item{trim}{trimming parameter indicating the minimal percentage of observations in each regime. Default to 0.15}
 \item{type}{Whether the variable is taken is level, difference or a mix (diff y= y-1, diff lags) as in the ADF test}

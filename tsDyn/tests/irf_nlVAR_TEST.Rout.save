@@ -168,10 +168,10 @@ Type 'q()' to quit R.
 > models_IRF_any <- models_multivariate %>% 
 +   filter(model == "VAR") %>% 
 +   mutate(ortho = list(tibble(ortho =c(TRUE, FALSE)))) %>% 
-+   {suppressWarnings(unnest(., ortho, .preserve = "object"))} %>% 
-+   mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 2, seed = 7, ortho = .y)),
-+          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 2, seed = 7, ortho = .y)),
-+          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 2, seed = 7, ortho = .y)))
++   unnest(., ortho) %>% 
++   mutate(irf = map2(object, ortho, ~irf_any(.x,  boot = TRUE, runs = 1, seed = 7, ortho = .y)),
++          irf_vars = map2(object_vars, ortho, ~irf(.x, runs = 1, seed = 7, ortho = .y)),
++          irf_vec2 = map2(object, ortho, ~irf(.x,  boot = FALSE, runs = 1, seed = 7, ortho = .y)))
 > 
 > models_IRF_any %>% 
 +   mutate(across(where(is.list), class)) %>% 
@@ -194,22 +194,33 @@ Type 'q()' to quit R.
 15   2   trend   VAR   list        list      NA  TRUE list     list     list
 16   2   trend   VAR   list        list      NA FALSE list     list     list
 > 
+> ## showquick summary
+> irf_extract_here <- function(x) {
++   head(x$irf[[1]], 2) %>% 
++     as.data.frame() %>% 
++     mutate(type = "irf") %>% 
++     rbind(head(x$Upper[[1]], 2) %>% 
++             as.data.frame() %>% 
++             mutate(type = "Upper_CI")) %>% 
++     relocate(type)
++ }
+> 
 > ## show head of irf any
-> map_df(models_IRF_any$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
+> map_dfr(models_IRF_any$irf, irf_extract_here) %>% 
 +   as.data.frame() %>% 
 +   head(10)%>% 
-+   print(digits=3) 
-   dolcan    cpiUSA
-1  0.0130 -0.008008
-2  0.0128 -0.009835
-3  1.0000  0.000000
-4  0.9871 -0.139549
-5  0.0129 -0.007913
-6  0.0128 -0.009736
-7  1.0000  0.000000
-8  0.9871 -0.141092
-9  0.0130 -0.004389
-10 0.0130 -0.000039
++   mutate(across(where(is.numeric), ~round(., 6)))
+       type   dolcan    cpiUSA
+1       irf 0.012960 -0.008008
+2       irf 0.012792 -0.009835
+3  Upper_CI 0.000000  0.168830
+4  Upper_CI 0.000284  0.168505
+5       irf 1.000000  0.000000
+6       irf 0.987108 -0.139549
+7  Upper_CI 0.000000  1.000000
+8  Upper_CI 0.001679  0.998075
+9       irf 0.012941 -0.007913
+10      irf 0.012773 -0.009736
 > 
 > 
 > ## compare with vars
@@ -309,33 +320,48 @@ Type 'q()' to quit R.
 > 
 > models_VECM <- models_multivariate %>% 
 +   filter(model == "VECM") %>% 
-+   mutate(irf = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE)))
-> 
++   mutate(irf = map(object, ~irf_any(.,  boot = TRUE, runs = 1, seed = 7, ortho = FALSE)))
 > 
 > ## show two first of first componment
 > models_VECM %>% 
-+   mutate(irf = map(irf, ~ head(.$irf[[1]], 2) %>% 
-+                      as_tibble)) %>% 
++   mutate(irf = map(irf, irf_extract_here)) %>% 
 +   select(-object, -object_vars) %>% 
 +   unnest(irf) %>% 
-+   as.data.frame()
-   lag include model nthresh   dolcan    cpiUSA
-1    1    both  VECM      NA 1.000000 0.0000000
-2    1    both  VECM      NA 1.150497 0.5368465
-3    1   const  VECM      NA 1.000000 0.0000000
-4    1   const  VECM      NA 1.158429 0.5918901
-5    1    none  VECM      NA 1.000000 0.0000000
-6    1    none  VECM      NA 1.167443 1.1502466
-7    1   trend  VECM      NA 1.000000 0.0000000
-8    1   trend  VECM      NA 1.162446 0.7468192
-9    2    both  VECM      NA 1.000000 0.0000000
-10   2    both  VECM      NA 1.152608 0.6520061
-11   2   const  VECM      NA 1.000000 0.0000000
-12   2   const  VECM      NA 1.162481 0.7117269
-13   2    none  VECM      NA 1.000000 0.0000000
-14   2    none  VECM      NA 1.171534 1.1898042
-15   2   trend  VECM      NA 1.000000 0.0000000
-16   2   trend  VECM      NA 1.167209 0.8854858
++   as.data.frame() %>% 
++   mutate(across(where(is.numeric), ~round(., 6)))
+   lag include model nthresh     type    dolcan   cpiUSA
+1    1    both  VECM      NA      irf  1.000000 0.000000
+2    1    both  VECM      NA      irf  1.150497 0.536847
+3    1    both  VECM      NA Upper_CI  0.000000 1.000000
+4    1    both  VECM      NA Upper_CI -0.001956 1.378209
+5    1   const  VECM      NA      irf  1.000000 0.000000
+6    1   const  VECM      NA      irf  1.158429 0.591890
+7    1   const  VECM      NA Upper_CI  0.000000 1.000000
+8    1   const  VECM      NA Upper_CI -0.001181 1.388875
+9    1    none  VECM      NA      irf  1.000000 0.000000
+10   1    none  VECM      NA      irf  1.167443 1.150247
+11   1    none  VECM      NA Upper_CI  0.000000 1.000000
+12   1    none  VECM      NA Upper_CI  0.005716 1.823742
+13   1   trend  VECM      NA      irf  1.000000 0.000000
+14   1   trend  VECM      NA      irf  1.162446 0.746819
+15   1   trend  VECM      NA Upper_CI  0.000000 1.000000
+16   1   trend  VECM      NA Upper_CI -0.000421 1.426727
+17   2    both  VECM      NA      irf  1.000000 0.000000
+18   2    both  VECM      NA      irf  1.152608 0.652006
+19   2    both  VECM      NA Upper_CI  0.000000 1.000000
+20   2    both  VECM      NA Upper_CI  0.000536 1.445896
+21   2   const  VECM      NA      irf  1.000000 0.000000
+22   2   const  VECM      NA      irf  1.162481 0.711727
+23   2   const  VECM      NA Upper_CI  0.000000 1.000000
+24   2   const  VECM      NA Upper_CI  0.000778 1.443891
+25   2    none  VECM      NA      irf  1.000000 0.000000
+26   2    none  VECM      NA      irf  1.171534 1.189804
+27   2    none  VECM      NA Upper_CI  0.000000 1.000000
+28   2    none  VECM      NA Upper_CI  0.001019 1.644230
+29   2   trend  VECM      NA      irf  1.000000 0.000000
+30   2   trend  VECM      NA      irf  1.167209 0.885486
+31   2   trend  VECM      NA Upper_CI  0.000000 1.000000
+32   2   trend  VECM      NA Upper_CI  0.000896 1.467909
 > 
 > 
 > ## plot 1
@@ -448,48 +474,80 @@ $dolcan
 > 
 > ## regime specific for TVAR
 > models_TVAR_irf <- models_TVAR  %>% 
-+   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L")))
++   mutate(irf_L = map(object, ~irf_any(.,  boot = TRUE, runs = 1, seed = 7, ortho = FALSE, regime = "L")))
 > 
 > ## show two first of first componment
 > models_TVAR_irf %>% 
-+   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
-+                      as_tibble)) %>% 
++   mutate(irf = map(irf_L, irf_extract_here)) %>%
 +   select(-object, -object_vars, -irf_L ) %>% 
 +   unnest(irf) %>% 
-+   as.data.frame()
-   lag include model nthresh    dolcan      cpiUSA
-1    1    both  TVAR       1 1.0000000  0.00000000
-2    1    both  TVAR       1 0.9822979  0.71811173
-3    1    both  TVAR       2 1.0000000  0.00000000
-4    1    both  TVAR       2 0.9822979  0.71811173
-5    1   const  TVAR       1 1.0000000  0.00000000
-6    1   const  TVAR       1 0.9939684  1.34157882
-7    1   const  TVAR       2 1.0000000  0.00000000
-8    1   const  TVAR       2 1.0310970  0.59375307
-9    1    none  TVAR       1 1.0000000  0.00000000
-10   1    none  TVAR       1 1.0018378  0.30564625
-11   1    none  TVAR       2 1.0000000  0.00000000
-12   1    none  TVAR       2 0.9994742  0.30631672
-13   1   trend  TVAR       1 1.0000000  0.00000000
-14   1   trend  TVAR       1 1.0038460  0.68548271
-15   1   trend  TVAR       2 1.0000000  0.00000000
-16   1   trend  TVAR       2 1.0280167  0.40856653
-17   2    both  TVAR       1 1.0000000  0.00000000
-18   2    both  TVAR       1 1.1164077 -0.05789139
-19   2    both  TVAR       2 1.0000000  0.00000000
-20   2    both  TVAR       2 1.1164077 -0.05789139
-21   2   const  TVAR       1 1.0000000  0.00000000
-22   2   const  TVAR       1 1.1438210  0.83541511
-23   2   const  TVAR       2 1.0000000  0.00000000
-24   2   const  TVAR       2 1.1438210  0.83541511
-25   2    none  TVAR       1 1.0000000  0.00000000
-26   2    none  TVAR       1 1.1452641  0.66249651
-27   2    none  TVAR       2 1.0000000  0.00000000
-28   2    none  TVAR       2 1.1963932 -0.03686374
-29   2   trend  TVAR       1 1.0000000  0.00000000
-30   2   trend  TVAR       1 1.1450492  0.70350616
-31   2   trend  TVAR       2 1.0000000  0.00000000
-32   2   trend  TVAR       2 1.1557695  1.05338082
++   as.data.frame() %>% 
++   mutate(across(where(is.numeric), ~round(., 6)))
+   lag include model nthresh     type    dolcan    cpiUSA
+1    1    both  TVAR       1      irf  1.000000  0.000000
+2    1    both  TVAR       1      irf  0.982298  0.718112
+3    1    both  TVAR       1 Upper_CI  0.000000  1.000000
+4    1    both  TVAR       1 Upper_CI -0.002896  0.993410
+5    1    both  TVAR       2      irf  1.000000  0.000000
+6    1    both  TVAR       2      irf  0.982298  0.718112
+7    1    both  TVAR       2 Upper_CI  0.000000  1.000000
+8    1    both  TVAR       2 Upper_CI -0.002680  0.995241
+9    1   const  TVAR       1      irf  1.000000  0.000000
+10   1   const  TVAR       1      irf  0.993968  1.341579
+11   1   const  TVAR       1 Upper_CI  0.000000  1.000000
+12   1   const  TVAR       1 Upper_CI  0.000894  0.995010
+13   1   const  TVAR       2      irf  1.000000  0.000000
+14   1   const  TVAR       2      irf  1.031097  0.593753
+15   1   const  TVAR       2 Upper_CI  0.000000  1.000000
+16   1   const  TVAR       2 Upper_CI  0.003019  0.983623
+17   1    none  TVAR       1      irf  1.000000  0.000000
+18   1    none  TVAR       1      irf  1.001838  0.305646
+19   1    none  TVAR       1 Upper_CI  0.000000  1.000000
+20   1    none  TVAR       1 Upper_CI  0.000357  1.002424
+21   1    none  TVAR       2      irf  1.000000  0.000000
+22   1    none  TVAR       2      irf  0.999474  0.306317
+23   1    none  TVAR       2 Upper_CI  0.000000  1.000000
+24   1    none  TVAR       2 Upper_CI  0.000851  0.999196
+25   1   trend  TVAR       1      irf  1.000000  0.000000
+26   1   trend  TVAR       1      irf  1.003846  0.685483
+27   1   trend  TVAR       1 Upper_CI  0.000000  1.000000
+28   1   trend  TVAR       1 Upper_CI  0.002103  0.980364
+29   1   trend  TVAR       2      irf  1.000000  0.000000
+30   1   trend  TVAR       2      irf  1.028017  0.408567
+31   1   trend  TVAR       2 Upper_CI  0.000000  1.000000
+32   1   trend  TVAR       2 Upper_CI -0.000175  0.993426
+33   2    both  TVAR       1      irf  1.000000  0.000000
+34   2    both  TVAR       1      irf  1.116408 -0.057891
+35   2    both  TVAR       1 Upper_CI  0.000000  1.000000
+36   2    both  TVAR       1 Upper_CI  0.005069  1.179249
+37   2    both  TVAR       2      irf  1.000000  0.000000
+38   2    both  TVAR       2      irf  1.116408 -0.057891
+39   2    both  TVAR       2 Upper_CI  0.000000  1.000000
+40   2    both  TVAR       2 Upper_CI  0.006126  1.142099
+41   2   const  TVAR       1      irf  1.000000  0.000000
+42   2   const  TVAR       1      irf  1.143821  0.835415
+43   2   const  TVAR       1 Upper_CI  0.000000  1.000000
+44   2   const  TVAR       1 Upper_CI  0.001238  1.366002
+45   2   const  TVAR       2      irf  1.000000  0.000000
+46   2   const  TVAR       2      irf  1.143821  0.835415
+47   2   const  TVAR       2 Upper_CI  0.000000  1.000000
+48   2   const  TVAR       2 Upper_CI -0.003818  1.188527
+49   2    none  TVAR       1      irf  1.000000  0.000000
+50   2    none  TVAR       1      irf  1.145264  0.662497
+51   2    none  TVAR       1 Upper_CI  0.000000  1.000000
+52   2    none  TVAR       1 Upper_CI  0.001583  1.433116
+53   2    none  TVAR       2      irf  1.000000  0.000000
+54   2    none  TVAR       2      irf  1.196393 -0.036864
+55   2    none  TVAR       2 Upper_CI  0.000000  1.000000
+56   2    none  TVAR       2 Upper_CI  0.000725  1.203324
+57   2   trend  TVAR       1      irf  1.000000  0.000000
+58   2   trend  TVAR       1      irf  1.145049  0.703506
+59   2   trend  TVAR       1 Upper_CI  0.000000  1.000000
+60   2   trend  TVAR       1 Upper_CI  0.001119  1.396871
+61   2   trend  TVAR       2      irf  1.000000  0.000000
+62   2   trend  TVAR       2      irf  1.155769  1.053381
+63   2   trend  TVAR       2 Upper_CI  0.000000  1.000000
+64   2   trend  TVAR       2 Upper_CI -0.000626  1.438063
 > 
 > 
 > ## plot 1
@@ -646,48 +704,80 @@ $dolcan
 > 
 > ## regime specific for TVECM
 > models_TVECM_irf <- models_TVECM   %>% 
-+   mutate(irf_L = map(object, ~suppressWarnings(irf_any(.,  boot = TRUE, runs = 2, seed = 7, ortho = FALSE, regime = "L"))))
++   mutate(irf_L = map(object, ~suppressWarnings(irf_any(.,  boot = TRUE, runs = 1, seed = 7, ortho = FALSE, regime = "L"))))
 > 
 > ## show two first of first componment
 > models_TVECM_irf %>% 
-+   mutate(irf = map(irf_L, ~ head(.$irf[[1]], 2) %>% 
-+                      as_tibble)) %>% 
++   mutate(irf = map(irf_L, irf_extract_here)) %>% 
 +   select(-object, -object_vars, -irf_L ) %>% 
 +   unnest(irf) %>% 
-+   as.data.frame()
-   lag include model nthresh   dolcan     cpiUSA
-1    1    both TVECM       1 1.000000 0.00000000
-2    1    both TVECM       1 1.115865 0.63586390
-3    1    both TVECM       2 1.000000 0.00000000
-4    1    both TVECM       2 1.115865 0.63586390
-5    1   const TVECM       1 1.000000 0.00000000
-6    1   const TVECM       1 1.087586 0.89921828
-7    1   const TVECM       2 1.000000 0.00000000
-8    1   const TVECM       2 1.087586 0.89921828
-9    1    none TVECM       1 1.000000 0.00000000
-10   1    none TVECM       1 1.095626 0.46554720
-11   1    none TVECM       2 1.000000 0.00000000
-12   1    none TVECM       2 1.142178 1.80965373
-13   1   trend TVECM       1 1.000000 0.00000000
-14   1   trend TVECM       1 1.183445 0.87258224
-15   1   trend TVECM       2 1.000000 0.00000000
-16   1   trend TVECM       2 1.078900 1.48918404
-17   2    both TVECM       1 1.000000 0.00000000
-18   2    both TVECM       1 1.168665 0.28165429
-19   2    both TVECM       2 1.000000 0.00000000
-20   2    both TVECM       2 1.139679 0.23686021
-21   2   const TVECM       1 1.000000 0.00000000
-22   2   const TVECM       1 1.179502 0.47237733
-23   2   const TVECM       2 1.000000 0.00000000
-24   2   const TVECM       2 1.112088 0.58785242
-25   2    none TVECM       1 1.000000 0.00000000
-26   2    none TVECM       1 1.121259 0.09224268
-27   2    none TVECM       2 1.000000 0.00000000
-28   2    none TVECM       2 1.231963 0.07427862
-29   2   trend TVECM       1 1.000000 0.00000000
-30   2   trend TVECM       1 1.184091 0.74883497
-31   2   trend TVECM       2 1.000000 0.00000000
-32   2   trend TVECM       2 1.158615 0.71551439
++   as.data.frame() %>% 
++   mutate(across(where(is.numeric), ~round(., 6)))
+   lag include model nthresh     type    dolcan   cpiUSA
+1    1    both TVECM       1      irf  1.000000 0.000000
+2    1    both TVECM       1      irf  1.115865 0.635864
+3    1    both TVECM       1 Upper_CI  0.000000 1.000000
+4    1    both TVECM       1 Upper_CI  0.001099 0.992494
+5    1    both TVECM       2      irf  1.000000 0.000000
+6    1    both TVECM       2      irf  1.115865 0.635864
+7    1    both TVECM       2 Upper_CI  0.000000 1.000000
+8    1    both TVECM       2 Upper_CI -0.002071 0.795772
+9    1   const TVECM       1      irf  1.000000 0.000000
+10   1   const TVECM       1      irf  1.087586 0.899218
+11   1   const TVECM       1 Upper_CI  0.000000 1.000000
+12   1   const TVECM       1 Upper_CI  0.001768 0.899371
+13   1   const TVECM       2      irf  1.000000 0.000000
+14   1   const TVECM       2      irf  1.087586 0.899218
+15   1   const TVECM       2 Upper_CI  0.000000 1.000000
+16   1   const TVECM       2 Upper_CI -0.003737 0.945145
+17   1    none TVECM       1      irf  1.000000 0.000000
+18   1    none TVECM       1      irf  1.095626 0.465547
+19   1    none TVECM       1 Upper_CI  0.000000 1.000000
+20   1    none TVECM       1 Upper_CI  0.005645 1.653400
+21   1    none TVECM       2      irf  1.000000 0.000000
+22   1    none TVECM       2      irf  1.142178 1.809654
+23   1    none TVECM       2 Upper_CI  0.000000 1.000000
+24   1    none TVECM       2 Upper_CI  0.005597 1.745848
+25   1   trend TVECM       1      irf  1.000000 0.000000
+26   1   trend TVECM       1      irf  1.183445 0.872582
+27   1   trend TVECM       1 Upper_CI  0.000000 1.000000
+28   1   trend TVECM       1 Upper_CI  0.000343 1.610538
+29   1   trend TVECM       2      irf  1.000000 0.000000
+30   1   trend TVECM       2      irf  1.078900 1.489184
+31   1   trend TVECM       2 Upper_CI  0.000000 1.000000
+32   1   trend TVECM       2 Upper_CI -0.002040 0.820806
+33   2    both TVECM       1      irf  1.000000 0.000000
+34   2    both TVECM       1      irf  1.168665 0.281654
+35   2    both TVECM       1 Upper_CI  0.000000 1.000000
+36   2    both TVECM       1 Upper_CI -0.001356 1.279373
+37   2    both TVECM       2      irf  1.000000 0.000000
+38   2    both TVECM       2      irf  1.139679 0.236860
+39   2    both TVECM       2 Upper_CI  0.000000 1.000000
+40   2    both TVECM       2 Upper_CI -0.008496 1.213897
+41   2   const TVECM       1      irf  1.000000 0.000000
+42   2   const TVECM       1      irf  1.179502 0.472377
+43   2   const TVECM       1 Upper_CI  0.000000 1.000000
+44   2   const TVECM       1 Upper_CI  0.004413 1.310172
+45   2   const TVECM       2      irf  1.000000 0.000000
+46   2   const TVECM       2      irf  1.112088 0.587852
+47   2   const TVECM       2 Upper_CI  0.000000 1.000000
+48   2   const TVECM       2 Upper_CI -0.008211 1.055222
+49   2    none TVECM       1      irf  1.000000 0.000000
+50   2    none TVECM       1      irf  1.121259 0.092243
+51   2    none TVECM       1 Upper_CI  0.000000 1.000000
+52   2    none TVECM       1 Upper_CI  0.010255 1.583673
+53   2    none TVECM       2      irf  1.000000 0.000000
+54   2    none TVECM       2      irf  1.231963 0.074279
+55   2    none TVECM       2 Upper_CI  0.000000 1.000000
+56   2    none TVECM       2 Upper_CI  0.015478 1.536769
+57   2   trend TVECM       1      irf  1.000000 0.000000
+58   2   trend TVECM       1      irf  1.184091 0.748835
+59   2   trend TVECM       1 Upper_CI  0.000000 1.000000
+60   2   trend TVECM       1 Upper_CI  0.001301 1.348732
+61   2   trend TVECM       2      irf  1.000000 0.000000
+62   2   trend TVECM       2      irf  1.158615 0.715514
+63   2   trend TVECM       2 Upper_CI  0.000000 1.000000
+64   2   trend TVECM       2 Upper_CI -0.007753 1.246237
 > 
 > 
 > ## plot 1

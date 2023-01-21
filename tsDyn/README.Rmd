@@ -36,6 +36,6 @@ Most of the development is hosted under the branch called [Dev94](https://github
 
 ```{r, eval=FALSE}
 library(remotes)
-install_github("MatthieuStigler/tsDyn/tsDyn", ref = "Dev94")
+remotes::install_github("MatthieuStigler/tsDyn/tsDyn", ref = "dev")
 ```
 

@@ -201,9 +201,9 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
         LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
         LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
       } else if(inherits(LRinclude, c("matrix", "numeric"))) {
-        LRplus<-LRinclude
+        LRplus <- LRinclude
       } else{
-        stop("Argument LRinclude badly given")
+        stop("Argument LRinclude not correctly indicated")
       }
     ## run coint regression
       if(LRinclude=="none"){

@@ -41,6 +41,7 @@
 #' observations in each regime
 #' @template param_boot.scheme
 #' @param hpc Possibility to run the bootstrap on parallel core. See details in
+#' @param seed Seed used in the bootstrap resampling
 #' \code{\link{TVECM.HStest}}
 #' @return A object of class "Hansen99Test" containing:
 #' 
@@ -115,7 +116,8 @@ setarTest <- function(x, m, thDelay = 0, trim=0.1,
                       include = c("const", "trend","none", "both"),
                       nboot = 10, 
                       test=c("1vs", "2vs3"), hpc=c("none", "foreach"), 
-                      boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check")){
+                      boot.scheme = c("resample", "resample_block", "wild1", "wild2", "check"),
+                      seed = NULL){
   
   test <- match.arg(test)
   hpc <- match.arg(hpc)
@@ -159,9 +161,11 @@ setarTest <- function(x, m, thDelay = 0, trim=0.1,
     
     ### run bootstrap
     if(hpc=="none"){
+      if(!is.null(seed)) set.seed(seed)
       Ftestboot <- replicate(nboot, boot_test(null_model, boot.scheme=boot.scheme), simplify = FALSE)
       Ftestboot <- do.call("rbind", Ftestboot)
     } else {
+      if(!is.null(seed)) warning("Argument 'seed' will not work with arg. 'hpc'")
       Ftestboot <- foreach(i=1:nboot, .export="boot_test", .combine="rbind") %dopar% boot_test(null_model, boot.scheme)
     }
     

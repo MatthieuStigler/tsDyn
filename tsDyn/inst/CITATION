@@ -1,13 +1,18 @@
 citHeader("To cite package 'tsDyn' in publications use:")
 
-citEntry(entry="Manual",
-	title = "Threshold cointegration: overview and implementation in R",
-	author = "Matthieu Stigler",
-	booktitle = "Handbook of Statistics, Volume 41",
-	publisher = "Elsevier",
-	editor = "Hrishikesh Vinod",
-	year = 2019,
-	textVersion = "Matthieu Stigler (2019). tsDyn: Threshold cointegration: overview and implementation in R, Handbook of Statistics, Volume 41, Elsevier")
+bibentry(bibtype="InCollection",
+         title = "Nonlinear time series in R: Threshold cointegration with tsDyn",
+         author = "Matthieu Stigler",
+         volume = "42",
+         pages = "229-264",
+         year = "2019",
+         editor = "Hrishikesh D. Vinod and C.R. Rao",
+         publisher = "Elsevier",
+         booktitle = "Handbook of Statistics, Volume 41",
+         issn = "0169-7161",
+         doi = "https://doi.org/10.1016/bs.host.2019.01.008",
+         url = "https://www.sciencedirect.com/science/article/pii/S0169716119300355")
+
 
 
 citEntry(entry="Manual",
