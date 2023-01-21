@@ -1,14 +1,11 @@
 
 
 ## Test environments
-* local R installation, R 4.1.2 on Ubuntu 20.04
+
+* local R installation, R 4.2.2 on Ubuntu 20.04
 * win-builder (devel, release, old-release)
-* R-hub standard platforms
 
 ## R CMD check results
 
-0 errors | 0 warnings | 0 note
-
-## Downstream dependencies
-
-I checked downstream dependencies with `revdepcheck::revdep_check` and all passed the test.
+- winbuilder R-oldrelease has a NOTE, _Possibly mis-spelled words in DESCRIPTION_, but the words are all listed in inst/WORDLIST.
+- winbuilder R-release and devel have a NOTE, _Found the following (possibly) invalid DOIs:_, but this is a false positive. 
