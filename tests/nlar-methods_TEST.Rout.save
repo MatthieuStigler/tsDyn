@@ -1,6 +1,6 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.2.2 Patched (2022-11-10 r83330) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -18,6 +18,9 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
+Registered S3 method overwritten by 'quantmod':
+  method            from
+  as.zoo.data.frame zoo 
 > suppressWarnings(RNGversion("3.5.3"))
 > 
 > 
@@ -2033,10 +2036,11 @@ NULL
 > 
 > 
 > ## Output of mod_no_aar[-44] is platform/machien specific...
-> suppressMessages(suppressWarnings(sapply(mod_no_aar[-44], tsDyn:::mod_refit_check)))
+> ## Output of mod_no_aar[-23] is platform/machien specific: doesn't work on M1mac
+> suppressMessages(suppressWarnings(sapply(mod_no_aar[-c(23, 44)], tsDyn:::mod_refit_check)))
  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 > 
 > 
 > ### Pred Roll, acc_stat:
@@ -2146,4 +2150,4 @@ $aar
 > 
 > proc.time()
    user  system elapsed 
- 13.270   0.291  14.266 
+  7.387   0.097   7.475 
