@@ -45,7 +45,8 @@ sapply(mod, getTh)
 
 
 ## Output of mod_no_aar[-44] is platform/machien specific...
-suppressMessages(suppressWarnings(sapply(mod_no_aar[-44], tsDyn:::mod_refit_check)))
+## Output of mod_no_aar[-23] is platform/machien specific: doesn't work on M1mac
+suppressMessages(suppressWarnings(sapply(mod_no_aar[-c(23, 44)], tsDyn:::mod_refit_check)))
 
 
 ### Pred Roll, acc_stat:
