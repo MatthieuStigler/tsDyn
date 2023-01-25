@@ -36,6 +36,8 @@ Registered S3 method overwritten by 'quantmod':
 > 
 > mod <-  models_univariate$object
 > mod_no_aar <-  subset(models_univariate,  model != "aar")$object
+> names(mod_no_aar) <- with(subset(models_univariate,  model != "aar"),
++                           paste(model, include, lag, sep="_"))
 > mod_notrend_noaar <-  subset(models_univariate,  !include %in% c("trend", "both") & model != "aar")$object
 > mod_notrend <-  subset(models_univariate,  !include %in% c("trend", "both") )$object
 > mod_const_only <-  subset(models_univariate,  include =="const" )$object
@@ -2035,12 +2037,27 @@ NULL
 
 > 
 > 
-> ## Output of mod_no_aar[-44] is platform/machien specific...
-> ## Output of mod_no_aar[-23] is platform/machien specific: doesn't work on M1mac
+> ## Output of mod_no_aar[-44] is platform/machine specific...
+> ## Output of mod_no_aar[-23] is platform/machine specific: doesn't work on M1mac
 > suppressMessages(suppressWarnings(sapply(mod_no_aar[-c(23, 44)], tsDyn:::mod_refit_check)))
- [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+ linear_both_1 linear_const_1  linear_none_1 linear_trend_1  linear_both_2 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+linear_const_2  linear_none_2 linear_trend_2   setar_both_1   setar_both_1 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+ setar_const_1  setar_const_1   setar_none_1   setar_none_1  setar_trend_1 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+ setar_trend_1   setar_both_2   setar_both_2   setar_both_2   setar_both_2 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+ setar_const_2  setar_const_2  setar_const_2   setar_none_2   setar_none_2 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+  setar_none_2   setar_none_2  setar_trend_2  setar_trend_2  setar_trend_2 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+ setar_trend_2   lstar_both_1  lstar_const_1   lstar_none_1  lstar_trend_1 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+  lstar_both_2   lstar_both_2  lstar_const_2  lstar_const_2   lstar_none_2 
+          TRUE           TRUE           TRUE           TRUE           TRUE 
+  lstar_none_2  lstar_trend_2 
+          TRUE           TRUE 
 > 
 > 
 > ### Pred Roll, acc_stat:
@@ -2150,4 +2167,4 @@ $aar
 > 
 > proc.time()
    user  system elapsed 
-  7.387   0.097   7.475 
+  7.379   0.140   7.504 

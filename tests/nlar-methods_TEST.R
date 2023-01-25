@@ -14,6 +14,8 @@ models_univariate <- readRDS(path_mod_uni)
 
 mod <-  models_univariate$object
 mod_no_aar <-  subset(models_univariate,  model != "aar")$object
+names(mod_no_aar) <- with(subset(models_univariate,  model != "aar"),
+                          paste(model, include, lag, sep="_"))
 mod_notrend_noaar <-  subset(models_univariate,  !include %in% c("trend", "both") & model != "aar")$object
 mod_notrend <-  subset(models_univariate,  !include %in% c("trend", "both") )$object
 mod_const_only <-  subset(models_univariate,  include =="const" )$object
@@ -44,8 +46,8 @@ lapply(mod_notrend_noaar, ar_mean)
 sapply(mod, getTh)
 
 
-## Output of mod_no_aar[-44] is platform/machien specific...
-## Output of mod_no_aar[-23] is platform/machien specific: doesn't work on M1mac
+## Output of mod_no_aar[-44] is platform/machine specific...
+## Output of mod_no_aar[-23] is platform/machine specific: doesn't work on M1mac
 suppressMessages(suppressWarnings(sapply(mod_no_aar[-c(23, 44)], tsDyn:::mod_refit_check)))
 
 
