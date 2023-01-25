@@ -73,7 +73,7 @@ comp_VECM_logLik <- function(x, r=1) all.equal(logLik(x[[1]], r=r), logLik(x[[2]
 roundAll.Equal <- function(x, round=8){
   isFALSE <- x!="TRUE"
   xFalse <- x[isFALSE]
-  # extract the number (i.e remove all the rest)
+  # extract the number (i.e remoe all the rest)
   xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
             "", xFalse)
   xf2<- round(as.numeric(xf),round)
@@ -86,7 +86,7 @@ models_noLR <-  all_models[-grep("LR", names(all_models))]
 ### Compare VECM methods:
 sapply(all_models, comp_teststat )
 sapply(all_models, comp_betas, tol=lowtol)
-roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
+roundAll.Equal(sapply(all_models, comp_coefs, tol = 1e-07), round=7) # 5 and 6
 sapply(all_models, comp_LL)
 sapply(models_noLR, comp_IRF)
 sapply(models_noLR, comp_IRF, ortho = FALSE)

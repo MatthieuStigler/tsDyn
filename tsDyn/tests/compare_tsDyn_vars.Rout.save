@@ -1,6 +1,6 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.2.2 Patched (2022-11-10 r83330) -- "Innocent and Trusting"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -105,7 +105,7 @@ Loading required package: lmtest
 > roundAll.Equal <- function(x, round=8){
 +   isFALSE <- x!="TRUE"
 +   xFalse <- x[isFALSE]
-+   # extract the number (i.e remove all the rest)
++   # extract the number (i.e remoe all the rest)
 +   xf<- gsub("(Component ([0-9]+)?([[:punct:]][[:alnum:]]+[[:punct:]])?: )?Mean relative difference: ", 
 +             "", xFalse)
 +   xf2<- round(as.numeric(xf),round)
@@ -122,7 +122,7 @@ Loading required package: lmtest
 > sapply(all_models, comp_betas, tol=lowtol)
   l1_co   l3_co   l1_bo   l3_bo l1_LRco l3_LRco l1_LRtr l3_LRtr 
    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-> roundAll.Equal(sapply(all_models, comp_coefs), round=7) # 5 and 6
+> roundAll.Equal(sapply(all_models, comp_coefs, tol = 1e-07), round=7) # 5 and 6
                                 l1_co                                 l3_co 
                                "TRUE"                                "TRUE" 
                                 l1_bo                                 l3_bo 
@@ -346,4 +346,4 @@ FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
 > 
 > proc.time()
    user  system elapsed 
-  3.329   0.171   3.686 
+  2.646   0.064   2.699 
