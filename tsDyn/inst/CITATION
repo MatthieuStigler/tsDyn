@@ -10,7 +10,7 @@ bibentry(bibtype="InCollection",
          publisher = "Elsevier",
          booktitle = "Handbook of Statistics, Volume 41",
          issn = "0169-7161",
-         doi = "https://doi.org/10.1016/bs.host.2019.01.008",
+         doi = "10.1016/bs.host.2019.01.008",
          url = "https://www.sciencedirect.com/science/article/pii/S0169716119300355")
 
 

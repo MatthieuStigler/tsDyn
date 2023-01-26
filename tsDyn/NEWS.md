@@ -1,8 +1,9 @@
 ## tsDyn 11-0.4
- * By  Matthieu Stigler (2023-01-23).
+ * By  Matthieu Stigler (2023-01-26).
  * Fixing test output as numerical differences on exotic platforms implied 11-0.3 didn't pass. 
+ * Fix doi formatting
 
-## tsDyn 11-0.3
+## tsDyn 11-0.3 (not submitted to CRAN)
  * By  Matthieu Stigler (2023-01-21).
  * Minor fix, integrate pull request  #47 "Replace rgl.* functions with *3d" by @dmurdoch
 
