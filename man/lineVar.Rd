@@ -39,7 +39,7 @@ If NULL, will be estimated using the estimator specified in \code{estim}}
 or 'ML' for Johansen MLE}
 
 \item{LRinclude}{Possibility to include in the long-run relationship and the
-ECT a trend, a, constant, etc. Can also be a matrix with exogeneous regressors}
+ECT a trend, a, constant, etc.}
 
 \item{exogen}{Inclusion of exogenous variables (first row being first=oldest
 value). Is either of same size than data (then automatically cut) or than
