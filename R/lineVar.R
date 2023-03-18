@@ -116,12 +116,12 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 	  colnames(data)<-paste("Var", c(1:k), sep="")
 
 ###Check args
-  include<-match.arg(include)
-  LRinclude<-match.arg(LRinclude)
+  include <- match.arg(include)
+  if(is.character(LRinclude)) LRinclude <- match.arg(LRinclude)
   if(lag==0) {
     warning("Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...")
   }
-  if(LRinclude%in%c("const", "both") & include !="none")  {
+  if(is.character(LRinclude) && LRinclude%in%c("const", "both") & include !="none")  {
     warning("When `LRinclude` is either 'const' or 'both', `include` can only be `none`.\n  Setting include='none'.")
     include <- "none"
   }
@@ -197,16 +197,20 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
     ## build LRplus: deterministic/exogeneous regressor in coint
       if(is.character(LRinclude)){
-        LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),"trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
-        LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", "both"=c("const", "trend"), "none"=NULL)
+        LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),
+                        "trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
+        LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", 
+                             "both"=c("const", "trend"), "none"=NULL)
         LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
-      } else if(inherits(LRinclude, c("matrix", "numeric"))) {
+      } else if(inherits(LRinclude, c("matrix", "numeric", "ts"))) {
+        LRinc_name <- "exo"
         LRplus <- LRinclude
+        LRinc_dim <- 1
       } else{
         stop("Argument LRinclude not correctly indicated")
       }
     ## run coint regression
-      if(LRinclude=="none"){
+      if(is.character(LRinclude) && LRinclude=="none"){
         cointLM<-lm(y[,1] ~  y[,-1]-1)
       } else {
         cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
