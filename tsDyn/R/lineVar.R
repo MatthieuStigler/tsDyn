@@ -30,7 +30,7 @@
 #'@param beta for VECM only: user-specified cointegrating value. 
 #'If NULL, will be estimated using the estimator specified in \code{estim}
 #'@param LRinclude Possibility to include in the long-run relationship and the
-#'ECT a trend, a, constant, etc. Can also be a matrix with exogeneous regressors
+#'ECT a trend, a, constant, etc. 
 #'@param estim Type of estimator for the VECM: '2OLS' for the two-step approach
 #'or 'ML' for Johansen MLE
 #'@param exogen Inclusion of exogenous variables (first row being first=oldest
@@ -117,11 +117,11 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
 ###Check args
   include <- match.arg(include)
-  if(is.character(LRinclude)) LRinclude <- match.arg(LRinclude)
+  LRinclude <- match.arg(LRinclude)
   if(lag==0) {
     warning("Lag=0 not fully implemented, methods not expected to work: fevd, predict, irf,...")
   }
-  if(is.character(LRinclude) && LRinclude%in%c("const", "both") & include !="none")  {
+  if(LRinclude%in%c("const", "both") & include !="none")  {
     warning("When `LRinclude` is either 'const' or 'both', `include` can only be `none`.\n  Setting include='none'.")
     include <- "none"
   }
@@ -196,21 +196,14 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
     if(is.null(beta) ){
 
     ## build LRplus: deterministic/exogeneous regressor in coint
-      if(is.character(LRinclude)){
-        LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),
-                        "trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
-        LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", 
-                             "both"=c("const", "trend"), "none"=NULL)
-        LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
-      } else if(inherits(LRinclude, c("matrix", "numeric", "ts"))) {
-        LRinc_name <- "exo"
-        LRplus <- LRinclude
-        LRinc_dim <- 1
-      } else{
-        stop("Argument LRinclude not correctly indicated")
-      }
+      LRplus <-switch(LRinclude, "none"=NULL,"const"=rep(1,T),
+                      "trend"=seq_len(T),"both"=cbind(rep(1,T),seq_len(T)))
+      LRinc_name <- switch(LRinclude, "const"="const", "trend"="trend", 
+                           "both"=c("const", "trend"), "none"=NULL)
+      LRinc_dim <- switch(LRinclude, "const"=1, "trend"=1, "both"=2, "none"=0)
+      
     ## run coint regression
-      if(is.character(LRinclude) && LRinclude=="none"){
+      if(LRinclude=="none"){
         cointLM<-lm(y[,1] ~  y[,-1]-1)
       } else {
         cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
