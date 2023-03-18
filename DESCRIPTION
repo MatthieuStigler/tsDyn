@@ -20,3 +20,4 @@ URL: https://github.com/MatthieuStigler/tsDyn/wiki
 BugReports: https://github.com/MatthieuStigler/tsDyn/issues
 RoxygenNote: 7.2.3
 LazyData: true
+Encoding: UTF-8
