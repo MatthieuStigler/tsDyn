@@ -1,4 +1,9 @@
 
+usethis::use_package("generics", "Imports")
+usethis::use_package("broom", "Suggests")
+usethis::use_package("dplyr", "Suggests")
+usethis::use_package("stringr", "Suggests")
+
 # usethis::use_news_md()
 # usethis::use_cran_comments(open = FALSE)
 
