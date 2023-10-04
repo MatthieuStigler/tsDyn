@@ -1,6 +1,6 @@
 
-R version 3.6.1 (2019-07-05) -- "Action of the Toes"
-Copyright (C) 2019 The R Foundation for Statistical Computing
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -23,8 +23,15 @@ Type 'q()' to quit R.
 > ############################
 > ### Load data
 > ############################
-> path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
-> if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+> 
+> if(getRversion()>="4.3.0"){
++   file <- "models_multivariate.rds"
++ } else {
++   file <- "models_multivariate_R_less_4_3.rds"
++ }
+> 
+> path_mod_multi <- system.file(file.path("inst/testdata/",file), package = "tsDyn")
+> if(path_mod_multi=="") path_mod_multi <- system.file(file.path("testdata/",file), package = "tsDyn")
 > 
 > models_multivariate <- readRDS(path_mod_multi)
 > 
@@ -5229,7 +5236,7 @@ Equation cpiUSA  0.24673984
 [31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [46] TRUE TRUE TRUE
 > 
-> ## NOn linear functions
+> ## Non linear functions
 > sapply(mods_nonLIn, function(x) head(regime(x), 3))
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
 [1,]   NA   NA   NA   NA   NA   NA   NA   NA   NA    NA    NA    NA    NA    NA
@@ -9624,4 +9631,4 @@ X_{t-2}^{1} \\ X_{t-2}^{2}
 > 
 > proc.time()
    user  system elapsed 
- 20.029   0.352  20.714 
+ 12.811   0.151  12.956 
