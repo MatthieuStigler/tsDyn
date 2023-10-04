@@ -70,13 +70,13 @@
 #'
 #' @export
 logLik.nlVar <- function(object,...){
-	resids<-object$residuals
-	k<-object$k
-	t<-object$t
-	Sigma<-matrix(1/t*crossprod(resids),ncol=k)
-# 	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(resids %*% solve(Sigma) %*% t(resids)))
-	res <- -(t*k/2)*log(2*pi) -t*k/2 - (t/2)* log(det(Sigma)) 
-	return(res)
+  resids<-object$residuals
+  k<-object$k
+  t<-object$t
+  Sigma<-matrix(1/t*crossprod(resids),ncol=k)
+  # 	res <- -(t*k/2)*log(2*pi) - (t/2)* log(det(Sigma)) -1/2 *sum(diag(resids %*% solve(Sigma) %*% t(resids)))
+  res <- -(t*k/2)*log(2*pi) -t*k/2 - (t/2)* log(det(Sigma)) 
+  return(res)
 }
 
 
@@ -106,7 +106,7 @@ logLik.VECM <- function(object,r,...){
   return(res)
 }
 
-  
+
 getP <- function(object) UseMethod("getP")
 getP.ca.jo <- function(object) object@P
 getP.cajo.test <- function(object) ncol(object@Z0)
@@ -137,7 +137,7 @@ logLik.cajo.test <- function(object,r,...) logLik.ca.jo(object=object, r=r,...)
 #### Small function: get number of estimated parameters
 npar  <- function (object, ...)  
   UseMethod("npar")
- 
+
 npar.default<-function(object, ...) 
   length(coef(object))
 
@@ -158,43 +158,43 @@ npar.VECM<-function(object, ..., r) {
 #' @export
 #### AIC criterions
 AIC.nlVar<-function(object,..., k=2, fitMeasure=c("SSR", "LL")){
-	fitMeasure <- match.arg(fitMeasure)
-	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else t*log(det(crossprod(residuals(object))/t))
-	fit+k*npar(object)
+  fitMeasure <- match.arg(fitMeasure)
+  t<-object$t
+  fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else t*log(det(crossprod(residuals(object))/t))
+  fit+k*npar(object)
 }
 
 #' @export
 AIC.VECM<-function(object,..., k=2,r, fitMeasure=c("SSR", "LL")){
-	fitMeasure <- match.arg(fitMeasure)
-	Rank<-if(missing(r)) object$model.specific$r else r
-	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else t*log(det(crossprod(residuals(object))/t))
-	fit+k*npar(object, r=Rank)
+  fitMeasure <- match.arg(fitMeasure)
+  Rank<-if(missing(r)) object$model.specific$r else r
+  t<-object$t
+  fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else t*log(det(crossprod(residuals(object))/t))
+  fit+k*npar(object, r=Rank)
 }
 
 #' @export
 #### BIC criterions
 BIC.nlVar<-function(object,..., k=log(object$t), fitMeasure=c("SSR", "LL")){
-	fitMeasure <- match.arg(fitMeasure)
-	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else t*log(det(crossprod(residuals(object))/t))
-	fit+k*npar(object)
+  fitMeasure <- match.arg(fitMeasure)
+  t<-object$t
+  fit <- if(fitMeasure=="LL") -2*logLik.nlVar(object) else t*log(det(crossprod(residuals(object))/t))
+  fit+k*npar(object)
 }
 
 #' @export
 BIC.VECM<-function(object,..., k=log(object$t),r, fitMeasure=c("SSR", "LL")){
-	fitMeasure <- match.arg(fitMeasure)
-	nVar<-object$k
-	Rank<-if(missing(r)) object$model.specific$r else r
-	t<-object$t
-	fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else t*log(det(crossprod(residuals(object))/t))
-	fit+k*npar(object, r=Rank)
+  fitMeasure <- match.arg(fitMeasure)
+  nVar<-object$k
+  Rank<-if(missing(r)) object$model.specific$r else r
+  t<-object$t
+  fit <- if(fitMeasure=="LL") -2*logLik.VECM(object,r=Rank) else t*log(det(crossprod(residuals(object))/t))
+  fit+k*npar(object, r=Rank)
 }
 
 #' @export
 deviance.nlVar<-function(object, ...){
-	as.numeric(crossprod(c(object$residuals)))
+  as.numeric(crossprod(c(object$residuals)))
 }
 
 #' @export
@@ -259,15 +259,15 @@ residuals.nlVar<-function(object, initVal=FALSE, ...){
 
 #' @export
 fitted.nlVar <- function(object, level=c("model", "original"),...){
-
+  
   level <- match.arg(level)
   mod <- ifelse(inherits(object, "VECM"), "VECM", "VAR")
-
+  
   if(mod=="VAR"&&level=="original" &&attr(object, "varsLevel")=="level"){
     warning("level='original' has no effect for VAR models in levels")
     level <- "model"
   }
-
+  
   if(level=="model"){
     res <- object$fitted
   } else {
@@ -275,7 +275,7 @@ fitted.nlVar <- function(object, level=c("model", "original"),...){
     series <- cbind(original.data, object$fitted)
     res<- original.data+ object$fitted
   }
-
+  
   return(res)
 }
 
@@ -317,7 +317,7 @@ coefMat <- function (object, ...)
 
 coefMat.default<-function(object, ...)
   coefficients(object)
-  
+
 coefMat.nlVar<-function(object,...){
   if(inherits(object, "VAR"))
     return(object$coefficients)
@@ -341,6 +341,7 @@ coefVec.nlVar<-function(object,...){
 }
 
 
+
 ###Method toMlm
 toMlm<- function(x, ...) {
   UseMethod("toMlm")
@@ -357,7 +358,7 @@ toMlm.nlVar<-function(x){
   Ytminusi<-mod[,-ix]
   mlm<-lm(Yt ~.-1, Ytminusi)
   return(mlm)
-  }
+}
 
 
 ### Method eqNames
@@ -372,23 +373,23 @@ eqNames.nlVar <- function(object)
 #########################
 ###Latex vector
 TeXVec<-function(vec){
-	d<-vec[1]
-	for(i in 1:(length(vec)	-1))
-		d<-paste(d,"slashslash",vec[i+1] )
-	d
+  d<-vec[1]
+  for(i in 1:(length(vec)	-1))
+    d<-paste(d,"slashslash",vec[i+1] )
+  d
 }
 
 ###LateX elements of R matrix
 TeXMat<-function(mat, oneLine=FALSE){
-	mat<-matrix(mat, ncol=ifelse(inherits(mat, "matrix"), ncol(mat), length(mat)))
-	nr<-nrow(mat)
-	nc<-ncol(mat)	
-	d<-mat[,1]
-	for(i in 1:(nc-1))
-	  d<-paste(d,"&",mat[,i+1])
-	d[seq_len(nr-1)]<-paste(d[seq_len(nr-1)],"slashslash")
-	d[nr]<-paste(d[nr], "")
- 	matrix(d, nrow=ifelse(oneLine,1,nr), ncol=1)
+  mat<-matrix(mat, ncol=ifelse(inherits(mat, "matrix"), ncol(mat), length(mat)))
+  nr<-nrow(mat)
+  nc<-ncol(mat)	
+  d<-mat[,1]
+  for(i in 1:(nc-1))
+    d<-paste(d,"&",mat[,i+1])
+  d[seq_len(nr-1)]<-paste(d[seq_len(nr-1)],"slashslash")
+  d[nr]<-paste(d[nr], "")
+  matrix(d, nrow=ifelse(oneLine,1,nr), ncol=1)
 }
 if(FALSE){
   a<-matrix(c(1,2,3,4,5,6), ncol=2)
@@ -396,43 +397,43 @@ if(FALSE){
 }
 ###Function include
 include<-function(x, res, coef, skip=0, mat="smatrix"){
-	n<-length(res)
-	res[(n+1):(n+5)]<-"blank"
-	if(x$include=="const"){
-		res[n+1]<-paste("\\begin{",mat, "}     %const", sep="")
-		res[n+2]<-TeXVec(coef[,1+skip])
-		res[n+3]<-paste("\\end{",mat,"}", sep="")}
-	if(x$include=="trend"){
-		res[n+1]<-paste("\\begin{",mat,"}     %trend", sep="")
-		res[n+2]<-TeXVec(coef[,1+skip])
-		res[n+3]<-paste("\\end{",mat,"}     %trend", sep="")}
-	if(x$include=="both"){
-		res[n+1]<-paste("\\begin{",mat, "}     %const", sep="")
-		res[n+2]<-TeXVec(coef[,1+skip])
-		res[n+3]<-paste("\\end{",mat,"}+\\begin{",mat,"}     %trend", sep="")
-		res[n+4]<-TeXVec(coef[,2+skip])
-		res[n+5]<-paste("\\end{",mat, "}t", sep="")
-		}
-	return(res)
+  n<-length(res)
+  res[(n+1):(n+5)]<-"blank"
+  if(x$include=="const"){
+    res[n+1]<-paste("\\begin{",mat, "}     %const", sep="")
+    res[n+2]<-TeXVec(coef[,1+skip])
+    res[n+3]<-paste("\\end{",mat,"}", sep="")}
+  if(x$include=="trend"){
+    res[n+1]<-paste("\\begin{",mat,"}     %trend", sep="")
+    res[n+2]<-TeXVec(coef[,1+skip])
+    res[n+3]<-paste("\\end{",mat,"}     %trend", sep="")}
+  if(x$include=="both"){
+    res[n+1]<-paste("\\begin{",mat, "}     %const", sep="")
+    res[n+2]<-TeXVec(coef[,1+skip])
+    res[n+3]<-paste("\\end{",mat,"}+\\begin{",mat,"}     %trend", sep="")
+    res[n+4]<-TeXVec(coef[,2+skip])
+    res[n+5]<-paste("\\end{",mat, "}t", sep="")
+  }
+  return(res)
 }
 
 ###Function lag
 LagTeX<-function(res, x, coef, skip,mat="smatrix"){
-	if(attr(x, "varsLevel")=="diff")
-	    delta<-"slashDelta "
-	else
-	    delta<-NULL
-	for(j in 1:x$lag){
-		nres<-length(res)
-		res[nres+1]<-paste("+\\begin{",mat,"}      %Lag", j,sep="")
-	 	for(i in 1:x$k){
-	 		res[nres+i+1]<-TeXMat(coef[,seq_len(x$k)+(j-1)*x$k+skip])[i]}
-		nres<-length(res)
-		res[nres+1]<-paste("\\end{",mat,"}",sep="")
- 		res[nres+2]<-paste("\\begin{",mat,"}", sep="")
-		res[nres+3]<-TeXVec(paste(delta,"X_{t-",j,"}^{",seq(1, x$k),"}", sep=""))
-		res[nres+4]<-paste("\\end{",mat,"}", sep="")
-	}
-res
+  if(attr(x, "varsLevel")=="diff")
+    delta<-"slashDelta "
+  else
+    delta<-NULL
+  for(j in 1:x$lag){
+    nres<-length(res)
+    res[nres+1]<-paste("+\\begin{",mat,"}      %Lag", j,sep="")
+    for(i in 1:x$k){
+      res[nres+i+1]<-TeXMat(coef[,seq_len(x$k)+(j-1)*x$k+skip])[i]}
+    nres<-length(res)
+    res[nres+1]<-paste("\\end{",mat,"}",sep="")
+    res[nres+2]<-paste("\\begin{",mat,"}", sep="")
+    res[nres+3]<-TeXVec(paste(delta,"X_{t-",j,"}^{",seq(1, x$k),"}", sep=""))
+    res[nres+4]<-paste("\\end{",mat,"}", sep="")
+  }
+  res
 }
 
