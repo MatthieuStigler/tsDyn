@@ -371,7 +371,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
 
   z<-list(residuals=res,  
           coefficients=B,  k=k, t=t,T=T, npar=npar, nparB=ncol(B), type="linear", 
-          # coef_names_vec = coef_names_vec,
+          coef_names_vec = coef_names_vec,
           fitted.values=fitted, 
           model.x=Z, 
           include=include,
@@ -621,11 +621,7 @@ print.summary.VAR<-function(x,...){
 vcov.VAR<-function(object, ...){
   sum<-summary.VAR(object)
   so<-sum$sigma %x% sum$cov.unscaled
-  co.names<-gsub(" ", "", colnames(coef(object)))
-  eq.names <- eqNames(object)
-  together.names<-paste(rep(eq.names,each= length(co.names)), co.names, sep=":")
-  dimnames(so)<-list(together.names, together.names)
-  # dimnames(so)<-list(object$coef_names_vec, object$coef_names_vec)
+  dimnames(so)<-list(object$coef_names_vec, object$coef_names_vec)
   so
 }
 
