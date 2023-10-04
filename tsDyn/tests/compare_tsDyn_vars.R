@@ -1,5 +1,7 @@
+library(broom)
 library(tsDyn)
 library(vars)
+suppressPackageStartupMessages(library(tidyverse, warn.conflicts = FALSE))
 
 data(Canada)
 
@@ -191,3 +193,34 @@ sapply(all_var_models, comp_var_IRF)
 sapply(all_var_models, comp_var_IRF_old)
 sapply(all_var_models, comp_var_IRF, ortho = TRUE)
 sapply(all_var_models, comp_var_IRF_old, ortho = TRUE)
+
+
+################################
+#'## Tidy
+################################
+comp_tidy <- function(x) {
+  n_co <- x[[1]]$nparB
+  
+  ## need to slice because of issue: https://github.com/tidymodels/broom/issues/1174
+  
+  out_tsD <- tidy(x[[1]]) |> 
+    as_tibble() |> 
+    dplyr::mutate(term = stringr::str_replace(term, "Intercept", "const") |> 
+                    stringr::str_replace("Trend", "trend") |> 
+                    stringr::str_replace(" -([0-9]+)", ".l\\1")) |> 
+    dplyr::rename(group=equation) |> 
+    dplyr::slice(1:n_co) |> 
+    dplyr::arrange(group, term)
+  
+  out_vars <- broom::tidy(x[[2]]) |> #as_tibble() |> 
+    dplyr::slice(1:n_co) |> 
+    dplyr::arrange(group, term)
+  all.equal(out_vars, out_tsD)
+  # waldo::compare(out_tsD,
+                 # out_vars, tolerance = 1e-12)
+  
+}
+## comp_tidy(x=all_var_models[[1]])
+same_B <- sapply(all_var_models, comp_var_coefs)
+sapply(all_var_models[same_B=="TRUE"], comp_tidy)
+
