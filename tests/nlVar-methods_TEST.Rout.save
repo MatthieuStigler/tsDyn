@@ -38,6 +38,9 @@ Type 'q()' to quit R.
 > 
 > mods <- models_multivariate$object
 > mods_nonLIn <- subset(models_multivariate, model %in% c("TVAR", "TVECM"))$object
+> mods_Linear <- subset(models_multivariate, model %in% c("VAR", "VECM"))$object
+> length(mods_nonLIn)+length(mods_Linear)==length(mods)
+[1] TRUE
 > 
 > ############################
 > ### tests
@@ -5235,6 +5238,201 @@ Equation cpiUSA  0.24673984
 [16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
 [46] TRUE TRUE TRUE
+> 
+> ## Linear models
+> sapply(mods_Linear, \(x) round(confint(x),3))
+[[1]]
+                  2.5 % 97.5 %
+dolcan:Intercept -0.014  0.035
+dolcan:Trend      0.379  0.379
+dolcan:dolcan-1  -0.018  0.018
+dolcan:cpiUSA-1  -0.001  0.000
+cpiUSA:Intercept  0.652  1.322
+cpiUSA:Trend     -0.142 -0.137
+cpiUSA:dolcan-1  -0.239  0.239
+cpiUSA:cpiUSA-1   0.993  1.011
+
+[[2]]
+                  2.5 % 97.5 %
+dolcan:Intercept -0.003  0.029
+dolcan:dolcan-1   0.438  0.473
+dolcan:cpiUSA-1   0.987  0.987
+cpiUSA:Intercept -0.361  0.079
+cpiUSA:dolcan-1  -0.239  0.239
+cpiUSA:cpiUSA-1   0.998  1.001
+
+[[3]]
+                 2.5 % 97.5 %
+dolcan:dolcan-1  0.996  1.005
+dolcan:cpiUSA-1  0.335  0.335
+cpiUSA:dolcan-1 -0.066  0.066
+cpiUSA:cpiUSA-1  0.997  0.999
+
+[[4]]
+                 2.5 % 97.5 %
+dolcan:Trend     0.000  0.000
+dolcan:dolcan-1 -0.016  0.011
+dolcan:cpiUSA-1  0.991  0.992
+cpiUSA:Trend     0.035  0.038
+cpiUSA:dolcan-1 -0.183  0.183
+cpiUSA:cpiUSA-1  1.002  1.016
+
+[[5]]
+                  2.5 % 97.5 %
+dolcan:Intercept -0.011  0.038
+dolcan:Trend      0.283  0.283
+dolcan:dolcan-1  -0.109  0.109
+dolcan:cpiUSA-1  -0.008  0.008
+dolcan:dolcan-2   1.041  1.259
+dolcan:cpiUSA-2   0.525  0.541
+cpiUSA:Intercept -0.306  0.299
+cpiUSA:Trend      1.455  1.460
+cpiUSA:dolcan-1  -1.511  1.179
+cpiUSA:cpiUSA-1  -0.704 -0.506
+cpiUSA:dolcan-2  -1.340  1.348
+cpiUSA:cpiUSA-2  -0.558 -0.360
+
+[[6]]
+                  2.5 % 97.5 %
+dolcan:Intercept  0.000  0.033
+dolcan:dolcan-1   0.137  0.355
+dolcan:cpiUSA-1   1.143  1.159
+dolcan:dolcan-2   0.421  0.638
+dolcan:cpiUSA-2  -0.012  0.004
+cpiUSA:Intercept  1.254  1.660
+cpiUSA:dolcan-1  -1.510  1.177
+cpiUSA:cpiUSA-1  -0.699 -0.502
+cpiUSA:dolcan-2  -1.338  1.346
+cpiUSA:cpiUSA-2  -0.556 -0.359
+
+[[7]]
+                 2.5 % 97.5 %
+dolcan:dolcan-1  1.052  1.270
+dolcan:cpiUSA-1  0.676  0.692
+dolcan:dolcan-2 -0.111  0.107
+dolcan:cpiUSA-2  1.476  1.491
+cpiUSA:dolcan-1 -1.507  1.187
+cpiUSA:cpiUSA-1 -0.604 -0.411
+cpiUSA:dolcan-2 -1.348  1.352
+cpiUSA:cpiUSA-2 -0.581 -0.388
+
+[[8]]
+                 2.5 % 97.5 %
+dolcan:Trend     0.000  0.000
+dolcan:dolcan-1 -0.110  0.108
+dolcan:cpiUSA-1  1.146  1.161
+dolcan:dolcan-2  0.489  0.707
+dolcan:cpiUSA-2 -0.011  0.005
+cpiUSA:Trend     1.468  1.471
+cpiUSA:dolcan-1 -1.511  1.186
+cpiUSA:cpiUSA-1 -0.637 -0.440
+cpiUSA:dolcan-2 -1.344  1.351
+cpiUSA:cpiUSA-2 -0.565 -0.367
+
+[[9]]
+                  2.5 % 97.5 %
+dolcan:ECT       -0.032  0.002
+dolcan:Intercept -0.061 -0.040
+dolcan:Trend      0.011  0.011
+dolcan:dolcan-1   0.084  0.302
+dolcan:cpiUSA-1  -0.008  0.008
+cpiUSA:ECT       -0.205  0.204
+cpiUSA:Intercept  0.038  0.293
+cpiUSA:Trend      0.587  0.588
+cpiUSA:dolcan-1  -1.346  1.338
+cpiUSA:cpiUSA-1   0.358  0.556
+
+[[10]]
+                  2.5 % 97.5 %
+dolcan:ECT       -0.006  0.004
+dolcan:Intercept  0.044  0.049
+dolcan:dolcan-1  -0.107  0.111
+dolcan:cpiUSA-1   0.124  0.140
+cpiUSA:ECT        0.099  0.220
+cpiUSA:Intercept  0.515  0.576
+cpiUSA:dolcan-1  -1.342  1.336
+cpiUSA:cpiUSA-1   0.366  0.562
+
+[[11]]
+                 2.5 % 97.5 %
+dolcan:ECT      -0.006  0.004
+dolcan:dolcan-1 -0.036  0.182
+dolcan:cpiUSA-1  0.163  0.173
+cpiUSA:ECT       1.010  1.144
+cpiUSA:dolcan-1 -1.471  1.476
+cpiUSA:cpiUSA-1  0.736  0.865
+
+[[12]]
+                 2.5 % 97.5 %
+dolcan:ECT      -0.005  0.007
+dolcan:Trend     0.239  0.239
+dolcan:dolcan-1 -0.109  0.109
+dolcan:cpiUSA-1 -0.007  0.008
+cpiUSA:ECT       0.087  0.235
+cpiUSA:Trend     0.508  0.508
+cpiUSA:dolcan-1 -1.359  1.356
+cpiUSA:cpiUSA-1  0.410  0.600
+
+[[13]]
+                  2.5 % 97.5 %
+dolcan:ECT       -0.032  0.002
+dolcan:Intercept -0.050 -0.029
+dolcan:Trend      0.012  0.012
+dolcan:dolcan-1   0.074  0.295
+dolcan:cpiUSA-1  -0.009  0.009
+dolcan:dolcan-2  -0.111  0.111
+dolcan:cpiUSA-2   0.159  0.177
+cpiUSA:ECT        0.485  0.899
+cpiUSA:Intercept -0.134  0.129
+cpiUSA:Trend      0.453  0.454
+cpiUSA:dolcan-1  -1.386  1.342
+cpiUSA:cpiUSA-1  -0.741 -0.519
+cpiUSA:dolcan-2  -1.373  1.367
+cpiUSA:cpiUSA-2  -0.100  0.122
+
+[[14]]
+                  2.5 % 97.5 %
+dolcan:ECT       -0.006  0.004
+dolcan:Intercept  0.043  0.049
+dolcan:dolcan-1  -0.108  0.113
+dolcan:cpiUSA-1   0.121  0.139
+dolcan:dolcan-2   0.053  0.274
+dolcan:cpiUSA-2   0.657  0.675
+cpiUSA:ECT       -0.063  0.060
+cpiUSA:Intercept  0.423  0.492
+cpiUSA:dolcan-1  -1.393  1.332
+cpiUSA:cpiUSA-1  -0.792 -0.570
+cpiUSA:dolcan-2  -1.366  1.362
+cpiUSA:cpiUSA-2  -0.095  0.127
+
+[[15]]
+                 2.5 % 97.5 %
+dolcan:ECT      -0.006  0.004
+dolcan:dolcan-1 -0.050  0.172
+dolcan:cpiUSA-1  0.164  0.180
+dolcan:dolcan-2  1.018  1.240
+dolcan:cpiUSA-2 -0.007  0.010
+cpiUSA:ECT       0.572  0.705
+cpiUSA:dolcan-1 -1.494  1.443
+cpiUSA:cpiUSA-1 -0.517 -0.300
+cpiUSA:dolcan-2 -1.473  1.476
+cpiUSA:cpiUSA-2  0.094  0.309
+
+[[16]]
+                 2.5 % 97.5 %
+dolcan:ECT      -0.005  0.008
+dolcan:Trend     0.230  0.230
+dolcan:dolcan-1 -0.111  0.111
+dolcan:cpiUSA-1 -0.008  0.009
+dolcan:dolcan-2  0.054  0.277
+dolcan:cpiUSA-2  0.646  0.664
+cpiUSA:ECT      -0.079  0.078
+cpiUSA:Trend     0.484  0.484
+cpiUSA:dolcan-1 -1.409  1.348
+cpiUSA:cpiUSA-1 -0.872 -0.652
+cpiUSA:dolcan-2 -1.382  1.380
+cpiUSA:cpiUSA-2 -0.066  0.154
+
 > 
 > ## Non linear functions
 > sapply(mods_nonLIn, function(x) head(regime(x), 3))
