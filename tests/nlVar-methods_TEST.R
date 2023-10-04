@@ -4,8 +4,15 @@ suppressMessages(library(tidyverse))
 ############################
 ### Load data
 ############################
-path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
-if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+
+if(getRversion()>="4.3.0"){
+  file <- "models_multivariate.rds"
+} else {
+  file <- "models_multivariate_R_less_4_3.rds"
+}
+
+path_mod_multi <- system.file(file.path("inst/testdata/",file), package = "tsDyn")
+if(path_mod_multi=="") path_mod_multi <- system.file(file.path("testdata/",file), package = "tsDyn")
 
 models_multivariate <- readRDS(path_mod_multi)
 
@@ -65,7 +72,7 @@ sapply(mods, function(x) tail(fitted(x), 3))
 ##
 suppressMessages(suppressWarnings(sapply(mods, tsDyn:::mod_refit_check)))
 
-## NOn linear functions
+## Non linear functions
 sapply(mods_nonLIn, function(x) head(regime(x), 3))
 sapply(mods_nonLIn, function(x) tail(regime(x), 3))
 
