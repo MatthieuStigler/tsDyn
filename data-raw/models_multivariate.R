@@ -25,6 +25,8 @@ models_VAR <-  grid_simple %>%
 
 models_VAR$object_vars[[1]]$call
 
+## check class, should be array also with R >= 4.3.0
+class(models_VAR$object[[1]]$model)
 
 models_VECM_tsD <-  grid_simple %>% 
   mutate(model = "VECM",
@@ -70,7 +72,7 @@ models_multivariate <- bind_rows(models_VAR,
 path <- system.file("inst/testdata", package = "tsDyn")
 if(path== "") path <- system.file("testdata", package = "tsDyn")
 path <-  "~/Dropbox/Documents/tsDyn/tsDyn/inst/testdata"
-saveRDS(models_multivariate, file= paste(path, "models_multivariate.rds", sep = "/"), compress = "xz")
+saveRDS(models_multivariate, file= file.path(path, "models_multivariate.rds"), compress = "xz")
 
 ## this gives path: system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
 path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
