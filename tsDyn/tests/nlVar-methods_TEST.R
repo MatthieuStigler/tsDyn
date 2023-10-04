@@ -19,6 +19,8 @@ models_multivariate <- readRDS(path_mod_multi)
 
 mods <- models_multivariate$object
 mods_nonLIn <- subset(models_multivariate, model %in% c("TVAR", "TVECM"))$object
+mods_Linear <- subset(models_multivariate, model %in% c("VAR", "VECM"))$object
+length(mods_nonLIn)+length(mods_Linear)==length(mods)
 
 ############################
 ### tests
@@ -71,6 +73,9 @@ sapply(mods, function(x) tail(fitted(x), 3))
 
 ##
 suppressMessages(suppressWarnings(sapply(mods, tsDyn:::mod_refit_check)))
+
+## Linear models
+sapply(mods_Linear, \(x) round(confint(x),3))
 
 ## Non linear functions
 sapply(mods_nonLIn, function(x) head(regime(x), 3))

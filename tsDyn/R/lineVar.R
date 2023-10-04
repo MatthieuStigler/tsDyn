@@ -625,6 +625,34 @@ vcov.VAR<-function(object, ...){
   so
 }
 
+
+#' @export
+# code copied from confint.default, problem is that it expects 
+# a vector coef, which cannot be changed 
+# (local temporary change of coef.VAR created errors elsewhere)
+confint.VAR <- function (object, parm, level = 0.95, ...) {
+  ## get coefs
+  cf <- coef(object)
+  cf <- c(matrix(cf, nrow=1, byrow = TRUE))
+  names(cf) <- object$coef_names_vec
+  pnames <- names(cf)
+  if (missing(parm)) {
+    parm <- pnames
+  } else if (is.numeric(parm))  {
+    parm <- pnames[parm]
+  }
+  a <- (1 - level)/2
+  a <- c(a, 1 - a)
+  pct <- paste(format(100 * a, trim = TRUE, scientific = FALSE, digits = 3), 
+               "%")
+  fac <- stats::qt(a, object$df.residual)
+  ci <- array(NA, dim = c(length(parm), 2L), dimnames = list(parm, 
+                                                             pct))
+  ses <- sqrt(diag(vcov(object)))[parm]
+  ci[] <- cf[parm] + ses %o% fac
+  ci
+}
+
 #' @export
 toLatex.VAR<-function(object,..., digits=4, parenthese=c("StDev","Pvalue"), label){
   x<-object
