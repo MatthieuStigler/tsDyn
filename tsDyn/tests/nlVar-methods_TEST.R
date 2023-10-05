@@ -76,6 +76,8 @@ suppressMessages(suppressWarnings(sapply(mods, tsDyn:::mod_refit_check)))
 
 ## Linear models
 sapply(mods_Linear, \(x) round(confint(x),3))
+map_dfr(mods_Linear, \(x) tidy(x) |> 
+          mutate(across(where(is.numeric), ~round(., 3))))
 
 ## Non linear functions
 sapply(mods_nonLIn, function(x) head(regime(x), 3))
