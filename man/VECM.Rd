@@ -31,7 +31,7 @@ If NULL, will be estimated using the estimator specified in \code{estim}}
 \item{estim}{Type of estimator: \code{2OLS} for the two-step approach or
 \code{ML} for Johansen MLE}
 
-\item{LRinclude}{Type of deterministic regressors to include in the long-term
+\item{LRinclude}{Type of deterministic regressor(s) to include in the long-term
 relationship. Can also be a matrix with exogeneous regressors (2OLS only).}
 
 \item{exogen}{Inclusion of exogenous variables (first row being first=oldest

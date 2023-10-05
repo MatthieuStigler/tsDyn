@@ -38,8 +38,8 @@ If NULL, will be estimated using the estimator specified in \code{estim}}
 \item{estim}{Type of estimator for the VECM: '2OLS' for the two-step approach
 or 'ML' for Johansen MLE}
 
-\item{LRinclude}{Possibility to include in the long-run relationship and the
-ECT a trend, a, constant, etc.}
+\item{LRinclude}{For VECM: type of deterministic regressor(s) to include in the long-term
+relationship. Can also be a matrix with exogeneous regressors (2OLS only).}
 
 \item{exogen}{Inclusion of exogenous variables (first row being first=oldest
 value). Is either of same size than data (then automatically cut) or than
