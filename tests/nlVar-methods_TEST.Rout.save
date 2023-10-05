@@ -5433,6 +5433,153 @@ cpiUSA:cpiUSA-1 -0.872 -0.652
 cpiUSA:dolcan-2 -1.382  1.380
 cpiUSA:cpiUSA-2 -0.066  0.154
 
+> map_dfr(mods_Linear, \(x) tidy(x) |> 
++           mutate(across(where(is.numeric), ~round(., 3))))
+    equation      term estimate std.error statistic p.value
+1     dolcan Intercept    0.010     0.012     0.838   0.403
+2     dolcan     Trend    0.000     0.000    -0.249   0.803
+3     dolcan dolcan -1    0.987     0.009   110.837   0.000
+4     dolcan cpiUSA -1    0.000     0.000     0.442   0.659
+5     cpiUSA Intercept    0.379     0.170     2.226   0.027
+6     cpiUSA     Trend   -0.001     0.001    -0.596   0.551
+7     cpiUSA dolcan -1   -0.140     0.122    -1.147   0.252
+8     cpiUSA cpiUSA -1    1.002     0.004   222.856   0.000
+9     dolcan Intercept    0.013     0.008     1.559   0.120
+10    dolcan dolcan -1    0.987     0.009   111.020   0.000
+11    dolcan cpiUSA -1    0.000     0.000     1.252   0.212
+12    cpiUSA Intercept    0.455     0.112     4.065   0.000
+13    cpiUSA dolcan -1   -0.141     0.121    -1.162   0.246
+14    cpiUSA cpiUSA -1    1.000     0.001  1421.261   0.000
+15    dolcan dolcan -1    1.000     0.002   419.096   0.000
+16    dolcan cpiUSA -1    0.000     0.000     0.307   0.759
+17    cpiUSA dolcan -1    0.335     0.033    10.043   0.000
+18    cpiUSA cpiUSA -1    0.998     0.001  1830.173   0.000
+19    dolcan     Trend    0.000     0.000    -1.336   0.183
+20    dolcan dolcan -1    0.992     0.007   146.709   0.000
+21    dolcan cpiUSA -1    0.000     0.000     1.368   0.172
+22    cpiUSA     Trend   -0.003     0.001    -3.427   0.001
+23    cpiUSA dolcan -1    0.037     0.093     0.393   0.694
+24    cpiUSA cpiUSA -1    1.009     0.003   302.527   0.000
+25    dolcan Intercept    0.014     0.012     1.092   0.275
+26    dolcan     Trend    0.000     0.000    -0.299   0.765
+27    dolcan dolcan -1    1.150     0.055    20.756   0.000
+28    dolcan cpiUSA -1   -0.004     0.004    -0.920   0.358
+29    dolcan dolcan -2   -0.166     0.055    -2.999   0.003
+30    dolcan cpiUSA -2    0.004     0.004     0.957   0.339
+31    cpiUSA Intercept    0.283     0.154     1.843   0.066
+32    cpiUSA     Trend    0.000     0.001     0.325   0.746
+33    cpiUSA dolcan -1    0.533     0.684     0.780   0.436
+34    cpiUSA cpiUSA -1    1.458     0.050    29.055   0.000
+35    cpiUSA dolcan -2   -0.605     0.683    -0.885   0.377
+36    cpiUSA cpiUSA -2   -0.459     0.050    -9.106   0.000
+37    dolcan Intercept    0.016     0.008     1.959   0.051
+38    dolcan dolcan -1    1.151     0.055    20.794   0.000
+39    dolcan cpiUSA -1   -0.004     0.004    -0.914   0.362
+40    dolcan dolcan -2   -0.166     0.055    -3.009   0.003
+41    dolcan cpiUSA -2    0.004     0.004     0.932   0.352
+42    cpiUSA Intercept    0.246     0.103     2.388   0.018
+43    cpiUSA dolcan -1    0.529     0.683     0.776   0.439
+44    cpiUSA cpiUSA -1    1.457     0.050    29.098   0.000
+45    cpiUSA dolcan -2   -0.601     0.682    -0.880   0.379
+46    cpiUSA cpiUSA -2   -0.457     0.050    -9.136   0.000
+47    dolcan dolcan -1    1.161     0.055    20.982   0.000
+48    dolcan cpiUSA -1   -0.002     0.004    -0.490   0.625
+49    dolcan dolcan -2   -0.160     0.055    -2.889   0.004
+50    dolcan cpiUSA -2    0.002     0.004     0.493   0.622
+51    cpiUSA dolcan -1    0.684     0.685     1.000   0.318
+52    cpiUSA cpiUSA -1    1.484     0.049    30.161   0.000
+53    cpiUSA dolcan -2   -0.507     0.686    -0.739   0.460
+54    cpiUSA cpiUSA -2   -0.485     0.049    -9.877   0.000
+55    dolcan     Trend    0.000     0.000    -1.649   0.100
+56    dolcan dolcan -1    1.153     0.055    20.833   0.000
+57    dolcan cpiUSA -1   -0.003     0.004    -0.786   0.432
+58    dolcan dolcan -2   -0.163     0.055    -2.944   0.003
+59    dolcan cpiUSA -2    0.004     0.004     0.878   0.381
+60    cpiUSA     Trend   -0.001     0.001    -1.543   0.124
+61    cpiUSA dolcan -1    0.598     0.685     0.872   0.384
+62    cpiUSA cpiUSA -1    1.469     0.050    29.426   0.000
+63    cpiUSA dolcan -2   -0.538     0.685    -0.786   0.432
+64    cpiUSA cpiUSA -2   -0.466     0.050    -9.234   0.000
+65    dolcan       ECT   -0.015     0.008    -1.787   0.075
+66    dolcan Intercept    0.011     0.005     2.088   0.038
+67    dolcan     Trend    0.000     0.000    -1.735   0.084
+68    dolcan dolcan -1    0.166     0.055     2.996   0.003
+69    dolcan cpiUSA -1   -0.004     0.004    -0.977   0.329
+70    cpiUSA       ECT   -0.050     0.104    -0.484   0.629
+71    cpiUSA Intercept    0.193     0.065     2.972   0.003
+72    cpiUSA     Trend    0.000     0.000    -0.975   0.330
+73    cpiUSA dolcan -1    0.587     0.682     0.861   0.390
+74    cpiUSA cpiUSA -1    0.457     0.050     9.091   0.000
+75    dolcan       ECT   -0.001     0.003    -0.439   0.661
+76    dolcan Intercept    0.002     0.001     1.678   0.094
+77    dolcan dolcan -1    0.160     0.055     2.884   0.004
+78    dolcan cpiUSA -1   -0.003     0.004    -0.743   0.458
+79    cpiUSA       ECT    0.047     0.031     1.503   0.134
+80    cpiUSA Intercept    0.132     0.016     8.446   0.000
+81    cpiUSA dolcan -1    0.545     0.681     0.801   0.424
+82    cpiUSA cpiUSA -1    0.464     0.050     9.314   0.000
+83    dolcan       ECT   -0.001     0.003    -0.269   0.788
+84    dolcan dolcan -1    0.168     0.055     3.043   0.003
+85    dolcan cpiUSA -1    0.002     0.002     1.000   0.318
+86    cpiUSA       ECT    0.073     0.034     2.149   0.032
+87    cpiUSA dolcan -1    1.077     0.749     1.438   0.151
+88    cpiUSA cpiUSA -1    0.800     0.033    24.314   0.000
+89    dolcan       ECT    0.001     0.003     0.453   0.651
+90    dolcan     Trend    0.000     0.000     1.212   0.227
+91    dolcan dolcan -1    0.161     0.056     2.902   0.004
+92    dolcan cpiUSA -1   -0.001     0.004    -0.317   0.752
+93    cpiUSA       ECT    0.239     0.038     6.342   0.000
+94    cpiUSA     Trend    0.001     0.000     7.869   0.000
+95    cpiUSA dolcan -1    0.508     0.690     0.737   0.462
+96    cpiUSA cpiUSA -1    0.505     0.048    10.495   0.000
+97    dolcan       ECT   -0.015     0.009    -1.788   0.075
+98    dolcan Intercept    0.012     0.005     2.140   0.033
+99    dolcan     Trend    0.000     0.000    -1.746   0.082
+100   dolcan dolcan -1    0.168     0.056     2.987   0.003
+101   dolcan cpiUSA -1   -0.003     0.005    -0.555   0.579
+102   dolcan dolcan -2   -0.022     0.056    -0.389   0.697
+103   dolcan cpiUSA -2   -0.003     0.005    -0.673   0.502
+104   cpiUSA       ECT   -0.040     0.105    -0.379   0.705
+105   cpiUSA Intercept    0.185     0.067     2.773   0.006
+106   cpiUSA     Trend    0.000     0.000    -0.856   0.393
+107   cpiUSA dolcan -1    0.692     0.693     0.998   0.319
+108   cpiUSA cpiUSA -1    0.454     0.057     8.031   0.000
+109   cpiUSA dolcan -2   -0.630     0.696    -0.905   0.366
+110   cpiUSA cpiUSA -2    0.011     0.057     0.194   0.846
+111   dolcan       ECT   -0.001     0.003    -0.406   0.685
+112   dolcan Intercept    0.002     0.001     1.731   0.084
+113   dolcan dolcan -1    0.164     0.056     2.903   0.004
+114   dolcan cpiUSA -1   -0.002     0.005    -0.413   0.680
+115   dolcan dolcan -2   -0.030     0.056    -0.538   0.591
+116   dolcan cpiUSA -2   -0.002     0.005    -0.501   0.616
+117   cpiUSA       ECT    0.046     0.031     1.476   0.141
+118   cpiUSA Intercept    0.130     0.017     7.435   0.000
+119   cpiUSA dolcan -1    0.666     0.692     0.961   0.337
+120   cpiUSA cpiUSA -1    0.458     0.056     8.131   0.000
+121   cpiUSA dolcan -2   -0.681     0.693    -0.982   0.327
+122   cpiUSA cpiUSA -2    0.016     0.056     0.280   0.780
+123   dolcan       ECT   -0.001     0.003    -0.296   0.768
+124   dolcan dolcan -1    0.172     0.056     3.062   0.002
+125   dolcan cpiUSA -1    0.002     0.004     0.369   0.712
+126   dolcan dolcan -2   -0.025     0.057    -0.446   0.656
+127   dolcan cpiUSA -2    0.001     0.004     0.297   0.767
+128   cpiUSA       ECT    0.061     0.034     1.803   0.072
+129   cpiUSA dolcan -1    1.129     0.746     1.512   0.131
+130   cpiUSA cpiUSA -1    0.638     0.055    11.614   0.000
+131   cpiUSA dolcan -2   -0.409     0.749    -0.545   0.586
+132   cpiUSA cpiUSA -2    0.202     0.055     3.689   0.000
+133   dolcan       ECT    0.002     0.003     0.513   0.608
+134   dolcan     Trend    0.000     0.000     1.211   0.227
+135   dolcan dolcan -1    0.166     0.057     2.930   0.004
+136   dolcan cpiUSA -1   -0.001     0.005    -0.148   0.883
+137   dolcan dolcan -2   -0.030     0.057    -0.534   0.594
+138   dolcan cpiUSA -2   -0.001     0.005    -0.225   0.822
+139   cpiUSA       ECT    0.230     0.040     5.757   0.000
+140   cpiUSA     Trend    0.001     0.000     6.875   0.000
+141   cpiUSA dolcan -1    0.655     0.701     0.935   0.350
+142   cpiUSA cpiUSA -1    0.484     0.056     8.631   0.000
+143   cpiUSA dolcan -2   -0.762     0.702    -1.086   0.278
+144   cpiUSA cpiUSA -2    0.044     0.056     0.788   0.431
 > 
 > ## Non linear functions
 > sapply(mods_nonLIn, function(x) head(regime(x), 3))
