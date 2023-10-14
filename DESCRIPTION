@@ -30,7 +30,6 @@ Suggests:
     sm,
     scatterplot3d,
     rgl,
-    tidyverse,
     rugarch,
     broom,
     dplyr,
