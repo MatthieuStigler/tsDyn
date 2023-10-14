@@ -4,6 +4,10 @@ usethis::use_package("broom", "Suggests")
 usethis::use_package("dplyr", "Suggests")
 usethis::use_package("stringr", "Suggests")
 
+usethis::use_package("purrr", "Suggests")
+usethis::use_package("tibble", "Suggests")
+usethis::use_package("tidyr", "Suggests")
+
 # usethis::use_news_md()
 # usethis::use_cran_comments(open = FALSE)
 
