@@ -1,6 +1,8 @@
 
 library(tsDyn)
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+library(purrr)
+library(tidyr)
 suppressWarnings(RNGversion("3.5.3"))
 
 

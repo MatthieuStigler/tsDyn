@@ -18,7 +18,9 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
-> suppressMessages(library(tidyverse))
+> suppressMessages(library(dplyr))
+> library(purrr)
+> library(tidyr)
 > 
 > ############################
 > ### Load data

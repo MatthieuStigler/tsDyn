@@ -1,5 +1,7 @@
 library(tsDyn)
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+library(purrr)
+library(tidyr)
 suppressWarnings(RNGversion("3.5.3"))
 
 roundAll.Equal <- function(x, round=8){
@@ -123,7 +125,7 @@ setar.boot.check(set_1th_l1_tr, round_digits = 1)
 
 ## why difference?
 if(FALSE) {
-  library(tidyverse)
+  library(ggplot)
   getTh(set_1th_l2)
   filt_diff <-  function(x, minus=2, tol =1) {
     x2 <- x %>% 

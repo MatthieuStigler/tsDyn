@@ -1,0 +1,153 @@
+
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> suppressMessages(library(dplyr))
+> library(purrr)
+> library(tidyr)
+> select <- dplyr::select
+> suppressWarnings(RNGversion("3.5.3"))
+> 
+> ############################
+> ### Load data
+> ############################
+> path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
+> if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
+> 
+> models_univariate <- readRDS(path_mod_uni)
+> 
+> ############################
+> ### Test irf univariate
+> ############################
+> 
+> 
+> ## boot: many models instable! had to search for a while to find seed with no errors...
+> df_regs <-  tibble(model = c("linear", "setar", "setar"),
++                        regime = c("all", "L", "H"))
+> models_irf <- models_univariate %>% 
++   filter(!model %in% c("aar", "lstar" )) %>% 
++   merge(df_regs, by = "model") %>% 
++   as_tibble() %>% 
++   relocate(model, .after = include) %>% 
++   mutate(irf = map2(object, regime,  ~suppressWarnings(irf(.x,  boot = TRUE, runs = 5, seed = 7, regime = .y))))
+> 
+> ## IRF
+> df_irf <- map_df(models_irf$irf, ~ head(.$irf[[1]], 2) %>%  as_tibble) %>% 
++   as.data.frame()
+> 
+> ## Lower
+> df_all <- models_irf %>% 
++   mutate(irf_irf = map(irf, ~ head(.$irf[[1]], 5)),
++          irf_low = map(irf, ~ head(.$Lower[[1]], 5)),
++          irf_upp = map(irf, ~ head(.$Upper[[1]], 5))) %>% 
++   select(-irf) %>% 
++   gather(irf_stat, value, irf_irf, irf_low, irf_upp) %>% 
++   mutate(value = map(value, ~tibble(x=.) %>% 
++                           mutate(n.ahead = 0:4))) %>% 
++   select(-object) %>% 
++   unnest(value) %>% 
++   spread(irf_stat, x)
+> 
+> df_all %>% 
++   filter(n.ahead %in% c( 1)) %>% 
++   as.data.frame() %>% 
++   print(digits=3)
+   lag include  model nthresh thDelay regime n.ahead irf_irf irf_low irf_upp
+1    1    both linear      NA      NA    all       1   0.529  0.3251   0.620
+2    1    both  setar       1       0      H       1   0.527 -0.5643   0.566
+3    1    both  setar       1       0      L       1   0.883 -3.2687  -0.294
+4    1    both  setar       2       0      H       1   0.935  0.4642   1.058
+5    1    both  setar       2       0      L       1  -0.358 -1.2017  -0.697
+6    1   const linear      NA      NA    all       1   0.586  0.3622   0.714
+7    1   const  setar       1       0      H       1   0.910  0.2896   1.266
+8    1   const  setar       1       0      L       1   0.944  0.1842   2.093
+9    1   const  setar       2       0      H       1   1.019 -0.0806   1.111
+10   1   const  setar       2       0      L       1   0.193 -0.6432   2.324
+11   1    none linear      NA      NA    all       1   0.984  0.9260   0.987
+12   1    none  setar       1       0      H       1   0.928  0.8804   0.940
+13   1    none  setar       1       0      L       1   1.199  1.1473   1.247
+14   1    none  setar       2       0      H       1   0.919  0.8331   0.914
+15   1    none  setar       2       0      L       1   1.168  1.0017   1.220
+16   1   trend linear      NA      NA    all       1   0.895  0.7591   0.900
+17   1   trend  setar       1       0      H       1   0.850  0.7407   0.870
+18   1   trend  setar       1       0      L       1   1.684  1.6723   1.875
+19   1   trend  setar       2       0      H       1   0.957  0.8500   1.059
+20   1   trend  setar       2       0      L       1   1.332  0.8377   1.400
+21   2    both linear      NA      NA    all       1   0.659  0.4723   0.837
+22   2    both  setar       1       0      H       1   0.654  0.6774   0.905
+23   2    both  setar       1       0      L       1   1.485 -0.3572   1.646
+24   2    both  setar       1       1      H       1   0.474  0.2723   0.557
+25   2    both  setar       1       1      L       1   1.665  0.5960   1.808
+26   2    both  setar       2       0      H       1   0.951  0.3929   1.175
+27   2    both  setar       2       0      L       1  -0.552 -1.5928  -0.397
+28   2    both  setar       2       1      H       1   1.291  0.9871   2.005
+29   2    both  setar       2       1      L       1   0.957  0.9223   1.280
+30   2   const linear      NA      NA    all       1   0.711  0.5129   0.877
+31   2   const  setar       1       0      H       1   1.005  0.6929   1.164
+32   2   const  setar       1       0      L       1   1.128  0.2717   1.684
+33   2   const  setar       1       1      H       1   0.618  0.2691   0.914
+34   2   const  setar       1       1      L       1   1.131  0.7803   1.536
+35   2   const  setar       2       0      H       1   1.165  0.8421   1.314
+36   2   const  setar       2       0      L       1   1.116  0.0283   1.131
+37   2   const  setar       2       1      H       1   1.289  0.3128   1.797
+38   2   const  setar       2       1      L       1   0.745  0.5698   0.882
+39   2    none linear      NA      NA    all       1   0.953  0.8192   1.012
+40   2    none  setar       1       0      H       1   1.073  1.0342   1.271
+41   2    none  setar       1       0      L       1   1.415  1.1633   1.855
+42   2    none  setar       1       1      H       1   0.407  0.3419   0.816
+43   2    none  setar       1       1      L       1   0.765  0.1354   0.902
+44   2    none  setar       2       0      H       1   1.151  1.0290   1.314
+45   2    none  setar       2       0      L       1   1.054  0.0950   1.220
+46   2    none  setar       2       1      H       1   1.234  0.8955   1.785
+47   2    none  setar       2       1      L       1   0.765  0.5818   1.126
+48   2   trend linear      NA      NA    all       1   0.897  0.7915   0.961
+49   2   trend  setar       1       0      H       1   0.980  1.0546   1.134
+50   2   trend  setar       1       0      L       1   2.247  1.0474   2.999
+51   2   trend  setar       1       1      H       1   0.632  0.6371   0.942
+52   2   trend  setar       1       1      L       1   0.701  0.4601   0.794
+53   2   trend  setar       2       0      H       1   1.108  0.8376   1.228
+54   2   trend  setar       2       0      L       1   0.500  0.4973   1.205
+55   2   trend  setar       2       1      H       1   0.786  0.2494   1.432
+56   2   trend  setar       2       1      L       1   1.060  0.6921   1.273
+> 
+> 
+> df_all %>% 
++   mutate(is_in = irf_irf >= irf_low & irf_irf <= irf_upp) %>% 
++   count(model, regime, is_in) %>% 
++   as.data.frame() %>% 
++   print(digits=3)
+   model regime is_in   n
+1 linear    all FALSE   2
+2 linear    all  TRUE  38
+3  setar      H FALSE  10
+4  setar      H  TRUE 110
+5  setar      L FALSE   9
+6  setar      L  TRUE 111
+> 
+> 
+> ## try plot
+> irf_1 <- irf(models_univariate$object[[1]])
+> irf_10 <- irf(models_univariate$object[[10]])
+There were 50 or more warnings (use warnings() to see the first 50)
+> plot(irf_1)
+> plot(irf_10)
+> 
+> proc.time()
+   user  system elapsed 
+  8.251   0.114   8.333 
