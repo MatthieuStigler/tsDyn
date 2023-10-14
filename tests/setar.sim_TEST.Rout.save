@@ -18,7 +18,9 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(tsDyn)
-> suppressMessages(library(tidyverse))
+> suppressMessages(library(dplyr))
+> library(purrr)
+> library(tidyr)
 > suppressWarnings(RNGversion("3.5.3"))
 > 
 > roundAll.Equal <- function(x, round=8){
@@ -299,7 +301,7 @@ Possible unit root in the low  regime. Roots are: 0.633
 > 
 > ## why difference?
 > if(FALSE) {
-+   library(tidyverse)
++   library(ggplot)
 +   getTh(set_1th_l2)
 +   filt_diff <-  function(x, minus=2, tol =1) {
 +     x2 <- x %>% 

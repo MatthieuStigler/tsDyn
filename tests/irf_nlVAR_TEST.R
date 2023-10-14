@@ -1,5 +1,8 @@
 library(tsDyn)
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+library(purrr)
+library(tidyr)
+select <- dplyr::select
 suppressWarnings(RNGversion("3.5.3"))
 
 ############################
@@ -98,10 +101,10 @@ comp <- models_IRF_any %>%
          is_same_tssDvec2 = map_lgl(comp_irf_tsDOld_vars, ~isTRUE(.)),
          comp_irf_tsDOld_tsDNew = map2_lgl(irf, irf_vec2,  ~all.equal(.x$irf, .y$irf)),
          is_same_tsD_2ver = map_lgl(comp_irf_tsDOld_tsDNew, ~isTRUE(.))) %>% 
-  select(-starts_with("irf"), -starts_with("comp_irf"), comp_irf_tsDOld_tsDNew)
+  dplyr::select(-starts_with("irf"), -starts_with("comp_irf"), comp_irf_tsDOld_tsDNew)
 
 comp %>% 
-  select(-starts_with("object")) %>% 
+  dplyr::select(-starts_with("object")) %>% 
   as.data.frame()
 
 ############################
@@ -115,7 +118,7 @@ models_VECM <- models_multivariate %>%
 ## show two first of first componment
 models_VECM %>% 
   mutate(irf = map(irf, irf_extract_here)) %>% 
-  select(-object, -object_vars) %>% 
+  dplyr::select(-object, -object_vars) %>% 
   unnest(irf) %>% 
   as.data.frame() %>% 
   mutate(across(where(is.numeric), ~round(., 6)))
@@ -146,7 +149,7 @@ models_TVAR_irf <- models_TVAR  %>%
 ## show two first of first componment
 models_TVAR_irf %>% 
   mutate(irf = map(irf_L, irf_extract_here)) %>%
-  select(-object, -object_vars, -irf_L ) %>% 
+  dplyr::select(-object, -object_vars, -irf_L ) %>% 
   unnest(irf) %>% 
   as.data.frame() %>% 
   mutate(across(where(is.numeric), ~round(., 6)))

@@ -33,7 +33,8 @@ The following objects are masked from ‘package:base’:
 Loading required package: sandwich
 Loading required package: urca
 Loading required package: lmtest
-> suppressPackageStartupMessages(library(tidyverse, warn.conflicts = FALSE))
+> suppressMessages(library(dplyr))
+> library(purrr)
 > 
 > data(Canada)
 > 

@@ -1,7 +1,8 @@
 library(broom)
 library(tsDyn)
 library(vars)
-suppressPackageStartupMessages(library(tidyverse, warn.conflicts = FALSE))
+suppressMessages(library(dplyr))
+library(purrr)
 
 data(Canada)
 

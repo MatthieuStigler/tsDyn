@@ -1,5 +1,6 @@
-  library(tsDyn)
-suppressMessages(library(tidyverse))
+library(tsDyn)
+suppressMessages(library(dplyr))
+library(tidyr)
 
 ###SETAR
 

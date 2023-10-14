@@ -1,5 +1,8 @@
 library(tsDyn)
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+library(purrr)
+library(tidyr)
+select <- dplyr::select
 suppressWarnings(RNGversion("3.5.3"))
 
 ############################

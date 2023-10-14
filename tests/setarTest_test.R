@@ -1,5 +1,8 @@
 library(tsDyn)
-suppressMessages(library(tidyverse))
+suppressMessages(library(dplyr))
+library(purrr)
+library(tidyr)
+library(tibble)
 suppressWarnings(RNGversion("3.5.3"))
 
 data(IIPUs)
