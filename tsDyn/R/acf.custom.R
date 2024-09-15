@@ -5,6 +5,7 @@ acf.custom <- function(..., main, ylim) {
   plot(obj, main=main, ylim=ylim)
 }
 
+#' @export
 pacf.custom <- function(..., main, ylim) {
   obj <- pacf(..., plot=FALSE)
   obj$acf <- obj$acf[-1,,,drop=FALSE]

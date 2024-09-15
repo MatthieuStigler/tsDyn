@@ -101,7 +101,7 @@ irf_old <- function(x, impulse=NULL, response=NULL, n.ahead=10, ortho=TRUE, cumu
 
 
 #' @importFrom stats df.residual
-
+#'@export
 irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE, regime = "all",  ...) {
   irf_1.nlVar(x, n.ahead = n.ahead,
               cumulative = cumulative,
@@ -110,6 +110,7 @@ irf_1.VAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE, regime = "
 
 }
 
+#'@export
 irf_1.VECM <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE, regime = "all",  ...) {
   irf_1.nlVar(x, n.ahead = n.ahead,
               cumulative = cumulative,
@@ -118,6 +119,7 @@ irf_1.VECM <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE, regime = 
   
 }
 
+#'@export
 irf_1.TVAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,  
                         regime = c("L", "M", "H"), ...) {
   regime <-  match.arg(regime)
@@ -128,6 +130,7 @@ irf_1.TVAR <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,
   
 }
 
+#'@export
 irf_1.TVECM <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,  
                         regime = c("L", "M", "H"), ...) {
   regime <-  match.arg(regime)
@@ -138,7 +141,7 @@ irf_1.TVECM <-  function(x, n.ahead=10, cumulative=FALSE, ortho =FALSE,
   
 }
 
-
+#'@export
 irf_1.nlVar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("all", "L", "M", "H"), ortho =FALSE,  ...) {
   regime <-  match.arg(regime)
   series <- get_series(x)

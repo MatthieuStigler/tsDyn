@@ -6,7 +6,7 @@
 #'
 #'@aliases regime regime.default
 #'@param object object of class \code{setar} or \code{nlVar}
-#'@param initVal Logical. Whether the NA initial values should be returned.
+#'@param initVal Logical. Whether the initial NA values should be returned.
 #'Default to TRUE.
 #'@param timeAttr Logical. Whether the time attributes should be returned.
 #'Default to TRUE.
@@ -85,7 +85,7 @@ regime.nlVar <- function(object, initVal=TRUE, timeAttr=TRUE, series = NULL, ...
 }
 
 #' @rdname regime
-#' @param discretize logical (default TRUE) whether the series are discretized to {1,2}, 
+#' @param discretize logical (default TRUE) whether the series are discretized to \{1,2\}, 
 #' or whether regime probabilities are returned. 
 #' @export
 regime.lstar <- function(object, initVal=TRUE, timeAttr=TRUE, series, discretize=TRUE, ...){

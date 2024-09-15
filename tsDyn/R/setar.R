@@ -674,7 +674,7 @@ plot.setar <- function(x, ask=interactive(), legend=FALSE, regSwStart, regSwStop
   invisible(x)
 }
 
-
+#'@export
 oneStep.setar <- function(object, newdata, itime, thVar, ...){
   mL <- object$model.specific$mL
   mH <- object$model.specific$mH

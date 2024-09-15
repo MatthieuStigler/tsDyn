@@ -76,19 +76,26 @@ getTh.nlVar<-function(object,...){
 
 ######## Get lag  ########
 get_lag <- function (object, ...)  UseMethod("get_lag")
+#'@export
 get_lag.nlar <- function (object, ...) as.integer(object$str$m)
+#'@export
 get_lag.nlVar <- function (object, ...) as.integer(object$lag)
 
 ######## Get nthresh  ########
 get_nthresh <- function (object, ...)  UseMethod("get_nthresh")
+#'@export
 get_nthresh.nlar <- function (object, ...) as.integer(object$model.specific$nthresh)
+#'@export
 get_nthresh.nlVar <- function (object, ...) as.integer(object$model.specific$nthresh)
+#'@export
 get_nthresh.lstar <- function (object, ...) 1L
 
 
 ######## Get nVar ########
 get_nVar <- function (object, ...)  UseMethod("get_nVar")
+#'@export
 get_nVar.nlar <- function (object, ...) 1L
+#'@export
 get_nVar.nlVar <- function (object, ...) as.integer(object$k)
 
 
@@ -105,11 +112,13 @@ get_series <- function(x) {
 ######## get orig data ########
 get_data_orig <- function (object, as.df = FALSE, ...)  UseMethod("get_data_orig")
 
+#'@export
 get_data_orig.nlar <- function (object, as.df = FALSE, ...) {
   res <- object$str$x
   if(as.df) res <- as.data.frame(res)
   res
 }
+#'@export
 get_data_orig.nlVar <- function (object, as.df = FALSE, ...) {
   res <- object$model[, seq_len(get_nVar(object))]
   if(as.df) res <- as.data.frame(res)

@@ -5,6 +5,7 @@
 extend <- function(...)
 	UseMethod("extend")
 
+#'@export
 extend.list <- function(this, subclass, ..., listV) {
 	class(this) <- c(subclass, class(this))
 	if(missing(listV))
@@ -22,6 +23,7 @@ MyEnv <- function(...) {
 	structure(this, class=c("MyEnv",class(this)))
 }
 
+#'@export
 extend.MyEnv <- function(this, subclass, ...) {
 	class(this) <- c(subclass, class(this))
 	newvars <- list(...)

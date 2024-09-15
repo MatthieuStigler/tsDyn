@@ -1,5 +1,6 @@
 irf_1 <- function(x, n.ahead = 10, cumulative = FALSE, ...) UseMethod("irf_1")
 
+#'@export
 irf_1.ar <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   coefs <- as.numeric(x$ar)
   empty_series <- c(1, rep(0, n.ahead))
@@ -8,6 +9,7 @@ irf_1.ar <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   data.frame(x=res, n.ahead = 0:n.ahead)
 }
 
+#'@export
 irf_1.linear <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   coefs <- coef(x)
   if(any(grepl("const|trend", names(coefs)))) coefs <-  coefs[-grep("const|trend", names(coefs))]
@@ -19,6 +21,7 @@ irf_1.linear <-  function(x, n.ahead=10, cumulative=FALSE, ...) {
   data.frame(x=res, n.ahead = 0:n.ahead)
 }
 
+#'@export
 irf_1.setar <-  function(x, n.ahead=10, cumulative=FALSE, regime = c("L", "M", "H"), ...) {
   regime <-  match.arg(regime)
   coefs <- coef(x, regime = regime, hyperCoef = FALSE)

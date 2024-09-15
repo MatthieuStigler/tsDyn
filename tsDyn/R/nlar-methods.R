@@ -90,6 +90,7 @@ nlar.struct <- function(x, m, d=1, steps=d, series) {
 
 getXXYY <- function(obj, ...) UseMethod("getXXYY")
 
+#'@export
 getXXYY.nlar.struct <- function(obj, ...) {
 	x <- obj$x
 	m <- obj$m
@@ -106,6 +107,7 @@ getYY <- function(obj, ...)
 
 getdXXYY <- function(obj, ...) UseMethod("getdXXYY")
 
+#'@export
 getdXXYY.nlar.struct <- function(obj,same.dim=FALSE, ...) {
 	x <- obj$x
 	m<-if(same.dim) obj$m-1 else obj$m
@@ -126,9 +128,11 @@ getdX1 <- function(obj, ...)
 getNUsed <- function(obj, ...)
 	UseMethod("getNUsed")
 
+#'@export
 getNUsed.nlar.struct <- function(obj, ...)
 	length(obj$x)
 
+#'@export
 getNUsed.nlar <- function(obj, ...)
 	length(obj$str$x)
 	
@@ -460,10 +464,15 @@ toLatex.nlar <- function(object, digits, label,...) {
 
 ## get_include
 get_include <- function(object) UseMethod("get_include")
+#'@export
 get_include.linear <-  function(object) object$include
+#'@export
 get_include.setar <-  function(object) object$include
+#'@export
 get_include.lstar <-  function(object) object$model.specific$include
+#'@export
 get_include.aar <-  function(object) "const"
+#'@export
 get_include.star <-  function(object) "const"
 
 
