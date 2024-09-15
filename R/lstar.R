@@ -515,6 +515,7 @@ confint.lstar <- function(object, parm, level = 0.95, ...){
   confint.default(object, parm=parm, level=level, ...)
 }
 
+#'@export
 oneStep.lstar <- function(object, newdata, itime, thVar, ...){
   include <- object$model.specific$include
   if(!include %in%c("none","const")) stop("oneStep currently only implemented for include==const/none\n")

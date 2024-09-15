@@ -273,6 +273,7 @@ class(res)<-"TVECMSeo06Test"
 return(res)
 }
 
+#'@export
 print.TVECMSeo06Test<-function(x,...){
   cat("## Test of no cointegration versus threshold cointegration of Seo 2006 ##\n\n", sep="")
   
@@ -281,6 +282,7 @@ print.TVECMSeo06Test<-function(x,...){
   cat("P-value (", length(x$allBoots), " bootstrap):\t", x$PvalBoot, "\n",sep="")
 }
 
+#'@export
 summary.TVECMSeo06Test<-function(object,...){
   print(object)
   cat("Critical values (bootstrap):\n", sep="")
@@ -292,6 +294,7 @@ summary.TVECMSeo06Test<-function(object,...){
   print(object$B)
 }
 
+#'@export
 plot.TVECMSeo06Test<-function(x,...){
   if( length(x$allBoots)<2)
     stop("Should have at least 2 bootstrap replications for the plot")

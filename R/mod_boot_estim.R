@@ -25,6 +25,7 @@ mod_boot <- function(x) {
 ####### mod_refit #######
 mod_refit <-  function(x, data) UseMethod("mod_refit")
 
+#'@export
 mod_refit.linear <-  function(x, data) {
   x_mod <-  x$model.specific
   linear(data, 
@@ -32,6 +33,7 @@ mod_refit.linear <-  function(x, data) {
          include = x$include, type = x$x_mod$type)
 }
 
+#'@export
 mod_refit.setar <-  function(x, data) {
   x_mod <-  x$model.specific
   setar(data, 
@@ -43,7 +45,7 @@ mod_refit.setar <-  function(x, data) {
         trace = FALSE)
 }
 
-
+#'@export
 mod_refit.lstar <-  function(x, data) {
   x_mod <-  x$model.specific
   lstar(data, 
@@ -54,6 +56,7 @@ mod_refit.lstar <-  function(x, data) {
         trace = FALSE)
 }
 
+#'@export
 mod_refit.VAR <-  function(x, data) {
   x_mod <-  x$model.specific
   inpt_args <- x$inputArgs
@@ -66,6 +69,7 @@ mod_refit.VAR <-  function(x, data) {
           LRinclude = inpt_args$LRinclude)
 }
 
+#'@export
 mod_refit.TVAR <-  function(x, data) {
   x_mod <-  x$model.specific
   inpt_args <- x$inputArgs
@@ -82,6 +86,7 @@ mod_refit.TVAR <-  function(x, data) {
        trace = FALSE)
 }
 
+#'@export
 mod_refit.TVECM <-  function(x, data) {
   x_mod <-  x$model.specific
   inpt_args <- x$inputArgs

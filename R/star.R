@@ -81,6 +81,7 @@ computeGradient <- function(object, ...)
 #
 # Returns a list of the gradients with respect to  the linear and
 #     nonlinear parameters
+#'@export
 computeGradient.star <- function(object, ...)
 {
  
@@ -129,6 +130,7 @@ testRegime <- function(object, ...)
 # returns a list containing the p-value of the F statistic and a boolean,
 #      true if there is some remaining nonlinearity and false otherwise.
 #' @importFrom Matrix norm Matrix
+#'@export
 testRegime.star <- function(object, G, rob=FALSE, sig=0.05, trace = TRUE, ...)
 {
 
@@ -305,6 +307,7 @@ startingValues <- function(object, ...)
 # returns a modified copy of 'object' with good starting values for
 #      gamma[noRegime-1] and th[noRegime-1]. It also modifies the linear
 #      parameters phi1 (as they are estimated for the new gamma and th).
+#'@export
 startingValues.star <- function(object, trace=TRUE, ...)
 {
 
@@ -410,6 +413,7 @@ estimateParams <- function(object, ...)
 #
 # Estimates object$model.specific$phi1
 #                   object$model.specific$phi2
+#'@export
 estimateParams.star <- function(object, trace=TRUE, control=list(), ...)
 {
 
@@ -971,6 +975,7 @@ star.predefined <- function(x, m, noRegimes, d=1, steps=d, series,
                      model.specific=res), "star"))
 }
 
+#'@export
 oneStep.star <- function(object, newdata, itime, thVar, ...)
 {
 

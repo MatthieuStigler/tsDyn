@@ -43,6 +43,7 @@ print.nnetTs <- function(x, ...) {
 	invisible(x)
 }
 
+#'@export
 oneStep.nnetTs <- function(object, newdata, ...)
 	predict(object$model.specific, newdata)
 

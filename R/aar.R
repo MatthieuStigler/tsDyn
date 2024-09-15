@@ -90,6 +90,7 @@ plot.aar <- function(x, ask=interactive(), ...) {
   invisible(x)
 }
 
+#'@export
 oneStep.aar <- function(object, newdata, ...){
   newdata <- data.frame(newdata)
   names(newdata) <- attr(object$model.specific$terms, "term.labels")

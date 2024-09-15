@@ -85,6 +85,7 @@ KapShinTest <- function(x, m=1, series, include = c("none","const", "trend", "bo
 
 }
 
+#'@export
 print.KapShin2006Test<-function(x, ...){
   cat("Test of unit root against stationary setar\n\n")
   

@@ -1,4 +1,4 @@
-
+#'@export
 as.matrix.ts <- function(x, ...)  {
     # A function implemented by Diethelm Wuertz
     ans = as.matrix.default(unclass(x))

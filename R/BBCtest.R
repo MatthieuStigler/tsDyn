@@ -145,6 +145,7 @@ class(ret)<-"BBC2004Test"
  return(ret)
 }
 
+#'@export
 print.BBC2004Test<-function(x, ...){
   cat("Test of unit root against stationary setar\n\n")
   

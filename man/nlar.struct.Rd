@@ -4,6 +4,7 @@
 \alias{getXXYY}
 \alias{getXX}
 \alias{getYY}
+\alias{getNUsed}
 \title{NLAR common structure}
 \description{
 NLAR common structure

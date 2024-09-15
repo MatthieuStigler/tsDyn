@@ -108,7 +108,9 @@ logLik.VECM <- function(object,r,...){
 
 
 getP <- function(object) UseMethod("getP")
+#'@export
 getP.ca.jo <- function(object) object@P
+#'@export
 getP.cajo.test <- function(object) ncol(object@Z0)
 
 #' @export
@@ -138,15 +140,19 @@ logLik.cajo.test <- function(object,r,...) logLik.ca.jo(object=object, r=r,...)
 npar  <- function (object, ...)  
   UseMethod("npar")
 
+#'@export
 npar.default<-function(object, ...) 
   length(coef(object))
 
+#'@export
 npar.nlar<-function(object, ...) 
   object$x
 
+#'@export
 npar.nlVar<-function(object, ...) 
   object$npar+object$model.specific$nthresh
 
+#'@export
 npar.VECM<-function(object, ..., r) {
   nVar<-object$k
   Rank<-if(missing(r)) object$model.specific$r else r
@@ -315,9 +321,11 @@ coef.nlVar <- function(object,  regime = c("all", "L", "M", "H"), ...){
 coefMat <- function (object, ...)  
   UseMethod("coefMat")
 
+#'@export
 coefMat.default<-function(object, ...)
   coefficients(object)
 
+#'@export
 coefMat.nlVar<-function(object,...){
   if(inherits(object, "VAR"))
     return(object$coefficients)
@@ -330,9 +338,11 @@ coefMat.nlVar<-function(object,...){
 coefVec <- function (object, ...)  
   UseMethod("coefVec")
 
+#'@export
 coefVec.default<-function(object, ...)
   coefficients(object)
 
+#'@export
 coefVec.nlVar<-function(object,...){
   coef_M <- coefMat(object)
   coef_c <- matrix(t(coef_M), ncol=1, byrow = FALSE)
@@ -347,10 +357,12 @@ toMlm<- function(x, ...) {
   UseMethod("toMlm")
 }
 
+#'@export
 toMlm.default <- function(x){
   lm(x$model)
 }
 
+#'@export
 toMlm.nlVar<-function(x){
   mod<-as.data.frame(x$model[-c(1:(x$T-x$t)),] )
   ix <- 1:x$k
@@ -361,10 +373,12 @@ toMlm.nlVar<-function(x){
 }
 
 
+
 ### Method eqNames
 eqNames <- function (object, ...)  
   UseMethod("eqNames")
 
+#'@export
 eqNames.nlVar <- function(object)
   gsub("Equation ", "", rownames(coef(object)))
 

@@ -13,7 +13,7 @@ regime(object, initVal = TRUE, timeAttr = TRUE, series = NULL, ...)
 \arguments{
 \item{object}{object of class \code{setar} or \code{nlVar}}
 
-\item{initVal}{Logical. Whether the NA initial values should be returned.
+\item{initVal}{Logical. Whether the initial NA values should be returned.
 Default to TRUE.}
 
 \item{timeAttr}{Logical. Whether the time attributes should be returned.
@@ -23,7 +23,7 @@ Default to TRUE.}
 
 \item{\dots}{additional arguments to \code{regime}}
 
-\item{discretize}{logical (default TRUE) whether the series are discretized to {1,2}, 
+\item{discretize}{logical (default TRUE) whether the series are discretized to \{1,2\}, 
 or whether regime probabilities are returned.}
 }
 \value{

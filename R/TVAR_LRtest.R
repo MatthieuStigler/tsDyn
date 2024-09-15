@@ -550,6 +550,7 @@ TVAR.LRtest <- function (data, lag=1, trend=TRUE, series, thDelay = 1:m, mTh=1, 
   return(res)
 }#End of thw whole function
 
+#'@export
 print.TVARtest<-function(x,...){
   cat("Test of linear VAR against TVAR(1) and TVAR(2)\n\nLR test:\n")
   LR<-rbind(x$LRtest.val,x$Pvalueboot)
@@ -557,6 +558,7 @@ print.TVARtest<-function(x,...){
   print(LR)
 }
 
+#'@export
 summary.TVARtest<-function(object,...){
   cat("Test of linear VAR against TVAR(1) and TVAR(2)\n\nLR test:\n")
   LR<-rbind(object$LRtest.val,object$Pvalueboot)
