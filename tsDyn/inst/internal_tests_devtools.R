@@ -22,6 +22,12 @@ devtools::check(manual = TRUE,
                 incoming = TRUE)
 
 
+## Rhb  v2
+git remote set-url origin https://github.com/MatthieuStigler/tsDyn.git
+rhub::rhub_setup()
+rhub::rhub_doctor()
+rhub::rhub_check()
+
 
 ## Online Checks
 # _R_CHECK_FORCE_SUGGESTS_
