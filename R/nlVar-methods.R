@@ -358,12 +358,12 @@ toMlm<- function(x, ...) {
 }
 
 #'@export
-toMlm.default <- function(x){
+toMlm.default <- function(x, ...){
   lm(x$model)
 }
 
 #'@export
-toMlm.nlVar<-function(x){
+toMlm.nlVar<-function(x, ...){
   mod<-as.data.frame(x$model[-c(1:(x$T-x$t)),] )
   ix <- 1:x$k
   Yt<-as.matrix(mod[,ix])
@@ -379,7 +379,7 @@ eqNames <- function (object, ...)
   UseMethod("eqNames")
 
 #'@export
-eqNames.nlVar <- function(object)
+eqNames.nlVar <- function(object, ...)
   gsub("Equation ", "", rownames(coef(object)))
 
 
