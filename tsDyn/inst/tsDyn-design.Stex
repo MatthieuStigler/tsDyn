@@ -1,0 +1,75 @@
+\documentclass[a4paper]{article}
+%\VignetteIndexEntry{tsDyn-design: tsDyn package internal design}
+\usepackage[latin9]{inputenc}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{Sweave}
+\SweaveOpts{eps=FALSE, eval=FALSE}
+\newcommand{\tsDyn}{\texttt{tsDyn} }
+\linespread{1.3}
+
+\begin{document}
+
+\begin{titlepage}
+{\centering \huge tsDyn 0.5\\}
+{\centering \Large internal design\\}\par
+\vfill\par
+{\centering DRAFT. last revised 21/05/2006 by Antonio, Fabio Di Narzo\\}
+\end{titlepage}
+
+\section{Objectives}
+The main objective was modularity. 
+One should be able to use a small subset of package funtions, without having to learn how more general things works.
+
+Easy extendibility. To add models, don't have to learn a lot of internals, which however should have a structure as clean and simple as possible.
+
+\section{Generic design issues}
+The S3 class system was adopted. Inheritance and polymorphism is exploited to ideally group together different specific models (i.e., by now, 'NLAR' models).
+
+For consistency of objects definitions, the developer should always use class constructors, if present.
+This is the case for the 'nlar' class and built-in subclasses. They all extend the 'list' class.
+
+\subsection{Using inheritance consistently: the \texttt{extend} facility}
+Inspired by the \texttt{R.oo} package, I've added the 'extend' generic for obtaining a subclass from an instantiated object, and which should be used when returning from constructors.
+The mechanism is simple: pass a properly initialized base object (hopefully by calling its constructor), the subclass name as a character string and, finally, new fields to be added to the class. The result will be an object of the base class + specified subclass, with all the necessary fields.
+
+\section{The object oriented GUI system}
+The \texttt{tcltk} package is powerful for displaying simple GUI's, but has unclean usage: you have constantly to deal with tcl/tk commands for displaying-manipulating graphical elements.
+More important, in R variables are always passed by value, not by reference, so is really difficult (if not impossible) to separate GUI design from actual code, or to add custom, pre-made GUI elements to the whole system.
+
+For this reason, a simple whole object oriented GUI system was written, on top of the tcltk package. The main  objective is to make an essential system which automates some common, repetitive tasks, without hiding the tcl/tk layer, which can always be used to perform operations not implemented by the abstract system.
+
+The system is experimental, but working by now, and doing the work it was designed for.
+
+\subsection{Dialogs representation and building}
+The system is constituted by essentially 3 classes.\\
+The main class is \texttt{Node}, from which extends \texttt{Frame} and \texttt{Widget}.
+
+Each \texttt{Node} object, in general, can have an arbitrary number of \emph{childs} of the \texttt{Node} class. You can add childs using the \texttt{add} generic:
+\begin{Scode}
+add(object, child1, child2, ...)
+\end{Scode}
+
+The \texttt{Node} class mainly deals with managing the tree structure, and has only the \texttt{add} method for modifying it. The list of childs can be accessed by \texttt{object\$childs}, the parent node can be accessed by \texttt{object\$parent}. A node can also have a \texttt{tkvar} field wich stores an eventually associated tk variable. This variable is essential for acting on tk objects after they're instantiated. For example, for closing a window whose root node is \texttt{rootNode}, you have to call \texttt{tkdestroy(rootNode\$tkvar)}.
+
+The \texttt{Node} class can be considered a virtual class: it should be a \texttt{Frame} or a \texttt{Widget}. They are the equivalent of tk Frames/Widgets. The main difference is that a Frame can have child nodes (Frames themself or Widgets), a Widget not.
+
+A tree of nodes is the representation of a complete dialog. You instantiate the corresponding tk objects by calling \texttt{build} on the node. Build calls are automatically propagated to child nodes recursively, so that you can instantiate (and show) a whole dialog by calling \texttt{build} on the root node.
+
+\subsection{Adding more widgets}
+Adding custom frames/widgets is as simple as extending the Frame/Widget class. For example, here the code for defining a button with its associated callback function:
+\begin{Scode}
+Button <- function(label, fun)
+	extend(Widget(opts=list(type="button", text=label, command=fun)), "Button")
+\end{Scode}
+
+\section{Extending the package}
+In principle, you can add functions to the package as you whish. You will only have to pay attention to name collisions.
+However, adopting the name convention already used in other similar functions is desiderable, for avoiding confusion to the final user.
+
+\subsection{Adding NLAR models}
+If you wish to add a NLAR model, consider doing this by extending the \texttt{nlar} class. This will provide some common printing-plotting-summary routines to the new model. The main argument to the \texttt{nlar} constructor is the \texttt{nlar.struct} object, whose constructor is documented among "internal" \texttt{tsDyn} objects.
+
+Consider adding also a custom \texttt{toLatex} method, as well as plot diagnostics, a summary, a print method.
+
+\end{document}

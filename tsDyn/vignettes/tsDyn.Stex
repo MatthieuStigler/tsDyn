@@ -1,0 +1,725 @@
+\documentclass[a4paper]{article}
+%\VignetteIndexEntry{tsDyn: Nonlinear autoregressive time series models in R}
+\usepackage[latin9]{inputenc}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{SweaveCustom}
+\SweaveOpts{eps=FALSE}
+\newcommand{\tsDyn}{\texttt{tsDyn} }
+\linespread{1.3}
+
+\begin{document}
+\begin{Scode}{results=hide, echo=FALSE}
+require(tsDyn)
+require(tseriesChaos)
+options(prompt=" ", encoding="LATIN-9")
+\end{Scode}
+
+\begin{titlepage}
+{\centering \huge Nonlinear autoregressive\\[0.5cm]
+time series models in R\\[0.5cm]
+using \tsDyn version 0.7\\}
+\vfill\par
+{\centering last revised 11/03/2008 by Antonio, Fabio Di Narzo\\}
+\end{titlepage}
+
+\section{Introduction} \tsDyn is an R package for the estimation of
+a number of nonlinear time series models.  The package is at an early stage, and
+may presumably change significantly in the near future. However, it is
+quite usable in the current version.
+
+Each function in the package has at least a minimal help page, with
+one or more working examples and detailed explanation of function
+arguments and returned values.  In this document we try to
+give an overall guided tour of package contents, with some
+additional notes which are generally difficult to put in the context
+of a manual.
+
+This guide is divided into 3 main sections:
+\begin{itemize}
+\item Explorative analysis tools
+\item Nonlinear autoregressive models
+\item A case study
+\end{itemize}
+
+\section{Explorative analysis}
+\subsection{Bivariate and trivariate relations}
+A first explorative analysis should include inspecting the distribution of $(x_t, x_{t-l})$ and that of $(x_t, x_{t-l_1}, x_{t-l_2})$ for some lags $l, l_1, l_2$. This can be done easily in R in a variety of ways. The \tsDyn package provide functions \texttt{autopairs} and \texttt{autotriples} for this purpose.\\
+The \texttt{autopairs} function displays, in essence, a scatterplot of time series $x_t$ versus $x_{t-lag}$. The main arguments to the function are the time series and the desired lag. The scatterplot may be also processed to produce bivariate kernel density estimations, as well as nonparametric kernel autoregression estimations. The type of output is governed by the argument \texttt{type}. Possibile values, along with their meanings, are:\\
+\begin{tabular}{rl}
+\texttt{lines} & directed lines \\
+\texttt{points} & simple scatterplot \\
+\texttt{levels} & iso-density levels \\
+\texttt{persp} & density perspective plot \\
+\texttt{image} & density image map \\
+\texttt{regression} & kernel autoregression line superposed to scatterplot\\
+\end{tabular}
+\\For kernel density and regression estimation, you can specify also the kernel window \texttt{h}. 
+A typical call to that function can be:
+\begin{Scode}{eval=FALSE}
+autopairs(x, lag=, type=, h=)
+\end{Scode}
+All arguments (except the time series \texttt{x}) have default values.
+
+Similar to \texttt{autopairs}, there is the \texttt{autotriples}
+function. This shows $x_t$ versus $(x_{t-lag1}, x_{t-lag2})$, so that
+the user has to specify time series $x$ and lags \texttt{lag1} and
+\texttt{lag2}. The scatterplot can be processed to produce kernel
+regression estimates. Plotting possibilities are:\\
+\begin{tabular}{rl} 
+\texttt{levels} & iso-values lines\\
+\texttt{persp} & perspective plot\\ 
+\texttt{image} & image map\\
+\texttt{lines} & directed lines \\
+\texttt{points} & simple scatterplot \\
+\end{tabular}
+
+\subsection{Linearity} An interesting tool for inspecting possible
+nonlinearities in the time series is the \emph{locally linear
+autoregressive fit} plot, proposed by
+Casdagli~\cite{Casdagli1991}. Suppose you think that the dynamical
+system underlying your time series is best reconstructed with
+embedding dimension $m$ and time delay $d$. Then the locally linear
+autoregressive fit plot displays the relative error made by
+forecasting time series values with linear models of the form: 
+\[x_{t+s} = \phi_0 + \phi_1 x_{t} + \ldots + \phi_m x_{t-(m-1) d} \]
+estimated on points in the sphere of radius $\epsilon$ around
+$\mathbf{x}^m_t$ for a range of values of $\epsilon$. A minimum
+attained at relatively small values of $\epsilon$ may indicate that a
+global linear model would be inappropriate for the approximation of
+the time series dynamics.  
+
+For this analysis \tsDyn proposes the function \texttt{llar}
+which accepts, among others, the following arguments:\\
+\begin{tabular}{rl} 
+\texttt{x} & time series \\ \
+\texttt{m, d, steps} & embedding parameters (see the above model formulation)\\
+\end{tabular}\\ 
+The function returns a `\texttt{llar}' object, which
+can be plotted with the generic \texttt{plot} method. So, a typical
+usage would be:\\ 
+\begin{Scode}{fig=TRUE, height=4} 
+obj <- llar(log(lynx), m=3)
+plot(obj)
+\end{Scode}
+
+However, the \texttt{obj} object can be explicitely converted in an ordinary data.frame:
+\begin{Scode}
+obj <- data.frame(obj)
+\end{Scode}
+with variables:
+\begin{Scode}
+names(obj)
+\end{Scode}
+where `\texttt{RMSE}' stands for Relative Mean Square Error, and \texttt{eps} is enough self-explaining. You can explore this object with usual R commands dedicated to data.frames, such as:
+\begin{Scode}{fig=TRUE, height=4}
+plot(RMSE~eps, data=obj, type="l", log="x")
+\end{Scode}
+
+\subsection{Tests (experimental)}
+\tsDyn implements conditional mutual independence and linearity tests as described in Manzan~\cite{Manzan2003}. Function implementations are rather basic, and little tested. Use them carefully!
+
+The \texttt{delta.test} function performs a bootstrap test of independence of $x_t$ versus $x_{t-md}$ conditional on intermediate observations $\{x_{t-d}, \ldots, x_{t-(m-1)d}\}$. The test statistic, available with the function \texttt{delta}, is based on the sample correlation integral, and calls internally the \texttt{d2} function provided by the \texttt{tseriesChaos} package. Among others things, the test requires the specification of a neighborhood window $\epsilon$.\\
+Function arguments are the time series \texttt{x}, a vector of
+embedding dimensions \texttt{m}, time delay \texttt{d}, a vector of
+neighborhood windows \texttt{eps}, the number of bootstrap
+replications \texttt{B}. However, default values are available for
+\texttt{m, d, eps} and \texttt{B}, so that a typical call can be:
+\begin{Scode}{eval=FALSE}
+delta.test(x)
+\end{Scode}
+The return value is a matrix of p-values, labelled with their associated 
+embedding dimensions and neighborhood windows (normally multiple values are tried simultaneously).
+
+The \texttt{delta.lin.test} function performs a bootstrap test of linear dipendence of $x_t$ 
+versus $x_{t-md}$ conditional on intermediate observations $\{x_{t-d}, \ldots, x_{t-(m-1)d}\}$. 
+The test statistic is available with the function \texttt{delta.lin}. The function arguments 
+and returned values are the same as those of \texttt{delta.test}.
+
+\section{Nonlinear autoregressive time series models}
+Consider the discrete-time univariate stochastic process $\{X_t\}_{t \in T}$.
+Suppose $X_t$ is generated by the map:
+\begin{equation}\label{eq:generalNLAR}
+X_{t+s} = f(X_t, X_{t-d}, \ldots, X_{t-(m-1)d}; \theta) + \epsilon_{t+s}
+\end{equation}
+with $\{\epsilon_t\}_{t \in T}$ white noise, $\epsilon_{t+s}$ indipendent w.r.t. $X_{t+s}$, and with $f$ a generic function from $\mathbf{R}^m$ to $\mathbf{R}$.
+This class of models is frequently referenced in the literature with the acronym NLAR(m), 
+which stands for \emph{NonLinear AutoRegressive} of order $m$.
+
+In \eqref{eq:generalNLAR}, we have implicitely defined the \emph{embedding dimension} $m$, the 
+\emph{time delay} $d$ and the \emph{forecasting steps} $s$. The vector $\theta$ indicates a generic vector of parameters governing the shape of $f$, which we would estimate on the basis of some empirical evidence (i.e., an observed time series $\{x_1,x_2,\ldots,x_N\}$).
+
+In \tsDyn some specific NLAR models are implemented. For a list of currently available models, type:
+\begin{Scode}
+availableModels()
+\end{Scode}
+
+Each model can be estimated using a function which takes the name of the model as indicated by 
+\texttt{availableModels}. I.e., use \texttt{linear} for fitting a linear model.
+
+All those functions returns an object of base class \texttt{nlar}, from which informations can be extracted using some common methods. Among others:
+\begin{verbatim}
+print(obj)	#prints basic infos on fitted model and estimated parameters
+summary(obj)	#if possible, shows more detailed infos and diagnostics on estimated model
+plot(obj)	#shows common diagnostic plots
+\end{verbatim}
+
+Another method that can be useful for inspecting the estimated model properties is the \texttt{predict} method:
+\begin{Scode}{eval=FALSE}
+x.new <- predict(obj, n.ahead = )
+\end{Scode}
+This function attempts to extend of \texttt{n.ahead} observations of the original time series used for estimating the model encapsulated in \texttt{obj} using the so called \emph{skeleton} of the fitted model. Assuming that from \eqref{eq:generalNLAR} we estimated $f$ as $\hat{f} = f(\cdot; \hat{\theta})$, using the time series $\mathbf{x} = \{x_1, x_2, \ldots, x_N\}$, we have:
+\begin{eqnarray*}
+\hat x_{N+1} &=& \hat{f}(x_{N-s}, x_{N - s - d}, \ldots, x_{N - s -(m-1)d})\\
+\hat x_{N+2} &=& \hat{f}(x_{N-s+1}, x_{N - s + 1 - d}, \ldots, x_{N - s + 1 -(m-1)d})\\
+\ldots \\
+\hat x_{N+S} &=& \hat{f}(x_{N-s+(S-1)}, x_{N - s + (S - 1) - d}, \ldots, x_{N - s + (S - 1) -(m-1)d})
+\end{eqnarray*}
+
+A detailed description of some actually implemented models follows.
+
+\subsection{Linear models}
+\begin{equation}\label{eq:linear}
+X_{t+s} = \phi + \phi_0 X_t + \phi_1 X_{t-d} + \ldots + \phi_m X_{t-(m-1)d} + \epsilon_{t+s}
+\end{equation}
+It's a classical AR(m) model, and its specification doesn't require additional hyper-parameters. 
+Estimation is done via CLS (Conditional Least Squares). 
+The summary command returns asymptotics standard errors for the estimated coefficients, based on the normality assumption of residuals.
+
+Note that in R there are plenty of functions for AR (and, more generally, ARMA) models estimation, with different estimation methods, such as ML, CLS, Yule-Walker, $\ldots$. If you really need to fit linear models, use these methods directly.
+
+A interesting reparametrization of the model can be done using differences, as in the ADF test for unit roots:
+
+\begin{equation}\label{eq:linearADF}
+\Delta X_{t+s} = \phi + \rho X_t + \zeta_1 \Delta X_{t-d} + \ldots + \zeta_{m-1} \Delta X_{t-(m-2)d} + \epsilon_{t+s}
+\end{equation}
+
+We have (see Hamilton~\cite{Hamilton1994}): 
+\begin{itemize}
+ \item $\rho=\phi_0+\phi_1+\ldots+\phi_m$
+\item $\zeta_i =-(\phi_{j+1}+ \phi_{j+2}+\ldots+\phi_{m}) \qquad \text{for } j=1,2, \ldots, m-1$
+\end{itemize}
+
+It has the major advantage that the stationarity condition that all the roots of the polynomial in (\ref{eq:linear}) lying in the unit root circle is in the ADF representation simply that $-1<\rho<0$. 
+
+This can be set in \tsDyn using the argument \texttt{type} to \texttt{ADF} and using one lag less in \texttt{m}:
+\begin{Scode}
+usual <- linear(lynx, m=3)
+adf<- linear(lynx, m=2, type="ADF")
+\end{Scode}
+
+Note that it is only a reparametrization, the model estimated being the same:
+
+\begin{Scode}
+ all.equal(deviance(adf), deviance(usual))
+all.equal(residuals(usual), residuals(adf))
+\end{Scode}
+
+
+
+\subsection{SETAR models}
+\begin{equation}
+X_{t+s} = \left\{
+\begin{array}{lr}
+\phi_1 + \phi_{10} X_t + \phi_{11} X_{t-d} + \ldots + \phi_{1L} X_{t-(L-1)d} + \epsilon_{t+s} & Z_t \leq \text{th}\\
+\\
+\phi_2 + \phi_{20} X_t + \phi_{21} X_{t-d} + \ldots + \phi_{2H} X_{t-(H-1)d} + \epsilon_{t+s} & Z_t > \text{th}
+\end{array} \right.
+\end{equation}
+with $Z_t$ a threshold variable. How is one to define $Z_t$? 
+Strictly speaking, in SETAR models $Z_t$ should be one of $\{X_t, X_{t-d}, X_{t-(m-1)d}\}$. 
+We can define the threshold variable $Z_t$ via the \emph{threshold delay} $\delta$, 
+such that 
+\[Z_t = X_{t-\delta d}\] 
+Using this formulation, you can specify SETAR models with:
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay= )
+\end{Scode}
+where \texttt{thDelay} stands for the above defined $\delta$, and must be an integer number between $0$ and $m-1$.\\
+For greater flexibility, you can also define the threshold variable as an arbitrary linear combination of lagged time series values:
+\[
+Z_t = \beta_1 X_t + \beta_2 X_{t-1} + \ldots + \beta_m X_{t-(m-1)d}
+\]
+In R this is implemented as follows:
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, mTh= )
+\end{Scode}
+where \texttt{mTh} stands for $\beta$, and takes the form of a vector of real coefficients of length $m$.\\
+Finally, $Z_t$ can be an external variable. This is obtained with the call:
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thVar= )
+\end{Scode}
+where \texttt{thVar} is the vector containing the threshold variable values.
+
+
+Models with two thresholds and hence three regime are aslo availabe through the argument \texttt{nthresh}, its default value being 1. 
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay=, nthresh=2)
+\end{Scode}
+
+Another hyper-parameter one can specify is the threshold value $\text{th}$, via the additional argument \texttt{th}.
+If not specified, this is estimated by fitting the model for a grid of different, by default all values of $\text{th}$, and taking the best fit as the final $\text{th}$ estimate. This is done calling internally selectSETAR() with \texttt{criterion="SSR"}. 
+
+Note that, conditional on $\{Z_t\leq \text{th}\}$, the model is linear. So, for a fixed threshold value, the CLS estimation is straightforward.
+
+The summary command for this model returns asymptotic standard errors for the estimated $\phi$ coefficients, based on the assumption that $\epsilon_t$ are normally distributed.
+
+
+The threshold variable isn't the only additional parameter governing the TAR model. One can specify the \emph{low} and \emph{high} regime autoregressive orders $L$ and $H$. These can be specified with the arguments \texttt{mL} and \texttt{mH}, respectively:
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay = , mL =, mH =)
+\end{Scode}
+If not specified, \texttt{mL} and \texttt{mH} defaults to \texttt{m}.
+One can decide also only to select a few values between \texttt{1:mL} and \texttt{1:mH}. This is possible using \texttt{ML} and \texttt{MH}. Hence to have a first regime with lag 1 and 3, the second with all 3, would be: \texttt{ML=c(1,3)} and \texttt{MH=1:3}. 
+\begin{Scode}{eval=FALSE}
+obj <- setar(x, m=, d=, steps=, thDelay = , ML =, MH =)
+\end{Scode}
+
+
+As suggested in Enders and Granger (1997)\cite{EndersGranger1998}, the threshold variable can be in differences, leading to the so-called Momentum-TAR (M-TAR). In this case, the regime switching depends not on the position of the variable at time $t-1$ but on its signs at $t-1$. Hence, on can estimate whethera variable behaves differently whether it was previously increasing or decreasing. A M-TAR can be specified setting the argument \texttt{model="MTAR"}. Note that when the number of lags \texttt{m} is equal to the delay \texttt{d}, there is one less observation in the series\footnote{This is for now handled not so properly and may result in failures in the different methods}.
+
+An interesting specification of the model in terms of another representation is possible with \texttt{type = c("level", "diff", "ADF")}. This will either set all variables in levels, in difference or as in the specification of the ADF test:
+
+Note that using \texttt{type=level} or \texttt{ADF} results in the same model fit but is a convenient way to test for a unit root, as the value of the variable in levels should be smaller than one. 
+
+
+\subsection{LSTAR models}
+The LSTAR model can be viewed as a generalization of the above defined SETAR model:
+\begin{eqnarray*}
+X_{t+s} =& 
+( \phi_1 + \phi_{10} X_t + \phi_{11} X_{t-d} + \ldots + \phi_{1L} X_{t-(L-1)d} )
+	( 1 - G(Z_t, \gamma, \text{th}) ) \\
+	 & + ( \phi_2 + \phi_{20} X_t + \phi_{21} X_{t-d} + \ldots + \phi_{2H} X_{t-(H-1)d} )
+	 G( Z_t, \gamma, \text{th}) + \epsilon_{t+s}
+\end{eqnarray*}
+with $G$ the logistic function, and $Z_t$ the threshold variable. For $Z_t$, $L$ and $H$ specification, the same convention as that of SETAR models is followed. In addition, for LSTAR models one has to specify some starting values for all the parameters to be estimated: $(\phi, \gamma, \text{th})$.
+
+Estimation is done by analytically determining $\phi_1$ and $\phi_2$ (through linear regression)
+and then minimizing residuals sum of squares with respect to $\text{th}$ and $\gamma$. These two steps are repeated
+until convergence is achieved.
+
+\subsection{Neural Network models}
+A neural network model with linear output, $D$ \emph{hidden units} and activation function $g$, is represented as:
+\begin{equation}
+x_{t+s} = \beta_0 + \sum_{j=1}^D \beta_j g( \gamma_{0j} + \sum_{i=1}^{m} \gamma_{ij} x_{t-(i-1) d} )
+\end{equation}
+
+For the implementation the \texttt{nnet} package is used, so please refer to the \texttt{nnet} package documentation for more details.
+
+The only additional argument for specifying this model is the number of hidden units \texttt{size}, which stands for the above defined $D$:
+\begin{Scode}{eval=FALSE}
+obj <- nnetTs(x, m=, d=, steps=, size=)
+\end{Scode}
+
+The estimation is done via CLS. No additional summary informations are available for this model.
+
+\subsection{Additive Autoregressive models}
+A non-parametric additive model (a GAM, Generalized Additive Model), of the form:
+\begin{equation}
+x_{t+s} = \mu + \sum_{i=1}^{m} s_i ( x_{t-(i-1) d} )
+\end{equation}
+where $s_i$ are smooth functions represented by penalized cubic regression splines. They are estimated, along with their degree of smoothing, using the \texttt{mgcv} package~\cite{Wood2004}.
+
+No additional parameters are required for this model:
+\begin{Scode}{eval=FALSE}
+obj <- aar(x, m=, d=, steps=)
+\end{Scode}
+
+Some diagnostic plots and summaries are provided for this model, adapted from those produced by \texttt{mgcv}.
+
+\subsection{Model selection}
+A common task in time series modelling is \emph{fine tuning} of the hyper-parameters. R is a complete programming language, so the user can easily define his error criterion, fit a set of models and chose the best between them. However, the \tsDyn package provides some helpful functions for this task.
+
+For SETAR models, there is the \texttt{selectSETAR} function. The time series, the embedding parameters and a vector of values for each provided hyper-parameter is passed to this function. The routine then tries to fit the model for the full grid of hyper-parameter values, and gives as output a list of the best combinations found. So, for example:
+\begin{Scode}
+x <- log10(lynx)
+selectSETAR(x, m=3, mL=1:3, mH=1:3, thDelay=0:2)
+\end{Scode}
+tries to fit $3 \times 3 \times 3 \times 5$ models, one for each combination of \texttt{mL},\texttt{mH},\texttt{thDelay} and \texttt{th}, and returns the best combinations w.r.t. the AIC criterion.
+
+Totally analogous are the \texttt{selectLSTAR} and \texttt{selectNNET} functions, for which we refer to the online documentation.
+
+\section{Case study}
+We herein analyse the Canadian lynx data set.
+This consists of annual records of the numbers of the Canadian lynx trapped in the Mackenzie River district of North-west Canada for the period 1821-1934.
+
+The time series, named \texttt{lynx}, is available in a default R installation, so one can type directly, in an R session:
+\begin{Scode}{fig=TRUE, height=4}
+str(lynx)
+summary(lynx)
+plot(lynx)
+\end{Scode}
+
+Here we will roughly follow the analysis in Tong~\cite{Tong1990}.
+
+\subsection{Explorative analysis}
+First, we log transform the data:
+\begin{Scode}
+x <- log10(lynx)
+\end{Scode}
+
+Plot of the time series and time-inverted time series:
+\begin{Scode}{fig=TRUE, height=4}
+par(mfrow=c(2,1), mar=c(0,0,0,0))
+plot(x, ax=F)
+box()
+plot(x[length(x):1], type="l", ax=F)
+box()
+\end{Scode}
+
+Nonparametric regression function of $X_t$ versus $X_{t-1}$ and of $X_t$ versus $X_{t-3}$ (kernel estimation):
+\begin{Scode}{fig=TRUE,results=hide}
+par(mfrow=c(2,1), mar=c(2,2,0,0))
+autopairs(x, lag=1, type="regression")
+autopairs(x, lag=3, type="regression")
+\end{Scode}
+
+For lag 3 (bottom plot), a linear approximation for the regression function may be questionable.
+
+The marginal histogram of data shows bimodality:
+\begin{Scode}{fig=TRUE, height=4}
+hist(x, br=13)
+\end{Scode}
+
+Global and partial autocorrelation:
+\begin{Scode}{fig=TRUE, height=4}
+par(mfrow=c(2,1), mar=c(2,4,0,0))
+acf(x)
+pacf(x)
+\end{Scode}
+
+The \texttt{tseriesChaos} package offers some other explorative tools tipycal of nonlinear time series analysis. The Average Mutual Information (see online help for further explanation):
+\begin{Scode}{fig=TRUE,results=hide}
+library(tseriesChaos)
+mutual(x)
+\end{Scode}
+
+Recurrence plot (see online help):
+\begin{Scode}{fig=TRUE, width=5, height=4}
+recurr(x, m=3, d=1, levels=c(0,0.2,1))
+\end{Scode}
+
+From this plot, deterministic cycles appears from the embedding-reconstructed underlying dynamics.
+
+Directed lines are a tipycal tool for time series explorations. The \texttt{lag.plot} function in the base \texttt{stats} package does this well:
+\begin{Scode}{fig=TRUE, results=hide, width=8, height=4}
+lag.plot(x, lags=3, layout=c(1,3))
+\end{Scode}
+
+Especially for lag 2, a cycle is again evident. Moreover, the void space in the middle is a typical argument for rejecting the bivariate normality of $(X_t, X_{t-l})$.
+
+What follows is the application of still-experimental code for testing the conditional mutual independence and linearity for lags 2 and 3:
+\begin{Scode}
+delta.test(x)
+delta.lin.test(x)
+\end{Scode}
+P-values are reported, labelled with their embedding dimensions $m$
+and \emph{window} values $\epsilon$.
+We reject conditional independence quite easily. There is some trouble instead for deciding to reject or not linearity. See Manzan~\cite{Manzan2003} for a detailed discussion on these tests.
+
+\subsection{Model selection}
+The first model proposed in the literature for these data was an AR(2): 
+\[
+X_t = 1.05 + 1.41 X_{t-1} - 0.77 X_{t-2} + \epsilon_t
+\]
+with $v(\epsilon_t)=\sigma^2=0.04591$.
+
+This can be estimated with \tsDyn using the command:
+\begin{Scode}
+mod.ar <- linear(x, m=2)
+mod.ar
+\end{Scode}
+
+As an improvement to the AR model, we may consider applying a SETAR(2; 2,2) model with threshold delay $\delta=1$. In R:
+\begin{Scode}
+mod.setar <- setar(x, m=2, mL=2, mH=2, thDelay=1)
+mod.setar
+\end{Scode}
+
+\begin{Scode}{echo=F, results=hide}
+beta <- round(coef(mod.setar),3)
+\end{Scode}
+So, the fitted model may be written as:
+\[
+X_{t+1} = \left\{\begin{array}{lr}
+\Sexpr{beta[1]} + \Sexpr{beta[2]} X_{t} \Sexpr{beta[3]} X_{t-1} & X_{t-1} \leq \Sexpr{beta[7]} \\
+\Sexpr{beta[4]} + \Sexpr{beta[5]} X_{t} \Sexpr{beta[6]} X_{t-1} & X_{t-1} > \Sexpr{beta[7]} \\
+\end{array}\right.
+\]
+
+For an automatic comparison, we may fit different linear and nonlinear models and directly compare some measures of their fit:
+\begin{Scode}{results=hide, echo=FALSE}
+set.seed(10)
+\end{Scode}
+\begin{Scode}
+mod <- list()
+mod[["linear"]] <- linear(x, m=2)
+mod[["setar"]] <- setar(x, m=2, thDelay=1)
+mod[["lstar"]] <- lstar(x, m=2, thDelay=1)
+mod[["nnetTs"]] <- nnetTs(x, m=2, size=3)
+mod[["aar"]] <- aar(x, m=2)
+\end{Scode}
+
+Now the \texttt{mod} object contains a labelled list of fitted \texttt{nlar} models.
+As an example, we can compare them in term of the AIC and MAPE index:
+\begin{Scode}
+sapply(mod, AIC)
+sapply(mod, MAPE)
+\end{Scode}
+
+From this comparison, the SETAR model seems to be the best.
+
+More detailed diagnostics can be extracted:
+\begin{Scode}
+summary(mod[["setar"]])
+\end{Scode}
+
+More diagnostic plots can be displayed using the command:
+\begin{Scode}{eval=FALSE}
+plot(mod[["setar"]])
+\end{Scode}
+
+\subsection{Out-of-sample forecasting}
+Fit models on first 104 observations:
+
+\begin{Scode}
+set.seed(10)
+mod.test <- list()
+x.train <- window(x, end=1924)
+x.test <- window(x, start=1925)
+mod.test[["linear"]] <- linear(x.train, m=2)
+mod.test[["setar"]] <- setar(x.train, m=2, thDelay=1)
+mod.test[["lstar"]] <- lstar(x.train, m=2, thDelay=1, trace=FALSE, control=list(maxit=1e5))
+mod.test[["nnet"]] <- nnetTs(x.train, m=2, size=3, control=list(maxit=1e5))
+mod.test[["aar"]] <- aar(x.train, m=2)
+\end{Scode}
+
+Compare forecasts with real last 10 observed values:
+\begin{Scode}{fig=TRUE, height=6}
+frc.test <- lapply(mod.test, predict, n.ahead=10)
+plot(x.test,ylim=range(x))
+for(i in 1:length(frc.test))
+	lines(frc.test[[i]], lty=i+1, col=i+1)
+
+legend(1925,2.4, lty=1:(length(frc.test)+1), col=1:(length(frc.test)+1), legend=c("observed",names(frc.test)))
+\end{Scode}
+
+From this visual comparison, the SETAR(2; 2,2) model seems to be one of the bests.
+
+\subsection{Inspecting model skeleton}
+\begin{Scode}{echo=FALSE, results=hide}
+par(cex=0.6)
+\end{Scode}
+An interesting task can be inspecting the fitted model skeleton.
+
+This can be achieved by comparing the forecasting results under each model.
+\begin{Scode}{fig=TRUE, width=4, height=4}
+x.new <- predict(mod[["linear"]], n.ahead=100)
+lag.plot(x.new, 1)
+\end{Scode}
+
+A fixed point, i.e. the only possible stationary solution with a linear model.
+\begin{Scode}{fig=TRUE, width=3.5, height=3.5}
+x.new <- predict(mod[["setar"]], n.ahead=100)
+lag.plot(x.new, 1)
+\end{Scode}
+
+A stable periodic cycle.
+
+\begin{Scode}{fig=TRUE, width=3.5, height=3.5}
+x.new <- predict(mod[["nnetTs"]], n.ahead=100)
+lag.plot(x.new, 1)
+\end{Scode}
+
+Appears to be a quasiperiodic cycle lying on an invariant curve.
+
+\section{Sensitivity on initial conditions}
+In the previous section we observed skeletons with cyclical or limit fixed point behaviour.
+
+Neural networks and SETAR models can explain also different types of attractors.
+For this data set, Tong~\cite{Tong1990} showed that particular types of SETAR models 
+can yeld to fixed limit points as well as unstable orbits and \emph{possibly chaotic} systems.
+
+For example, a fixed limit point:
+\begin{Scode}{fig=TRUE, width=4, height=4}
+mod.point <- setar(x, m=10, mL=3, mH=10, thDelay=0, th=3.12)
+lag.plot(predict(mod.point, n.ahead=100))
+\end{Scode}
+
+Unstable orbit:
+\begin{Scode}{fig=TRUE, width=4, height=4}
+mod.unstable <- setar(x, m=9, mL=9, mH=6, thDelay=4, th=2.61)
+lag.plot(predict(mod.unstable, n.ahead=100))
+\end{Scode}
+
+Possibly chaotic systems:
+\begin{Scode}{fig=TRUE, width=4, height=4}
+mod.chaos1 <- setar(x, m=5, mL=5, mH=3, thDelay=1, th=2.78)
+lag.plot(predict(mod.chaos1, n.ahead=100))
+\end{Scode}
+\begin{Scode}{fig=TRUE, width=4, height=4}
+mod.chaos2 <- setar(x, m=5, mL=5, mH=3, thDelay=1, th=2.95)
+lag.plot(predict(mod.chaos2, n.ahead=100))
+\end{Scode}
+
+For a given fitted model, we can try estimating the maximal Lyapunov exponent with the Kantz algorithm 
+using the \texttt{lyap\_k} function in the \texttt{tseriesChaos} package~\cite{tseriesChaos2005,TISEAN1999}. 
+This function takes as input an observed time series, so we can procede as follows:
+\begin{enumerate}
+\item generate N observations from the model
+\item add a little observational noise (otherwise the Kantz algorithm will fail)
+\item apply the \texttt{lyap\_k} function to the generated time series
+\end{enumerate}
+
+Follows the R code for analysing the selected SETAR(2; 2,2) model of the previous paragraph and the possibly chaotic 
+SETAR(2; 5,3) just seen above.
+\begin{Scode}{fig=TRUE, height=4}
+N <- 1000
+x.new <- predict(mod[["setar"]], n.ahead=N)
+x.new <- x.new + rnorm(N, sd=sd(x.new)/100)
+ly <- lyap_k(x.new, m=2, d=1, t=1, k=2, ref=750, s=200, eps=sd(x.new)/10)
+plot(ly)
+\end{Scode}
+
+There is no scaling region, so the maximal Lyapunov exponent can assumed to be $\leq 0$.
+\begin{Scode}{fig=TRUE, height=4}
+x.new <- predict(mod.chaos2, n.ahead=N)
+x.new <- x.new + rnorm(N, sd=sd(x.new)/100)
+ly <- lyap_k(x.new, m=5, d=1, t=1, k=2, ref=750, s=200, eps=sd(x.new)/10)
+plot(ly)
+\end{Scode}
+
+Here there is a scaling region. The final $\lambda$ estimate for this time series is the slope of the plotted curve in that region:
+\begin{Scode}
+lyap(ly,start=6,end=70)
+\end{Scode}
+
+At this point a natural question can be: 
+\emph{why not use directly the original time series as input to \texttt{lyap\_k} instead of model-generated observations}?
+The answer here is that we have a too short time series for succesfully applying the Kantz algorithm, 
+so a preliminary modelling for generating more observations is necessary.
+
+\section{Annex A: Implementation details}
+
+This section is devoted to document some points in the the implementation and is intended rather for developers. Users will hopefully not need it. 
+
+\subsection{nlar.struct}
+Until Version 0.6 the building of data was organized as follows:
+\begin{itemize}
+ \item \texttt{setar}, \texttt{star} and others all called \texttt{nlar.struct}
+\item \texttt{nlar.struct} calls \texttt{embedd} from package \texttt{tseriesChaos}, and stores it, returning xx, yy, m and d after some checks. 
+
+\begin{verbatim}
+xxyy <- embedd(x, lags=c((0:(m-1))*(-d), steps) )
+
+  extend(list(), "nlar.struct",
+         x=x, m=m, d=d, steps=steps, series=series,
+         xx=xxyy[,1:m,drop=FALSE], yy=xxyy[,m+1], n.used=length(x))
+ 
+\end{verbatim}
+\item But to use xx and yy the values are recomputed with new function \texttt{getXX(str)} used on str instead of using the returned value \texttt{str\$xx}. It has been implemented as a class:
+\begin{verbatim}
+ getXXYY <- function(obj, ...) UseMethod("getXXYY")
+
+getXXYY.nlar.struct <- function(obj, ...) {
+	x <- obj$x
+	m <- obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getXX <- function(obj, ...)
+	getXXYY(obj,...)[ , 1:obj$m , drop=FALSE]
+
+getYY <- function(obj, ...)
+	getXXYY(obj, ...)[ , obj$m+1]
+
+\end{verbatim}
+\end{itemize}
+
+\paragraph{Extension to MTAR models and ADF specification}
+
+Extension to MTAR and ADF required use of both levels and lags in the same specification. That means, one needs also to obtain the differenced series. This will affect the end sample size.
+
+In the usual case, end sample size $t$ with be equal to $t=T-m$. It would be different (T-m-thDelay) with $thDelay>m$ but it is excluded. 
+In some cases, the MTAR and ADF specification will lead to reduce the size of the end sample with 1 less observation, if
+\begin{itemize}
+ \item MTAR: the lag of the transition delay in the MTAR is: $thDelay==(m-1)$
+\item ADF and diff model: allways
+\end{itemize}
+
+To do this, some workarounds were needed, that are for now rather unsatisfactory. Similar functions as \texttt{getXX} and \texttt{getYY }have been created for the lags, see:
+\begin{verbatim}
+ getdXXYY <- function(obj, ...) UseMethod("getdXXYY")
+
+getdXXYY.nlar.struct <- function(obj,same.dim=FALSE, ...) {
+	x <- obj$x
+	m<-if(same.dim) obj$m-1 else obj$m
+	d <- obj$d
+	steps <- obj$steps
+	embedd(x, lags=c((0:(m-1))*(-d), steps) )
+}
+
+getdXX <- function(obj, ...)
+	diff(getdXXYY(obj,...))[ , 1:obj$m , drop=FALSE]
+
+getdYY <- function(obj, ...)
+	diff(getdXXYY(obj, ...))[ , obj$m+1]
+
+getdX1 <- function(obj, ...)
+	getdXXYY(obj,...)[ -1, 1, drop=FALSE]
+\end{verbatim}
+
+But when there is one less observation (see cases above), problems arise. So setar looks like:
+\begin{verbatim}
+   SeqmaxTh<-seq_len(maxTh+1)
+
+if(model=="TAR"){
+      if(type =="level")
+	z <- getXX(str)[,SeqmaxTh]
+      else
+	z<-getXX(str)[-1,SeqmaxTh]
+    }
+    else{
+      if(max(thDelay)==m-1){
+	if(type =="level"){
+	  z<-getdXX(str)[, SeqmaxTh]
+	  xx<-xx[-1,, drop=FALSE]
+	  yy<-yy[-1]
+	  str$xx<-xx
+	  str$yy<-yy
+	}
+	else 
+	  z<-getdXX(str)[, SeqmaxTh]
+      }
+      else{
+	if(type =="level")
+	  z<-getdXX(str,same.dim=TRUE)[,SeqmaxTh]
+	else
+	  z<-getdXX(str)[,SeqmaxTh]
+      }
+    }
+\end{verbatim}
+
+The biggest problem is that sometimes the xx vector need to be cut...
+\begin{verbatim}
+ 	z<-getXX(str)[-1,SeqmaxTh]
+\end{verbatim}
+
+And so there are currently some bugs arising:
+\begin{Scode}{eval=FALSE}
+plot(setar(lynx, m=1, model="MTAR"))
+plot(setar(lynx, m=3, type="ADF"))
+ #both won't work
+\end{Scode}
+
+
+\paragraph{Adding arguments ML, MM}
+Args \texttt{ML}, \texttt{MH} (and \texttt{MM} when \texttt{nthresh}$=2$) have been added to allow to have holes in the lag structure. They are surely conflicting with arg \texttt{d}, that is, if arg \texttt{d} is not 1. 
+
+\nocite{*}
+\bibliographystyle{amsplain}
+
+\bibliography{bib}
+\end{document}

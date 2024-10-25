@@ -1,0 +1,21 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{SweaveCustom}{}
+
+\RequirePackage{ifthen}
+\newboolean{Sweave@gin}
+\setboolean{Sweave@gin}{true}
+
+\DeclareOption{nogin}{\setboolean{Sweave@gin}{false}}
+\ProcessOptions
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage{graphicx,ae,fancyvrb}
+\IfFileExists{upquote.sty}{\RequirePackage{upquote}}{}
+
+\ifthenelse{\boolean{Sweave@gin}}{\setkeys{Gin}{width=0.8\textwidth}}{}%
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl,frame=lines,label=R code,labelposition=topline,fontsize=\small}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{frame=lines,label=output,labelposition=topline,fontsize=\small}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl,frame=lines,label=R code,labelposition=topline}
+
+\newenvironment{Schunk}{}{}

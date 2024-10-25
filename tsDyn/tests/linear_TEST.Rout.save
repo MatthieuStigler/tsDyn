@@ -1,0 +1,151 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> suppressWarnings(RNGversion("3.5.3"))
+> 
+> ### linear
+> grid <-  expand.grid(include = c( "const", "trend","none", "both"),
++                      lag = 1:3)
+> all_lin <- mapply(linear, include = as.character(grid$include),  m = grid$lag, MoreArgs = list(x = lh),
++                   SIMPLIFY = FALSE)
+> names(all_lin) <-  paste(grid$include, "l", grid$lag, sep="_")
+> lapply(all_lin, coef)
+$const_l_1
+    const     phi.1 
+0.9998652 0.5859870 
+
+$trend_l_1
+      trend       phi.1 
+0.008879993 0.895448654 
+
+$none_l_1
+    phi.1 
+0.9836385 
+
+$both_l_1
+      const       trend       phi.1 
+0.960001423 0.007328862 0.529055888 
+
+$const_l_2
+     const      phi.1      phi.2 
+ 1.2281886  0.7110028 -0.2217373 
+
+$trend_l_2
+       trend        phi.1        phi.2 
+ 0.009393203  0.896697060 -0.004950298 
+
+$none_l_2
+     phi.1      phi.2 
+0.95299035 0.03115904 
+
+$both_l_2
+       const        trend        phi.1        phi.2 
+ 1.217407570  0.009017984  0.659082417 -0.254184319 
+
+$const_l_3
+      const       phi.1       phi.2       phi.3 
+ 1.53752119  0.65782378 -0.06581322 -0.23483547 
+
+$trend_l_3
+      trend       phi.1       phi.2       phi.3 
+ 0.00960834  0.89440447 -0.06374027  0.06254620 
+
+$none_l_3
+      phi.1       phi.2       phi.3 
+ 0.94986030 -0.05445084  0.09133812 
+
+$both_l_3
+      const       trend       phi.1       phi.2       phi.3 
+ 1.58894725  0.01110629  0.58395447 -0.07693093 -0.27902573 
+
+> 
+> ## compare with ar?
+> ar_1_noMean <- ar(lh, order.max =1, demean = FALSE, method = "ols")
+> ar_1_Mean <- ar(lh, order.max =1, demean = TRUE, method = "ols")
+> 
+> ar_2_noMean <- ar(lh, aic = FALSE, order.max =2, demean = FALSE, method = "ols")
+> ar_2_Mean <- ar(lh, aic = FALSE, order.max =2, demean = TRUE, method = "ols")
+> 
+> ## compare coefs
+> all.equal(coef(all_lin[["const_l_1"]])[2], ar_1_Mean$ar[,,1], check.attributes = FALSE)
+[1] TRUE
+> all.equal(coef(all_lin[["none_l_1"]]), ar_1_noMean$ar[,,1], check.attributes = FALSE)
+[1] TRUE
+> 
+> all.equal(coef(all_lin[["const_l_2"]])[-1], ar_2_Mean$ar[,,1], check.attributes = FALSE)
+[1] TRUE
+> all.equal(coef(all_lin[["none_l_2"]]), ar_2_noMean$ar[,,1], check.attributes = FALSE)
+[1] TRUE
+> 
+> ## compare means: intercept in ar is (1-phi)(diff means), ch Hamilton 3.4.35
+> ## diff means is difference between estimated mean, and c/(1- phi)
+> linear_1_Mean <-  all_lin[["const_l_1"]] 
+> comp_means <- function(ar, linear) {
++   ar_empimean <- ar$x.mean  
++   ar_int <- ar$x.intercept  
++   lin_coefs <- coef(linear)
++   lin_LR_mean <-  ar_mean(linear)
++   diff_means <- lin_LR_mean - ar_empimean
++   res <- c(ar_int = ar_int, diff = (1- sum(lin_coefs[-1])) * diff_means)
++   list(res, check = all.equal(res[1], res[2], check.attributes = FALSE))
++ }
+> comp_means(ar = ar_1_Mean, linear = linear_1_Mean)$check
+[1] TRUE
+> comp_means(ar = ar_2_Mean, linear = all_lin[["const_l_2"]] )$check
+[1] TRUE
+> 
+> 
+> ## predict?
+> all_lin_const <- all_lin[grep("const", names(all_lin))]
+> all_lin_pred <- lapply(all_lin_const, predict, n.ahead = 5)
+> 
+> ar_1_Mean_pred <- predict(ar_1_Mean, n.ahead = 5)$pred
+> 
+> all.equal(ar_1_Mean_pred, all_lin_pred[["const_l_1"]], check.attributes = TRUE)
+[1] TRUE
+> 
+> ## ar_mean
+> all_lin_noTrend <- all_lin[grep("const|none", names(all_lin))]
+> sapply(all_lin_noTrend, ar_mean)
+const_l_1.ar_mean  none_l_1.ar_mean const_l_2.ar_mean  none_l_2.ar_mean 
+         2.415057          0.000000          2.404750          0.000000 
+const_l_3.ar_mean  none_l_3.ar_mean 
+         2.391820          0.000000 
+> 
+> 
+> ## charac root
+> do.call("rbind", lapply(all_lin_noTrend, charac_root))
+            root value_all
+const_l_1      1  1.706523
+none_l_1       1  1.016634
+const_l_2.1    1  2.123638
+const_l_2.2    2  2.123638
+none_l_2.1     1  1.015604
+none_l_2.2     2 31.600320
+const_l_3.1    1  1.360258
+const_l_3.2    2  2.301410
+const_l_3.3    3  1.360258
+none_l_3.1     1  1.011858
+none_l_3.2     2  3.289381
+none_l_3.3     3  3.289381
+> 
+> proc.time()
+   user  system elapsed 
+  1.585   0.060   1.642 

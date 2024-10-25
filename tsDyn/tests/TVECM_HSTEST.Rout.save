@@ -1,0 +1,140 @@
+
+R version 3.5.2 (2018-12-20) -- "Eggshell Igloo"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(tsDyn)
+> suppressWarnings(RNGversion("3.5.3"))
+> 
+> data(zeroyld)
+> data<-zeroyld
+> 
+> ## Test against paper:
+> all.equal(round(TVECM.HStest(data, lag=1, intercept=TRUE, nboot=0)$stat,4),20.5994)
+[1] TRUE
+> all.equal(round(TVECM.HStest(data, lag=2, intercept=TRUE, nboot=0)$stat,4),28.2562 )
+[1] TRUE
+> all.equal(round(TVECM.HStest(data, lag=3, intercept=TRUE, nboot=0)$stat,4), 29.9405 )
+[1] "Mean relative difference: 0.01292669"
+> 
+> 
+> ## prob:
+> all.equal(round(TVECM.HStest(data, lag=2, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),29.5295)
+[1] "Mean relative difference: 0.005730698"
+> all.equal(round(TVECM.HStest(data, lag=1, intercept=TRUE, nboot=0, fixed.beta=1)$stat,4),21.5586 )
+[1] "Mean relative difference: 0.02895189"
+>   
+> ## Test: no boot
+> TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
+> TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+> TVECM.HStest(data, lag=1, intercept=TRUE, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 20.59942	(Maximized for threshold value: -0.04805437 )
+> TVECM.HStest(data, lag=1, intercept=FALSE, nboot=0)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+> 
+> 
+> ## Test: boot
+> set.seed(123)
+> t1<-TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5)
+> set.seed(123)
+> t2<-TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5)
+> set.seed(123)
+> t3<-TVECM.HStest(data, lag=1, intercept=TRUE, ngridTh=50, nboot=5, boot.type="ResBoot")
+> set.seed(123)
+> t4<-TVECM.HStest(data, lag=1, intercept=FALSE, ngridTh=50, nboot=5, boot.type="ResBoot")
+> 
+> ## Test: methodst1
+> summary(t1)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
+P-Value:	 0 		( Fixed regressor bootstrap )
+
+Critical values:
+   0.90%   0.95%    0.99%
+ 15.5439 15.6446 15.72516
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> plot(t1)
+> plot(t1, which="Density")
+> plot(t1, which="LM values")
+> t2
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0 		( Fixed regressor bootstrap )
+> summary(t2)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0 		( Fixed regressor bootstrap )
+
+Critical values:
+    0.90%    0.95%    0.99%
+ 14.69722 14.97985 15.20596
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> t3
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
+P-Value:	 0 		( Residual Bootstrap )
+> summary(t3)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 18.2336	(Maximized for threshold value: -0.1002829 )
+P-Value:	 0 		( Residual Bootstrap )
+
+Critical values:
+   0.90%    0.95%    0.99%
+ 16.3054 17.18791 17.89392
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> t4
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0.2 		( Residual Bootstrap )
+> summary(t4)
+## Test of linear versus threshold cointegration of Hansen and Seo (2002) ##
+
+Test Statistic:	 16.06721	(Maximized for threshold value: -0.4225114 )
+P-Value:	 0.2 		( Residual Bootstrap )
+
+Critical values:
+   0.90%    0.95%    0.99%
+ 16.3054 17.18791 17.89392
+Number of bootstrap replications:	 5 
+
+Cointegrating value (estimated under restricted linear model): -1.022065 
+> 
+> proc.time()
+   user  system elapsed 
+  3.866   0.136   6.678 
