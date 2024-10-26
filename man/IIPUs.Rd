@@ -13,7 +13,7 @@ graph is exactly the same.
 \source{
 Hansen (1999) Testing for linearity, Journal of Economic Surveys,
 Volume 13, Number 5, December 1999 , pp. 551-576(26) available at:
-\url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
+\url{https://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 }
 \usage{
 IIPUs

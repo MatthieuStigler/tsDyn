@@ -99,7 +99,7 @@ sun <- (sqrt(sunspot.year + 1) - 1) * 2
 \references{
 Hansen (1999) Testing for linearity, Journal of Economic
 Surveys, Volume 13, Number 5, December 1999 , pp. 551-576(26) available at:
-\url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
+\url{https://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 }
 \seealso{
 \code{\link{TVAR.LRtest}} for the multivariate version.

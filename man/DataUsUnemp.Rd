@@ -10,7 +10,7 @@
   A monthly time series of class \code{ts} starting in January 1956 and ending in August 1999.}
 \source{
 Caner and Hansen,Threshold autoregression with a unit root Econometrica, 2001, 69, 1555-1596
-available at: \url{http://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
+available at: \url{https://www.ssc.wisc.edu/~bhansen/papers/cv.htm}
 }
 \keyword{datasets}
 \concept{Testing for linearity}

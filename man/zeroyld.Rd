@@ -14,7 +14,7 @@ zeroyldMeta
 \source{
 Hansen, B. and Seo, B. (2002), Testing for two-regime threshold cointegration in vector error-correction models, Journal of Econometrics, 110, pages 293 - 318
 
-The data can be downloaded from: \url{http://www.ssc.wisc.edu/~bhansen/progs/joe_02r.zip}.
+The data can be downloaded from: \url{https://www.ssc.wisc.edu/~bhansen/progs/joe_02r.zip}.
 
 The authors themselves took the data from the webpage of Huston McCulloch:
 \url{https://www.asc.ohio-state.edu/mcculloch.2/ts/mcckwon/mccull.htm}
