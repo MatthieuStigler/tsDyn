@@ -20,11 +20,9 @@ install.packages("tsDyn")
 
 ## Development version
 
-Most of the development is hosted under the branch called
-[Dev94](https://github.com/MatthieuStigler/tree/Dev94). To install
-that version, use:
+You can download the version from github using:
 
 ``` r
 library(remotes)
-remotes::install_github("MatthieuStigler/tsDyn", ref = "dev")
+remotes::install_github("MatthieuStigler/tsDyn")
 ```
