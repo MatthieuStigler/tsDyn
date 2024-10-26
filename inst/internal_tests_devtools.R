@@ -12,7 +12,7 @@ usethis::use_package("tidyr", "Suggests")
 # usethis::use_cran_comments(open = FALSE)
 
 ## URL checks:
-url_check(".")
+urlchecker::url_check(".")
 # curlGetHeaders("https://faculty.chicagobooth.edu/ruey-s-tsay/research/analysis-of-financial-time-series-2nd-edition")
 
 
