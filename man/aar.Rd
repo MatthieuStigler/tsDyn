@@ -32,7 +32,7 @@ aar(x, m, d=1, steps=d, series)
 }
 \value{
   An object of class \code{nlar}, subclass \code{aar}, i.e. a list
-  with mostly internal structures for the fitted \code{\link{gam}} object.
+  with mostly internal structures for the fitted \code{\link[mgcv]{gam}} object.
 }
 \author{ Antonio, Fabio Di Narzo }
 \examples{
