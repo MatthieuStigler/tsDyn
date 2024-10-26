@@ -1,9 +1,0 @@
-^data-raw$
-^man-roxygen$
-^.*\.Rproj$
-^\.Rproj\.user$
-^revdep$
-^README\.Rmd$
-^cran-comments\.md$
-^CRAN-RELEASE$
-^CRAN-SUBMISSION$
