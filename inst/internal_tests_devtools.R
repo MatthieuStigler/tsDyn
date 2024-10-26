@@ -22,11 +22,19 @@ devtools::check(manual = TRUE,
                 incoming = TRUE)
 
 
+devtools::check_win_devel()
+devtools::check_win_release()
+devtools::check_win_oldrelease()
+
 ## Rhb  v2
 # git remote set-url origin https://github.com/MatthieuStigler/tsDyn.git
 rhub::rhub_setup()
 rhub::rhub_doctor()
-rhub::rhub_check()
+
+rhub::rhub_platforms()
+
+rhub::rhub_check(platforms = "linux")
+rhub::rhub_check(platforms = c("windows", "macos"))
 
 
 ## Online Checks
@@ -39,9 +47,7 @@ devtools::check_rhub(interactive = FALSE,
                      platforms = my_platf,
                      env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false", ## rgl not working on Ubuntu Linux 16.04 LTS, R-release, GCC
                                   `_R_CHECK_CRAN_INCOMING_USE_ASPELL_` = "true"))
-devtools::check_win_devel()
-devtools::check_win_release()
-devtools::check_win_oldrelease()
+
 
 devtools::spell_check(use_wordlist = TRUE)
 
