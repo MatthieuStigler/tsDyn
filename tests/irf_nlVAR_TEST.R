@@ -8,8 +8,8 @@ suppressWarnings(RNGversion("3.5.3"))
 ############################
 ### Load data
 ############################
-path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
-if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+
+path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
 
 models_multivariate <- readRDS(path_mod_multi)
 

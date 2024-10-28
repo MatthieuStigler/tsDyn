@@ -24,8 +24,7 @@ n.shock = 20
 path_mod_uni <- system.file("inst/testdata/models_univariate.rds", package = "tsDyn")
 if(path_mod_uni=="") path_mod_uni <- system.file("testdata/models_univariate.rds", package = "tsDyn")
 
-path_mod_multi <- system.file("inst/testdata/models_multivariate.rds", package = "tsDyn")
-if(path_mod_multi=="") path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
+path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
 
 models_ar_setar <- readRDS(path_mod_uni) %>% 
   filter(model %in% c("linear", "setar"))
