@@ -1,3 +1,7 @@
+## Resubmission
+
+This is a resubmission from version 11.0.5, now submitting with version 11.0.5.1. 
+This hopefully solves the previous issue, or at least allows for better diagnostic of the problem by switching to testthat. 
 
 
 ## Test environments
