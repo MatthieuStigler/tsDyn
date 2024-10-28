@@ -12,7 +12,8 @@ if(getRversion()>="4.3.0"){
   file <- "models_multivariate_R_less_4_3.rds"
 }
 
-path_mod_multi <- testthat::test_path("testdata", file)
+# path_mod_multi <- testthat::test_path("testdata", file)
+path_mod_multi <- system.file("testdata/models_multivariate.rds", package = "tsDyn")
 models_multivariate <- readRDS(path_mod_multi)
 
 
