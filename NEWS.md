@@ -1,3 +1,7 @@
+## tsDyn 11.0.5.2
+ * By  Matthieu Stigler (2024-10-29)
+ * Fix CRAN issues: disable over-sensitive tests
+
 ## tsDyn 11.0.5.1
  * By  Matthieu Stigler (2024-10-28)
  * Fix CRAN issues: use now teststhat for one file
