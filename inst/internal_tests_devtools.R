@@ -29,6 +29,8 @@ devtools::check_win_devel()
 devtools::check_win_release()
 devtools::check_win_oldrelease()
 
+devtools::check_mac_release()
+
 ## Rhb  v2
 # git remote set-url origin https://github.com/MatthieuStigler/tsDyn.git
 rhub::rhub_setup()
