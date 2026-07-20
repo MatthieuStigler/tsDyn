@@ -1,3 +1,7 @@
+## tsDyn 11.0.6
+ * By  Matthieu Stigler (2026-07-20)
+ * Fix minor issues.
+ 
 ## tsDyn 11.0.5.2
  * By  Matthieu Stigler (2024-10-29)
  * Fix CRAN issues: disable over-sensitive tests
