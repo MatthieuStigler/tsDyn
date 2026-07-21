@@ -74,5 +74,6 @@ cat(devtools::spell_check(use_wordlist = TRUE)$word, sep = "\n")
 
 ## Release
 devtools::release_checks()
-devtools::release()
+
+usethis::use_release_issue() ## newer for # devtools::release()
 # direct: devtools::submit_cran()
