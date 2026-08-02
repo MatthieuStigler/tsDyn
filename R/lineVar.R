@@ -207,7 +207,7 @@ lineVar<-function(data, lag, r=1,include = c( "const", "trend","none", "both"), 
         cointLM<-lm(y[,1] ~  y[,-1]-1)
       } else {
         cointLM<-lm(y[,1] ~  y[,-1]-1+ LRplus)
-        Xminus1 <- cbind(Xminus1, tail(LRplus,nrow(Xminus1)))
+        Xminus1 <- cbind(Xminus1, matrix(tail(LRplus,nrow(Xminus1)), ncol=1))
       }
       
       betaLT<-coint<-c(1,-cointLM$coef)
