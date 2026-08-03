@@ -1,5 +1,5 @@
 ## tsDyn 11.0.6
- * By  Matthieu Stigler (2026-07-20)
+ * By  Matthieu Stigler (2026-08-03)
  * Fix minor issues.
  
 ## tsDyn 11.0.5.2
