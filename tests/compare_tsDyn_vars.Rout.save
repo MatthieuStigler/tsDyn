@@ -1,7 +1,7 @@
 
-R version 4.2.2 Patched (2022-11-10 r83330) -- "Innocent and Trusting"
-Copyright (C) 2022 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R Under development (unstable) (2026-11-02 r90827) -- "Unsuffered Consequences"
+Copyright (C) 2026 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -137,30 +137,20 @@ Loading required package: lmtest
 > sapply(all_models, comp_LL)
   l1_co   l3_co   l1_bo   l3_bo l1_LRco l3_LRco l1_LRtr l3_LRtr 
    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
-> sapply(models_noLR, comp_IRF)
-     l1_co                                                     
-[1,] "Component \"e\": Mean relative difference: 0.03872391"   
-[2,] "Component \"prod\": Mean relative difference: 0.03872391"
-[3,] "Component \"rw\": Mean relative difference: 0.03872391"  
-[4,] "Component \"U\": Mean relative difference: 0.03872391"   
-     l3_co                                                    
-[1,] "Component \"e\": Mean relative difference: 0.1009638"   
-[2,] "Component \"prod\": Mean relative difference: 0.1009638"
-[3,] "Component \"rw\": Mean relative difference: 0.1009638"  
-[4,] "Component \"U\": Mean relative difference: 0.1009638"   
-     l1_bo                                                     
-[1,] "Component \"e\": Mean relative difference: 0.04562581"   
-[2,] "Component \"prod\": Mean relative difference: 0.04562581"
-[3,] "Component \"rw\": Mean relative difference: 0.04562581"  
-[4,] "Component \"U\": Mean relative difference: 0.04562581"   
-     l3_bo                                                    
-[1,] "Component \"e\": Mean relative difference: 0.1094004"   
-[2,] "Component \"prod\": Mean relative difference: 0.1094004"
-[3,] "Component \"rw\": Mean relative difference: 0.1094004"  
-[4,] "Component \"U\": Mean relative difference: 0.1094004"   
-> sapply(models_noLR, comp_IRF, ortho = FALSE)
-l1_co l3_co l1_bo l3_bo 
- TRUE  TRUE  TRUE  TRUE 
+> roundAll.Equal(sapply(models_noLR, comp_IRF), round=5) # BLAS-dependent digits (MKL)
+     l1_co                               l3_co                              
+[1,] "Mean relative difference: 0.03872" "Mean relative difference: 0.10096"
+[2,] "Mean relative difference: 0.03872" "Mean relative difference: 0.10096"
+[3,] "Mean relative difference: 0.03872" "Mean relative difference: 0.10096"
+[4,] "Mean relative difference: 0.03872" "Mean relative difference: 0.10096"
+     l1_bo                               l3_bo                             
+[1,] "Mean relative difference: 0.04563" "Mean relative difference: 0.1094"
+[2,] "Mean relative difference: 0.04563" "Mean relative difference: 0.1094"
+[3,] "Mean relative difference: 0.04563" "Mean relative difference: 0.1094"
+[4,] "Mean relative difference: 0.04563" "Mean relative difference: 0.1094"
+> roundAll.Equal(sapply(models_noLR, comp_IRF, ortho = FALSE), round=5)
+ l1_co  l3_co  l1_bo  l3_bo 
+"TRUE" "TRUE" "TRUE" "TRUE" 
 > sapply(all_models, comp_FEVD)
   l1_co   l3_co   l1_bo   l3_bo l1_LRco l3_LRco l1_LRtr l3_LRtr 
    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE    TRUE 
@@ -234,7 +224,7 @@ l3_LRtr TRUE TRUE TRUE TRUE TRUE
 > 
 > all.equal(deviance(vecm_Rrest_tsD),sum(deviance(cajorls(vecm_Rrest_var)[[1]])), check.attributes=FALSE)
 [1] TRUE
-> all.equal(-2*(logLik(vecm_Rrest_tsD)-logLik(vecm_l1_co_tsD)), vecm_Rrest_var@teststat)
+> all.equal(-2*(logLik(vecm_Rrest_tsD)-logLik(vecm_l1_co_tsD)), vecm_Rrest_var@teststat, tolerance = lowlowtol) # 2.4e-08 with MKL
 [1] TRUE
 > 
 > #########################
@@ -382,4 +372,4 @@ l1_co l1_no l3_co l3_no
 > 
 > proc.time()
    user  system elapsed 
-  2.646   0.064   2.699 
+  1.795   0.162   1.966 
