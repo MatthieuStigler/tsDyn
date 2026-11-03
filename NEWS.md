@@ -1,6 +1,8 @@
 ## tsDyn 11.0.6
  * By  Matthieu Stigler (2026-08-03)
  * Fix minor issues.
+ * Fix CRAN issues: rename deprecated special arguments in structure() calls in the data files.
+ * Fix CRAN issues: make the saved output of tests/compare_tsDyn_vars.R robust to BLAS differences (MKL), contributed by Christopher Smolen.
  
 ## tsDyn 11.0.5.2
  * By  Matthieu Stigler (2024-10-29)

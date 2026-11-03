@@ -91,8 +91,8 @@ sapply(all_models, comp_teststat )
 sapply(all_models, comp_betas, tol=lowtol)
 roundAll.Equal(sapply(all_models, comp_coefs, tol = 1e-07), round=7) # 5 and 6
 sapply(all_models, comp_LL)
-sapply(models_noLR, comp_IRF)
-sapply(models_noLR, comp_IRF, ortho = FALSE)
+roundAll.Equal(sapply(models_noLR, comp_IRF), round=5) # BLAS-dependent digits (MKL)
+roundAll.Equal(sapply(models_noLR, comp_IRF, ortho = FALSE), round=5)
 sapply(all_models, comp_FEVD)
 sapply(all_models, comp_resid, tol=lowlowtol) # 5
 sapply(all_models, comp_fitted)
@@ -117,7 +117,7 @@ all.equal(coefB(vecm_Rrest_tsD),coefB(vecm_Rrest_var), check.attributes=FALSE)
 all.equal(logLik(vecm_Rrest_tsD, r=1),logLik(vecm_Rrest_var, r=1), check.attributes=FALSE)
 
 all.equal(deviance(vecm_Rrest_tsD),sum(deviance(cajorls(vecm_Rrest_var)[[1]])), check.attributes=FALSE)
-all.equal(-2*(logLik(vecm_Rrest_tsD)-logLik(vecm_l1_co_tsD)), vecm_Rrest_var@teststat)
+all.equal(-2*(logLik(vecm_Rrest_tsD)-logLik(vecm_l1_co_tsD)), vecm_Rrest_var@teststat, tolerance = lowlowtol) # 2.4e-08 with MKL
 
 #########################
 ##### VAR #####
